@@ -6,7 +6,7 @@ enum DecorationLanguage: int {
   deco_inline = 0,
   deco_css = 1,
   deco_vega = 2,
-  deco_rootjson = 3
+  deco_root_json = 3
 }
 
 table Decoration {
@@ -15,6 +15,20 @@ table Decoration {
 }
 
 ///////////////////////////////////////////////// Histogram
+
+enum ErrorMethod: byte {
+  frac_normal = 0,
+  frac_clopper_pearson = 1,
+  frac_wilson = 2,
+  frac_agresti_coull = 3,
+  frac_feldman_cousins = 4,
+  frac_jeffrey = 5,
+  frac_bayesian_uniform = 6
+}
+
+table FractionBinning {
+  error_method: ErrorMethod;
+}
 
 table IntegerBinning {
   min: long;   // assumed to be inclusive (if not, change its value!)
@@ -94,6 +108,7 @@ table SparseRegularBinning {
 }
 
 union Binning {
+  FractionBinning,
   IntegerBinning,
   RegularBinning,
   TicTacToeOverflowBinning,
@@ -103,8 +118,31 @@ union Binning {
   SparseRegularBinning
 }
 
+table Region {
+  expressions: [string];      // predicates to apply
+}
+
+table Slice {
+  expression: string;         // expression to slice
+  binning: Binning (required);
+}
+
+table Variation {
+  expressions: [string];      // assignments in this block
+}
+
+table Multiplier {
+  identifier: string (key);
+  region: Region;
+  slice: Slice;
+  variations: [Variation];
+  multiplier: [Multiplier];
+  title: string;
+  decoration: Decoration;
+}
+
 table Axis {
-  binning: Binning;
+  binning: Binning;      // note: no binning is allowed
   expression: string;
   title: string;
   decoration: Decoration;
@@ -191,27 +229,7 @@ table GenericError {
   p: double = 0.6826894921370859;    // +1 sigma
 }
 
-table Distribution {
-  content: Content (required);
-  correlation: Correlation;
-  extremes: Extreme;
-  moments: [Moment];
-  quantiles: [Quantile];
-  generic_errors: [GenericError];
-}
-
-table Profile {
-  correlation: Correlation;
-  extreme: Extreme;
-  moments: [Moment];
-  quantiles: [Quantile];
-  generic_errors: [GenericError];
-  expression: string;
-  title: string;
-  decoration: Decoration;
-}
-
-table UnbinnedStatistics {
+table DistributionStats {
   correlation: Correlation;
   extremes: [Extreme];
   moments: [Moment];
@@ -219,13 +237,26 @@ table UnbinnedStatistics {
   generic_errors: [GenericError];
 }
 
+table Distribution {
+  content: Content (required);
+  stats: DistributionStats;
+}
+
+table Profile {
+  expression: string;
+  title: string;
+  decoration: Decoration;
+}
+
 table Histogram {
   lookup: string (key);
-  title: string;
+  multipliers: [Multiplier];
   axis: [Axis] (required);
-  distribution: Distribution (required);
   profiles: [Profile];
-  unbinned_statistics: UnbinnedStatistics;
+  distribution: Distribution (required);
+  unbinned_stats: [DistributionStats];
+  profile_stats: [DistributionStats];
+  title: string;
   decoration: Decoration;
 }
 
