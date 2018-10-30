@@ -1,0 +1,163 @@
+namespace histos;
+
+table IntegerBinning {
+  min: long;   // assumed to be inclusive (if not, change its value!)
+  max: long;
+  has_underflow: bool = true;
+  has_overflow: bool = true;
+}
+
+table RealInterval {
+  low: double;
+  high: double;
+  low_inclusive: bool = true;
+  high_inclusive: bool = false;
+}
+
+enum NonRealMapping: byte {
+  missing = 0,
+  in_underflow = 1,
+  in_overflow = 2,
+  in_nanflow = 3
+}
+
+table RealOverflow {
+  has_underflow: bool = true;
+  has_overflow: bool = true;
+  has_nanflow: bool = true;
+  minf_mapping: NonRealMapping = in_underflow;
+  pinf_mapping: NonRealMapping = in_underflow;
+  nan_mapping: NonRealMapping = in_nanflow;
+}
+
+table RegularBinning {
+  num: ulong;
+  interval: RealInterval (required);
+  overflow: RealOverflow;
+  circular: bool = false;
+}
+
+table TicTacToeOverflowBinning {
+  numx: ulong;
+  numy: ulong;
+  x: RealInterval (required);
+  y: RealInterval (required);
+  overflow: RealOverflow (required);
+}
+
+// https://www.redblobgames.com/grids/hexagons
+enum HexagonalCoordinates: byte {
+  offset = 0,
+  doubled_offset = 1,
+  cube_xy = 2,
+  cube_yz = 3,
+  cube_xz = 4
+}
+
+table HexagonalBinning {
+  q: IntegerBinning (required);
+  r: IntegerBinning (required);
+  coordinates: HexagonalCoordinates = offset;
+  originx: double = 0.0;    // x coordinate of (q, r) == (0, 0)
+  originy: double = 0.0;    // y coordinate of (q, r) == (0, 0)
+}
+
+table VariableBinning {
+  intervals: [RealInterval] (required);
+  overflow: RealOverflow;
+}
+
+table CategoryBinning {
+  categories: [string] (required);
+}
+
+table SparseRegularBinning {
+  bin_width: double;
+  origin: double = 0.0;
+  nanflow: bool = true;
+}
+
+union Binning {
+  IntegerBinning,
+  RegularBinning,
+  TicTacToeOverflowBinning,
+  HexagonalBinning,
+  VariableBinning,
+  CategoryBinning,
+  SparseRegularBinning
+}
+
+table Axis {
+  binning: Binning;
+  name: string;
+}
+
+table CountInt8 {
+  count: [byte] (required);
+}
+
+table CountInt16 {
+  count: [short] (required);
+}
+
+table CountInt32 {
+  count: [int] (required);
+}
+
+table CountInt64 {
+  count: [long] (required);
+}
+
+table CountFloat32 {
+  count: [float] (required);
+}
+
+table CountFloat64 {
+  count: [double] (required);
+}
+
+union Count {
+  CountInt8,
+  CountInt16,
+  CountInt32,
+  CountInt64,
+  CountFloat32,
+  CountFloat64
+}
+
+table WeightedFloat32 {
+  sumw: [float] (required);
+  sumw2: [float] (required);
+  count: Count;   // optional; can use if different from sumw
+}
+
+table WeightedFloat64 {
+  sumw: [double] (required);
+  sumw2: [double] (required);
+  count: Count;   // optional; can use if different from sumw
+}
+
+union Distribution {
+  CountInt8,
+  CountInt16,
+  CountInt32,
+  CountInt64,
+  CountFloat32,
+  CountFloat64,
+  WeightedFloat32,
+  WeightedFloat64
+}
+
+table Hist {
+  axis: [Axis] (required);
+  distribution: Distribution (required);
+  lookup: string (key);
+}
+
+table Book {
+  hist: [Hist];
+}
+
+file_extension "hist";
+file_identifier "hist";
+root_type Book;
