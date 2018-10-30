@@ -1,5 +1,21 @@
 namespace histos.generated;
 
+///////////////////////////////////////////////// Decoration
+
+enum DecorationLanguage: int {
+  deco_inline = 0,
+  deco_css = 1,
+  deco_vega = 2,
+  deco_rootjson = 3
+}
+
+table Decoration {
+  language: DecorationLanguage;
+  specification: string;
+}
+
+///////////////////////////////////////////////// Histogram
+
 table IntegerBinning {
   min: long;   // assumed to be inclusive (if not, change its value!)
   max: long;
@@ -91,6 +107,7 @@ table Axis {
   binning: Binning;
   expression: string;
   title: string;
+  decoration: Decoration;
 }
 
 table CountInt8 {
@@ -149,11 +166,6 @@ union Content {
   WeightedFloat64
 }
 
-table MeanVariance {
-  sumwx: [double] (required);
-  sumwx2: [double] (required);
-}
-
 table Correlation {
   sumwx: [double] (required);
   sumwxy: [double] (required);   // symmetric matrix: N*(N+1) elements
@@ -181,7 +193,6 @@ table GenericError {
 
 table Distribution {
   content: Content (required);
-  mean_variance: MeanVariance;
   correlation: Correlation;
   extremes: Extreme;
   moments: [Moment];
@@ -190,7 +201,6 @@ table Distribution {
 }
 
 table Profile {
-  mean_variance: MeanVariance;
   correlation: Correlation;
   extreme: Extreme;
   moments: [Moment];
@@ -198,18 +208,31 @@ table Profile {
   generic_errors: [GenericError];
   expression: string;
   title: string;
+  decoration: Decoration;
 }
 
-table Hist {
+table UnbinnedStatistics {
+  correlation: Correlation;
+  extremes: [Extreme];
+  moments: [Moment];
+  quantiles: [Quantile];
+  generic_errors: [GenericError];
+}
+
+table Histogram {
   lookup: string (key);
   title: string;
   axis: [Axis] (required);
   distribution: Distribution (required);
   profiles: [Profile];
+  unbinned_statistics: UnbinnedStatistics;
+  decoration: Decoration;
 }
 
+///////////////////////////////////////////////// Book
+
 table Book {
-  hist: [Hist];
+  histograms: [Histogram];
 }
 
 file_extension "hist";
