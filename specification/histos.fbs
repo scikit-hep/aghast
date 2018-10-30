@@ -127,12 +127,19 @@ table Slice {
   binning: Binning (required);
 }
 
+table Systematic {
+  p: double = 0.6826894921370859;    // +1 sigma
+  category: string;                  // optional
+}
+
 table Variation {
   expressions: [string];      // assignments in this block
+  systematic: [Systematic];
 }
 
 table Multiplier {
   identifier: string (key);
+  sources: [string];          // sources for which this multiplier is valid
   region: Region;
   slice: Slice;
   variations: [Variation];
@@ -260,10 +267,18 @@ table Histogram {
   decoration: Decoration;
 }
 
+///////////////////////////////////////////////// Ntuple
+
+// table Ntuple {
+// 
+// }
+
 ///////////////////////////////////////////////// Book
 
 table Book {
+  lookup: string (key);
   histograms: [Histogram];
+  books: [Book];
 }
 
 file_extension "hist";
