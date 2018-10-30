@@ -1,4 +1,4 @@
-namespace histos;
+namespace histos.generated;
 
 table IntegerBinning {
   min: long;   // assumed to be inclusive (if not, change its value!)
@@ -89,7 +89,8 @@ union Binning {
 
 table Axis {
   binning: Binning;
-  name: string;
+  expression: string;
+  title: string;
 }
 
 table CountInt8 {
@@ -137,7 +138,7 @@ table WeightedFloat64 {
   count: Count;   // optional; can use if different from sumw
 }
 
-union Distribution {
+union Content {
   CountInt8,
   CountInt16,
   CountInt32,
@@ -148,10 +149,63 @@ union Distribution {
   WeightedFloat64
 }
 
+table MeanVariance {
+  sumwx: [double] (required);
+  sumwx2: [double] (required);
+}
+
+table Correlation {
+  sumwx: [double] (required);
+  sumwxy: [double] (required);   // symmetric matrix: N*(N+1) elements
+}
+
+table Extreme {
+  min: double;
+  max: double;
+}
+
+table Moment {
+  n: int;
+  sumwn: [double] (required);
+}
+
+table Quantile {
+  p: double;    // 0.0 <= p <= 1.0
+  value: [double] (required);
+}
+
+table GenericError {
+  error: double;
+  p: double = 0.6826894921370859;    // +1 sigma
+}
+
+table Distribution {
+  content: Content (required);
+  mean_variance: MeanVariance;
+  correlation: Correlation;
+  extremes: Extreme;
+  moments: [Moment];
+  quantiles: [Quantile];
+  generic_errors: [GenericError];
+}
+
+table Profile {
+  mean_variance: MeanVariance;
+  correlation: Correlation;
+  extreme: Extreme;
+  moments: [Moment];
+  quantiles: [Quantile];
+  generic_errors: [GenericError];
+  expression: string;
+  title: string;
+}
+
 table Hist {
+  lookup: string (key);
+  title: string;
   axis: [Axis] (required);
   distribution: Distribution (required);
-  lookup: string (key);
+  profiles: [Profile];
 }
 
 table Book {
