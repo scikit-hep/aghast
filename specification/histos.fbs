@@ -315,115 +315,53 @@ table Histogram {
 
 ///////////////////////////////////////////////// Ntuple
 
-table PageInt8 {
-  data: [byte] (required);
-}
-
-table PagesInt8 {
-  data: [PageInt8] (required);
-}
-
-table PageUInt8 {
+table Page {
   data: [ubyte] (required);
 }
 
-table PagesUInt8 {
-  data: [PageUInt8] (required);
-}
-
-table PageInt16 {
-  data: [short] (required);
-}
-
-table PagesInt16 {
-  data: [PageInt16] (required);
-}
-
-table PageUInt16 {
-  data: [ushort] (required);
-}
-
-table PagesUInt16 {
-  data: [PageUInt16] (required);
-}
-
-table PageInt32 {
-  data: [int] (required);
-}
-
-table PagesInt32 {
-  data: [PageInt32] (required);
-}
-
-table PageUInt32 {
-  data: [uint] (required);
-}
-
-table PagesUInt32 {
-  data: [PageUInt32] (required);
-}
-
-table PageInt64 {
-  data: [long] (required);
-}
-
-table PagesInt64 {
-  data: [PageInt64] (required);
-}
-
-table PageUInt64 {
-  data: [ulong] (required);
-}
-
-table PagesUInt64 {
-  data: [PageUInt64] (required);
-}
-
-table PageFloat32 {
-  data: [float] (required);
-}
-
-table PagesFloat32 {
-  data: [PageFloat32] (required);
-}
-
-table PageFloat64 {
-  data: [double] (required);
-}
-
-table PagesFloat64 {
-  data: [PageFloat64] (required);
-}
-
-union Pages {
-  PagesInt8,
-  PagesUInt8,
-  PagesInt16,
-  PagesUInt16,
-  PagesInt32,
-  PagesUInt32,
-  PagesInt64,
-  PagesUInt64,
-  PagesFloat32,
-  PagesFloat64
-}
-
-table Column {
-  data: Pages (required);
-  numentries: ulong;
+table ColumnChunk {
+  pages: [Page] (required);
+  page_offsets: [ulong] (required);
   page_extremes: [Extreme];
 }
 
 table Chunk {
-  columns: [Column] (required);
-  numentries: ulong;
+  columns: [ColumnChunk] (required);
+  metadata: Metadata;
+}
+
+enum DType: byte {
+  dtype_int8 = 0,
+  dtype_uint8 = 1,
+  dtype_int16 = 2,
+  dtype_uint16 = 3,
+  dtype_int32 = 4,
+  dtype_uint32 = 5,
+  dtype_int64 = 6,
+  dtype_uint64 = 7,
+  dtype_float32 = 8,
+  dtype_float64 = 9
+}
+
+enum Filter: int {
+  filter_none = 0,
+  // compressions and such
+}
+
+table Column {
+  identifier: string (key);
+  dtype: DType = dtype_float64;
+  filters: [Filter];
+  title: string;
+  metadata: Metadata;
+  decoration: Decoration;
 }
 
 table Ntuple {
   identifier: string (key);
-  numentries: ulong;
-  columns: [string] (required);
+  columns: [Column] (required);
   chunks: [Chunk] (required);
+  chunk_offsets: [ulong] (required);
   unbinned_stats: [DistributionStats];
   functions: [Function];
   title: string;
