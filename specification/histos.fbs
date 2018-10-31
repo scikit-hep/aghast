@@ -70,10 +70,42 @@ enum DType: byte {
   dtype_float32 = 8,
   dtype_float64 = 9
 }
-
+  
 enum Filter: int {
   filter_none = 0,
   // compressions and such
+}
+
+table RawInlineBuffer {
+  buffer: [ubyte] (required);
+}
+
+table RawExternalBuffer {
+  pointer: ulong;
+  numbytes: ulong;
+}
+
+union RawBuffer {
+  RawInlineBuffer,
+  RawExternalBuffer
+}
+
+table InlineBuffer {
+  buffer: [ubyte] (required);
+  dtype: DType = dtype_float64;
+  filters: [Filter];
+}
+
+table ExternalBuffer {
+  pointer: ulong;
+  numbytes: ulong;
+  dtype: DType = dtype_float64;
+  filters: [Filter];
+}
+
+union Buffer {
+  InlineBuffer,
+  ExternalBuffer
 }
 
 enum FractionalErrorMethod: byte {
@@ -216,66 +248,42 @@ table Axis {
   decoration: Decoration;
 }
 
-table InlineCounts {
-  buffer: [ubyte] (required);
-  dtype: DType = dtype_int64;
+table Counts {
+  counts: Buffer (required);
 }
 
-
-table ExternalCounts {
-  pointer: ulong;
-  numbytes: ulong;
-  dtype: DType = dtype_int64;
-}
-
-union Count {
-  InlineCounts,
-  ExternalCounts
-}
-
-table InlineWeights {
-  sumw_buffer: [ubyte] (required);
-  sumw_dtype: DType = dtype_float64;
-  sumw2_buffer: [ubyte] (required);
-  sumw2_dtype: DType = dtype_float64;
-  count: Count;   // optional; can use if different from sumw
-}
-
-table ExternalWeights {
-  sumw_pointer: ulong;
-  sumw_numbytes: ulong;
-  sumw_dtype: DType = dtype_float64;
-  sumw2_pointer: ulong;
-  sumw2_numbytes: ulong;
-  sumw2_dtype: DType = dtype_float64;
-  count: Count;   // optional; can use if different from sumw
+table Weights {
+  sumw: Buffer (required);
+  sumw2: Buffer (required);
+  counts: Counts;
 }
 
 union Content {
-  InlineCounts,
-  ExternalCounts,
-  InlineWeights,
-  ExternalWeights
+  Counts,
+  Weights
 }
 
 table Correlation {
-  sumwx: [double] (required);
-  sumwxy: [double] (required);   // symmetric matrix: N*(N+1) elements
+  sumwx: Buffer (required);
+  sumwxy: Buffer (required);   // symmetric matrix: N*(N+1) elements
 }
 
 table Extreme {
   min: double;
   max: double;
+  excludes_minf: bool = false;
+  excludes_pinf: bool = false;
+  excludes_nan: bool = true;
 }
 
 table Moment {
   n: int;
-  sumwn: [double] (required);
+  sumwn: Buffer (required);
 }
 
 table Quantile {
   p: double;    // 0.0 <= p <= 1.0
-  value: [double] (required);
+  value: Buffer (required);
 }
 
 table GenericError {
@@ -320,7 +328,7 @@ table Histogram {
 ///////////////////////////////////////////////// Ntuple
 
 table Page {
-  data: [ubyte] (required);
+  buffer: RawBuffer (required);
 }
 
 table ColumnChunk {
