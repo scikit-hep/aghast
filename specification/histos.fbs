@@ -77,6 +77,11 @@ enum Endianness: byte {
   big_endian = 1,
 }
 
+enum DimensionOrder: byte {
+  c_order = 0,
+  fortran_order = 1
+}
+
 enum Filter: int {
   filter_none = 0,
   filter_gzip = 1,
@@ -115,6 +120,7 @@ table InlineBuffer {
   postfilter_slice: Slice;
   dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
+  dimension_order: DimensionOrder = c_order;
 }
 
 table ExternalBuffer {
@@ -124,6 +130,7 @@ table ExternalBuffer {
   postfilter_slice: Slice;
   dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
+  dimension_order: DimensionOrder = c_order;
   location: string;
 }
 
@@ -370,6 +377,7 @@ table Column {
   identifier: string (key);
   dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
+  dimension_order: DimensionOrder = c_order;
   filters: [Filter];
   title: string;
   metadata: Metadata;
