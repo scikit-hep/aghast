@@ -100,6 +100,7 @@ table RawExternalBuffer {
   numbytes: ulong;
   filters: [Filter];
   postfilter_slice: Slice;
+  location: string;
 }
 
 union RawBuffer {
@@ -109,19 +110,20 @@ union RawBuffer {
 
 table InlineBuffer {
   buffer: [ubyte] (required);
-  dtype: DType = dtype_float64;
-  endianness: Endianness = little_endian;
   filters: [Filter];
   postfilter_slice: Slice;
+  dtype: DType = dtype_float64;
+  endianness: Endianness = little_endian;
 }
 
 table ExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
-  dtype: DType = dtype_float64;
-  endianness: Endianness = little_endian;
   filters: [Filter];
   postfilter_slice: Slice;
+  dtype: DType = dtype_float64;
+  endianness: Endianness = little_endian;
+  location: string;
 }
 
 union Buffer {
