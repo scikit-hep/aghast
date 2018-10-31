@@ -96,6 +96,14 @@ struct Slice {
   stop: ulong;
 }
 
+enum ExternalType: int {
+  external_memory = 0,
+  external_sharedmemory = 1,
+  external_memmap = 2,
+  external_file = 3,
+  external_url = 4
+}
+
 table RawInlineBuffer {
   buffer: [ubyte] (required);
   filters: [Filter];
@@ -105,6 +113,7 @@ table RawInlineBuffer {
 table RawExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
+  external_type: ExternalType = external_memory;
   filters: [Filter];
   postfilter_slice: Slice;
   location: string;
@@ -127,6 +136,7 @@ table InlineBuffer {
 table ExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
+  external_type: ExternalType = external_memory;
   filters: [Filter];
   postfilter_slice: Slice;
   dtype: DType = dtype_none;
