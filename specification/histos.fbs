@@ -70,7 +70,12 @@ enum DType: byte {
   dtype_float32 = 8,
   dtype_float64 = 9
 }
-  
+
+enum Endianness: byte {
+  little_endian = 0,
+  big_endian = 1,
+}
+
 enum Filter: int {
   filter_none = 0,
   filter_gzip = 1,
@@ -105,6 +110,7 @@ union RawBuffer {
 table InlineBuffer {
   buffer: [ubyte] (required);
   dtype: DType = dtype_float64;
+  endianness: Endianness = little_endian;
   filters: [Filter];
   postfilter_slice: Slice;
 }
@@ -113,6 +119,7 @@ table ExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
   dtype: DType = dtype_float64;
+  endianness: Endianness = little_endian;
   filters: [Filter];
   postfilter_slice: Slice;
 }
@@ -359,6 +366,7 @@ table Chunk {
 table Column {
   identifier: string (key);
   dtype: DType = dtype_float64;
+  endianness: Endianness = little_endian;
   filters: [Filter];
   title: string;
   metadata: Metadata;
