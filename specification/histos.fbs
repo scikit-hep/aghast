@@ -58,7 +58,25 @@ table Function {
 
 ///////////////////////////////////////////////// Histogram
 
-enum ErrorMethod: byte {
+enum DType: byte {
+  dtype_int8 = 0,
+  dtype_uint8 = 1,
+  dtype_int16 = 2,
+  dtype_uint16 = 3,
+  dtype_int32 = 4,
+  dtype_uint32 = 5,
+  dtype_int64 = 6,
+  dtype_uint64 = 7,
+  dtype_float32 = 8,
+  dtype_float64 = 9
+}
+
+enum Filter: int {
+  filter_none = 0,
+  // compressions and such
+}
+
+enum FractionalErrorMethod: byte {
   frac_normal = 0,
   frac_clopper_pearson = 1,
   frac_wilson = 2,
@@ -69,7 +87,7 @@ enum ErrorMethod: byte {
 }
 
 table FractionBinning {
-  error_method: ErrorMethod;
+  error_method: FractionalErrorMethod;
 }
 
 table IntegerBinning {
@@ -198,60 +216,46 @@ table Axis {
   decoration: Decoration;
 }
 
-table CountUInt8 {
-  count: [ubyte] (required);
+table InlineCounts {
+  buffer: [ubyte] (required);
+  dtype: DType = dtype_int64;
 }
 
-table CountUInt16 {
-  count: [ushort] (required);
-}
 
-table CountUInt32 {
-  count: [uint] (required);
-}
-
-table CountUInt64 {
-  count: [ulong] (required);
-}
-
-table CountFloat32 {
-  count: [float] (required);
-}
-
-table CountFloat64 {
-  count: [double] (required);
+table ExternalCounts {
+  pointer: ulong;
+  numbytes: ulong;
+  dtype: DType = dtype_int64;
 }
 
 union Count {
-  CountUInt8,
-  CountUInt16,
-  CountUInt32,
-  CountUInt64,
-  CountFloat32,
-  CountFloat64
+  InlineCounts,
+  ExternalCounts
 }
 
-table WeightedFloat32 {
-  sumw: [float] (required);
-  sumw2: [float] (required);
+table InlineWeights {
+  sumw_buffer: [ubyte] (required);
+  sumw_dtype: DType = dtype_float64;
+  sumw2_buffer: [ubyte] (required);
+  sumw2_dtype: DType = dtype_float64;
   count: Count;   // optional; can use if different from sumw
 }
 
-table WeightedFloat64 {
-  sumw: [double] (required);
-  sumw2: [double] (required);
+table ExternalWeights {
+  sumw_pointer: ulong;
+  sumw_numbytes: ulong;
+  sumw_dtype: DType = dtype_float64;
+  sumw2_pointer: ulong;
+  sumw2_numbytes: ulong;
+  sumw2_dtype: DType = dtype_float64;
   count: Count;   // optional; can use if different from sumw
 }
 
 union Content {
-  CountUInt8,
-  CountUInt16,
-  CountUInt32,
-  CountUInt64,
-  CountFloat32,
-  CountFloat64,
-  WeightedFloat32,
-  WeightedFloat64
+  InlineCounts,
+  ExternalCounts,
+  InlineWeights,
+  ExternalWeights
 }
 
 table Correlation {
@@ -328,24 +332,6 @@ table ColumnChunk {
 table Chunk {
   columns: [ColumnChunk] (required);
   metadata: Metadata;
-}
-
-enum DType: byte {
-  dtype_int8 = 0,
-  dtype_uint8 = 1,
-  dtype_int16 = 2,
-  dtype_uint16 = 3,
-  dtype_int32 = 4,
-  dtype_uint32 = 5,
-  dtype_int64 = 6,
-  dtype_uint64 = 7,
-  dtype_float32 = 8,
-  dtype_float64 = 9
-}
-
-enum Filter: int {
-  filter_none = 0,
-  // compressions and such
 }
 
 table Column {
