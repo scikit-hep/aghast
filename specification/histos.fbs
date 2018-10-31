@@ -2,7 +2,7 @@ namespace histos.generated;
 
 ///////////////////////////////////////////////// Decoration
 
-enum DecorationLanguage: int {
+enum DecorationLanguage: uint {
   deco_inline = 0,
   deco_css = 1,
   deco_vega = 2,
@@ -16,7 +16,7 @@ table Decoration {
 
 ///////////////////////////////////////////////// Metadata
 
-enum MetadataLanguage: int {
+enum MetadataLanguage: uint {
   meta_inline = 0,
   meta_json = 1,
 }
@@ -173,20 +173,20 @@ table Axis {
   decoration: Decoration;
 }
 
-table CountInt8 {
-  count: [byte] (required);
+table CountUInt8 {
+  count: [ubyte] (required);
 }
 
-table CountInt16 {
-  count: [short] (required);
+table CountUInt16 {
+  count: [ushort] (required);
 }
 
-table CountInt32 {
-  count: [int] (required);
+table CountUInt32 {
+  count: [uint] (required);
 }
 
-table CountInt64 {
-  count: [long] (required);
+table CountUInt64 {
+  count: [ulong] (required);
 }
 
 table CountFloat32 {
@@ -198,10 +198,10 @@ table CountFloat64 {
 }
 
 union Count {
-  CountInt8,
-  CountInt16,
-  CountInt32,
-  CountInt64,
+  CountUInt8,
+  CountUInt16,
+  CountUInt32,
+  CountUInt64,
   CountFloat32,
   CountFloat64
 }
@@ -219,10 +219,10 @@ table WeightedFloat64 {
 }
 
 union Content {
-  CountInt8,
-  CountInt16,
-  CountInt32,
-  CountInt64,
+  CountUInt8,
+  CountUInt16,
+  CountUInt32,
+  CountUInt64,
   CountFloat32,
   CountFloat64,
   WeightedFloat32,
@@ -384,15 +384,18 @@ union Pages {
 
 table Column {
   data: Pages (required);
+  numentries: uint64 (required);
   page_extremes: [Extreme];
 }
 
 table Chunk {
   columns: [Column] (required);
+  numentries: uint64 (required);
 }
 
 table Ntuple {
   identifier: string (key);
+  numentries: uint64 (required);
   columns: [string] (required);
   chunks: [Chunk] (required);
   unbinned_stats: [DistributionStats];
