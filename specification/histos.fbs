@@ -59,16 +59,17 @@ table Function {
 ///////////////////////////////////////////////// Histogram
 
 enum DType: byte {
-  dtype_int8 = 0,
-  dtype_uint8 = 1,
-  dtype_int16 = 2,
-  dtype_uint16 = 3,
-  dtype_int32 = 4,
-  dtype_uint32 = 5,
-  dtype_int64 = 6,
-  dtype_uint64 = 7,
-  dtype_float32 = 8,
-  dtype_float64 = 9
+  dtype_none = 0,
+  dtype_int8 = 1,
+  dtype_uint8 = 2,
+  dtype_int16 = 3,
+  dtype_uint16 = 4,
+  dtype_int32 = 5,
+  dtype_uint32 = 6,
+  dtype_int64 = 7,
+  dtype_uint64 = 8,
+  dtype_float32 = 9,
+  dtype_float64 = 10
 }
 
 enum Endianness: byte {
@@ -112,7 +113,7 @@ table InlineBuffer {
   buffer: [ubyte] (required);
   filters: [Filter];
   postfilter_slice: Slice;
-  dtype: DType = dtype_float64;
+  dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
 }
 
@@ -121,7 +122,7 @@ table ExternalBuffer {
   numbytes: ulong;
   filters: [Filter];
   postfilter_slice: Slice;
-  dtype: DType = dtype_float64;
+  dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
   location: string;
 }
@@ -367,7 +368,7 @@ table Chunk {
 
 table Column {
   identifier: string (key);
-  dtype: DType = dtype_float64;
+  dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
   filters: [Filter];
   title: string;
