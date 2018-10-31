@@ -1,35 +1,60 @@
 namespace histos.generated;
 
+///////////////////////////////////////////////// Metadata
+
+enum MetadataLanguage: uint {
+  meta_unspecified = 0,
+  meta_json = 1,
+}
+
+table Metadata {
+  language: MetadataLanguage = meta_unspecified;
+  data: string (required);
+}
+
 ///////////////////////////////////////////////// Decoration
 
 enum DecorationLanguage: uint {
-  deco_inline = 0,
+  deco_unspecified = 0,
   deco_css = 1,
   deco_vega = 2,
   deco_root_json = 3
 }
 
 table Decoration {
-  language: DecorationLanguage;
-  data: string;
-}
-
-///////////////////////////////////////////////// Metadata
-
-enum MetadataLanguage: uint {
-  meta_inline = 0,
-  meta_json = 1,
-}
-
-table Metadata {
-  language: MetadataLanguage;
-  data: string;
+  language: DecorationLanguage = deco_unspecified;
+  data: string (required);
 }
 
 ///////////////////////////////////////////////// Functions
 
+table Parameter {
+  identifier: string (required);
+  value: double;
+}
 
+table ParameterizedFunctionData {
+  expression: string (required);
+  parameters: [Parameter] (required);
+  contours: [double];
+}
 
+table EvaluatedFunctionData {
+  values: [double] (required);
+  derivatives: [double];
+}
+
+union FunctionData {
+  ParameterizedFunctionData,
+  EvaluatedFunctionData
+}
+
+table Function {
+  identifier: string (key);
+  title: string;
+  metadata: Metadata;
+  decoration: Decoration;
+}
 
 ///////////////////////////////////////////////// Histogram
 
@@ -156,10 +181,10 @@ table Variation {
 
 table Multiplier {
   identifier: string (key);
+  multiplier: [Multiplier];
   region: Region;
   slice: Slice;
   variations: [Variation];
-  multiplier: [Multiplier];
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -282,6 +307,7 @@ table Histogram {
   distribution: Distribution (required);
   unbinned_stats: [DistributionStats];
   profile_stats: [DistributionStats];
+  functions: [Function];
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -384,21 +410,22 @@ union Pages {
 
 table Column {
   data: Pages (required);
-  numentries: uint64 (required);
+  numentries: ulong;
   page_extremes: [Extreme];
 }
 
 table Chunk {
   columns: [Column] (required);
-  numentries: uint64 (required);
+  numentries: ulong;
 }
 
 table Ntuple {
   identifier: string (key);
-  numentries: uint64 (required);
+  numentries: ulong;
   columns: [string] (required);
   chunks: [Chunk] (required);
   unbinned_stats: [DistributionStats];
+  functions: [Function];
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -408,9 +435,12 @@ table Ntuple {
 
 table Book {
   identifer: string (key);
+  books: [Book];
+  functions: [Function];
   histograms: [Histogram];
   ntuples: [Ntuple];
-  books: [Book];
+  title: string;
+  metadata: Metadata;
 }
 
 file_extension "hist";
