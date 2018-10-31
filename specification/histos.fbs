@@ -11,12 +11,24 @@ enum DecorationLanguage: int {
 
 table Decoration {
   language: DecorationLanguage;
-  specification: string;
+  data: string;
 }
 
 ///////////////////////////////////////////////// Metadata
 
-// ...
+enum MetadataLanguage: int {
+  meta_inline = 0,
+  meta_json = 1,
+}
+
+table Metadata {
+  language: MetadataLanguage;
+  data: string;
+}
+
+///////////////////////////////////////////////// Functions
+
+
 
 
 ///////////////////////////////////////////////// Histogram
@@ -144,12 +156,12 @@ table Variation {
 
 table Multiplier {
   identifier: string (key);
-  sources: [string];          // sources for which this multiplier is valid
   region: Region;
   slice: Slice;
   variations: [Variation];
   multiplier: [Multiplier];
   title: string;
+  metadata: Metadata;
   decoration: Decoration;
 }
 
@@ -157,6 +169,7 @@ table Axis {
   binning: Binning;      // note: no binning is allowed
   expression: string;
   title: string;
+  metadata: Metadata;
   decoration: Decoration;
 }
 
@@ -257,11 +270,12 @@ table Distribution {
 table Profile {
   expression: string;
   title: string;
+  metadata: Metadata;
   decoration: Decoration;
 }
 
 table Histogram {
-  lookup: string (key);
+  identifier: string (key);
   multipliers: [Multiplier];
   axis: [Axis] (required);
   profiles: [Profile];
@@ -269,20 +283,130 @@ table Histogram {
   unbinned_stats: [DistributionStats];
   profile_stats: [DistributionStats];
   title: string;
+  metadata: Metadata;
   decoration: Decoration;
 }
 
 ///////////////////////////////////////////////// Ntuple
 
-// table Ntuple {
-// 
-// }
+table PageInt8 {
+  data: [byte] (required);
+}
+
+table PagesInt8 {
+  data: [PageInt8] (required);
+}
+
+table PageUInt8 {
+  data: [ubyte] (required);
+}
+
+table PagesUInt8 {
+  data: [PageUInt8] (required);
+}
+
+table PageInt16 {
+  data: [short] (required);
+}
+
+table PagesInt16 {
+  data: [PageInt16] (required);
+}
+
+table PageUInt16 {
+  data: [ushort] (required);
+}
+
+table PagesUInt16 {
+  data: [PageUInt16] (required);
+}
+
+table PageInt32 {
+  data: [int] (required);
+}
+
+table PagesInt32 {
+  data: [PageInt32] (required);
+}
+
+table PageUInt32 {
+  data: [uint] (required);
+}
+
+table PagesUInt32 {
+  data: [PageUInt32] (required);
+}
+
+table PageInt64 {
+  data: [long] (required);
+}
+
+table PagesInt64 {
+  data: [PageInt64] (required);
+}
+
+table PageUInt64 {
+  data: [ulong] (required);
+}
+
+table PagesUInt64 {
+  data: [PageUInt64] (required);
+}
+
+table PageFloat32 {
+  data: [float] (required);
+}
+
+table PagesFloat32 {
+  data: [PageFloat32] (required);
+}
+
+table PageFloat64 {
+  data: [double] (required);
+}
+
+table PagesFloat64 {
+  data: [PageFloat64] (required);
+}
+
+union Pages {
+  PagesInt8,
+  PagesUInt8,
+  PagesInt16,
+  PagesUInt16,
+  PagesInt32,
+  PagesUInt32,
+  PagesInt64,
+  PagesUInt64,
+  PagesFloat32,
+  PagesFloat64
+}
+
+table Column {
+  data: Pages (required);
+  page_extremes: [Extreme];
+}
+
+table Chunk {
+  columns: [Column] (required);
+}
+
+table Ntuple {
+  identifier: string (key);
+  columns: [string] (required);
+  chunks: [Chunk] (required);
+  unbinned_stats: [DistributionStats];
+  title: string;
+  metadata: Metadata;
+  decoration: Decoration;
+}
 
 ///////////////////////////////////////////////// Book
 
 table Book {
-  lookup: string (key);
+  identifer: string (key);
   histograms: [Histogram];
+  ntuples: [Ntuple];
   books: [Book];
 }
 
