@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 
 import flatbuffers
-import histos_generated
+import histos.histos_generated
+import histos.histos_generated.Book
 
 class Book(object):
-    def tobuffer(self):
-        builder = flatbuffers.Builder()
-        book = self._toflatbuffers()
+    def tobuffer(self, initialSize=1024):
+        builder = flatbuffers.Builder(initialSize)
+        book = self._toflatbuffers(builder)
         builder.Finish(book)
         return builder.Output()
 
     def _toflatbuffers(self, builder):
-        histos_generated.Book.BookStart(builder)
-        histos_generated.Book.BookAddIdentifier(builder, self._identifier)
+        identifier = builder.CreateString(self._identifier)
         if self._title is not None:
-            histos_generated.Book.BookAddTitle(builder, self._title)
-        return histos_generated.Book.BookEnd(builder)
+            title = builder.CreateString(self._title)
+        histos.histos_generated.Book.BookStart(builder)
+        histos.histos_generated.Book.BookAddIdentifer(builder, identifier)
+        if self._title is not None:
+            histos.histos_generated.Book.BookAddTitle(builder, title)
+        return histos.histos_generated.Book.BookEnd(builder)
 
     def __init__(self, identifier, title=None):
         self.identifier = identifier
