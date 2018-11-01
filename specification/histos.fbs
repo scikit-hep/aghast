@@ -253,12 +253,17 @@ union Binning {
 }
 
 table Region {
-  expressions: [string];      // predicates to apply
+  expressions: [string] (required);  // predicates to apply
 }
 
 table BinnedRegion {
-  expression: string;         // expression to slice
+  expression: string (required);     // expression to slice
   binning: Binning (required);
+}
+
+table Assignment {
+  identifier: string (key);
+  expression: string (required);
 }
 
 table Systematic {
@@ -267,16 +272,16 @@ table Systematic {
 }
 
 table Variation {
-  expressions: [string];      // assignments in this block
+  assignments: [Assignment] (required);
   systematic: [Systematic];
 }
 
 table Multiplier {
   identifier: string (key);
-  multiplier: [Multiplier];
-  region: Region;
-  binned_region: BinnedRegion;
-  variations: [Variation];
+  multiplier: [Multiplier];          // nested ANDs
+  regions: [Region];                 // list of ORs of (overlapping?) regions
+  binned_regions: [BinnedRegion];    // list of ORs of exclusive, binned regions
+  variations: [Variation];           // list of ORs with assignments
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -411,6 +416,7 @@ table Ntuple {
 
 table Book {
   identifer: string (key);
+  multipliers: [Multiplier];
   books: [Book];
   functions: [Function];
   histograms: [Histogram];
