@@ -415,7 +415,7 @@ table Ntuple {
 ///////////////////////////////////////////////// Book
 
 table Book {
-  identifer: string (key);
+  identifier: string (key);
   multipliers: [Multiplier];
   books: [Book];
   functions: [Function];
