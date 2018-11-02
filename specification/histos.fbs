@@ -22,8 +22,8 @@ enum DecorationLanguage: uint {
 }
 
 table Decoration {
-  language: DecorationLanguage = deco_unspecified;
   data: string (required);
+  language: DecorationLanguage = deco_unspecified;
 }
 
 ///////////////////////////////////////////////// Functions

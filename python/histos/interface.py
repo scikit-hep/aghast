@@ -127,7 +127,7 @@ class Metadata(Histos):
 
     @data.setter
     def data(self, value):
-        self._data = string("Metadata.data", value)
+        self._data = string("Metadata.data", required("Metadata.data", value))
 
     @property
     def language(self):
@@ -135,21 +135,35 @@ class Metadata(Histos):
 
     @language.setter
     def language(self, value):
-        self._language = enum("Metadata.language", value, [self.unspecified, self.json])
+        self._language = enum("Metadata.language", required("Metadata.language", value), [self.unspecified, self.json])
 
 ################################################# Decoration
 
 class Decoration(Histos):
-    def __init__(self, x):
-        self.x = x
+    unspecified = Enum("unspecified", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
+    css = Enum("css", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    root_json = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+
+    def __init__(self, data, language=unspecified):
+        self.data = data
+        self.language = language
 
     @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
+    def data(self):
+        return _get(self, "data", self._flatbuffers.Data)
 
-    @x.setter
-    def x(self, value):
-        self._x = string("Decoration.x", value)
+    @data.setter
+    def data(self, value):
+        self._data = string("Decoration.data", required("Decoration.data", value))
+
+    @property
+    def language(self):
+        return _get(self, "language", self._flatbuffers.Language)
+
+    @language.setter
+    def language(self, value):
+        self._language = enum("Decoration.language", required("Decoration.language", value), [self.unspecified, self.css, self.vega, self.root_json])
 
 ################################################# Object
 
@@ -160,16 +174,25 @@ class Object(Histos):
 ################################################# Parameter
 
 class Parameter(Histos):
-    def __init__(self, x):
-        self.x = x
+    def __init__(self, identifier, value):
+        self.identifier = identifier
+        self.value = value
 
     @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
+    def identifier(self):
+        return _get(self, "identifier", self._flatbuffers.Identifier)
 
-    @x.setter
-    def x(self, value):
-        self._x = string("Parameter.x", value)
+    @identifier.setter
+    def identifier(self, value):
+        self._identifier = string("Parameter.identifier", required("Parameter.identifier", value))
+
+    @property
+    def value(self):
+        return _get(self, "value", self._flatbuffers.Value)
+
+    @value.setter
+    def value(self, value):
+        self._value = number("Parameter.value", required("Parameter.value", value))
 
 ################################################# Function
 
