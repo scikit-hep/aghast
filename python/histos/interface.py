@@ -5,12 +5,137 @@ import struct
 import numpy
 import flatbuffers
 
-import histos.histos_generated
+import histos.histos_generated.Assignment
+import histos.histos_generated.Axis
+import histos.histos_generated.BinnedRegion
+import histos.histos_generated.Binning
+import histos.histos_generated.Buffer
+import histos.histos_generated.CategoryBinning
+import histos.histos_generated.Chunk
 import histos.histos_generated.Collection
+import histos.histos_generated.ColumnChunk
+import histos.histos_generated.Column
+import histos.histos_generated.Content
+import histos.histos_generated.Correlation
+import histos.histos_generated.Counts
+import histos.histos_generated.DecorationLanguage
+import histos.histos_generated.Decoration
+import histos.histos_generated.DimensionOrder
+import histos.histos_generated.Distribution
+import histos.histos_generated.DistributionStats
+import histos.histos_generated.DType
+import histos.histos_generated.Endianness
+import histos.histos_generated.EvaluatedFunction
+import histos.histos_generated.ExternalBuffer
+import histos.histos_generated.ExternalType
+import histos.histos_generated.Extreme
+import histos.histos_generated.Filter
+import histos.histos_generated.FractionalErrorMethod
+import histos.histos_generated.FractionBinning
+import histos.histos_generated.FunctionData
+import histos.histos_generated.Function
+import histos.histos_generated.GenericErrors
+import histos.histos_generated.HexagonalBinning
+import histos.histos_generated.HexagonalCoordinates
+import histos.histos_generated.Histogram
+import histos.histos_generated.InlineBuffer
+import histos.histos_generated.IntegerBinning
+import histos.histos_generated.MetadataLanguage
+import histos.histos_generated.Metadata
+import histos.histos_generated.Moment
+import histos.histos_generated.NonRealMapping
+import histos.histos_generated.Ntuple
+import histos.histos_generated.ObjectData
+import histos.histos_generated.Object
+import histos.histos_generated.Page
+import histos.histos_generated.ParameterizedFunction
+import histos.histos_generated.Parameter
+import histos.histos_generated.Profile
+import histos.histos_generated.Quantile
+import histos.histos_generated.RawBuffer
+import histos.histos_generated.RawExternalBuffer
+import histos.histos_generated.RawInlineBuffer
+import histos.histos_generated.RealInterval
+import histos.histos_generated.RealOverflow
+import histos.histos_generated.Region
+import histos.histos_generated.RegularBinning
+import histos.histos_generated.Slice
+import histos.histos_generated.SparseRegularBinning
+import histos.histos_generated.Systematic
+import histos.histos_generated.TicTacToeOverflowBinning
+import histos.histos_generated.VariableBinning
+import histos.histos_generated.Variation
+import histos.histos_generated.Weights
 
-import histos.checktype
+from histos.checktype import *
 
+def _get(obj, field, getter):
+    field = "_" + field
+    if not hasattr(obj, field):
+        setattr(obj, field, getter())
+    return getattr(obj, field)
+
+class Histos(object):
+    def _valid(self):
+        pass
+
+    @property
+    def isvalid(self):
+        try:
+            self._valid()
+        except ValueError:
+            return False
+        else:
+            return True
+
+    def __repr__(self):
+        return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
+
+class Enum(object):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def __repr__(self):
+        return repr(self.name)
+
+    def __str__(self):
+        return str(self.name)
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __eq__(self, other):
+        return self is other or (isinstance(other, Enum) and self.name == other.name)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
 ################################################# Metadata
+
+class Metadata(Histos):
+    unspecified = Enum("unspecified", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
+    json = Enum("json", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_json)
+
+    def __init__(self, data, language=unspecified):
+        self.data = data
+        self.language = language
+
+    @property
+    def data(self):
+        return _get(self, "data", self._flatbuffers.Data)
+
+    @data.setter
+    def data(self, value):
+        self._data = string("Metadata.data", value)
+
+    @property
+    def language(self):
+        return _get(self, "language", self._flatbuffers.Language)
+
+    @language.setter
+    def language(self, value):
+        self._language = enum("Metadata.language", value, [self.unspecified, self.json])
 
 ################################################# Decoration
 
@@ -104,7 +229,7 @@ import histos.checktype
 
 ################################################# Collection
 
-class Collection(object):
+class Collection(Histos):
     def tobuffer(self, internalize=False):
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, internalize, None))
@@ -176,26 +301,19 @@ class Collection(object):
     
     @property
     def identifier(self):
-        if not hasattr(self, "_identifier"):
-            self._identifier = self._flatbuffers.Identifier()
-        return self._identifier
+        return _get(self, "identifier", self._flatbuffers.Identifier)
 
     @identifier.setter
     def identifier(self, value):
-        self._identifier = histos.checktype.string("Collection.identifier", value)
+        self._identifier = string("Collection.identifier", value)
 
     @property
     def title(self):
-        if not hasattr(self, "_title"):
-            self._title = self._flatbuffers.Title()
-        return self._title
+        return _get(self, "title", self._flatbuffers.Title)
 
     @title.setter
     def title(self, value):
-        self._title = histos.checktype.string("Collection.title", value)
-
-    def _valid(self):
-        pass
+        self._title = string("Collection.title", value)
 
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))

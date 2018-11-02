@@ -8,8 +8,8 @@ enum MetadataLanguage: uint {
 }
 
 table Metadata {
-  language: MetadataLanguage = meta_unspecified;
   data: string (required);
+  language: MetadataLanguage = meta_unspecified;
 }
 
 ///////////////////////////////////////////////// Decoration
