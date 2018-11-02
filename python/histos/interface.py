@@ -139,93 +139,593 @@ class Metadata(Histos):
 
 ################################################# Decoration
 
+class Decoration(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Decoration.x", value)
+
 ################################################# Object
+
+class Object(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# Parameter
 
+class Parameter(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Parameter.x", value)
+
 ################################################# Function
+
+class Function(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# ParameterizedFunction
 
+class ParameterizedFunction(Function):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("ParameterizedFunction.x", value)
+
 ################################################# EvaluatedFunction
+
+class EvaluatedFunction(Function):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("EvaluatedFunction.x", value)
 
 ################################################# Buffer
 
+class Buffer(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
 ################################################# RawInlineBuffer
+
+class RawInlineBuffer(Buffer):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("RawInlineBuffer.x", value)
 
 ################################################# RawExternalBuffer
 
+class RawExternalBuffer(Buffer):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("RawExternalBuffer.x", value)
+
 ################################################# InlineBuffer
+
+class InlineBuffer(RawInlineBuffer):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("InlineBuffer.x", value)
 
 ################################################# ExternalBuffer
 
+class ExternalBuffer(RawExternalBuffer):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("ExternalBuffer.x", value)
+
 ################################################# Binning
+
+class Binning(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# FractionalBinning
 
+class FractionalBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("FractionalBinning.x", value)
+
 ################################################# IntegerBinning
+
+class IntegerBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("IntegerBinning.x", value)
 
 ################################################# RealInterval
 
+class RealInterval(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("RealInterval.x", value)
+
 ################################################# RealOverflow
+
+class RealOverflow(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("RealOverflow.x", value)
 
 ################################################# RegularBinning
 
+class RegularBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("RegularBinning.x", value)
+
 ################################################# TicTacToeOverflowBinning
+
+class TicTacToeOverflowBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("TicTacToeOverflowBinning.x", value)
 
 ################################################# HexagonalBinning
 
+class HexagonalBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("HexagonalBinning.x", value)
+
 ################################################# VariableBinning
+
+class VariableBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("VariableBinning.x", value)
 
 ################################################# CategoryBinning
 
+class CategoryBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("CategoryBinning.x", value)
+
 ################################################# SparseRegularBinning
+
+class SparseRegularBinning(Binning):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("SparseRegularBinning.x", value)
 
 ################################################# Axis
 
+class Axis(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Axis.x", value)
+
 ################################################# Counts
+
+class Counts(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# UnweightedCounts
 
+class UnweightedCounts(Counts):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("UnweightedCounts.x", value)
+
 ################################################# WeightedCounts
+
+class WeightedCounts(Counts):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("WeightedCounts.x", value)
 
 ################################################# Correlation
 
+class Correlation(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Correlation.x", value)
+
 ################################################# Extreme
+
+class Extreme(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Extreme.x", value)
 
 ################################################# Moment
 
+class Moment(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Moment.x", value)
+
 ################################################# Quantile
+
+class Quantile(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Quantile.x", value)
 
 ################################################# GenericErrors
 
+class GenericErrors(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("GenericErrors.x", value)
+
 ################################################# DistributionStats
+
+class DistributionStats(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("DistributionStats.x", value)
 
 ################################################# Distribution
 
+class Distribution(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Distribution.x", value)
+
 ################################################# Profile
+
+class Profile(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Profile.x", value)
 
 ################################################# Histogram
 
+class Histogram(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Histogram.x", value)
+
 ################################################# Page
+
+class Page(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Page.x", value)
 
 ################################################# ColumnChunk
 
+class ColumnChunk(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("ColumnChunk.x", value)
+
 ################################################# Chunk
+
+class Chunk(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Chunk.x", value)
 
 ################################################# Column
 
+class Column(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Column.x", value)
+
 ################################################# Ntuple
+
+class Ntuple(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Ntuple.x", value)
 
 ################################################# Region
 
+class Region(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Region.x", value)
+
 ################################################# BinnedRegion
+
+class BinnedRegion(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("BinnedRegion.x", value)
 
 ################################################# Assignment
 
+class Assignment(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Assignment.x", value)
+
 ################################################# Systematic
 
+class Systematic(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Systematic.x", value)
+
 ################################################# Variation
+
+class Variation(Histos):
+    def __init__(self, x):
+        self.x = x
+
+    @property
+    def x(self):
+        return _get(self, "x", self._flatbuffers.X)
+
+    @x.setter
+    def x(self, value):
+        self._x = string("Variation.x", value)
 
 ################################################# Collection
 
