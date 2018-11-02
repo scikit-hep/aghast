@@ -67,13 +67,22 @@ import histos.histos_generated.VariableBinning
 import histos.histos_generated.Variation
 import histos.histos_generated.Weights
 
-from histos.checktype import *
+import histos.checktype
 
-def _get(obj, field, getter):
-    field = "_" + field
-    if not hasattr(obj, field):
-        setattr(obj, field, getter())
-    return getattr(obj, field)
+def checkedparameter(check):
+    @property
+    def prop(self):
+        private = "_" + check.param
+        if not hasattr(self, private):
+            setattr(self, private, getattr(self._flatbuffers, check.param.capitalize())())
+        return getattr(self, private)
+
+    @prop.setter
+    def prop(self, value):
+        private = "_" + check.param
+        setattr(self, private, check(value))
+
+    return prop
 
 class Histos(object):
     def _valid(self):
@@ -203,16 +212,16 @@ class Function(Histos):
 ################################################# ParameterizedFunction
 
 class ParameterizedFunction(Function):
-    def __init__(self, x):
-        self.x = x
+    def __init__(self, expression, parameters, contours=None):
+        self.expression = expression
 
     @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
+    def expression(self):
+        return _get(self, "expression", self._flatbuffers.Expression)
 
-    @x.setter
-    def x(self, value):
-        self._x = string("ParameterizedFunction.x", value)
+    @expression.setter
+    def expression(self, value):
+        self._expression = string("ParameterizedFunction.expression", required("ParameterizedFunction.expression", value))
 
 ################################################# EvaluatedFunction
 
@@ -818,25 +827,17 @@ class Collection(Histos):
         offset, = struct.unpack("<Q", file[-12:-4])
         return cls.frombuffer(file[offset:-12])
 
+    params = {
+        "identifier": histos.checktype.CheckString("Collection", "identifier", required=True),
+        "title":      histos.checktype.CheckString("Collection", "title", required=False),
+        }
+
+    identifier = checkedparameter(params["identifier"])
+    title      = checkedparameter(params["title"])
+
     def __init__(self, identifier, title=""):
         self.identifier = identifier
         self.title = title
-    
-    @property
-    def identifier(self):
-        return _get(self, "identifier", self._flatbuffers.Identifier)
-
-    @identifier.setter
-    def identifier(self, value):
-        self._identifier = string("Collection.identifier", value)
-
-    @property
-    def title(self):
-        return _get(self, "title", self._flatbuffers.Title)
-
-    @title.setter
-    def title(self, value):
-        self._title = string("Collection.title", value)
 
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
