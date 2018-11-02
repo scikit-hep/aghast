@@ -69,7 +69,7 @@ import histos.histos_generated.Weights
 
 import histos.checktype
 
-def checkedparameter(check):
+def typedproperty(check):
     @property
     def prop(self):
         private = "_" + check.param
@@ -126,25 +126,17 @@ class Metadata(Histos):
     unspecified = Enum("unspecified", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
     json = Enum("json", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_json)
 
+    params = {
+        "data":     histos.checktype.CheckString("Metadata", "data", required=True),
+        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=[unspecified, json]),
+        }
+
+    data     = typedproperty(params["data"])
+    language = typedproperty(params["language"])
+
     def __init__(self, data, language=unspecified):
         self.data = data
         self.language = language
-
-    @property
-    def data(self):
-        return _get(self, "data", self._flatbuffers.Data)
-
-    @data.setter
-    def data(self, value):
-        self._data = string("Metadata.data", required("Metadata.data", value))
-
-    @property
-    def language(self):
-        return _get(self, "language", self._flatbuffers.Language)
-
-    @language.setter
-    def language(self, value):
-        self._language = enum("Metadata.language", required("Metadata.language", value), [self.unspecified, self.json])
 
 ################################################# Decoration
 
@@ -154,25 +146,17 @@ class Decoration(Histos):
     vega = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
     root_json = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
 
+    params = {
+        "data":     histos.checktype.CheckString("Metadata", "data", required=True),
+        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=[unspecified, css, vega, root_json]),
+        }
+
+    data     = typedproperty(params["data"])
+    language = typedproperty(params["language"])
+
     def __init__(self, data, language=unspecified):
         self.data = data
         self.language = language
-
-    @property
-    def data(self):
-        return _get(self, "data", self._flatbuffers.Data)
-
-    @data.setter
-    def data(self, value):
-        self._data = string("Decoration.data", required("Decoration.data", value))
-
-    @property
-    def language(self):
-        return _get(self, "language", self._flatbuffers.Language)
-
-    @language.setter
-    def language(self, value):
-        self._language = enum("Decoration.language", required("Decoration.language", value), [self.unspecified, self.css, self.vega, self.root_json])
 
 ################################################# Object
 
@@ -183,25 +167,17 @@ class Object(Histos):
 ################################################# Parameter
 
 class Parameter(Histos):
+    params = {
+        "identifier": histos.checktype.Check("Parameter", "identifier", required=),
+        "value": histos.checktype.Check("Parameter", "value", required=),
+        }
+
+    identifier = typedproperty(params["identifier"])
+    value = typedproperty(params["value"])
+
     def __init__(self, identifier, value):
         self.identifier = identifier
         self.value = value
-
-    @property
-    def identifier(self):
-        return _get(self, "identifier", self._flatbuffers.Identifier)
-
-    @identifier.setter
-    def identifier(self, value):
-        self._identifier = string("Parameter.identifier", required("Parameter.identifier", value))
-
-    @property
-    def value(self):
-        return _get(self, "value", self._flatbuffers.Value)
-
-    @value.setter
-    def value(self, value):
-        self._value = number("Parameter.value", required("Parameter.value", value))
 
 ################################################# Function
 
@@ -212,30 +188,24 @@ class Function(Histos):
 ################################################# ParameterizedFunction
 
 class ParameterizedFunction(Function):
+    params = {
+        "expression": histos.checktype.Check("ParameterizedFunction", "expression", required=),
+        "parameters": histos.checktype.Check("ParameterizedFunction", "parameters", required=),
+        "contours": histos.checktype.Check("ParameterizedFunction", "contours", required=),
+        }
+
+    expression = typedproperty(params["expression"])
+    parameters = typedproperty(params["parameters"])
+    contours = typedproperty(params["contours"])
+
     def __init__(self, expression, parameters, contours=None):
         self.expression = expression
-
-    @property
-    def expression(self):
-        return _get(self, "expression", self._flatbuffers.Expression)
-
-    @expression.setter
-    def expression(self, value):
-        self._expression = string("ParameterizedFunction.expression", required("ParameterizedFunction.expression", value))
 
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
-    def __init__(self, x):
+    def __init__(self, values, derivatives=None, generic_errors=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("EvaluatedFunction.x", value)
 
 ################################################# Buffer
 
@@ -246,44 +216,43 @@ class Buffer(Histos):
 ################################################# RawInlineBuffer
 
 class RawInlineBuffer(Buffer):
-    def __init__(self, x):
+    def __init__(self, buffer, filters=None, postfilter_slice=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("RawInlineBuffer.x", value)
 
 ################################################# RawExternalBuffer
 
 class RawExternalBuffer(Buffer):
-    def __init__(self, x):
+    memory   = Enum("memory", histos.histos_generated.ExternalType.ExternalType.external_memory)
+    samefile = Enum("samefile", histos.histos_generated.ExternalType.ExternalType.external_samefile)
+    file     = Enum("file", histos.histos_generated.ExternalType.ExternalType.external_file)
+    url      = Enum("url", histos.histos_generated.ExternalType.ExternalType.external_url)
+
+    def __init__(self, pointer, numbytes, external_type=memory):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("RawExternalBuffer.x", value)
 
 ################################################# InlineBuffer
 
 class InlineBuffer(RawInlineBuffer):
-    def __init__(self, x):
+    none    = Enum("none", histos.histos_generated.DType.DType.dtype_none)
+    int8    = Enum("int8", histos.histos_generated.DType.DType.dtype_int8)
+    uint8   = Enum("uint8", histos.histos_generated.DType.DType.dtype_uint8)
+    int16   = Enum("int16", histos.histos_generated.DType.DType.dtype_int16)
+    uint16  = Enum("uint16", histos.histos_generated.DType.DType.dtype_uint16)
+    int32   = Enum("int32", histos.histos_generated.DType.DType.dtype_int32)
+    uint32  = Enum("uint32", histos.histos_generated.DType.DType.dtype_uint32)
+    int64   = Enum("int64", histos.histos_generated.DType.DType.dtype_int64)
+    uint64  = Enum("uint64", histos.histos_generated.DType.DType.dtype_uint64)
+    float32 = Enum("float32", histos.histos_generated.DType.DType.dtype_float32)
+    float64 = Enum("float64", histos.histos_generated.DType.DType.dtype_float64)
+
+    little = Enum("little", histos.histos_generated.Endianness.Endianness.little_endian)
+    big    = Enum("big", histos.histos_generated.Endianness.Endianness.big_endian)
+
+    c       = Enum("c", histos.histos_generated.DimensionOrder.DimensionOrder.c)
+    fortran = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran)
+
+    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=none, endianness=little, dimension_order=c):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("InlineBuffer.x", value)
 
 ################################################# ExternalBuffer
 
@@ -832,8 +801,8 @@ class Collection(Histos):
         "title":      histos.checktype.CheckString("Collection", "title", required=False),
         }
 
-    identifier = checkedparameter(params["identifier"])
-    title      = checkedparameter(params["title"])
+    identifier = typedproperty(params["identifier"])
+    title      = typedproperty(params["title"])
 
     def __init__(self, identifier, title=""):
         self.identifier = identifier
