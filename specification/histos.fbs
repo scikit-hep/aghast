@@ -98,10 +98,9 @@ struct Slice {
 
 enum ExternalType: int {
   external_memory = 0,
-  external_sharedmemory = 1,
-  external_memmap = 2,
-  external_file = 3,
-  external_url = 4
+  external_samefile = 1,
+  external_file = 2,
+  external_url = 3
 }
 
 table RawInlineBuffer {
