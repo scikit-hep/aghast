@@ -39,6 +39,5 @@ from histos.interface import Ntuple
 from histos.interface import Region
 from histos.interface import BinnedRegion
 from histos.interface import Assignment
-from histos.interface import Systematic
 from histos.interface import Variation
 from histos.interface import Collection

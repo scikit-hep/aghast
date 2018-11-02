@@ -211,17 +211,17 @@ table TicTacToeOverflowBinning {
 
 // https://www.redblobgames.com/grids/hexagons
 enum HexagonalCoordinates: byte {
-  offset = 0,
-  doubled_offset = 1,
-  cube_xy = 2,
-  cube_yz = 3,
-  cube_xz = 4
+  hex_offset = 0,
+  hex_doubled_offset = 1,
+  hex_cube_xy = 2,
+  hex_cube_yz = 3,
+  hex_cube_xz = 4
 }
 
 table HexagonalBinning {
   q: IntegerBinning (required);
   r: IntegerBinning (required);
-  coordinates: HexagonalCoordinates = offset;
+  coordinates: HexagonalCoordinates = hex_offset;
   originx: double = 0.0;    // x coordinate of (q, r) == (0, 0)
   originy: double = 0.0;    // y coordinate of (q, r) == (0, 0)
 }
@@ -260,6 +260,11 @@ table Axis {
   decoration: Decoration;
 }
 
+union Counts {
+  UnweightedCounts,
+  WeightedCounts
+}
+
 table UnweightedCounts {
   counts: Buffer (required);
 }
@@ -268,11 +273,6 @@ table WeightedCounts {
   sumw: Buffer (required);
   sumw2: Buffer (required);
   counts: Counts;
-}
-
-union Counts {
-  UnweightedCounts,
-  WeightedCounts
 }
 
 table Correlation {
@@ -317,7 +317,7 @@ table Distribution {
 }
 
 table Profile {
-  expression: string;
+  expression: string (required);
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -325,8 +325,8 @@ table Profile {
 
 table Histogram {
   axis: [Axis] (required);
-  profiles: [Profile];
   distribution: Distribution (required);
+  profiles: [Profile];
   unbinned_stats: [DistributionStats];
   profile_stats: [DistributionStats];
   functions: [Function];
@@ -401,14 +401,10 @@ table Assignment {
   expression: string (required);
 }
 
-table Systematic {
-  p: double = 0.6826894921370859;    // +1 sigma
-  category: string;                  // optional
-}
-
 table Variation {
   assignments: [Assignment] (required);
-  systematic: [Systematic];
+  systematic: [double];
+  category_systematic: [string];
 }
 
 table Collection {

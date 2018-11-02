@@ -15,7 +15,6 @@ import histos.histos_generated.Chunk
 import histos.histos_generated.Collection
 import histos.histos_generated.ColumnChunk
 import histos.histos_generated.Column
-import histos.histos_generated.Content
 import histos.histos_generated.Correlation
 import histos.histos_generated.Counts
 import histos.histos_generated.DecorationLanguage
@@ -38,6 +37,7 @@ import histos.histos_generated.GenericErrors
 import histos.histos_generated.HexagonalBinning
 import histos.histos_generated.HexagonalCoordinates
 import histos.histos_generated.Histogram
+import histos.histos_generated.__init__
 import histos.histos_generated.InlineBuffer
 import histos.histos_generated.IntegerBinning
 import histos.histos_generated.MetadataLanguage
@@ -61,11 +61,11 @@ import histos.histos_generated.Region
 import histos.histos_generated.RegularBinning
 import histos.histos_generated.Slice
 import histos.histos_generated.SparseRegularBinning
-import histos.histos_generated.Systematic
 import histos.histos_generated.TicTacToeOverflowBinning
+import histos.histos_generated.UnweightedCounts
 import histos.histos_generated.VariableBinning
 import histos.histos_generated.Variation
-import histos.histos_generated.Weights
+import histos.histos_generated.WeightedCounts
 
 import histos.checktype
 
@@ -74,7 +74,7 @@ def typedproperty(check):
     def prop(self):
         private = "_" + check.param
         if not hasattr(self, private):
-            setattr(self, private, getattr(self._flatbuffers, check.param.capitalize())())
+            setattr(self, private, check.fromflatbuffer(getattr(self._flatbuffers, check.param.capitalize())()))
         return getattr(self, private)
 
     @prop.setter
@@ -85,13 +85,10 @@ def typedproperty(check):
     return prop
 
 class Histos(object):
-    def _valid(self):
-        pass
-
     @property
     def isvalid(self):
         try:
-            self._valid()
+            self._valid(None)
         except ValueError:
             return False
         else:
@@ -168,8 +165,8 @@ class Object(Histos):
 
 class Parameter(Histos):
     params = {
-        "identifier": histos.checktype.Check("Parameter", "identifier", required=),
-        "value": histos.checktype.Check("Parameter", "value", required=),
+        "identifier": histos.checktype.Check("Parameter", "identifier", required=True),
+        "value": histos.checktype.Check("Parameter", "value", required=True),
         }
 
     identifier = typedproperty(params["identifier"])
@@ -181,7 +178,7 @@ class Parameter(Histos):
 
 ################################################# Function
 
-class Function(Histos):
+class Function(Object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -189,22 +186,22 @@ class Function(Histos):
 
 class ParameterizedFunction(Function):
     params = {
-        "expression": histos.checktype.Check("ParameterizedFunction", "expression", required=),
-        "parameters": histos.checktype.Check("ParameterizedFunction", "parameters", required=),
-        "contours": histos.checktype.Check("ParameterizedFunction", "contours", required=),
+        "expression": histos.checktype.Check("ParameterizedFunction", "expression", required=True),
+        "parameters": histos.checktype.Check("ParameterizedFunction", "parameters", required=True),
+        "contours": histos.checktype.Check("ParameterizedFunction", "contours", required=False),
         }
 
     expression = typedproperty(params["expression"])
     parameters = typedproperty(params["parameters"])
     contours = typedproperty(params["contours"])
 
-    def __init__(self, expression, parameters, contours=None):
+    def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
         self.expression = expression
 
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
-    def __init__(self, values, derivatives=None, generic_errors=None):
+    def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
         self.x = x
 
 ################################################# Buffer
@@ -248,19 +245,19 @@ class BufferInterpretation(object):
     little = Enum("little", histos.histos_generated.Endianness.Endianness.little_endian)
     big    = Enum("big", histos.histos_generated.Endianness.Endianness.big_endian)
 
-    c       = Enum("c", histos.histos_generated.DimensionOrder.DimensionOrder.c)
-    fortran = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran)
+    c_order       = Enum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order)
+    fortran_order = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order)
 
 ################################################# InlineBuffer
 
 class InlineBuffer(RawInlineBuffer, BufferInterpretation):
-    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c):
+    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order):
         self.x = x
 
 ################################################# ExternalBuffer
 
 class ExternalBuffer(RawExternalBuffer, BufferInterpretation):
-    def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c, location=""):
+    def __init__(self, pointer, numbytes, external_type=RawExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, location=""):
         self.x = x
 
 ################################################# Binning
@@ -273,12 +270,12 @@ class Binning(Histos):
 
 class FractionalBinning(Binning):
     normal = Enum("normal", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
-    clopper_pearson  = Enum("clopper_pearson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.clopper_pearson)
-    wilson           = Enum("wilson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.wilson)
-    agresti_coul     = Enum("agresti_coul", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.agresti_coul)
-    feldman_cousins  = Enum("feldman_cousins", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.feldman_cousins)
-    jeffrey          = Enum("jeffrey", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.jeffrey)
-    bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.bayesian_uniform)
+    clopper_pearson  = Enum("clopper_pearson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_clopper_pearson)
+    wilson           = Enum("wilson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_wilson)
+    agresti_coull    = Enum("agresti_coull", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_agresti_coull)
+    feldman_cousins  = Enum("feldman_cousins", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_feldman_cousins)
+    jeffrey          = Enum("jeffrey", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
+    bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
 
     def __init__(self, error_method=normal):
         self.x = x
@@ -301,6 +298,7 @@ class RealOverflow(Histos):
     missing      = Enum("missing", histos.histos_generated.NonRealMapping.NonRealMapping.missing)
     in_underflow = Enum("in_underflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_underflow)
     in_overflow  = Enum("in_overflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_overflow)
+    in_nanflow   = Enum("in_nanflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_nanflow)
 
     def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
         self.x = x
@@ -320,11 +318,11 @@ class TicTacToeOverflowBinning(Binning):
 ################################################# HexagonalBinning
 
 class HexagonalBinning(Binning):
-    offset         = Enum("offset", histos.histos_generated.HexagonalBinning.HexagonalBinning.offset)
-    doubled_offset = Enum("doubled_offset", histos.histos_generated.HexagonalBinning.HexagonalBinning.doubled_offset)
-    cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalBinning.HexagonalBinning.cube_xy)
-    cube_yz        = Enum("cube_yz", histos.histos_generated.HexagonalBinning.HexagonalBinning.cube_yz)
-    cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalBinning.HexagonalBinning.cube_xz)
+    offset         = Enum("offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
+    doubled_offset = Enum("doubled_offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
+    cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
+    cube_yz        = Enum("cube_yz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
+    cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
 
     def __init__(self, q, r, coordinates=offset, originx=0.0, originy=0.0):
         self.x = x
@@ -386,245 +384,104 @@ class Extreme(Histos):
 ################################################# Moment
 
 class Moment(Histos):
-    def __init__(self, x):
+    def __init__(self, n, buffer=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Moment.x", value)
 
 ################################################# Quantile
 
 class Quantile(Histos):
-    def __init__(self, x):
+    def __init__(self, p, value=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Quantile.x", value)
 
 ################################################# GenericErrors
 
 class GenericErrors(Histos):
-    def __init__(self, x):
+    def __init__(self, error=None, p=0.6826894921370859):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("GenericErrors.x", value)
 
 ################################################# DistributionStats
 
 class DistributionStats(Histos):
-    def __init__(self, x):
+    def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("DistributionStats.x", value)
 
 ################################################# Distribution
 
 class Distribution(Histos):
-    def __init__(self, x):
+    def __init__(self, counts, stats=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Distribution.x", value)
 
 ################################################# Profile
 
 class Profile(Histos):
-    def __init__(self, x):
+    def __init__(self, expression, title="", metadata=None, decoration=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Profile.x", value)
 
 ################################################# Histogram
 
-class Histogram(Histos):
-    def __init__(self, x):
+class Histogram(Object):
+    def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Histogram.x", value)
 
 ################################################# Page
 
 class Page(Histos):
-    def __init__(self, x):
+    def __init__(self, buffer):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Page.x", value)
 
 ################################################# ColumnChunk
 
 class ColumnChunk(Histos):
-    def __init__(self, x):
+    def __init__(self, pages, page_offsets, page_extremes=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("ColumnChunk.x", value)
 
 ################################################# Chunk
 
 class Chunk(Histos):
-    def __init__(self, x):
+    def __init__(self, columns, metadata=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Chunk.x", value)
 
 ################################################# Column
 
-class Column(Histos):
-    def __init__(self, x):
+class Column(Histos, BufferInterpretation):
+    def __init__(self, identifier, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, filters=None, title="", metadata=None, decoration=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Column.x", value)
 
 ################################################# Ntuple
 
-class Ntuple(Histos):
-    def __init__(self, x):
+class Ntuple(Object):
+    def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Ntuple.x", value)
 
 ################################################# Region
 
 class Region(Histos):
-    def __init__(self, x):
+    def __init__(self, expressions):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Region.x", value)
 
 ################################################# BinnedRegion
 
 class BinnedRegion(Histos):
-    def __init__(self, x):
+    def __init__(self, expression, binning):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("BinnedRegion.x", value)
 
 ################################################# Assignment
 
 class Assignment(Histos):
-    def __init__(self, x):
+    def __init__(self, identifier, expression):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Assignment.x", value)
-
-################################################# Systematic
-
-class Systematic(Histos):
-    def __init__(self, x):
-        self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Systematic.x", value)
 
 ################################################# Variation
 
 class Variation(Histos):
-    def __init__(self, x):
+    def __init__(self, assignments, systematic=None, category_systematic=None):
         self.x = x
-
-    @property
-    def x(self):
-        return _get(self, "x", self._flatbuffers.X)
-
-    @x.setter
-    def x(self, value):
-        self._x = string("Variation.x", value)
 
 ################################################# Collection
 
 class Collection(Histos):
     def tobuffer(self, internalize=False):
+        self._valid(1)
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, internalize, None))
         return builder.Output()
@@ -643,6 +500,8 @@ class Collection(Histos):
         return cls.frombuffer(array)
 
     def tofile(self, file, internalize=False):
+        self._valid(1)
+
         opened = False
         if not hasattr(file, "write"):
             file = open(file, "wb")
@@ -701,12 +560,13 @@ class Collection(Histos):
         self.identifier = identifier
         self.title = title
 
+    def _valid(self, multiplicity):
+        pass
+
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
 
     def _toflatbuffers(self, builder, internalize, file):
-        self._valid()
-
         identifier = builder.CreateString(self._identifier)
         if len(self._title) > 0:
             title = builder.CreateString(self._title)

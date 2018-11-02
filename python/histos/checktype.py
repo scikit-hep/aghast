@@ -20,6 +20,9 @@ class Check(object):
         else:
             return obj
 
+    def fromflatbuffer(self, obj):
+        return obj
+
 class CheckEnum(Check):
     def __init__(self, classname, param, required, choices):
         super(CheckEnum, self).__init__(classname, param, required)
@@ -31,6 +34,9 @@ class CheckEnum(Check):
             raise TypeError("{0}.{1} must be one of {2}, cannot pass {3}".format(self.classname, self.param, self.choices, repr(obj)))
         else:
             return self.choices[self.choices.index(obj)]
+
+    def fromflatbuffer(self, obj):
+        return self.choices[obj]
 
 class CheckString(Check):
     def __call__(self, obj):
