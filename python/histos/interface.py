@@ -6,11 +6,11 @@ import numpy
 import flatbuffers
 
 import histos.histos_generated
-import histos.histos_generated.Book
+import histos.histos_generated.Collection
 
 import histos.checktype
 
-class Book(object):
+class Collection(object):
     def tobuffer(self, internalize=False):
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, internalize, None))
@@ -19,7 +19,7 @@ class Book(object):
     @classmethod
     def frombuffer(cls, buffer, offset=0):
         out = cls.__new__(cls)
-        out._flatbuffers = histos.histos_generated.Book.Book.GetRootAsBook(buffer, offset)
+        out._flatbuffers = histos.histos_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
         return out
 
     def toarray(self):
@@ -88,7 +88,7 @@ class Book(object):
 
     @identifier.setter
     def identifier(self, value):
-        self._identifier = histos.checktype.string("Book.identifier", value)
+        self._identifier = histos.checktype.string("Collection.identifier", value)
 
     @property
     def title(self):
@@ -98,7 +98,7 @@ class Book(object):
 
     @title.setter
     def title(self, value):
-        self._title = histos.checktype.string("Book.title", value)
+        self._title = histos.checktype.string("Collection.title", value)
 
     def _valid(self):
         pass
@@ -112,8 +112,8 @@ class Book(object):
         identifier = builder.CreateString(self._identifier)
         if len(self._title) > 0:
             title = builder.CreateString(self._title)
-        histos.histos_generated.Book.BookStart(builder)
-        histos.histos_generated.Book.BookAddIdentifier(builder, identifier)
+        histos.histos_generated.Collection.CollectionStart(builder)
+        histos.histos_generated.Collection.CollectionAddIdentifier(builder, identifier)
         if len(self._title) > 0:
-            histos.histos_generated.Book.BookAddTitle(builder, title)
-        return histos.histos_generated.Book.BookEnd(builder)
+            histos.histos_generated.Collection.CollectionAddTitle(builder, title)
+        return histos.histos_generated.Collection.CollectionEnd(builder)

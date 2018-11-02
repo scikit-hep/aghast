@@ -29,29 +29,30 @@ table Decoration {
 ///////////////////////////////////////////////// Functions
 
 table Parameter {
-  identifier: string (required);
+  identifier: string (key);
   value: double;
 }
 
-table ParameterizedFunctionData {
+table ParameterizedFunction {
   expression: string (required);
   parameters: [Parameter] (required);
   contours: [double];
 }
 
-table EvaluatedFunctionData {
+table EvaluatedFunction {
   values: [double] (required);
   derivatives: [double];
   generic_errors: [GenericErrors];
 }
 
 union FunctionData {
-  ParameterizedFunctionData,
-  EvaluatedFunctionData
+  ParameterizedFunction,
+  EvaluatedFunction
 }
 
 table Function {
   identifier: string (key);
+  data: FunctionData (required);
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -251,41 +252,6 @@ union Binning {
   SparseRegularBinning
 }
 
-table Region {
-  expressions: [string] (required);  // predicates to apply
-}
-
-table BinnedRegion {
-  expression: string (required);     // expression to slice
-  binning: Binning (required);
-}
-
-table Assignment {
-  identifier: string (key);
-  expression: string (required);
-}
-
-table Systematic {
-  p: double = 0.6826894921370859;    // +1 sigma
-  category: string;                  // optional
-}
-
-table Variation {
-  assignments: [Assignment] (required);
-  systematic: [Systematic];
-}
-
-table Multiplier {
-  identifier: string (key);
-  multiplier: [Multiplier];          // nested ANDs
-  regions: [Region];                 // list of ORs of (overlapping?) regions
-  binned_regions: [BinnedRegion];    // list of ORs of exclusive, binned regions
-  variations: [Variation];           // list of ORs with assignments
-  title: string;
-  metadata: Metadata;
-  decoration: Decoration;
-}
-
 table Axis {
   binning: Binning;      // note: no binning is allowed
   expression: string;
@@ -358,17 +324,12 @@ table Profile {
 }
 
 table Histogram {
-  identifier: string (key);
-  multipliers: [Multiplier];
   axis: [Axis] (required);
   profiles: [Profile];
   distribution: Distribution (required);
   unbinned_stats: [DistributionStats];
   profile_stats: [DistributionStats];
   functions: [Function];
-  title: string;
-  metadata: Metadata;
-  decoration: Decoration;
 }
 
 ///////////////////////////////////////////////// Ntuple
@@ -400,30 +361,68 @@ table Column {
 }
 
 table Ntuple {
-  identifier: string (key);
   columns: [Column] (required);
   chunks: [Chunk] (required);
   chunk_offsets: [ulong] (required);
   unbinned_stats: [DistributionStats];
   functions: [Function];
+}
+
+///////////////////////////////////////////////// objects
+
+union ObjectData {
+  Histogram,
+  Ntuple,
+  ParameterizedFunction,
+  EvaluatedFunction
+}
+
+table Object {
+  identifier: string (key);
+  data: ObjectData (required);
   title: string;
   metadata: Metadata;
   decoration: Decoration;
 }
 
-///////////////////////////////////////////////// Book
+///////////////////////////////////////////////// collections
 
-table Book {
+table Region {
+  expressions: [string] (required);  // predicates to apply
+}
+
+table BinnedRegion {
+  expression: string (required);     // expression to slice
+  binning: Binning (required);
+}
+
+table Assignment {
   identifier: string (key);
-  multipliers: [Multiplier];
-  books: [Book];
-  functions: [Function];
-  histograms: [Histogram];
-  ntuples: [Ntuple];
+  expression: string (required);
+}
+
+table Systematic {
+  p: double = 0.6826894921370859;    // +1 sigma
+  category: string;                  // optional
+}
+
+table Variation {
+  assignments: [Assignment] (required);
+  systematic: [Systematic];
+}
+
+table Collection {
+  identifier: string (key);
+  objects: [Object];
+  collection: [Collection];          // nested ANDs
+  regions: [Region];                 // list of ORs of (overlapping?) regions
+  binned_regions: [BinnedRegion];    // list of ORs of exclusive, binned regions
+  variations: [Variation];           // list of ORs with assignments
   title: string;
   metadata: Metadata;
+  decoration: Decoration;
 }
 
 file_extension "hist";
 file_identifier "hist";
-root_type Book;
+root_type Collection;
