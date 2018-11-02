@@ -260,19 +260,19 @@ table Axis {
   decoration: Decoration;
 }
 
-table Counts {
+table UnweightedCounts {
   counts: Buffer (required);
 }
 
-table Weights {
+table WeightedCounts {
   sumw: Buffer (required);
   sumw2: Buffer (required);
   counts: Counts;
 }
 
-union Content {
-  Counts,
-  Weights
+union Counts {
+  UnweightedCounts,
+  WeightedCounts
 }
 
 table Correlation {
@@ -312,7 +312,7 @@ table DistributionStats {
 }
 
 table Distribution {
-  content: Content (required);
+  counts: Counts (required);
   stats: DistributionStats;
 }
 
