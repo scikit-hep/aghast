@@ -188,13 +188,13 @@ class Function(Object):
 
 class ParameterizedFunction(Function):
     params = {
-        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "identifier":     histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
         "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
-        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "title":          histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
         }
 
     identifier = typedproperty(params["identifier"])
