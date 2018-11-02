@@ -20,6 +20,7 @@ from histos.interface import VariableBinning
 from histos.interface import CategoryBinning
 from histos.interface import SparseRegularBinning
 from histos.interface import Axis
+from histos.interface import BinnedEvaluatedFunction
 from histos.interface import UnweightedCounts
 from histos.interface import WeightedCounts
 from histos.interface import Correlation

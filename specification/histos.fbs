@@ -332,6 +332,22 @@ table Histogram {
   functions: [Function];
 }
 
+///////////////////////////////////////////////// FunctionObject
+
+table BinnedEvaluatedFunction {
+  axis: [Axis] (required);
+  data: EvaluatedFunction (required);
+}
+
+union FunctionObjectData {
+  ParameterizedFunction,
+  BinnedEvaluatedFunction
+}
+
+table FunctionObject {
+  data: FunctionObjectData (required);
+}
+
 ///////////////////////////////////////////////// Ntuple
 
 table Page {
@@ -365,7 +381,7 @@ table Ntuple {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong] (required);
   unbinned_stats: [DistributionStats];
-  functions: [Function];
+  functions: [FunctionObject];
 }
 
 ///////////////////////////////////////////////// objects
@@ -373,8 +389,7 @@ table Ntuple {
 union ObjectData {
   Histogram,
   Ntuple,
-  ParameterizedFunction,
-  EvaluatedFunction
+  FunctionObject,
 }
 
 table Object {

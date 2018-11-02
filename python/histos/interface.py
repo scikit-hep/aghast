@@ -7,6 +7,7 @@ import flatbuffers
 
 import histos.histos_generated.Assignment
 import histos.histos_generated.Axis
+import histos.histos_generated.BinnedEvaluatedFunction
 import histos.histos_generated.BinnedRegion
 import histos.histos_generated.Binning
 import histos.histos_generated.Buffer
@@ -32,12 +33,13 @@ import histos.histos_generated.Filter
 import histos.histos_generated.FractionalErrorMethod
 import histos.histos_generated.FractionBinning
 import histos.histos_generated.FunctionData
+import histos.histos_generated.FunctionObjectData
+import histos.histos_generated.FunctionObject
 import histos.histos_generated.Function
 import histos.histos_generated.GenericErrors
 import histos.histos_generated.HexagonalBinning
 import histos.histos_generated.HexagonalCoordinates
 import histos.histos_generated.Histogram
-import histos.histos_generated.__init__
 import histos.histos_generated.InlineBuffer
 import histos.histos_generated.IntegerBinning
 import histos.histos_generated.MetadataLanguage
@@ -165,8 +167,8 @@ class Object(Histos):
 
 class Parameter(Histos):
     params = {
-        "identifier": histos.checktype.Check("Parameter", "identifier", required=True),
-        "value":      histos.checktype.Check("Parameter", "value", required=True),
+        "identifier": histos.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
+        "value":      histos.checktype.CheckNumber("Parameter", "value", required=True),
         }
 
     identifier = typedproperty(params["identifier"])
@@ -186,14 +188,22 @@ class Function(Object):
 
 class ParameterizedFunction(Function):
     params = {
-        "expression": histos.checktype.Check("ParameterizedFunction", "expression", required=True),
-        "parameters": histos.checktype.Check("ParameterizedFunction", "parameters", required=True),
-        "contours":   histos.checktype.Check("ParameterizedFunction", "contours", required=False),
+        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
+        "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
+        "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
+        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
+    identifier = typedproperty(params["identifier"])
     expression = typedproperty(params["expression"])
     parameters = typedproperty(params["parameters"])
     contours = typedproperty(params["contours"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
         self.expression = expression
@@ -202,13 +212,13 @@ class ParameterizedFunction(Function):
 
 class EvaluatedFunction(Function):
     params = {
-        "identifier":     histos.checktype.Check("EvaluatedFunction", "identifier", required=None),
-        "values":         histos.checktype.Check("EvaluatedFunction", "values", required=None),
-        "derivatives":    histos.checktype.Check("EvaluatedFunction", "derivatives", required=None),
-        "generic_errors": histos.checktype.Check("EvaluatedFunction", "generic_errors", required=None),
-        "title":          histos.checktype.Check("EvaluatedFunction", "title", required=None),
-        "metadata":       histos.checktype.Check("EvaluatedFunction", "metadata", required=None),
-        "decoration":     histos.checktype.Check("EvaluatedFunction", "decoration", required=None),
+        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "values":         histos.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
+        "derivatives":    histos.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
+        "generic_errors": histos.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
+        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
@@ -689,6 +699,30 @@ class Histogram(Object):
         self.unbinned_stats = unbinned_stats
         self.profile_stats = profile_stats
         self.functions = functions
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+
+################################################# BinnedEvaluatedFunction
+
+class BinnedEvaluatedFunction(Function):
+    params = {
+        "identifier":     histos.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
+        "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis),
+        "values":         histos.checktype.CheckVector("BinnedEvaluatedFunction", "values", required=True, type=float),
+        "derivatives":    histos.checktype.CheckVector("BinnedEvaluatedFunction", "derivatives", required=False, type=float),
+        "generic_errors": histos.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
+        "title":          histos.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        }
+
+    def __init__(self, identifier, axis, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
+        self.identifier = identifier
+        self.axis = axis
+        self.values = values
+        self.derivatives = derivatives
+        self.generic_errors = generic_errors
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
