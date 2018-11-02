@@ -161,7 +161,7 @@ enum FractionalErrorMethod: byte {
 }
 
 table FractionBinning {
-  error_method: FractionalErrorMethod;
+  error_method: FractionalErrorMethod = frac_normal;
 }
 
 table IntegerBinning {
@@ -190,7 +190,7 @@ table RealOverflow {
   has_overflow: bool = true;
   has_nanflow: bool = true;
   minf_mapping: NonRealMapping = in_underflow;
-  pinf_mapping: NonRealMapping = in_underflow;
+  pinf_mapping: NonRealMapping = in_overflow;
   nan_mapping: NonRealMapping = in_nanflow;
 }
 
@@ -238,7 +238,7 @@ table CategoryBinning {
 table SparseRegularBinning {
   bin_width: double;
   origin: double = 0.0;
-  nanflow: bool = true;
+  has_nanflow: bool = true;
 }
 
 union Binning {
