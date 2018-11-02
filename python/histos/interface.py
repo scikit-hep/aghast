@@ -139,9 +139,9 @@ class Metadata(Histos):
 
 class Decoration(Histos):
     unspecified = Enum("unspecified", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
-    css = Enum("css", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_css)
-    vega = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    root_json = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+    css         = Enum("css", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega        = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    root_json   = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
 
     params = {
         "data":     histos.checktype.CheckString("Metadata", "data", required=True),
@@ -201,8 +201,24 @@ class ParameterizedFunction(Function):
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
+    params = {
+        "identifier": histos.checktype.Check("EvaluatedFunction", "identifier", required=None),
+        "values": histos.checktype.Check("EvaluatedFunction", "values", required=None),
+        "derivatives": histos.checktype.Check("EvaluatedFunction", "derivatives", required=None),
+        "generic_errors": histos.checktype.Check("EvaluatedFunction", "generic_errors", required=None),
+        "title": histos.checktype.Check("EvaluatedFunction", "title", required=None),
+        "metadata": histos.checktype.Check("EvaluatedFunction", "metadata", required=None),
+        "decoration": histos.checktype.Check("EvaluatedFunction", "decoration", required=None),
+        }
+
     def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
-        self.x = x
+        self.identifier = identifier
+        self.values = values
+        self.derivatives = derivatives
+        self.generic_errors = generic_errors
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Buffer
 
@@ -213,8 +229,16 @@ class Buffer(Histos):
 ################################################# RawInlineBuffer
 
 class RawInlineBuffer(Buffer):
+    params = {
+        "buffer": histos.checktype.Check("RawInlineBuffer", "buffer", required=None),
+        "filters": histos.checktype.Check("RawInlineBuffer", "filters", required=None),
+        "postfilter_slice": histos.checktype.Check("RawInlineBuffer", "postfilter_slice", required=None),
+        }
+
     def __init__(self, buffer, filters=None, postfilter_slice=None):
-        self.x = x
+        self.buffer = buffer
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
 
 ################################################# RawExternalBuffer
 
@@ -224,8 +248,20 @@ class RawExternalBuffer(Buffer):
     file     = Enum("file", histos.histos_generated.ExternalType.ExternalType.external_file)
     url      = Enum("url", histos.histos_generated.ExternalType.ExternalType.external_url)
 
+    params = {
+        "pointer": histos.checktype.Check("     = Enum", "pointer", required=None),
+        "numbytes": histos.checktype.Check("     = Enum", "numbytes", required=None),
+        "external_type": histos.checktype.Check("     = Enum", "external_type", required=None),
+        "filters": histos.checktype.Check("     = Enum", "filters", required=None),
+        "postfilter_slice": histos.checktype.Check("     = Enum", "postfilter_slice", required=None),
+        }
+
     def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
-        self.x = x
+        self.pointer = pointer
+        self.numbytes = numbytes
+        self.external_type = external_type
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
 
 ################################################# BufferInterpretation
 
@@ -251,14 +287,48 @@ class BufferInterpretation(object):
 ################################################# InlineBuffer
 
 class InlineBuffer(RawInlineBuffer, BufferInterpretation):
+    params = {
+        "buffer": histos.checktype.Check("InlineBuffer", "buffer", required=None),
+        "filters": histos.checktype.Check("InlineBuffer", "filters", required=None),
+        "postfilter_slice": histos.checktype.Check("InlineBuffer", "postfilter_slice", required=None),
+        "dtype": histos.checktype.Check("InlineBuffer", "dtype", required=None),
+        "endianness": histos.checktype.Check("InlineBuffer", "endianness", required=None),
+        "dimension_order": histos.checktype.Check("InlineBuffer", "dimension_order", required=None),
+        }
+
     def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order):
-        self.x = x
+        self.buffer = buffer
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
+        self.dtype = dtype
+        self.endianness = endianness
+        self.dimension_order = dimension_order
 
 ################################################# ExternalBuffer
 
 class ExternalBuffer(RawExternalBuffer, BufferInterpretation):
+    params = {
+        "pointer": histos.checktype.Check("ExternalBuffer", "pointer", required=None),
+        "numbytes": histos.checktype.Check("ExternalBuffer", "numbytes", required=None),
+        "external_type": histos.checktype.Check("ExternalBuffer", "external_type", required=None),
+        "filters": histos.checktype.Check("ExternalBuffer", "filters", required=None),
+        "postfilter_slice": histos.checktype.Check("ExternalBuffer", "postfilter_slice", required=None),
+        "dtype": histos.checktype.Check("ExternalBuffer", "dtype", required=None),
+        "endianness": histos.checktype.Check("ExternalBuffer", "endianness", required=None),
+        "dimension_order": histos.checktype.Check("ExternalBuffer", "dimension_order", required=None),
+        "location": histos.checktype.Check("ExternalBuffer", "location", required=None),
+        }
+
     def __init__(self, pointer, numbytes, external_type=RawExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, location=""):
-        self.x = x
+        self.pointer = pointer
+        self.numbytes = numbytes
+        self.external_type = external_type
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
+        self.dtype = dtype
+        self.endianness = endianness
+        self.dimension_order = dimension_order
+        self.location = location
 
 ################################################# Binning
 
@@ -277,20 +347,44 @@ class FractionalBinning(Binning):
     jeffrey          = Enum("jeffrey", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
     bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
 
+    params = {
+        "error_method": histos.checktype.Check("uniform = Enum", "error_method", required=None),
+        }
+
     def __init__(self, error_method=normal):
-        self.x = x
+        self.error_method = error_method
 
 ################################################# IntegerBinning
 
 class IntegerBinning(Binning):
+    params = {
+        "min": histos.checktype.Check("IntegerBinning", "min", required=None),
+        "max": histos.checktype.Check("IntegerBinning", "max", required=None),
+        "has_underflow": histos.checktype.Check("IntegerBinning", "has_underflow", required=None),
+        "has_overflow": histos.checktype.Check("IntegerBinning", "has_overflow", required=None),
+        }
+
     def __init__(self, min, max, has_underflow=True, has_overflow=True):
-        self.x = x
+        self.min = min
+        self.max = max
+        self.has_underflow = has_underflow
+        self.has_overflow = has_overflow
 
 ################################################# RealInterval
 
 class RealInterval(Histos):
+    params = {
+        "low": histos.checktype.Check("RealInterval", "low", required=None),
+        "high": histos.checktype.Check("RealInterval", "high", required=None),
+        "low_inclusive": histos.checktype.Check("RealInterval", "low_inclusive", required=None),
+        "high_inclusive": histos.checktype.Check("RealInterval", "high_inclusive", required=None),
+        }
+
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
-        self.x = x
+        self.low = low
+        self.high = high
+        self.low_inclusive = low_inclusive
+        self.high_inclusive = high_inclusive
 
 ################################################# RealOverflow
 
@@ -300,20 +394,56 @@ class RealOverflow(Histos):
     in_overflow  = Enum("in_overflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_overflow)
     in_nanflow   = Enum("in_nanflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_nanflow)
 
+    params = {
+        "has_underflow": histos.checktype.Check("nanflow   = Enum", "has_underflow", required=None),
+        "has_overflow": histos.checktype.Check("nanflow   = Enum", "has_overflow", required=None),
+        "has_nanflow": histos.checktype.Check("nanflow   = Enum", "has_nanflow", required=None),
+        "minf_mapping": histos.checktype.Check("nanflow   = Enum", "minf_mapping", required=None),
+        "pinf_mapping": histos.checktype.Check("nanflow   = Enum", "pinf_mapping", required=None),
+        "nan_mapping": histos.checktype.Check("nanflow   = Enum", "nan_mapping", required=None),
+        }
+
     def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
-        self.x = x
+        self.has_underflow = has_underflow
+        self.has_overflow = has_overflow
+        self.has_nanflow = has_nanflow
+        self.minf_mapping = minf_mapping
+        self.pinf_mapping = pinf_mapping
+        self.nan_mapping = nan_mapping
 
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
+    params = {
+        "num": histos.checktype.Check("RegularBinning", "num", required=None),
+        "interval": histos.checktype.Check("RegularBinning", "interval", required=None),
+        "overflow": histos.checktype.Check("RegularBinning", "overflow", required=None),
+        "circular": histos.checktype.Check("RegularBinning", "circular", required=None),
+        }
+
     def __init__(self, num, interval, overflow=None, circular=False):
-        self.x = x
+        self.num = num
+        self.interval = interval
+        self.overflow = overflow
+        self.circular = circular
 
 ################################################# TicTacToeOverflowBinning
 
 class TicTacToeOverflowBinning(Binning):
+    params = {
+        "numx": histos.checktype.Check("TicTacToeOverflowBinning", "numx", required=None),
+        "numy": histos.checktype.Check("TicTacToeOverflowBinning", "numy", required=None),
+        "x": histos.checktype.Check("TicTacToeOverflowBinning", "x", required=None),
+        "y": histos.checktype.Check("TicTacToeOverflowBinning", "y", required=None),
+        "overflow ": histos.checktype.Check("TicTacToeOverflowBinning", "overflow ", required=None),
+        }
+
     def __init__(self, numx, numy, x, y, overflow):
+        self.numx = numx
+        self.numy = numy
         self.x = x
+        self.y = y
+        self.overflow  = overflow 
 
 ################################################# HexagonalBinning
 
@@ -324,32 +454,74 @@ class HexagonalBinning(Binning):
     cube_yz        = Enum("cube_yz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
     cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
 
+    params = {
+        "q": histos.checktype.Check("xz        = Enum", "q", required=None),
+        "r": histos.checktype.Check("xz        = Enum", "r", required=None),
+        "coordinates": histos.checktype.Check("xz        = Enum", "coordinates", required=None),
+        "originx": histos.checktype.Check("xz        = Enum", "originx", required=None),
+        "originy": histos.checktype.Check("xz        = Enum", "originy", required=None),
+        }
+
     def __init__(self, q, r, coordinates=offset, originx=0.0, originy=0.0):
-        self.x = x
+        self.q = q
+        self.r = r
+        self.coordinates = coordinates
+        self.originx = originx
+        self.originy = originy
 
 ################################################# VariableBinning
 
 class VariableBinning(Binning):
+    params = {
+        "intervals": histos.checktype.Check("VariableBinning", "intervals", required=None),
+        "overflow": histos.checktype.Check("VariableBinning", "overflow", required=None),
+        }
+
     def __init__(self, intervals, overflow=None):
-        self.x = x
+        self.intervals = intervals
+        self.overflow = overflow
 
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning):
+    params = {
+        "categories ": histos.checktype.Check("CategoryBinning", "categories ", required=None),
+        }
+
     def __init__(self, categories):
-        self.x = x
+        self.categories  = categories 
 
 ################################################# SparseRegularBinning
 
 class SparseRegularBinning(Binning):
+    params = {
+        "bin_width": histos.checktype.Check("SparseRegularBinning", "bin_width", required=None),
+        "origin": histos.checktype.Check("SparseRegularBinning", "origin", required=None),
+        "has_nanflow": histos.checktype.Check("SparseRegularBinning", "has_nanflow", required=None),
+        }
+
     def __init__(self, bin_width, origin=0.0, has_nanflow=True):
-        self.x = x
+        self.bin_width = bin_width
+        self.origin = origin
+        self.has_nanflow = has_nanflow
 
 ################################################# Axis
 
 class Axis(Histos):
+    params = {
+        "binning": histos.checktype.Check("Axis", "binning", required=None),
+        "expression": histos.checktype.Check("Axis", "expression", required=None),
+        "title": histos.checktype.Check("Axis", "title", required=None),
+        "metadata": histos.checktype.Check("Axis", "metadata", required=None),
+        "decoration": histos.checktype.Check("Axis", "decoration", required=None),
+        }
+
     def __init__(self, binning=None, expression="", title="", metadata=None, decoration=None):
-        self.x = x
+        self.binning = binning
+        self.expression = expression
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Counts
 
@@ -360,122 +532,300 @@ class Counts(Histos):
 ################################################# UnweightedCounts
 
 class UnweightedCounts(Counts):
+    params = {
+        "counts ": histos.checktype.Check("UnweightedCounts", "counts ", required=None),
+        }
+
     def __init__(self, counts):
-        self.x = x
+        self.counts  = counts 
 
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
+    params = {
+        "sumw": histos.checktype.Check("WeightedCounts", "sumw", required=None),
+        "sumw2": histos.checktype.Check("WeightedCounts", "sumw2", required=None),
+        "counts": histos.checktype.Check("WeightedCounts", "counts", required=None),
+        }
+
     def __init__(self, sumw, sumw2, counts=None):
-        self.x = x
+        self.sumw = sumw
+        self.sumw2 = sumw2
+        self.counts = counts
 
 ################################################# Correlation
 
 class Correlation(Histos):
+    params = {
+        "sumwx": histos.checktype.Check("Correlation", "sumwx", required=None),
+        "sumwxy ": histos.checktype.Check("Correlation", "sumwxy ", required=None),
+        }
+
     def __init__(self, sumwx, sumwxy):
-        self.x = x
+        self.sumwx = sumwx
+        self.sumwxy  = sumwxy 
 
 ################################################# Extreme
 
 class Extreme(Histos):
+    params = {
+        "min": histos.checktype.Check("Extreme", "min", required=None),
+        "max": histos.checktype.Check("Extreme", "max", required=None),
+        "excludes_minf": histos.checktype.Check("Extreme", "excludes_minf", required=None),
+        "excludes_pinf": histos.checktype.Check("Extreme", "excludes_pinf", required=None),
+        "excludes_nan": histos.checktype.Check("Extreme", "excludes_nan", required=None),
+        }
+
     def __init__(self, min, max, excludes_minf=False, excludes_pinf=False, excludes_nan=True):
-        self.x = x
+        self.min = min
+        self.max = max
+        self.excludes_minf = excludes_minf
+        self.excludes_pinf = excludes_pinf
+        self.excludes_nan = excludes_nan
 
 ################################################# Moment
 
 class Moment(Histos):
+    params = {
+        "n": histos.checktype.Check("Moment", "n", required=None),
+        "buffer": histos.checktype.Check("Moment", "buffer", required=None),
+        }
+
     def __init__(self, n, buffer=None):
-        self.x = x
+        self.n = n
+        self.buffer = buffer
 
 ################################################# Quantile
 
 class Quantile(Histos):
+    params = {
+        "p": histos.checktype.Check("Quantile", "p", required=None),
+        "value": histos.checktype.Check("Quantile", "value", required=None),
+        }
+
     def __init__(self, p, value=None):
-        self.x = x
+        self.p = p
+        self.value = value
 
 ################################################# GenericErrors
 
 class GenericErrors(Histos):
+    params = {
+        "error": histos.checktype.Check("GenericErrors", "error", required=None),
+        "p": histos.checktype.Check("GenericErrors", "p", required=None),
+        }
+
     def __init__(self, error=None, p=0.6826894921370859):
-        self.x = x
+        self.error = error
+        self.p = p
 
 ################################################# DistributionStats
 
 class DistributionStats(Histos):
+    params = {
+        "correlation": histos.checktype.Check("DistributionStats", "correlation", required=None),
+        "extremes": histos.checktype.Check("DistributionStats", "extremes", required=None),
+        "moments": histos.checktype.Check("DistributionStats", "moments", required=None),
+        "quantiles": histos.checktype.Check("DistributionStats", "quantiles", required=None),
+        "generic_errors": histos.checktype.Check("DistributionStats", "generic_errors", required=None),
+        }
+
     def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
-        self.x = x
+        self.correlation = correlation
+        self.extremes = extremes
+        self.moments = moments
+        self.quantiles = quantiles
+        self.generic_errors = generic_errors
 
 ################################################# Distribution
 
 class Distribution(Histos):
+    params = {
+        "counts": histos.checktype.Check("Distribution", "counts", required=None),
+        "stats": histos.checktype.Check("Distribution", "stats", required=None),
+        }
+
     def __init__(self, counts, stats=None):
-        self.x = x
+        self.counts = counts
+        self.stats = stats
 
 ################################################# Profile
 
 class Profile(Histos):
+    params = {
+        "expression": histos.checktype.Check("Profile", "expression", required=None),
+        "title": histos.checktype.Check("Profile", "title", required=None),
+        "metadata": histos.checktype.Check("Profile", "metadata", required=None),
+        "decoration": histos.checktype.Check("Profile", "decoration", required=None),
+        }
+
     def __init__(self, expression, title="", metadata=None, decoration=None):
-        self.x = x
+        self.expression = expression
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Histogram
 
 class Histogram(Object):
+    params = {
+        "identifier": histos.checktype.Check("Histogram", "identifier", required=None),
+        "axis": histos.checktype.Check("Histogram", "axis", required=None),
+        "distribution": histos.checktype.Check("Histogram", "distribution", required=None),
+        "profiles": histos.checktype.Check("Histogram", "profiles", required=None),
+        "unbinned_stats": histos.checktype.Check("Histogram", "unbinned_stats", required=None),
+        "profile_stats": histos.checktype.Check("Histogram", "profile_stats", required=None),
+        "functions": histos.checktype.Check("Histogram", "functions", required=None),
+        "title": histos.checktype.Check("Histogram", "title", required=None),
+        "metadata": histos.checktype.Check("Histogram", "metadata", required=None),
+        "decoration": histos.checktype.Check("Histogram", "decoration", required=None),
+        }
+
     def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
-        self.x = x
+        self.identifier = identifier
+        self.axis = axis
+        self.distribution = distribution
+        self.profiles = profiles
+        self.unbinned_stats = unbinned_stats
+        self.profile_stats = profile_stats
+        self.functions = functions
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Page
 
 class Page(Histos):
+    params = {
+        "buffer ": histos.checktype.Check("Page", "buffer ", required=None),
+        }
+
     def __init__(self, buffer):
-        self.x = x
+        self.buffer  = buffer 
 
 ################################################# ColumnChunk
 
 class ColumnChunk(Histos):
+    params = {
+        "pages": histos.checktype.Check("ColumnChunk", "pages", required=None),
+        "page_offsets": histos.checktype.Check("ColumnChunk", "page_offsets", required=None),
+        "page_extremes": histos.checktype.Check("ColumnChunk", "page_extremes", required=None),
+        }
+
     def __init__(self, pages, page_offsets, page_extremes=None):
-        self.x = x
+        self.pages = pages
+        self.page_offsets = page_offsets
+        self.page_extremes = page_extremes
 
 ################################################# Chunk
 
 class Chunk(Histos):
+    params = {
+        "columns": histos.checktype.Check("Chunk", "columns", required=None),
+        "metadata": histos.checktype.Check("Chunk", "metadata", required=None),
+        }
+
     def __init__(self, columns, metadata=None):
-        self.x = x
+        self.columns = columns
+        self.metadata = metadata
 
 ################################################# Column
 
 class Column(Histos, BufferInterpretation):
+    params = {
+        "identifier": histos.checktype.Check("Column", "identifier", required=None),
+        "dtype": histos.checktype.Check("Column", "dtype", required=None),
+        "endianness": histos.checktype.Check("Column", "endianness", required=None),
+        "dimension_order": histos.checktype.Check("Column", "dimension_order", required=None),
+        "filters": histos.checktype.Check("Column", "filters", required=None),
+        "title": histos.checktype.Check("Column", "title", required=None),
+        "metadata": histos.checktype.Check("Column", "metadata", required=None),
+        "decoration": histos.checktype.Check("Column", "decoration", required=None),
+        }
+
     def __init__(self, identifier, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, filters=None, title="", metadata=None, decoration=None):
-        self.x = x
+        self.identifier = identifier
+        self.dtype = dtype
+        self.endianness = endianness
+        self.dimension_order = dimension_order
+        self.filters = filters
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Ntuple
 
 class Ntuple(Object):
+    params = {
+        "identifier": histos.checktype.Check("Ntuple", "identifier", required=None),
+        "columns": histos.checktype.Check("Ntuple", "columns", required=None),
+        "chunks": histos.checktype.Check("Ntuple", "chunks", required=None),
+        "chunk_offsets": histos.checktype.Check("Ntuple", "chunk_offsets", required=None),
+        "unbinned_stats": histos.checktype.Check("Ntuple", "unbinned_stats", required=None),
+        "functions": histos.checktype.Check("Ntuple", "functions", required=None),
+        "title": histos.checktype.Check("Ntuple", "title", required=None),
+        "metadata": histos.checktype.Check("Ntuple", "metadata", required=None),
+        "decoration": histos.checktype.Check("Ntuple", "decoration", required=None),
+        }
+
     def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
-        self.x = x
+        self.identifier = identifier
+        self.columns = columns
+        self.chunks = chunks
+        self.chunk_offsets = chunk_offsets
+        self.unbinned_stats = unbinned_stats
+        self.functions = functions
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
 ################################################# Region
 
 class Region(Histos):
+    params = {
+        "expressions ": histos.checktype.Check("Region", "expressions ", required=None),
+        }
+
     def __init__(self, expressions):
-        self.x = x
+        self.expressions  = expressions 
 
 ################################################# BinnedRegion
 
 class BinnedRegion(Histos):
+    params = {
+        "expression": histos.checktype.Check("BinnedRegion", "expression", required=None),
+        "binning ": histos.checktype.Check("BinnedRegion", "binning ", required=None),
+        }
+
     def __init__(self, expression, binning):
-        self.x = x
+        self.expression = expression
+        self.binning  = binning 
 
 ################################################# Assignment
 
 class Assignment(Histos):
+    params = {
+        "identifier": histos.checktype.Check("Assignment", "identifier", required=None),
+        "expression ": histos.checktype.Check("Assignment", "expression ", required=None),
+        }
+
     def __init__(self, identifier, expression):
-        self.x = x
+        self.identifier = identifier
+        self.expression  = expression 
 
 ################################################# Variation
 
 class Variation(Histos):
+    params = {
+        "assignments": histos.checktype.Check("Variation", "assignments", required=None),
+        "systematic": histos.checktype.Check("Variation", "systematic", required=None),
+        "category_systematic": histos.checktype.Check("Variation", "category_systematic", required=None),
+        }
+
     def __init__(self, assignments, systematic=None, category_systematic=None):
-        self.x = x
+        self.assignments = assignments
+        self.systematic = systematic
+        self.category_systematic = category_systematic
 
 ################################################# Collection
 
