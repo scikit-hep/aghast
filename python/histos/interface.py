@@ -182,13 +182,19 @@ class Parameter(Histos):
 
 ################################################# Function
 
-class Function(Object):
+class Function(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+################################################# FunctionObject
+
+class FunctionObject(Object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# ParameterizedFunction
 
-class ParameterizedFunction(Function):
+class ParameterizedFunction(Function, FunctionObject):
     params = {
         "identifier":     histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
@@ -408,7 +414,7 @@ class IntegerBinning(Binning):
 
     def _valid(self, multiplicity):
         if min >= max:
-            raise ValueError("min ({0}) must be strictly less than max ({1})".format(self.min, self.max))
+            raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
 
 ################################################# RealInterval
 
@@ -428,7 +434,7 @@ class RealInterval(Histos):
 
     def _valid(self, multiplicity):
         if self.low >= self.high:
-            raise ValueError("low ({0}) must be strictly less than high ({1})".format(self.low, self.high))
+            raise ValueError("RealInterval.low ({0}) must be strictly less than RealInterval.high ({1})".format(self.low, self.high))
 
 ################################################# RealOverflow
 
@@ -703,10 +709,10 @@ class Distribution(Histos):
 
 class Profile(Histos):
     params = {
-        "expression": histos.checktype.Check("Profile", "expression", required=None),
-        "title":      histos.checktype.Check("Profile", "title", required=None),
-        "metadata":   histos.checktype.Check("Profile", "metadata", required=None),
-        "decoration": histos.checktype.Check("Profile", "decoration", required=None),
+        "expression": histos.checktype.CheckString("Profile", "expression", required=True),
+        "title":      histos.checktype.CheckString("Profile", "title", required=False),
+        "metadata":   histos.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
+        "decoration": histos.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, expression, title="", metadata=None, decoration=None):
@@ -719,16 +725,16 @@ class Profile(Histos):
 
 class Histogram(Object):
     params = {
-        "identifier":     histos.checktype.Check("Histogram", "identifier", required=None),
-        "axis":           histos.checktype.Check("Histogram", "axis", required=None),
-        "distribution":   histos.checktype.Check("Histogram", "distribution", required=None),
-        "profiles":       histos.checktype.Check("Histogram", "profiles", required=None),
-        "unbinned_stats": histos.checktype.Check("Histogram", "unbinned_stats", required=None),
-        "profile_stats":  histos.checktype.Check("Histogram", "profile_stats", required=None),
-        "functions":      histos.checktype.Check("Histogram", "functions", required=None),
-        "title":          histos.checktype.Check("Histogram", "title", required=None),
-        "metadata":       histos.checktype.Check("Histogram", "metadata", required=None),
-        "decoration":     histos.checktype.Check("Histogram", "decoration", required=None),
+        "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
+        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis),
+        "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
+        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
+        "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
+        "profile_stats":  histos.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
+        "functions":      histos.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "title":          histos.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
@@ -745,7 +751,7 @@ class Histogram(Object):
 
 ################################################# BinnedEvaluatedFunction
 
-class BinnedEvaluatedFunction(Function):
+class BinnedEvaluatedFunction(FunctionObject):
     params = {
         "identifier":     histos.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
         "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis),
@@ -771,7 +777,7 @@ class BinnedEvaluatedFunction(Function):
 
 class Page(Histos):
     params = {
-        "buffer":  histos.checktype.Check("Page", "buffer", required=None),
+        "buffer":  histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
     def __init__(self, buffer):
@@ -781,9 +787,9 @@ class Page(Histos):
 
 class ColumnChunk(Histos):
     params = {
-        "pages":         histos.checktype.Check("ColumnChunk", "pages", required=None),
-        "page_offsets":  histos.checktype.Check("ColumnChunk", "page_offsets", required=None),
-        "page_extremes": histos.checktype.Check("ColumnChunk", "page_extremes", required=None),
+        "pages":         histos.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
+        "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int),
+        "page_extremes": histos.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
         }
 
     def __init__(self, pages, page_offsets, page_extremes=None):
@@ -791,12 +797,20 @@ class ColumnChunk(Histos):
         self.page_offsets = page_offsets
         self.page_extremes = page_extremes
 
+    def _valid(self, multiplicity):
+        if len(self.page_offsets) == 0:
+            raise ValueError("ColumnChunk.page_offsets must not be empty")
+        if self.page_offsets[0] != 0:
+            raise ValueError("ColumnChunk.page_offsets must start with 0")
+        if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
+            raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
+
 ################################################# Chunk
 
 class Chunk(Histos):
     params = {
-        "columns":  histos.checktype.Check("Chunk", "columns", required=None),
-        "metadata": histos.checktype.Check("Chunk", "metadata", required=None),
+        "columns":  histos.checktype.CheckVector("Chunk", "columns", required=True, type=ColumnChunk),
+        "metadata": histos.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
     def __init__(self, columns, metadata=None):
@@ -807,14 +821,14 @@ class Chunk(Histos):
 
 class Column(Histos):
     params = {
-        "identifier":      histos.checktype.Check("Column", "identifier", required=None),
-        "dtype":           histos.checktype.Check("Column", "dtype", required=None),
-        "endianness":      histos.checktype.Check("Column", "endianness", required=None),
-        "dimension_order": histos.checktype.Check("Column", "dimension_order", required=None),
-        "filters":         histos.checktype.Check("Column", "filters", required=None),
-        "title":           histos.checktype.Check("Column", "title", required=None),
-        "metadata":        histos.checktype.Check("Column", "metadata", required=None),
-        "decoration":      histos.checktype.Check("Column", "decoration", required=None),
+        "identifier":      histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
+        "dtype":           histos.checktype.CheckEnum("Column", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":      histos.checktype.CheckEnum("Column", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order": histos.checktype.CheckEnum("Column", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "filters":         histos.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
+        "title":           histos.checktype.CheckString("Column", "title", required=False),
+        "metadata":        histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
+        "decoration":      histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, identifier, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
@@ -831,15 +845,15 @@ class Column(Histos):
 
 class Ntuple(Object):
     params = {
-        "identifier":     histos.checktype.Check("Ntuple", "identifier", required=None),
-        "columns":        histos.checktype.Check("Ntuple", "columns", required=None),
-        "chunks":         histos.checktype.Check("Ntuple", "chunks", required=None),
-        "chunk_offsets":  histos.checktype.Check("Ntuple", "chunk_offsets", required=None),
-        "unbinned_stats": histos.checktype.Check("Ntuple", "unbinned_stats", required=None),
-        "functions":      histos.checktype.Check("Ntuple", "functions", required=None),
-        "title":          histos.checktype.Check("Ntuple", "title", required=None),
-        "metadata":       histos.checktype.Check("Ntuple", "metadata", required=None),
-        "decoration":     histos.checktype.Check("Ntuple", "decoration", required=None),
+        "identifier":     histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
+        "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column),
+        "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
+        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=True, type=int),
+        "unbinned_stats": histos.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
+        "functions":      histos.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":          histos.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
@@ -853,11 +867,19 @@ class Ntuple(Object):
         self.metadata = metadata
         self.decoration = decoration
 
+    def _valid(self, multiplicity):
+        if len(self.chunk_offsets) == 0:
+            raise ValueError("Ntuple.chunk_offsets must not be empty")
+        if self.chunk_offsets[0] != 0:
+            raise ValueError("Ntuple.chunk_offsets must start with 0")
+        if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
+            raise ValueError("Ntuple.chunk_offsets must be monotonically increasing")
+
 ################################################# Region
 
 class Region(Histos):
     params = {
-        "expressions":  histos.checktype.Check("Region", "expressions", required=None),
+        "expressions":  histos.checktype.CheckVector("Region", "expressions", required=True, type=str),
         }
 
     def __init__(self, expressions):
@@ -867,8 +889,8 @@ class Region(Histos):
 
 class BinnedRegion(Histos):
     params = {
-        "expression": histos.checktype.Check("BinnedRegion", "expression", required=None),
-        "binning":    histos.checktype.Check("BinnedRegion", "binning", required=None),
+        "expression": histos.checktype.CheckString("BinnedRegion", "expression", required=True),
+        "binning":    histos.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
         }
 
     def __init__(self, expression, binning):
@@ -879,8 +901,8 @@ class BinnedRegion(Histos):
 
 class Assignment(Histos):
     params = {
-        "identifier": histos.checktype.Check("Assignment", "identifier", required=None),
-        "expression": histos.checktype.Check("Assignment", "expression", required=None),
+        "identifier": histos.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
+        "expression": histos.checktype.CheckString("Assignment", "expression", required=True),
         }
 
     def __init__(self, identifier, expression):
@@ -891,9 +913,9 @@ class Assignment(Histos):
 
 class Variation(Histos):
     params = {
-        "assignments":         histos.checktype.Check("Variation", "assignments", required=None),
-        "systematic":          histos.checktype.Check("Variation", "systematic", required=None),
-        "category_systematic": histos.checktype.Check("Variation", "category_systematic", required=None),
+        "assignments":         histos.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
+        "systematic":          histos.checktype.CheckVector("Variation", "systematic", required=False, type=float),
+        "category_systematic": histos.checktype.CheckVecotr("Variation", "category_systematic", required=False, type=str),
         }
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
