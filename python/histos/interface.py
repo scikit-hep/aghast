@@ -268,8 +268,8 @@ class RawExternalBuffer(Buffer):
     types = [memory, samefile, file, url]
 
     params = {
-        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True),
-        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True),
+        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
         "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=types),
         "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
@@ -330,8 +330,8 @@ class InlineBuffer(RawInlineBuffer, BufferInterpretation):
 
 class ExternalBuffer(RawExternalBuffer, BufferInterpretation):
     params = {
-        "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True),
-        "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True),
+        "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
         "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=RawExternalBuffer.types),
         "filters":          histos.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
@@ -393,6 +393,10 @@ class IntegerBinning(Binning):
         self.has_underflow = has_underflow
         self.has_overflow = has_overflow
 
+    def _valid(self, multiplicity):
+        if min >= max:
+            raise ValueError("min ({0}) must be strictly less than max ({1})".format(self.min, self.max))
+
 ################################################# RealInterval
 
 class RealInterval(Histos):
@@ -408,6 +412,10 @@ class RealInterval(Histos):
         self.high = high
         self.low_inclusive = low_inclusive
         self.high_inclusive = high_inclusive
+
+    def _valid(self, multiplicity):
+        if self.low >= self.high:
+            raise ValueError("low ({0}) must be strictly less than high ({1})".format(self.low, self.high))
 
 ################################################# RealOverflow
 
@@ -439,7 +447,7 @@ class RealOverflow(Histos):
 
 class RegularBinning(Binning):
     params = {
-        "num":      histos.checktype.CheckInteger("RegularBinning", "num", required=True),
+        "num":      histos.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
         "interval": histos.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
         "overflow": histos.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
         "circular": histos.checktype.CheckBool("RegularBinning", "circular", required=False),
@@ -455,8 +463,8 @@ class RegularBinning(Binning):
 
 class TicTacToeOverflowBinning(Binning):
     params = {
-        "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True),
-        "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True),
+        "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
+        "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
         "x":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "x", required=True, type=RealInterval),
         "y":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "y", required=True, type=RealInterval),
         "xoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
@@ -479,16 +487,17 @@ class HexagonalBinning(Binning):
     cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
     cube_yz        = Enum("cube_yz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
     cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
+    coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     params = {
-        "q":           histos.checktype.Check("xz        = Enum", "q", required=None),
-        "r":           histos.checktype.Check("xz        = Enum", "r", required=None),
-        "coordinates": histos.checktype.Check("xz        = Enum", "coordinates", required=None),
-        "originx":     histos.checktype.Check("xz        = Enum", "originx", required=None),
-        "originy":     histos.checktype.Check("xz        = Enum", "originy", required=None),
+        "q":           histos.checktype.CheckClass("HexagonalBinning", "q", required=True, type=IntegerBinning),
+        "r":           histos.checktype.CheckClass("HexagonalBinning", "r", required=True, type=IntegerBinning),
+        "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":     histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False),
+        "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False),
         }
 
-    def __init__(self, q, r, coordinates=offset, originx=0.0, originy=0.0):
+    def __init__(self, q, r, coordinates=offset, xorigin=0.0, yorigin=0.0):
         self.q = q
         self.r = r
         self.coordinates = coordinates
@@ -499,8 +508,8 @@ class HexagonalBinning(Binning):
 
 class VariableBinning(Binning):
     params = {
-        "intervals": histos.checktype.Check("VariableBinning", "intervals", required=None),
-        "overflow":  histos.checktype.Check("VariableBinning", "overflow", required=None),
+        "intervals": histos.checktype.CheckVector("VariableBinning", "intervals", required=True, type=RealInterval),
+        "overflow":  histos.checktype.CheckClass("VariableBinning", "overflow", required=False, type=RealOverflow),
         }
 
     def __init__(self, intervals, overflow=None):
@@ -511,7 +520,7 @@ class VariableBinning(Binning):
 
 class CategoryBinning(Binning):
     params = {
-        "categories":  histos.checktype.Check("CategoryBinning", "categories", required=None),
+        "categories":  histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
         }
 
     def __init__(self, categories):
@@ -521,9 +530,9 @@ class CategoryBinning(Binning):
 
 class SparseRegularBinning(Binning):
     params = {
-        "bin_width":   histos.checktype.Check("SparseRegularBinning", "bin_width", required=None),
-        "origin":      histos.checktype.Check("SparseRegularBinning", "origin", required=None),
-        "has_nanflow": histos.checktype.Check("SparseRegularBinning", "has_nanflow", required=None),
+        "bin_width":   histos.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        "has_nanflow": histos.checktype.CheckBool("SparseRegularBinning", "has_nanflow", required=False),
         }
 
     def __init__(self, bin_width, origin=0.0, has_nanflow=True):
