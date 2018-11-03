@@ -6,8 +6,6 @@ from histos.interface import Object
 from histos.interface import Parameter
 from histos.interface import Function
 from histos.interface import FunctionObject
-from histos.interface import ParameterizedFunction
-from histos.interface import EvaluatedFunction
 from histos.interface import Buffer
 from histos.interface import InlineBuffer
 from histos.interface import ExternalBuffer
@@ -41,6 +39,8 @@ from histos.interface import DistributionStats
 from histos.interface import Distribution
 from histos.interface import Profile
 from histos.interface import Histogram
+from histos.interface import ParameterizedFunction
+from histos.interface import EvaluatedFunction
 from histos.interface import BinnedEvaluatedFunction
 from histos.interface import Page
 from histos.interface import ColumnChunk

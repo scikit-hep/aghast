@@ -76,7 +76,7 @@ def typedproperty(check):
     def prop(self):
         private = "_" + check.param
         if not hasattr(self, private):
-            setattr(self, private, check.fromflatbuffer(getattr(self._flatbuffers, check.param.capitalize())()))
+            setattr(self, private, check.fromflatbuffers(getattr(self._flatbuffers, check.param.capitalize())()))
         return getattr(self, private)
 
     @prop.setter
@@ -192,60 +192,6 @@ class FunctionObject(Object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-################################################# ParameterizedFunction
-
-class ParameterizedFunction(Function, FunctionObject):
-    params = {
-        "identifier": histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
-        "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
-        "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
-        "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
-        "title":      histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
-        "metadata":   histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
-        "decoration": histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
-        }
-
-    identifier = typedproperty(params["identifier"])
-    expression = typedproperty(params["expression"])
-    parameters = typedproperty(params["parameters"])
-    contours   = typedproperty(params["contours"])
-    title      = typedproperty(params["title"])
-    metadata   = typedproperty(params["metadata"])
-    decoration = typedproperty(params["decoration"])
-
-    def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
-        self.expression = expression
-
-################################################# EvaluatedFunction
-
-class EvaluatedFunction(Function):
-    params = {
-        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
-        "values":         histos.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
-        "derivatives":    histos.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
-        "generic_errors": histos.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
-        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
-        }
-
-    identifier     = typedproperty(params["identifier"])
-    values         = typedproperty(params["values"])
-    derivatives    = typedproperty(params["derivatives"])
-    generic_errors = typedproperty(params["generic_errors"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
-
-    def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
-        self.identifier = identifier
-        self.values = values
-        self.derivatives = derivatives
-        self.generic_errors = generic_errors
-        self.title = title
-        self.metadata = metadata
-        self.decoration = decoration
-
 ################################################# Buffers
 
 class Buffer(Histos):
@@ -336,7 +282,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     filters          = typedproperty(params["filters"])
     postfilter_slice = typedproperty(params["postfilter_slice"])
 
-    def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None):
         self.pointer = pointer
         self.numbytes = numbytes
         self.external_type = external_type
@@ -345,7 +291,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
 
 ################################################# InlineBuffer
 
-class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InternalBuffer):
+class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     params = {
         "buffer":           histos.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
         "filters":          histos.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
@@ -886,6 +832,60 @@ class Histogram(Object):
         self.metadata = metadata
         self.decoration = decoration
 
+################################################# ParameterizedFunction
+
+class ParameterizedFunction(Function, FunctionObject):
+    params = {
+        "identifier": histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
+        "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
+        "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
+        "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
+        "title":      histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":   histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration": histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        }
+
+    identifier = typedproperty(params["identifier"])
+    expression = typedproperty(params["expression"])
+    parameters = typedproperty(params["parameters"])
+    contours   = typedproperty(params["contours"])
+    title      = typedproperty(params["title"])
+    metadata   = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
+
+    def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
+        self.expression = expression
+
+################################################# EvaluatedFunction
+
+class EvaluatedFunction(Function):
+    params = {
+        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "values":         histos.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
+        "derivatives":    histos.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
+        "generic_errors": histos.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
+        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        }
+
+    identifier     = typedproperty(params["identifier"])
+    values         = typedproperty(params["values"])
+    derivatives    = typedproperty(params["derivatives"])
+    generic_errors = typedproperty(params["generic_errors"])
+    title          = typedproperty(params["title"])
+    metadata       = typedproperty(params["metadata"])
+    decoration     = typedproperty(params["decoration"])
+
+    def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
+        self.identifier = identifier
+        self.values = values
+        self.derivatives = derivatives
+        self.generic_errors = generic_errors
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+
 ################################################# BinnedEvaluatedFunction
 
 class BinnedEvaluatedFunction(FunctionObject):
@@ -1097,7 +1097,7 @@ class Variation(Histos):
     params = {
         "assignments":         histos.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
         "systematic":          histos.checktype.CheckVector("Variation", "systematic", required=False, type=float),
-        "category_systematic": histos.checktype.CheckVecotr("Variation", "category_systematic", required=False, type=str),
+        "category_systematic": histos.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
     assignments         = typedproperty(params["assignments"])
@@ -1112,10 +1112,10 @@ class Variation(Histos):
 ################################################# Collection
 
 class Collection(Histos):
-    def tobuffer(self, internalize=False):
+    def tobuffer(self):
         self._valid(1)
         builder = flatbuffers.Builder(1024)
-        builder.Finish(self._toflatbuffers(builder, internalize, None))
+        builder.Finish(self._toflatbuffers(builder, None))
         return builder.Output()
 
     @classmethod
@@ -1131,7 +1131,7 @@ class Collection(Histos):
     def fromarray(cls, array):
         return cls.frombuffer(array)
 
-    def tofile(self, file, internalize=False):
+    def tofile(self, file):
         self._valid(1)
 
         opened = False
@@ -1183,7 +1183,7 @@ class Collection(Histos):
     params = {
         "identifier":     histos.checktype.CheckString("Collection", "identifier", required=True),
         "objects":        histos.checktype.CheckVector("Collection", "objects", required=True, type=Object),
-        "collections":    histos.checktype.CheckVector("Collection", "collections", required=False, type=Collection),
+        "collections":    histos.checktype.CheckVector("Collection", "collections", required=False, type=None),
         "regions":        histos.checktype.CheckVector("Collection", "regions", required=False, type=Region),
         "binned_regions": histos.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
         "variations":     histos.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
@@ -1219,7 +1219,7 @@ class Collection(Histos):
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
 
-    def _toflatbuffers(self, builder, internalize, file):
+    def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)
         if len(self._title) > 0:
             title = builder.CreateString(self._title)
@@ -1228,3 +1228,5 @@ class Collection(Histos):
         if len(self._title) > 0:
             histos.histos_generated.Collection.CollectionAddTitle(builder, title)
         return histos.histos_generated.Collection.CollectionEnd(builder)
+
+Collection.params["collections"].type = Collection

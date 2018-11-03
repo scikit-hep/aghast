@@ -93,9 +93,12 @@ enum Filter: int {
 }
 
 struct Slice {
-  start: ulong;
-  stop: ulong;
-  step: ulong;
+  start: long;
+  stop: long;
+  step: int;
+  has_start: bool;
+  has_stop: bool;
+  has_step: bool;
 }
 
 enum ExternalType: int {
