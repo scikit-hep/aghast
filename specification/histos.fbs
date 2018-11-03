@@ -95,6 +95,7 @@ enum Filter: int {
 struct Slice {
   start: ulong;
   stop: ulong;
+  step: ulong;
 }
 
 enum ExternalType: int {
@@ -202,11 +203,12 @@ table RegularBinning {
 }
 
 table TicTacToeOverflowBinning {
-  numx: ulong;
-  numy: ulong;
+  xnum: ulong;
+  ynum: ulong;
   x: RealInterval (required);
   y: RealInterval (required);
-  overflow: RealOverflow (required);
+  xoverflow: RealOverflow;
+  yoverflow: RealOverflow;
 }
 
 // https://www.redblobgames.com/grids/hexagons
@@ -222,8 +224,8 @@ table HexagonalBinning {
   q: IntegerBinning (required);
   r: IntegerBinning (required);
   coordinates: HexagonalCoordinates = hex_offset;
-  originx: double = 0.0;    // x coordinate of (q, r) == (0, 0)
-  originy: double = 0.0;    // y coordinate of (q, r) == (0, 0)
+  xorigin: double = 0.0;    // x coordinate of (q, r) == (0, 0)
+  yorigin: double = 0.0;    // y coordinate of (q, r) == (0, 0)
 }
 
 table VariableBinning {

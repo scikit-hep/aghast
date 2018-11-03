@@ -124,10 +124,11 @@ class Enum(object):
 class Metadata(Histos):
     unspecified = Enum("unspecified", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
     json = Enum("json", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_json)
+    language = [unspecified, json]
 
     params = {
         "data":     histos.checktype.CheckString("Metadata", "data", required=True),
-        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=[unspecified, json]),
+        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(params["data"])
@@ -144,10 +145,11 @@ class Decoration(Histos):
     css         = Enum("css", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_css)
     vega        = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
     root_json   = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+    language = [unspecified, css, vega, root_json]
 
     params = {
         "data":     histos.checktype.CheckString("Metadata", "data", required=True),
-        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=[unspecified, css, vega, root_json]),
+        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(params["data"])
@@ -233,6 +235,12 @@ class EvaluatedFunction(Function):
 ################################################# Buffer
 
 class Buffer(Histos):
+    none = Enum("none", histos.histos_generated.Filter.Filter.filter_none)
+    gzip = Enum("gzip", histos.histos_generated.Filter.Filter.filter_gzip)
+    lzma = Enum("lzma", histos.histos_generated.Filter.Filter.filter_lzma)
+    lz4  = Enum("lz4", histos.histos_generated.Filter.Filter.filter_lz4)
+    filters = [none, gzip, lzma, lz4]
+
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -240,9 +248,9 @@ class Buffer(Histos):
 
 class RawInlineBuffer(Buffer):
     params = {
-        "buffer":           histos.checktype.Check("RawInlineBuffer", "buffer", required=None),
-        "filters":          histos.checktype.Check("RawInlineBuffer", "filters", required=None),
-        "postfilter_slice": histos.checktype.Check("RawInlineBuffer", "postfilter_slice", required=None),
+        "buffer":           histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
+        "filters":          histos.checktype.CheckVector("RawInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
         }
 
     def __init__(self, buffer, filters=None, postfilter_slice=None):
@@ -257,13 +265,14 @@ class RawExternalBuffer(Buffer):
     samefile = Enum("samefile", histos.histos_generated.ExternalType.ExternalType.external_samefile)
     file     = Enum("file", histos.histos_generated.ExternalType.ExternalType.external_file)
     url      = Enum("url", histos.histos_generated.ExternalType.ExternalType.external_url)
+    types = [memory, samefile, file, url]
 
     params = {
-        "pointer":          histos.checktype.Check("     = Enum", "pointer", required=None),
-        "numbytes":         histos.checktype.Check("     = Enum", "numbytes", required=None),
-        "external_type":    histos.checktype.Check("     = Enum", "external_type", required=None),
-        "filters":          histos.checktype.Check("     = Enum", "filters", required=None),
-        "postfilter_slice": histos.checktype.Check("     = Enum", "postfilter_slice", required=None),
+        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True),
+        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True),
+        "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=types),
+        "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
         }
 
     def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
@@ -287,23 +296,26 @@ class BufferInterpretation(object):
     uint64  = Enum("uint64", histos.histos_generated.DType.DType.dtype_uint64)
     float32 = Enum("float32", histos.histos_generated.DType.DType.dtype_float32)
     float64 = Enum("float64", histos.histos_generated.DType.DType.dtype_float64)
+    dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
     little = Enum("little", histos.histos_generated.Endianness.Endianness.little_endian)
     big    = Enum("big", histos.histos_generated.Endianness.Endianness.big_endian)
+    endiannesses = [little, big]
 
     c_order       = Enum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order)
     fortran_order = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order)
+    orders = [c_order, fortran_order]
 
 ################################################# InlineBuffer
 
 class InlineBuffer(RawInlineBuffer, BufferInterpretation):
     params = {
-        "buffer":           histos.checktype.Check("InlineBuffer", "buffer", required=None),
-        "filters":          histos.checktype.Check("InlineBuffer", "filters", required=None),
-        "postfilter_slice": histos.checktype.Check("InlineBuffer", "postfilter_slice", required=None),
-        "dtype":            histos.checktype.Check("InlineBuffer", "dtype", required=None),
-        "endianness":       histos.checktype.Check("InlineBuffer", "endianness", required=None),
-        "dimension_order":  histos.checktype.Check("InlineBuffer", "dimension_order", required=None),
+        "buffer":           histos.checktype.CheckBuffer("InlineBuffer", "buffer", required=True),
+        "filters":          histos.checktype.CheckVector("InlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("InlineBuffer", "postfilter_slice", required=False),
+        "dtype":            histos.checktype.CheckEnum("InlineBuffer", "dtype", required=False, choices=BufferInterpretation.dtypes),
+        "endianness":       histos.checktype.CheckEnum("InlineBuffer", "endianness", required=False, choices=BufferInterpretation.endiannesses),
+        "dimension_order":  histos.checktype.CheckEnum("InlineBuffer", "dimension_order", required=False, choices=BufferInterpretation.orders),
         }
 
     def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order):
@@ -318,15 +330,15 @@ class InlineBuffer(RawInlineBuffer, BufferInterpretation):
 
 class ExternalBuffer(RawExternalBuffer, BufferInterpretation):
     params = {
-        "pointer":          histos.checktype.Check("ExternalBuffer", "pointer", required=None),
-        "numbytes":         histos.checktype.Check("ExternalBuffer", "numbytes", required=None),
-        "external_type":    histos.checktype.Check("ExternalBuffer", "external_type", required=None),
-        "filters":          histos.checktype.Check("ExternalBuffer", "filters", required=None),
-        "postfilter_slice": histos.checktype.Check("ExternalBuffer", "postfilter_slice", required=None),
-        "dtype":            histos.checktype.Check("ExternalBuffer", "dtype", required=None),
-        "endianness":       histos.checktype.Check("ExternalBuffer", "endianness", required=None),
-        "dimension_order":  histos.checktype.Check("ExternalBuffer", "dimension_order", required=None),
-        "location":         histos.checktype.Check("ExternalBuffer", "location", required=None),
+        "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True),
+        "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True),
+        "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=RawExternalBuffer.types),
+        "filters":          histos.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
+        "dtype":            histos.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=BufferInterpretation.dtypes),
+        "endianness":       histos.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=BufferInterpretation.endiannesses),
+        "dimension_order":  histos.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=BufferInterpretation.orders),
+        "location":         histos.checktype.CheckString("ExternalBuffer", "location", required=False),
         }
 
     def __init__(self, pointer, numbytes, external_type=RawExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, location=""):
@@ -356,9 +368,10 @@ class FractionalBinning(Binning):
     feldman_cousins  = Enum("feldman_cousins", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_feldman_cousins)
     jeffrey          = Enum("jeffrey", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
     bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
+    error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     params = {
-        "error_method": histos.checktype.Check("uniform = Enum", "error_method", required=None),
+        "error_method": histos.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
         }
 
     def __init__(self, error_method=normal):
@@ -368,10 +381,10 @@ class FractionalBinning(Binning):
 
 class IntegerBinning(Binning):
     params = {
-        "min":           histos.checktype.Check("IntegerBinning", "min", required=None),
-        "max":           histos.checktype.Check("IntegerBinning", "max", required=None),
-        "has_underflow": histos.checktype.Check("IntegerBinning", "has_underflow", required=None),
-        "has_overflow":  histos.checktype.Check("IntegerBinning", "has_overflow", required=None),
+        "min":           histos.checktype.CheckInteger("IntegerBinning", "min", required=True),
+        "max":           histos.checktype.CheckInteger("IntegerBinning", "max", required=True),
+        "has_underflow": histos.checktype.CheckBool("IntegerBinning", "has_underflow", required=False),
+        "has_overflow":  histos.checktype.CheckBool("IntegerBinning", "has_overflow", required=False),
         }
 
     def __init__(self, min, max, has_underflow=True, has_overflow=True):
@@ -384,10 +397,10 @@ class IntegerBinning(Binning):
 
 class RealInterval(Histos):
     params = {
-        "low":            histos.checktype.Check("RealInterval", "low", required=None),
-        "high":           histos.checktype.Check("RealInterval", "high", required=None),
-        "low_inclusive":  histos.checktype.Check("RealInterval", "low_inclusive", required=None),
-        "high_inclusive": histos.checktype.Check("RealInterval", "high_inclusive", required=None),
+        "low":            histos.checktype.CheckNumber("RealInterval", "low", required=True),
+        "high":           histos.checktype.CheckNumber("RealInterval", "high", required=True),
+        "low_inclusive":  histos.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
+        "high_inclusive": histos.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
 
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
@@ -403,14 +416,15 @@ class RealOverflow(Histos):
     in_underflow = Enum("in_underflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_underflow)
     in_overflow  = Enum("in_overflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_overflow)
     in_nanflow   = Enum("in_nanflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_nanflow)
+    mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     params = {
-        "has_underflow": histos.checktype.Check("nanflow   = Enum", "has_underflow", required=None),
-        "has_overflow":  histos.checktype.Check("nanflow   = Enum", "has_overflow", required=None),
-        "has_nanflow":   histos.checktype.Check("nanflow   = Enum", "has_nanflow", required=None),
-        "minf_mapping":  histos.checktype.Check("nanflow   = Enum", "minf_mapping", required=None),
-        "pinf_mapping":  histos.checktype.Check("nanflow   = Enum", "pinf_mapping", required=None),
-        "nan_mapping":   histos.checktype.Check("nanflow   = Enum", "nan_mapping", required=None),
+        "has_underflow": histos.checktype.CheckBool("RealOverflow", "has_underflow", required=False),
+        "has_overflow":  histos.checktype.CheckBool("RealOverflow", "has_overflow", required=False),
+        "has_nanflow":   histos.checktype.CheckBool("RealOverflow", "has_nanflow", required=False),
+        "minf_mapping":  histos.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
+        "pinf_mapping":  histos.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
+        "nan_mapping":   histos.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
     def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
@@ -425,10 +439,10 @@ class RealOverflow(Histos):
 
 class RegularBinning(Binning):
     params = {
-        "num":      histos.checktype.Check("RegularBinning", "num", required=None),
-        "interval": histos.checktype.Check("RegularBinning", "interval", required=None),
-        "overflow": histos.checktype.Check("RegularBinning", "overflow", required=None),
-        "circular": histos.checktype.Check("RegularBinning", "circular", required=None),
+        "num":      histos.checktype.CheckInteger("RegularBinning", "num", required=True),
+        "interval": histos.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
+        "overflow": histos.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
+        "circular": histos.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
     def __init__(self, num, interval, overflow=None, circular=False):
@@ -441,19 +455,21 @@ class RegularBinning(Binning):
 
 class TicTacToeOverflowBinning(Binning):
     params = {
-        "numx":      histos.checktype.Check("TicTacToeOverflowBinning", "numx", required=None),
-        "numy":      histos.checktype.Check("TicTacToeOverflowBinning", "numy", required=None),
-        "x":         histos.checktype.Check("TicTacToeOverflowBinning", "x", required=None),
-        "y":         histos.checktype.Check("TicTacToeOverflowBinning", "y", required=None),
-        "overflow":  histos.checktype.Check("TicTacToeOverflowBinning", "overflow", required=None),
+        "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True),
+        "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True),
+        "x":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "x", required=True, type=RealInterval),
+        "y":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "y", required=True, type=RealInterval),
+        "xoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
+        "yoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
 
-    def __init__(self, numx, numy, x, y, overflow):
-        self.numx = numx
-        self.numy = numy
+    def __init__(self, xnum, ynum, x, y, xoverflow=None, yoverflow=None):
+        self.xnum = xnum
+        self.ynum = ynum
         self.x = x
         self.y = y
-        self.overflow  = overflow 
+        self.xoverflow = xoverflow
+        self.yoverflow = yoverflow
 
 ################################################# HexagonalBinning
 
