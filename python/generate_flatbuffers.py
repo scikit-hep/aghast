@@ -31,8 +31,9 @@
 import os
 import shutil
 
-if os.path.exists(os.path.join("histos", "histos_generated")):
-    shutil.rmtree(os.path.join("histos", "histos_generated"))
+if __name__ == "__main__":
+    if os.path.exists(os.path.join("histos", "histos_generated")):
+        shutil.rmtree(os.path.join("histos", "histos_generated"))
 
-os.chdir("histos")
-os.system("flatc --python ../../flatbuffers/histos.fbs")
+    os.chdir("histos")
+    os.system("flatc --python ../../flatbuffers/histos.fbs")
