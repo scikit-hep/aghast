@@ -120,12 +120,7 @@ table RawExternalBuffer {
   location: string;
 }
 
-union RawBuffer {
-  RawInlineBuffer,
-  RawExternalBuffer
-}
-
-table InlineBuffer {
+table InterpretedInlineBuffer {
   buffer: [ubyte] (required);
   filters: [Filter];
   postfilter_slice: Slice;
@@ -134,7 +129,7 @@ table InlineBuffer {
   dimension_order: DimensionOrder = c_order;
 }
 
-table ExternalBuffer {
+table InterpretedExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
   external_type: ExternalType = external_memory;
@@ -146,9 +141,14 @@ table ExternalBuffer {
   location: string;
 }
 
-union Buffer {
-  InlineBuffer,
-  ExternalBuffer
+union RawBuffer {
+  RawInlineBuffer,
+  RawExternalBuffer
+}
+
+union InterpretedBuffer {
+  InterpretedInlineBuffer,
+  InterpretedExternalBuffer
 }
 
 enum FractionalErrorMethod: byte {
@@ -238,6 +238,7 @@ table CategoryBinning {
 }
 
 table SparseRegularBinning {
+  bins: [long] (required);
   bin_width: double;
   origin: double = 0.0;
   has_nanflow: bool = true;
@@ -262,54 +263,54 @@ table Axis {
   decoration: Decoration;
 }
 
+table UnweightedCounts {
+  counts: InterpretedBuffer (required);
+}
+
+table WeightedCounts {
+  sumw: InterpretedBuffer (required);
+  sumw2: InterpretedBuffer (required);
+  counts: UnweightedCounts;               // optional
+}
+
 union Counts {
   UnweightedCounts,
   WeightedCounts
 }
 
-table UnweightedCounts {
-  counts: Buffer (required);
-}
-
-table WeightedCounts {
-  sumw: Buffer (required);
-  sumw2: Buffer (required);
-  counts: Counts;
-}
-
 table Correlation {
-  sumwx: Buffer (required);
-  sumwxy: Buffer (required);   // symmetric matrix: N*(N+1) elements
+  sumwx: InterpretedBuffer (required);
+  sumwxy: InterpretedBuffer (required);   // symmetric matrix: N*(N+1) elements
 }
 
-table Extreme {
-  min: double;
-  max: double;
+table Extremes {
+  min: InterpretedBuffer (required);
+  max: InterpretedBuffer (required);
   excludes_minf: bool = false;
   excludes_pinf: bool = false;
   excludes_nan: bool = true;
 }
 
-table Moment {
+table Moments {
+  sumwn: InterpretedBuffer (required);
   n: int;
-  sumwn: Buffer (required);
 }
 
-table Quantile {
-  p: double;    // 0.0 <= p <= 1.0
-  value: Buffer (required);
+table Quantiles {
+  values: InterpretedBuffer (required);
+  p: double = 0.5;    // 0.0 <= p <= 1.0
 }
 
 table GenericErrors {
-  error: Buffer (required);
+  errors: InterpretedBuffer (required);
   p: double = 0.6826894921370859;    // +1 sigma
 }
 
 table DistributionStats {
   correlation: Correlation;
-  extremes: [Extreme];
-  moments: [Moment];
-  quantiles: [Quantile];
+  extremes: Extremes;
+  moments: [Moments];
+  quantiles: [Quantiles];
   generic_errors: [GenericErrors];
 }
 
@@ -359,7 +360,7 @@ table Page {
 table ColumnChunk {
   pages: [Page] (required);
   page_offsets: [ulong] (required);
-  page_extremes: [Extreme];
+  page_extremes: [Extremes];
 }
 
 table Chunk {

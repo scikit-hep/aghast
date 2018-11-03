@@ -10,7 +10,6 @@ import histos.histos_generated.Axis
 import histos.histos_generated.BinnedEvaluatedFunction
 import histos.histos_generated.BinnedRegion
 import histos.histos_generated.Binning
-import histos.histos_generated.Buffer
 import histos.histos_generated.CategoryBinning
 import histos.histos_generated.Chunk
 import histos.histos_generated.Collection
@@ -26,9 +25,8 @@ import histos.histos_generated.DistributionStats
 import histos.histos_generated.DType
 import histos.histos_generated.Endianness
 import histos.histos_generated.EvaluatedFunction
-import histos.histos_generated.ExternalBuffer
 import histos.histos_generated.ExternalType
-import histos.histos_generated.Extreme
+import histos.histos_generated.Extremes
 import histos.histos_generated.Filter
 import histos.histos_generated.FractionalErrorMethod
 import histos.histos_generated.FractionBinning
@@ -40,11 +38,13 @@ import histos.histos_generated.GenericErrors
 import histos.histos_generated.HexagonalBinning
 import histos.histos_generated.HexagonalCoordinates
 import histos.histos_generated.Histogram
-import histos.histos_generated.InlineBuffer
 import histos.histos_generated.IntegerBinning
+import histos.histos_generated.InterpretedBuffer
+import histos.histos_generated.InterpretedExternalBuffer
+import histos.histos_generated.InterpretedInlineBuffer
 import histos.histos_generated.MetadataLanguage
 import histos.histos_generated.Metadata
-import histos.histos_generated.Moment
+import histos.histos_generated.Moments
 import histos.histos_generated.NonRealMapping
 import histos.histos_generated.Ntuple
 import histos.histos_generated.ObjectData
@@ -53,7 +53,7 @@ import histos.histos_generated.Page
 import histos.histos_generated.ParameterizedFunction
 import histos.histos_generated.Parameter
 import histos.histos_generated.Profile
-import histos.histos_generated.Quantile
+import histos.histos_generated.Quantiles
 import histos.histos_generated.RawBuffer
 import histos.histos_generated.RawExternalBuffer
 import histos.histos_generated.RawInlineBuffer
@@ -232,7 +232,7 @@ class EvaluatedFunction(Function):
         self.metadata = metadata
         self.decoration = decoration
 
-################################################# Buffer
+################################################# Buffers
 
 class Buffer(Histos):
     none = Enum("none", histos.histos_generated.Filter.Filter.filter_none)
@@ -244,47 +244,25 @@ class Buffer(Histos):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-################################################# RawInlineBuffer
+class InlineBuffer(object):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-class RawInlineBuffer(Buffer):
-    params = {
-        "buffer":           histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
-        "filters":          histos.checktype.CheckVector("RawInlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
-        }
-
-    def __init__(self, buffer, filters=None, postfilter_slice=None):
-        self.buffer = buffer
-        self.filters = filters
-        self.postfilter_slice = postfilter_slice
-
-################################################# RawExternalBuffer
-
-class RawExternalBuffer(Buffer):
+class ExternalBuffer(object):
     memory   = Enum("memory", histos.histos_generated.ExternalType.ExternalType.external_memory)
     samefile = Enum("samefile", histos.histos_generated.ExternalType.ExternalType.external_samefile)
     file     = Enum("file", histos.histos_generated.ExternalType.ExternalType.external_file)
     url      = Enum("url", histos.histos_generated.ExternalType.ExternalType.external_url)
     types = [memory, samefile, file, url]
 
-    params = {
-        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=types),
-        "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
-        }
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-    def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
-        self.pointer = pointer
-        self.numbytes = numbytes
-        self.external_type = external_type
-        self.filters = filters
-        self.postfilter_slice = postfilter_slice
+class RawBuffer(object):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-################################################# BufferInterpretation
-
-class BufferInterpretation(object):
+class InterpretedBuffer(object):
     none    = Enum("none", histos.histos_generated.DType.DType.dtype_none)
     int8    = Enum("int8", histos.histos_generated.DType.DType.dtype_int8)
     uint8   = Enum("uint8", histos.histos_generated.DType.DType.dtype_uint8)
@@ -298,27 +276,62 @@ class BufferInterpretation(object):
     float64 = Enum("float64", histos.histos_generated.DType.DType.dtype_float64)
     dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
-    little = Enum("little", histos.histos_generated.Endianness.Endianness.little_endian)
-    big    = Enum("big", histos.histos_generated.Endianness.Endianness.big_endian)
-    endiannesses = [little, big]
+    little_endian = Enum("little_endian", histos.histos_generated.Endianness.Endianness.little_endian)
+    big_endian    = Enum("big_endian", histos.histos_generated.Endianness.Endianness.big_endian)
+    endiannesses = [little_endian, big_endian]
 
     c_order       = Enum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order)
     fortran_order = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order)
     orders = [c_order, fortran_order]
 
-################################################# InlineBuffer
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-class InlineBuffer(RawInlineBuffer, BufferInterpretation):
+################################################# RawInlineBuffer
+
+class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     params = {
-        "buffer":           histos.checktype.CheckBuffer("InlineBuffer", "buffer", required=True),
-        "filters":          histos.checktype.CheckVector("InlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("InlineBuffer", "postfilter_slice", required=False),
-        "dtype":            histos.checktype.CheckEnum("InlineBuffer", "dtype", required=False, choices=BufferInterpretation.dtypes),
-        "endianness":       histos.checktype.CheckEnum("InlineBuffer", "endianness", required=False, choices=BufferInterpretation.endiannesses),
-        "dimension_order":  histos.checktype.CheckEnum("InlineBuffer", "dimension_order", required=False, choices=BufferInterpretation.orders),
+        "buffer":           histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
+        "filters":          histos.checktype.CheckVector("RawInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
         }
 
-    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order):
+    def __init__(self, buffer, filters=None, postfilter_slice=None):
+        self.buffer = buffer
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
+
+################################################# RawExternalBuffer
+
+class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
+    params = {
+        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
+        "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
+        "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
+        }
+
+    def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
+        self.pointer = pointer
+        self.numbytes = numbytes
+        self.external_type = external_type
+        self.filters = filters
+        self.postfilter_slice = postfilter_slice
+
+################################################# InlineBuffer
+
+class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InternalBuffer):
+    params = {
+        "buffer":           histos.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
+        "filters":          histos.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
+        "dtype":            histos.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       histos.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  histos.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        }
+
+    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
         self.buffer = buffer
         self.filters = filters
         self.postfilter_slice = postfilter_slice
@@ -328,20 +341,20 @@ class InlineBuffer(RawInlineBuffer, BufferInterpretation):
 
 ################################################# ExternalBuffer
 
-class ExternalBuffer(RawExternalBuffer, BufferInterpretation):
+class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     params = {
         "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=RawExternalBuffer.types),
+        "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
         "filters":          histos.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
-        "dtype":            histos.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=BufferInterpretation.dtypes),
-        "endianness":       histos.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=BufferInterpretation.endiannesses),
-        "dimension_order":  histos.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=BufferInterpretation.orders),
+        "dtype":            histos.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       histos.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  histos.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         "location":         histos.checktype.CheckString("ExternalBuffer", "location", required=False),
         }
 
-    def __init__(self, pointer, numbytes, external_type=RawExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, location=""):
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
         self.pointer = pointer
         self.numbytes = numbytes
         self.external_type = external_type
@@ -530,12 +543,14 @@ class CategoryBinning(Binning):
 
 class SparseRegularBinning(Binning):
     params = {
+        "bins":        histos.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
         "bin_width":   histos.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
         "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
         "has_nanflow": histos.checktype.CheckBool("SparseRegularBinning", "has_nanflow", required=False),
         }
 
-    def __init__(self, bin_width, origin=0.0, has_nanflow=True):
+    def __init__(self, bins, bin_width, origin=0.0, has_nanflow=True):
+        self.bins = bins
         self.bin_width = bin_width
         self.origin = origin
         self.has_nanflow = has_nanflow
@@ -544,11 +559,11 @@ class SparseRegularBinning(Binning):
 
 class Axis(Histos):
     params = {
-        "binning":    histos.checktype.Check("Axis", "binning", required=None),
-        "expression": histos.checktype.Check("Axis", "expression", required=None),
-        "title":      histos.checktype.Check("Axis", "title", required=None),
-        "metadata":   histos.checktype.Check("Axis", "metadata", required=None),
-        "decoration": histos.checktype.Check("Axis", "decoration", required=None),
+        "binning":    histos.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
+        "expression": histos.checktype.CheckString("Axis", "expression", required=False),
+        "title":      histos.checktype.CheckString("Axis", "title", required=False),
+        "metadata":   histos.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
+        "decoration": histos.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
 
     def __init__(self, binning=None, expression="", title="", metadata=None, decoration=None):
@@ -568,19 +583,19 @@ class Counts(Histos):
 
 class UnweightedCounts(Counts):
     params = {
-        "counts":  histos.checktype.Check("UnweightedCounts", "counts", required=None),
+        "counts":  histos.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
     def __init__(self, counts):
-        self.counts  = counts 
+        self.counts = counts
 
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
     params = {
-        "sumw":   histos.checktype.Check("WeightedCounts", "sumw", required=None),
-        "sumw2":  histos.checktype.Check("WeightedCounts", "sumw2", required=None),
-        "counts": histos.checktype.Check("WeightedCounts", "counts", required=None),
+        "sumw":   histos.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
+        "sumw2":  histos.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
+        "counts": histos.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
         }
 
     def __init__(self, sumw, sumw2, counts=None):
@@ -592,23 +607,23 @@ class WeightedCounts(Counts):
 
 class Correlation(Histos):
     params = {
-        "sumwx":   histos.checktype.Check("Correlation", "sumwx", required=None),
-        "sumwxy":  histos.checktype.Check("Correlation", "sumwxy", required=None),
+        "sumwx":   histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
+        "sumwxy":  histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
         }
 
     def __init__(self, sumwx, sumwxy):
         self.sumwx = sumwx
         self.sumwxy  = sumwxy 
 
-################################################# Extreme
+################################################# Extremes
 
-class Extreme(Histos):
+class Extremes(Histos):
     params = {
-        "min":           histos.checktype.Check("Extreme", "min", required=None),
-        "max":           histos.checktype.Check("Extreme", "max", required=None),
-        "excludes_minf": histos.checktype.Check("Extreme", "excludes_minf", required=None),
-        "excludes_pinf": histos.checktype.Check("Extreme", "excludes_pinf", required=None),
-        "excludes_nan":  histos.checktype.Check("Extreme", "excludes_nan", required=None),
+        "min":           histos.checktype.CheckClass("Extremes", "min", required=True, type=InterpretedBuffer),
+        "max":           histos.checktype.CheckClass("Extremes", "max", required=True, type=InterpretedBuffer),
+        "excludes_minf": histos.checktype.CheckBool("Extremes", "excludes_minf", required=False),
+        "excludes_pinf": histos.checktype.CheckBool("Extremes", "excludes_pinf", required=False),
+        "excludes_nan":  histos.checktype.CheckBool("Extremes", "excludes_nan", required=False),
         }
 
     def __init__(self, min, max, excludes_minf=False, excludes_pinf=False, excludes_nan=True):
@@ -618,39 +633,39 @@ class Extreme(Histos):
         self.excludes_pinf = excludes_pinf
         self.excludes_nan = excludes_nan
 
-################################################# Moment
+################################################# Moments
 
-class Moment(Histos):
+class Moments(Histos):
     params = {
-        "n":      histos.checktype.Check("Moment", "n", required=None),
-        "buffer": histos.checktype.Check("Moment", "buffer", required=None),
+        "sumwn": histos.checktype.CheckClass("Moments", "sumwn", required=True, type=InterpretedBuffer),
+        "n":     histos.checktype.CheckInteger("Moments", "n", required=True, min=1),
         }
 
-    def __init__(self, n, buffer=None):
+    def __init__(self, sumwn, n):
+        self.sumwn = sumwn
         self.n = n
-        self.buffer = buffer
 
-################################################# Quantile
+################################################# Quantiles
 
-class Quantile(Histos):
+class Quantiles(Histos):
     params = {
-        "p":     histos.checktype.Check("Quantile", "p", required=None),
-        "value": histos.checktype.Check("Quantile", "value", required=None),
+        "values": histos.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
+        "p":      histos.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
         }
 
-    def __init__(self, p, value=None):
+    def __init__(self, values, p=0.5):
+        self.values = values
         self.p = p
-        self.value = value
 
 ################################################# GenericErrors
 
 class GenericErrors(Histos):
     params = {
-        "error": histos.checktype.Check("GenericErrors", "error", required=None),
-        "p":     histos.checktype.Check("GenericErrors", "p", required=None),
+        "errors": histos.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
+        "p":      histos.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
         }
 
-    def __init__(self, error=None, p=0.6826894921370859):
+    def __init__(self, errors, p=0.6826894921370859):
         self.error = error
         self.p = p
 
@@ -658,11 +673,11 @@ class GenericErrors(Histos):
 
 class DistributionStats(Histos):
     params = {
-        "correlation":    histos.checktype.Check("DistributionStats", "correlation", required=None),
-        "extremes":       histos.checktype.Check("DistributionStats", "extremes", required=None),
-        "moments":        histos.checktype.Check("DistributionStats", "moments", required=None),
-        "quantiles":      histos.checktype.Check("DistributionStats", "quantiles", required=None),
-        "generic_errors": histos.checktype.Check("DistributionStats", "generic_errors", required=None),
+        "correlation":    histos.checktype.CheckClass("DistributionStats", "correlation", required=False, type=Correlation),
+        "extremes":       histos.checktype.CheckClass("DistributionStats", "extremes", required=False, type=Extremes),
+        "moments":        histos.checktype.CheckVector("DistributionStats", "moments", required=False, type=Moments),
+        "quantiles":      histos.checktype.CheckVector("DistributionStats", "quantiles", required=False, type=Quantiles),
+        "generic_errors": histos.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
         }
 
     def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
@@ -676,8 +691,8 @@ class DistributionStats(Histos):
 
 class Distribution(Histos):
     params = {
-        "counts": histos.checktype.Check("Distribution", "counts", required=None),
-        "stats":  histos.checktype.Check("Distribution", "stats", required=None),
+        "counts": histos.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
+        "stats":  histos.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
         }
 
     def __init__(self, counts, stats=None):
@@ -790,7 +805,7 @@ class Chunk(Histos):
 
 ################################################# Column
 
-class Column(Histos, BufferInterpretation):
+class Column(Histos):
     params = {
         "identifier":      histos.checktype.Check("Column", "identifier", required=None),
         "dtype":           histos.checktype.Check("Column", "dtype", required=None),
@@ -802,7 +817,7 @@ class Column(Histos, BufferInterpretation):
         "decoration":      histos.checktype.Check("Column", "decoration", required=None),
         }
 
-    def __init__(self, identifier, dtype=BufferInterpretation.none, endianness=BufferInterpretation.little, dimension_order=BufferInterpretation.c_order, filters=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.dtype = dtype
         self.endianness = endianness
