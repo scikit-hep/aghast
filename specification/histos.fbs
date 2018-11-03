@@ -427,8 +427,8 @@ table Variation {
 
 table Collection {
   identifier: string (key);
-  objects: [Object];
-  collection: [Collection];          // nested ANDs
+  objects: [Object] (required);
+  collections: [Collection];         // nested ANDs
   regions: [Region];                 // list of ORs of (overlapping?) regions
   binned_regions: [BinnedRegion];    // list of ORs of exclusive, binned regions
   variations: [Variation];           // list of ORs with assignments

@@ -1181,16 +1181,37 @@ class Collection(Histos):
         return cls.frombuffer(file[offset:-12])
 
     params = {
-        "identifier": histos.checktype.CheckString("Collection", "identifier", required=True),
-        "title":      histos.checktype.CheckString("Collection", "title", required=False),
+        "identifier":     histos.checktype.CheckString("Collection", "identifier", required=True),
+        "objects":        histos.checktype.CheckVector("Collection", "objects", required=True, type=Object),
+        "collections":    histos.checktype.CheckVector("Collection", "collections", required=False, type=Collection),
+        "regions":        histos.checktype.CheckVector("Collection", "regions", required=False, type=Region),
+        "binned_regions": histos.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
+        "variations":     histos.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
+        "title":          histos.checktype.CheckString("Collection", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
         }
 
-    identifier = typedproperty(params["identifier"])
-    title      = typedproperty(params["title"])
+    identifier     = typedproperty(params["identifier"])
+    objects        = typedproperty(params["objects"])
+    collections    = typedproperty(params["collections"])
+    regions        = typedproperty(params["regions"])
+    binned_regions = typedproperty(params["binned_regions"])
+    variations     = typedproperty(params["variations"])
+    title          = typedproperty(params["title"])
+    metadata       = typedproperty(params["metadata"])
+    decoration     = typedproperty(params["decoration"])
 
-    def __init__(self, identifier, title=""):
+    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
+        self.objects = objects
+        self.collections = collections
+        self.regions = regions
+        self.binned_regions = binned_regions
+        self.variations = variations
         self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
 
     def _valid(self, multiplicity):
         pass
