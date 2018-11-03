@@ -196,13 +196,13 @@ class FunctionObject(Object):
 
 class ParameterizedFunction(Function, FunctionObject):
     params = {
-        "identifier":     histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
+        "identifier": histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
         "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
-        "title":          histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        "title":      histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":   histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration": histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
         }
 
     identifier = typedproperty(params["identifier"])
@@ -228,6 +228,14 @@ class EvaluatedFunction(Function):
         "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
         "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
+
+    identifier = typedproperty(params["identifier"])
+    values = typedproperty(params["values"])
+    derivatives = typedproperty(params["derivatives"])
+    generic_errors = typedproperty(params["generic_errors"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -302,6 +310,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
         }
 
+    buffer = typedproperty(params["buffer"])
+    filters = typedproperty(params["filters"])
+    postfilter_slice = typedproperty(params["postfilter_slice"])
+
     def __init__(self, buffer, filters=None, postfilter_slice=None):
         self.buffer = buffer
         self.filters = filters
@@ -317,6 +329,12 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
         }
+
+    pointer = typedproperty(params["pointer"])
+    numbytes = typedproperty(params["numbytes"])
+    external_type = typedproperty(params["external_type"])
+    filters = typedproperty(params["filters"])
+    postfilter_slice = typedproperty(params["postfilter_slice"])
 
     def __init__(self, pointer, numbytes, external_type=memory, filters=None, postfilter_slice=None):
         self.pointer = pointer
@@ -336,6 +354,13 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InternalBuffer):
         "endianness":       histos.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
         "dimension_order":  histos.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         }
+
+    buffer = typedproperty(params["buffer"])
+    filters = typedproperty(params["filters"])
+    postfilter_slice = typedproperty(params["postfilter_slice"])
+    dtype = typedproperty(params["dtype"])
+    endianness = typedproperty(params["endianness"])
+    dimension_order = typedproperty(params["dimension_order"])
 
     def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
         self.buffer = buffer
@@ -359,6 +384,16 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         "dimension_order":  histos.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         "location":         histos.checktype.CheckString("ExternalBuffer", "location", required=False),
         }
+
+    pointer = typedproperty(params["pointer"])
+    numbytes = typedproperty(params["numbytes"])
+    external_type = typedproperty(params["external_type"])
+    filters = typedproperty(params["filters"])
+    postfilter_slice = typedproperty(params["postfilter_slice"])
+    dtype = typedproperty(params["dtype"])
+    endianness = typedproperty(params["endianness"])
+    dimension_order = typedproperty(params["dimension_order"])
+    location = typedproperty(params["location"])
 
     def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
         self.pointer = pointer
@@ -393,6 +428,8 @@ class FractionalBinning(Binning):
         "error_method": histos.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
         }
 
+    error_method = typedproperty(params["error_method"])
+
     def __init__(self, error_method=normal):
         self.error_method = error_method
 
@@ -405,6 +442,11 @@ class IntegerBinning(Binning):
         "has_underflow": histos.checktype.CheckBool("IntegerBinning", "has_underflow", required=False),
         "has_overflow":  histos.checktype.CheckBool("IntegerBinning", "has_overflow", required=False),
         }
+
+    min = typedproperty(params["min"])
+    max = typedproperty(params["max"])
+    has_underflow = typedproperty(params["has_underflow"])
+    has_overflow = typedproperty(params["has_overflow"])
 
     def __init__(self, min, max, has_underflow=True, has_overflow=True):
         self.min = min
@@ -425,6 +467,11 @@ class RealInterval(Histos):
         "low_inclusive":  histos.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
         "high_inclusive": histos.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
+
+    low = typedproperty(params["low"])
+    high = typedproperty(params["high"])
+    low_inclusive = typedproperty(params["low_inclusive"])
+    high_inclusive = typedproperty(params["high_inclusive"])
 
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
         self.low = low
@@ -454,6 +501,13 @@ class RealOverflow(Histos):
         "nan_mapping":   histos.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
+    has_underflow = typedproperty(params["has_underflow"])
+    has_overflow = typedproperty(params["has_overflow"])
+    has_nanflow = typedproperty(params["has_nanflow"])
+    minf_mapping = typedproperty(params["minf_mapping"])
+    pinf_mapping = typedproperty(params["pinf_mapping"])
+    nan_mapping = typedproperty(params["nan_mapping"])
+
     def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
         self.has_underflow = has_underflow
         self.has_overflow = has_overflow
@@ -472,6 +526,11 @@ class RegularBinning(Binning):
         "circular": histos.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
+    num = typedproperty(params["num"])
+    interval = typedproperty(params["interval"])
+    overflow = typedproperty(params["overflow"])
+    circular = typedproperty(params["circular"])
+
     def __init__(self, num, interval, overflow=None, circular=False):
         self.num = num
         self.interval = interval
@@ -489,6 +548,13 @@ class TicTacToeOverflowBinning(Binning):
         "xoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
         "yoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
+
+    xnum = typedproperty(params["xnum"])
+    ynum = typedproperty(params["ynum"])
+    x = typedproperty(params["x"])
+    y = typedproperty(params["y"])
+    xoverflow = typedproperty(params["xoverflow"])
+    yoverflow = typedproperty(params["yoverflow"])
 
     def __init__(self, xnum, ynum, x, y, xoverflow=None, yoverflow=None):
         self.xnum = xnum
@@ -516,6 +582,12 @@ class HexagonalBinning(Binning):
         "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False),
         }
 
+    q = typedproperty(params["q"])
+    r = typedproperty(params["r"])
+    coordinates = typedproperty(params["coordinates"])
+    xorigin = typedproperty(params["xorigin"])
+    yorigin = typedproperty(params["yorigin"])
+
     def __init__(self, q, r, coordinates=offset, xorigin=0.0, yorigin=0.0):
         self.q = q
         self.r = r
@@ -531,6 +603,9 @@ class VariableBinning(Binning):
         "overflow":  histos.checktype.CheckClass("VariableBinning", "overflow", required=False, type=RealOverflow),
         }
 
+    intervals = typedproperty(params["intervals"])
+    overflow = typedproperty(params["overflow"])
+
     def __init__(self, intervals, overflow=None):
         self.intervals = intervals
         self.overflow = overflow
@@ -541,6 +616,8 @@ class CategoryBinning(Binning):
     params = {
         "categories":  histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
         }
+
+    categories = typedproperty(params["categories"])
 
     def __init__(self, categories):
         self.categories  = categories 
@@ -554,6 +631,11 @@ class SparseRegularBinning(Binning):
         "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
         "has_nanflow": histos.checktype.CheckBool("SparseRegularBinning", "has_nanflow", required=False),
         }
+
+    bins = typedproperty(params["bins"])
+    bin_width = typedproperty(params["bin_width"])
+    origin = typedproperty(params["origin"])
+    has_nanflow = typedproperty(params["has_nanflow"])
 
     def __init__(self, bins, bin_width, origin=0.0, has_nanflow=True):
         self.bins = bins
@@ -571,6 +653,12 @@ class Axis(Histos):
         "metadata":   histos.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
         "decoration": histos.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
+
+    binning = typedproperty(params["binning"])
+    expression = typedproperty(params["expression"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, binning=None, expression="", title="", metadata=None, decoration=None):
         self.binning = binning
@@ -592,6 +680,8 @@ class UnweightedCounts(Counts):
         "counts":  histos.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
+    counts = typedproperty(params["counts"])
+
     def __init__(self, counts):
         self.counts = counts
 
@@ -603,6 +693,10 @@ class WeightedCounts(Counts):
         "sumw2":  histos.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
         "counts": histos.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
         }
+
+    sumw = typedproperty(params["sumw"])
+    sumw2 = typedproperty(params["sumw2"])
+    counts = typedproperty(params["counts"])
 
     def __init__(self, sumw, sumw2, counts=None):
         self.sumw = sumw
@@ -616,6 +710,9 @@ class Correlation(Histos):
         "sumwx":   histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
         "sumwxy":  histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
         }
+
+    sumwx = typedproperty(params["sumwx"])
+    sumwxy = typedproperty(params["sumwxy"])
 
     def __init__(self, sumwx, sumwxy):
         self.sumwx = sumwx
@@ -632,6 +729,12 @@ class Extremes(Histos):
         "excludes_nan":  histos.checktype.CheckBool("Extremes", "excludes_nan", required=False),
         }
 
+    min = typedproperty(params["min"])
+    max = typedproperty(params["max"])
+    excludes_minf = typedproperty(params["excludes_minf"])
+    excludes_pinf = typedproperty(params["excludes_pinf"])
+    excludes_nan = typedproperty(params["excludes_nan"])
+
     def __init__(self, min, max, excludes_minf=False, excludes_pinf=False, excludes_nan=True):
         self.min = min
         self.max = max
@@ -647,6 +750,9 @@ class Moments(Histos):
         "n":     histos.checktype.CheckInteger("Moments", "n", required=True, min=1),
         }
 
+    sumwn = typedproperty(params["sumwn"])
+    n = typedproperty(params["n"])
+
     def __init__(self, sumwn, n):
         self.sumwn = sumwn
         self.n = n
@@ -659,6 +765,9 @@ class Quantiles(Histos):
         "p":      histos.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
         }
 
+    values = typedproperty(params["values"])
+    p = typedproperty(params["p"])
+
     def __init__(self, values, p=0.5):
         self.values = values
         self.p = p
@@ -670,6 +779,9 @@ class GenericErrors(Histos):
         "errors": histos.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
         "p":      histos.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
         }
+
+    errors = typedproperty(params["errors"])
+    p = typedproperty(params["p"])
 
     def __init__(self, errors, p=0.6826894921370859):
         self.error = error
@@ -686,6 +798,12 @@ class DistributionStats(Histos):
         "generic_errors": histos.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
         }
 
+    correlation = typedproperty(params["correlation"])
+    extremes = typedproperty(params["extremes"])
+    moments = typedproperty(params["moments"])
+    quantiles = typedproperty(params["quantiles"])
+    generic_errors = typedproperty(params["generic_errors"])
+
     def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
         self.correlation = correlation
         self.extremes = extremes
@@ -701,6 +819,9 @@ class Distribution(Histos):
         "stats":  histos.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
         }
 
+    counts = typedproperty(params["counts"])
+    stats = typedproperty(params["stats"])
+
     def __init__(self, counts, stats=None):
         self.counts = counts
         self.stats = stats
@@ -714,6 +835,11 @@ class Profile(Histos):
         "metadata":   histos.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
         "decoration": histos.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
+
+    expression = typedproperty(params["expression"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, expression, title="", metadata=None, decoration=None):
         self.expression = expression
@@ -736,6 +862,17 @@ class Histogram(Object):
         "metadata":       histos.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
         "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
+
+    identifier = typedproperty(params["identifier"])
+    axis = typedproperty(params["axis"])
+    distribution = typedproperty(params["distribution"])
+    profiles = typedproperty(params["profiles"])
+    unbinned_stats = typedproperty(params["unbinned_stats"])
+    profile_stats = typedproperty(params["profile_stats"])
+    functions = typedproperty(params["functions"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -763,6 +900,15 @@ class BinnedEvaluatedFunction(FunctionObject):
         "decoration":     histos.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
+    identifier = typedproperty(params["identifier"])
+    axis = typedproperty(params["axis"])
+    values = typedproperty(params["values"])
+    derivatives = typedproperty(params["derivatives"])
+    generic_errors = typedproperty(params["generic_errors"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
+
     def __init__(self, identifier, axis, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.axis = axis
@@ -780,6 +926,8 @@ class Page(Histos):
         "buffer":  histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
+    buffer = typedproperty(params["buffer"])
+
     def __init__(self, buffer):
         self.buffer  = buffer 
 
@@ -791,6 +939,10 @@ class ColumnChunk(Histos):
         "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int),
         "page_extremes": histos.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
         }
+
+    pages = typedproperty(params["pages"])
+    page_offsets = typedproperty(params["page_offsets"])
+    page_extremes = typedproperty(params["page_extremes"])
 
     def __init__(self, pages, page_offsets, page_extremes=None):
         self.pages = pages
@@ -813,6 +965,9 @@ class Chunk(Histos):
         "metadata": histos.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
+    columns = typedproperty(params["columns"])
+    metadata = typedproperty(params["metadata"])
+
     def __init__(self, columns, metadata=None):
         self.columns = columns
         self.metadata = metadata
@@ -830,6 +985,15 @@ class Column(Histos):
         "metadata":        histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
         "decoration":      histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
+
+    identifier = typedproperty(params["identifier"])
+    dtype = typedproperty(params["dtype"])
+    endianness = typedproperty(params["endianness"])
+    dimension_order = typedproperty(params["dimension_order"])
+    filters = typedproperty(params["filters"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -855,6 +1019,16 @@ class Ntuple(Object):
         "metadata":       histos.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
         "decoration":     histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
+
+    identifier = typedproperty(params["identifier"])
+    columns = typedproperty(params["columns"])
+    chunks = typedproperty(params["chunks"])
+    chunk_offsets = typedproperty(params["chunk_offsets"])
+    unbinned_stats = typedproperty(params["unbinned_stats"])
+    functions = typedproperty(params["functions"])
+    title = typedproperty(params["title"])
+    metadata = typedproperty(params["metadata"])
+    decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -882,6 +1056,8 @@ class Region(Histos):
         "expressions":  histos.checktype.CheckVector("Region", "expressions", required=True, type=str),
         }
 
+    expressions = typedproperty(params["expressions"])
+
     def __init__(self, expressions):
         self.expressions  = expressions 
 
@@ -892,6 +1068,9 @@ class BinnedRegion(Histos):
         "expression": histos.checktype.CheckString("BinnedRegion", "expression", required=True),
         "binning":    histos.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
         }
+
+    expression = typedproperty(params["expression"])
+    binning = typedproperty(params["binning"])
 
     def __init__(self, expression, binning):
         self.expression = expression
@@ -905,6 +1084,9 @@ class Assignment(Histos):
         "expression": histos.checktype.CheckString("Assignment", "expression", required=True),
         }
 
+    identifier = typedproperty(params["identifier"])
+    expression = typedproperty(params["expression"])
+
     def __init__(self, identifier, expression):
         self.identifier = identifier
         self.expression  = expression 
@@ -917,6 +1099,10 @@ class Variation(Histos):
         "systematic":          histos.checktype.CheckVector("Variation", "systematic", required=False, type=float),
         "category_systematic": histos.checktype.CheckVecotr("Variation", "category_systematic", required=False, type=str),
         }
+
+    assignments = typedproperty(params["assignments"])
+    systematic = typedproperty(params["systematic"])
+    category_systematic = typedproperty(params["category_systematic"])
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
         self.assignments = assignments
