@@ -116,7 +116,7 @@ class CheckInteger(Check):
         elif not obj <= self.max:
             raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.max, repr(obj)))
         else:
-            return float(obj)
+            return int(obj)
 
 class CheckEnum(Check):
     def __init__(self, classname, paramname, required, choices):

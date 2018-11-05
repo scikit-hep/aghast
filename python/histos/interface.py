@@ -415,7 +415,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        self._top().isvalid    # assigns _shape
+        self._top()._valid(())
         return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
@@ -460,7 +460,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        self._top().isvalid    # assigns _shape
+        self._top()._valid(())
         out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
         return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
@@ -518,7 +518,7 @@ class IntegerBinning(Binning):
     def _valid(self, shape):
         if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
-        return shape
+        return (self.max - self.min + 1 + int(self.has_underflow) + int(self.has_overflow),)
 
 ################################################# RealInterval
 
@@ -579,6 +579,9 @@ class RealOverflow(Histos):
         self.pinf_mapping = pinf_mapping
         self.nan_mapping = nan_mapping
 
+    def _valid(self, shape):
+        return (int(self.has_underflow) + int(self.has_overflow) + int(self.has_nanflow),)
+
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
@@ -600,33 +603,55 @@ class RegularBinning(Binning):
         self.overflow = overflow
         self.circular = circular
 
+    def _valid(self, shape):
+        self.interval._valid(shape)
+        if self.overflow is None:
+            overflowdims, = RealOverflow()._valid(shape)
+        else:
+            overflowdims, = self.overflow._valid(shape)
+        return (self.num + overflowdims,)
+
 ################################################# TicTacToeOverflowBinning
 
 class TicTacToeOverflowBinning(Binning):
     _params = {
         "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
         "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
-        "x":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "x", required=True, type=RealInterval),
-        "y":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "y", required=True, type=RealInterval),
+        "xinterval": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
+        "yinterval": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
         "xoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
         "yoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
 
     xnum      = typedproperty(_params["xnum"])
     ynum      = typedproperty(_params["ynum"])
-    x         = typedproperty(_params["x"])
-    y         = typedproperty(_params["y"])
+    xinterval = typedproperty(_params["xinterval"])
+    yinterval = typedproperty(_params["yinterval"])
     xoverflow = typedproperty(_params["xoverflow"])
     yoverflow = typedproperty(_params["yoverflow"])
 
-    def __init__(self, xnum, ynum, x, y, xoverflow=None, yoverflow=None):
+    def __init__(self, xnum, ynum, xinterval, yinterval, xoverflow=None, yoverflow=None):
         self.xnum = xnum
         self.ynum = ynum
-        self.x = x
-        self.y = y
+        self.xinterval = xinterval
+        self.yinterval = yinterval
         self.xoverflow = xoverflow
         self.yoverflow = yoverflow
 
+    def _valid(self, shape):
+        self.xinterval._valid(shape)
+        self.yinterval._valid(shape)
+        if self.xoverflow is None:
+            xoverflowdims, = RealOverflow()._valid(shape)
+        else:
+            xoverflowdims, = self.xoverflow._valid(shape)
+        if self.yoverflow is None:
+            yoverflowdims, = RealOverflow()._valid(shape)
+        else:
+            yoverflowdims, = self.yoverflow._valid(shape)
+
+        return (self.xnum + xoverflowdims, self.ynum + yoverflowdims)
+        
 ################################################# HexagonalBinning
 
 class HexagonalBinning(Binning):
@@ -1426,6 +1451,9 @@ class Collection(Histos):
             return False
         else:
             return True
+
+    def checkvalid(self):
+        self._valid(())
 
     def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)

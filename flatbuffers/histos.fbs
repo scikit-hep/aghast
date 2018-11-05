@@ -176,8 +176,8 @@ table RegularBinning {
 table TicTacToeOverflowBinning {
   xnum: ulong;
   ynum: ulong;
-  x: RealInterval (required);
-  y: RealInterval (required);
+  xinterval: RealInterval (required);
+  yinterval: RealInterval (required);
   xoverflow: RealOverflow;
   yoverflow: RealOverflow;
 }
