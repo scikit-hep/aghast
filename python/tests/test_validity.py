@@ -219,6 +219,7 @@ class Test(unittest.TestCase):
 
     def test_Ntuple(self):
         h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [], [0])])
+        assert h.isvalid
 
     def test_Region(self):
         pass

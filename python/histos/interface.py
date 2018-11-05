@@ -402,22 +402,30 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dimension_order = dimension_order
 
     def _valid(self, seen, shape):
-        if self._buffer is None:
-            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype)
-        elif len(self.buffer.shape) != 1:
-            raise ValueError("InterpretedInlineBuffer.buffer shape is {0} but only one-dimensional arrays are allowed".format(self.buffer.shape))
-        elif len(self.buffer) != functools.reduce(operator.mul, shape, 1):
-            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.buffer), functools.reduce(operator.mul, shape, 1)))
-        elif self.buffer.dtype != self.numpy_dtype:
-            raise ValueError("InterpretedInlineBuffer.buffer dtype is {0} but expecting {1}".format(self.buffer.dtype, self.numpy_dtype))
-        self._shape = shape
+        if self.filters is None:
+            if self._buffer is None:
+                self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype).view(InterpretedBuffer.none.dtype)
+                buf = None
+            else:
+                buf = self.buffer
 
-        if self.filters is not None:
-            raise NotImplementedError
+        else:
+            raise NotImplementedError(self.filters)
+
+        if buf is not None:
+            if len(buf.shape) != 1:
+                raise ValueError("InterpretedInlineBuffer.buffer shape is {0} but only one-dimensional arrays are allowed".format(buf.shape))
+            elif buf.dtype != InterpretedBuffer.none.dtype:
+                raise ValueError("InterpretedInlineBuffer.buffer underlying dtype is {0} but should be {1} (untyped)".format(buf.dtype, InterpretedBuffer.none.dtype))
+            elif len(buf) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
+                raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(buf), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+
+        self._shape = shape
 
         if self.postfilter_slice is not None:
             if self.postfilter_slice.step == 0:
                 raise ValueError("slice step cannot be zero")
+            raise NotImplementedError("handle postfilter_slice")
 
         return shape
 
@@ -1262,12 +1270,30 @@ class Page(Histos):
     def __init__(self, buffer):
         self.buffer  = buffer 
 
+    def _valid(self, seen, shape, column, numentries):
+        buf = self.buffer.numpy_array
+        if column.filters is not None:
+            raise NotImplementedError(column.filters)
+
+        if len(buf) != self.buffer.numpy_dtype.itemsize * numentries:
+            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), self.buffer.numpy_dtype.itemsize * numentries, self.buffer.numpy_dtype.itemsize))
+
+        self._dtype = self.buffer.numpy_dtype
+        self._shape = (numentries,)
+
+        if self.postfilter_slice is not None:
+            if self.postfilter_slice.step == 0:
+                raise ValueError("slice step cannot be zero")
+            raise NotImplementedError("handle postfilter_slice")
+
+        return numentries
+
 ################################################# ColumnChunk
 
 class ColumnChunk(Histos):
     _params = {
         "pages":         histos.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
-        "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int),
+        "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
         "page_extremes": histos.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
         }
 
@@ -1280,14 +1306,33 @@ class ColumnChunk(Histos):
         self.page_offsets = page_offsets
         self.page_extremes = page_extremes
 
-    def _valid(self, seen, shape):
-        if len(self.page_offsets) == 0:
-            raise ValueError("ColumnChunk.page_offsets must not be empty")
+    def _valid(self, seen, shape, column):
+        # have to do recursive check because ColumnChunk._valid is called directly by Chunk._valid
+        if id(obj) in seen:
+            raise ValueError("hierarchy is recursively nested")
+        seen.add(id(obj))
+
         if self.page_offsets[0] != 0:
             raise ValueError("ColumnChunk.page_offsets must start with 0")
         if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
             raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
-        return shape
+
+        if len(self.page_offsets) != len(self.pages) + 1:
+            raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
+
+        for i, x in enumerate(self.pages):
+            x._valid(seen, shape, column, self.page_offsets[i + 1] - self.page_offsets[i])
+
+        if self.page_extremes is not None:
+            if len(self.page_extremes) != len(self.pages):
+                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_extremes), len(self.pages)))
+
+            for x in self.page_extremes:
+                _valid(x, seen, shape)
+
+            raise NotImplementedError("check extremes")
+
+        return self.page_offsets[-1]
 
 ################################################# Chunk
 
@@ -1303,6 +1348,23 @@ class Chunk(Histos):
     def __init__(self, columns, metadata=None):
         self.columns = columns
         self.metadata = metadata
+
+    def _valid(self, seen, shape, columns, numentries):
+        # have to do recursive check because Chunk._valid is called directly by Ntuple._valid
+        if id(obj) in seen:
+            raise ValueError("hierarchy is recursively nested")
+        seen.add(id(obj))
+
+        if len(self.columns) != len(columns):
+            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(columns)))
+
+        for x, y in zip(self.columns, columns):
+            num = x._valid(seen, shape, y)
+            if numentries is not None and num != numentries:
+                raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
+
+        _valid(self.metadata, seen, shape)
+        return numentries
 
 ################################################# Column
 
@@ -1334,6 +1396,9 @@ class Column(Histos, Interpretation):
         self.metadata = metadata
         self.decoration = decoration
 
+    def _valid(self, seen, shape):
+        return shape
+
 ################################################# Ntuple
 
 class Ntuple(Object):
@@ -1341,7 +1406,7 @@ class Ntuple(Object):
         "identifier":     histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
         "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
         "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=True, type=int, minlen=1),
+        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
         "unbinned_stats": histos.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
         "functions":      histos.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         "title":          histos.checktype.CheckString("Ntuple", "title", required=False),
@@ -1359,7 +1424,7 @@ class Ntuple(Object):
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, columns, chunks, chunk_offsets=None, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.columns = columns
         self.chunks = chunks
@@ -1371,10 +1436,39 @@ class Ntuple(Object):
         self.decoration = decoration
 
     def _valid(self, seen, shape):
-        if self.chunk_offsets[0] != 0:
-            raise ValueError("Ntuple.chunk_offsets must start with 0")
-        if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
-            raise ValueError("Ntuple.chunk_offsets must be monotonically increasing")
+        if len(set(x.identifier for x in self.columns)) != len(self.columns):
+            raise ValueError("Ntuple.columns keys must be unique")
+
+        for x in self.columns:
+            _valid(x, seen, shape)
+
+        if self.chunk_offsets is None:
+            for x in self.chunks:
+                x._valid(seen, shape, self.columns, None)
+
+        else:
+            if self.chunk_offsets[0] != 0:
+                raise ValueError("Ntuple.chunk_offsets must start with 0")
+            if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
+                raise ValueError("Ntuple.chunk_offsets must be monotonically increasing")
+
+            if len(self.chunk_offsets) != len(self.chunks) + 1:
+                raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
+
+            for i, x in enumerate(self.chunks):
+                x._valid(seen, shape, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+
+        if self.unbinned_stats is not None:
+            for x in self.unbinned_stats:
+                _valid(x, seen, shape)
+
+        if self.functions is not None:
+            for x in self.functions:
+                _valid(x, seen, shape)
+
+        _valid(self.metadata, seen, shape)
+        _valid(self.decoration, seen, shape)
+
         return shape
 
 ################################################# Region

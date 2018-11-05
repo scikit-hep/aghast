@@ -413,7 +413,7 @@ table Column {
 table Ntuple {
   columns: [Column] (required);
   chunks: [Chunk] (required);
-  chunk_offsets: [ulong] (required);
+  chunk_offsets: [ulong];
   unbinned_stats: [DistributionStats];
   functions: [FunctionObject];
 }
