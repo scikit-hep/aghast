@@ -703,6 +703,7 @@ class HexagonalBinning(Binning):
         "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
         "xorigin":     histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
         "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "qangle":      histos.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
         "qoverflow":   histos.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
         "roverflow":   histos.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
         }
@@ -714,10 +715,11 @@ class HexagonalBinning(Binning):
     coordinates = typedproperty(_params["coordinates"])
     xorigin     = typedproperty(_params["xorigin"])
     yorigin     = typedproperty(_params["yorigin"])
+    qangle      = typedproperty(_params["qangle"])
     qoverflow   = typedproperty(_params["qoverflow"])
     roverflow   = typedproperty(_params["roverflow"])
 
-    def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qoverflow=None, roverflow=None):
+    def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, qoverflow=None, roverflow=None):
         self.qmin = qmin
         self.qmax = qmax
         self.rmin = rmin
@@ -994,7 +996,7 @@ class GenericErrors(Histos):
     errors = typedproperty(_params["errors"])
     p      = typedproperty(_params["p"])
 
-    def __init__(self, errors, p=0.6826894921370859):
+    def __init__(self, errors, p=math.erf(math.sqrt(0.5))):
         self.errors = errors
         self.p = p
 

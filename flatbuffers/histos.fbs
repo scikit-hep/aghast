@@ -209,6 +209,7 @@ table HexagonalBinning {
   coordinates: HexagonalCoordinates = hex_offset;
   xorigin: double = 0.0;    // x coordinate of (q, r) == (0, 0)
   yorigin: double = 0.0;    // y coordinate of (q, r) == (0, 0)
+  qangle: double = 0.0;     // angle of (q, r) == (1, 0) relative to (x, y) == (1, 0) in -pi/2 <= x <= pi/2
   qoverflow: RealOverflow;
   roverflow: RealOverflow;
 }
