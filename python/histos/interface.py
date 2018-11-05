@@ -1262,23 +1262,23 @@ class Histogram(Object):
 
 class Page(Histos):
     _params = {
-        "buffer":  histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
+        "buffer": histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
     buffer = typedproperty(_params["buffer"])
 
     def __init__(self, buffer):
-        self.buffer  = buffer 
+        self.buffer = buffer
 
     def _valid(self, seen, shape, column, numentries):
         buf = self.buffer.numpy_array
         if column.filters is not None:
             raise NotImplementedError(column.filters)
 
-        if len(buf) != self.buffer.numpy_dtype.itemsize * numentries:
-            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), self.buffer.numpy_dtype.itemsize * numentries, self.buffer.numpy_dtype.itemsize))
+        if len(buf) != column.numpy_dtype.itemsize * numentries:
+            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), column.numpy_dtype.itemsize * numentries, column.numpy_dtype.itemsize))
 
-        self._dtype = self.buffer.numpy_dtype
+        self._dtype = column.numpy_dtype
         self._shape = (numentries,)
 
         if self.postfilter_slice is not None:
@@ -1308,9 +1308,9 @@ class ColumnChunk(Histos):
 
     def _valid(self, seen, shape, column):
         # have to do recursive check because ColumnChunk._valid is called directly by Chunk._valid
-        if id(obj) in seen:
+        if id(self) in seen:
             raise ValueError("hierarchy is recursively nested")
-        seen.add(id(obj))
+        seen.add(id(self))
 
         if self.page_offsets[0] != 0:
             raise ValueError("ColumnChunk.page_offsets must start with 0")
@@ -1351,9 +1351,9 @@ class Chunk(Histos):
 
     def _valid(self, seen, shape, columns, numentries):
         # have to do recursive check because Chunk._valid is called directly by Ntuple._valid
-        if id(obj) in seen:
+        if id(self) in seen:
             raise ValueError("hierarchy is recursively nested")
-        seen.add(id(obj))
+        seen.add(id(self))
 
         if len(self.columns) != len(columns):
             raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(columns)))

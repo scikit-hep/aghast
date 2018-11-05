@@ -206,19 +206,19 @@ class Test(unittest.TestCase):
         assert h["id"].values.numpy_array.tolist() == [[0.0]]
 
     def test_Page(self):
-        pass
-
-    def test_ColumnChunk(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        h.checkvalid()
 
     def test_Chunk(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [Chunk([ColumnChunk([], [0])])])])
+        assert h.isvalid
 
     def test_Column(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64), Column("two", Column.int32)], [])])
+        assert h.isvalid
 
     def test_Ntuple(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [], [0])])
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [])])
         assert h.isvalid
 
     def test_Region(self):
