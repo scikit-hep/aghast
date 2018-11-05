@@ -144,10 +144,9 @@ class Test(unittest.TestCase):
         pass
 
     def test_BinnedEvaluatedFunction(self):
-        h = Collection("id", [BinnedEvaluatedFunction("id", [], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid
-        assert h.isvalid
-        assert h["id"].values.numpy_array.tolist() == 0.0
+        assert h["id"].values.numpy_array.tolist() == [0.0]
 
     def test_Page(self):
         pass

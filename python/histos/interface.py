@@ -140,9 +140,9 @@ def typedproperty(check):
 
 def _valid(obj, shape):
     if obj is None:
-        pass
+        return shape
     else:
-        obj._valid(shape)
+        return obj._valid(shape)
 
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
@@ -207,7 +207,7 @@ class Metadata(Histos):
         self.language = language
 
     def _valid(self, shape):
-        pass
+        return shape
 
 ################################################# Decoration
 
@@ -231,7 +231,7 @@ class Decoration(Histos):
         self.language = language
 
     def _valid(self, shape):
-        pass
+        return shape
 
 ################################################# Object
 
@@ -404,14 +404,14 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             raise ValueError("InterpretedInlineBuffer.buffer dtype is {0} but expecting {1}".format(self.buffer.dtype, self.numpy_dtype))
         self._shape = shape
 
-        filters = getattr(self, "filters", None)
-        if filters is not None:
+        if self.filters is not None:
             raise NotImplementedError
 
-        postfilter_slice = getattr(self, "postfilter_slice", None)
-        if postfilter_slice is not None:
-            if postfilter_slice.step == 0:
+        if self.postfilter_slice is not None:
+            if self.postfilter_slice.step == 0:
                 raise ValueError("slice step cannot be zero")
+
+        return shape
 
     @property
     def numpy_array(self):
@@ -515,6 +515,7 @@ class IntegerBinning(Binning):
     def _valid(self, shape):
         if min >= max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
+        return shape
 
 ################################################# RealInterval
 
@@ -540,6 +541,7 @@ class RealInterval(Histos):
     def _valid(self, shape):
         if self.low >= self.high:
             raise ValueError("RealInterval.low ({0}) must be strictly less than RealInterval.high ({1})".format(self.low, self.high))
+        return shape
 
 ################################################# RealOverflow
 
@@ -724,6 +726,15 @@ class Axis(Histos):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+
+    def _valid(self, shape):
+        if self.binning is None:
+            binshape = (1,)
+        else:
+            binshape = _valid(self.binning, shape)
+        _valid(self.metadata, shape)
+        _valid(self.decoration, shape)
+        return binshape
 
 ################################################# Counts
 
@@ -920,8 +931,8 @@ class Parameter(Histos):
         self.identifier = identifier
         self.value = value
 
-    def _valid(self, multiplier):
-        pass
+    def _valid(self, shape):
+        return shape
 
 ################################################# Function
 
@@ -972,10 +983,11 @@ class ParameterizedFunction(Function, FunctionObject):
         for x in self.parameters:
             _valid(x, shape)
 
-        contours = getattr(self, "_contours", None)
-        if contours is not None:
-            if len(contours) != len(numpy.unique(contours)):
+        if self.contours is not None:
+            if len(self.contours) != len(numpy.unique(self.contours)):
                 raise ValueError("ParameterizedFunction.contours must be unique")
+
+        return shape
 
 ################################################# EvaluatedFunction
 
@@ -1041,13 +1053,15 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.decoration = decoration
 
     def _valid(self, shape):
+        binshape = ()
         for x in self.axis:
-            _valid(x, shape)
-        _valid(self.values, shape)
-        _valid(getattr(self, "derivatives", None), shape)
-        _valid(getattr(self, "generic_errors", None), shape)
-        _valid(getattr(self, "metadata", None), shape)
-        _valid(getattr(self, "decoration", None), shape)
+            binshape = binshape + _valid(x, shape)
+        _valid(self.values, shape + binshape)
+        _valid(self.derivatives, shape)
+        _valid(self.generic_errors, shape)
+        _valid(self.metadata, shape)
+        _valid(self.decoration, shape)
+        return shape
 
 ################################################# Histogram
 
@@ -1125,6 +1139,7 @@ class ColumnChunk(Histos):
             raise ValueError("ColumnChunk.page_offsets must start with 0")
         if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
             raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
+        return shape
 
 ################################################# Chunk
 
@@ -1217,6 +1232,7 @@ class Ntuple(Object):
             raise ValueError("Ntuple.chunk_offsets must start with 0")
         if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
             raise ValueError("Ntuple.chunk_offsets must be monotonically increasing")
+        return shape
 
 ################################################# Region
 
@@ -1389,8 +1405,9 @@ class Collection(Histos):
         for x in self.objects:
             _valid(x, shape)
 
-        _valid(getattr(self, "metadata", None), shape)
-        _valid(getattr(self, "decoration", None), shape)
+        _valid(self.metadata, shape)
+        _valid(self.decoration, shape)
+        return shape
 
     def __getitem__(self, where):
         return _getbykey(self, "objects", where)
