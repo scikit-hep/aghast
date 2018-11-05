@@ -146,6 +146,9 @@ def _valid(obj, seen, shape):
     if obj is None:
         return shape
     else:
+        if id(obj) in seen:
+            raise ValueError("hierarchy is recursively nested")
+        seen.add(id(obj))
         return obj._valid(seen, shape)
 
 def _getbykey(self, field, where):
