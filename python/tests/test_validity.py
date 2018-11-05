@@ -60,14 +60,16 @@ class Test(unittest.TestCase):
     def test_InterpretedExternalBuffer(self):
         pass
 
-    def test_Binning(self):
-        pass
-
     def test_FractionalBinning(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(FractionalBinning())], InterpretedInlineBuffer())])
+        assert h.isvalid
+        assert h["id"].axis[0].binning.error_method == FractionalBinning.normal
 
     def test_IntegerBinning(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer())])
+        assert h.isvalid
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(20, 10))], InterpretedInlineBuffer())])
+        assert not h.isvalid
 
     def test_RealInterval(self):
         pass
@@ -94,7 +96,9 @@ class Test(unittest.TestCase):
         pass
 
     def test_Axis(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer())])
+        assert h.isvalid
+        assert h["id"].axis[0].expression == "x"
 
     def test_Counts(self):
         pass
@@ -147,6 +151,9 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid
         assert h["id"].values.numpy_array.tolist() == [0.0]
+
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(), Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0]]
 
     def test_Page(self):
         pass

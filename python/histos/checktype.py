@@ -111,9 +111,9 @@ class CheckInteger(Check):
             return obj
         elif not isinstance(obj, (numbers.Integral, numpy.integer)):
             raise TypeError("{0}.{1} must be an integer, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
-        elif self.min <= obj:
+        elif not self.min <= obj:
             raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.min, repr(obj)))
-        elif obj <= self.max:
+        elif not obj <= self.max:
             raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.max, repr(obj)))
         else:
             return float(obj)

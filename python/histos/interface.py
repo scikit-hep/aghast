@@ -473,7 +473,7 @@ class Binning(Histos):
 ################################################# FractionalBinning
 
 class FractionalBinning(Binning):
-    normal = Enum("normal", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
+    normal           = Enum("normal", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
     clopper_pearson  = Enum("clopper_pearson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_clopper_pearson)
     wilson           = Enum("wilson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_wilson)
     agresti_coull    = Enum("agresti_coull", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_agresti_coull)
@@ -490,6 +490,9 @@ class FractionalBinning(Binning):
 
     def __init__(self, error_method=normal):
         self.error_method = error_method
+
+    def _valid(self, shape):
+        return shape
 
 ################################################# IntegerBinning
 
@@ -513,7 +516,7 @@ class IntegerBinning(Binning):
         self.has_overflow = has_overflow
 
     def _valid(self, shape):
-        if min >= max:
+        if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
         return shape
 
