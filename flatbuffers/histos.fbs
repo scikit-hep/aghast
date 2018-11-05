@@ -202,13 +202,15 @@ enum HexagonalCoordinates: byte {
 }
 
 table HexagonalBinning {
-  qinterval: IntegerBinning (required);
-  rinterval: IntegerBinning (required);
+  qmin: long;   // assumed to be inclusive (if not, change its value!)
+  qmax: long;
+  rmin: long;
+  rmax: long;
   coordinates: HexagonalCoordinates = hex_offset;
   xorigin: double = 0.0;    // x coordinate of (q, r) == (0, 0)
   yorigin: double = 0.0;    // y coordinate of (q, r) == (0, 0)
-  q_pos_nanflow: BinPosition = pos_nonexistent;
-  r_pos_nanflow: BinPosition = pos_nonexistent;
+  qoverflow: RealOverflow;
+  roverflow: RealOverflow;
 }
 
 table EdgesBinning {

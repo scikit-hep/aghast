@@ -686,7 +686,7 @@ class TicTacToeOverflowBinning(Binning):
         
 ################################################# HexagonalBinning
 
-class HexagonalBinning(Binning, BinPosition):
+class HexagonalBinning(Binning):
     offset         = Enum("offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
     doubled_offset = Enum("doubled_offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
     cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
@@ -695,44 +695,50 @@ class HexagonalBinning(Binning, BinPosition):
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
-        "qinterval":     histos.checktype.CheckClass("HexagonalBinning", "qinterval", required=True, type=IntegerBinning),
-        "rinterval":     histos.checktype.CheckClass("HexagonalBinning", "rinterval", required=True, type=IntegerBinning),
-        "coordinates":   histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
-        "xorigin":       histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "yorigin":       histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "q_pos_nanflow": histos.checktype.CheckEnum("HexagonalBinning", "q_pos_nanflow", required=False, choices=BinPosition.positions),
-        "r_pos_nanflow": histos.checktype.CheckEnum("HexagonalBinning", "r_pos_nanflow", required=False, choices=BinPosition.positions),
+        "qmin":        histos.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
+        "qmax":        histos.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
+        "rmin":        histos.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
+        "rmax":        histos.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
+        "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":     histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "qoverflow":   histos.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
+        "roverflow":   histos.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
         }
 
-    qinterval     = typedproperty(_params["qinterval"])
-    rinterval     = typedproperty(_params["rinterval"])
-    coordinates   = typedproperty(_params["coordinates"])
-    xorigin       = typedproperty(_params["xorigin"])
-    yorigin       = typedproperty(_params["yorigin"])
-    q_pos_nanflow = typedproperty(_params["q_pos_nanflow"])
-    r_pos_nanflow = typedproperty(_params["r_pos_nanflow"])
+    qmin        = typedproperty(_params["qmin"])
+    qmax        = typedproperty(_params["qmax"])
+    rmin        = typedproperty(_params["rmin"])
+    rmax        = typedproperty(_params["rmax"])
+    coordinates = typedproperty(_params["coordinates"])
+    xorigin     = typedproperty(_params["xorigin"])
+    yorigin     = typedproperty(_params["yorigin"])
+    qoverflow   = typedproperty(_params["qoverflow"])
+    roverflow   = typedproperty(_params["roverflow"])
 
-    def __init__(self, qinterval, rinterval, coordinates=offset, xorigin=0.0, yorigin=0.0, q_pos_nanflow=BinPosition.nonexistent, r_pos_nanflow=BinPosition.nonexistent):
-        self.qinterval = qinterval
-        self.rinterval = rinterval
+    def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qoverflow=None, roverflow=None):
+        self.qmin = qmin
+        self.qmax = qmax
+        self.rmin = rmin
+        self.rmax = rmax
         self.coordinates = coordinates
         self.xorigin = xorigin
         self.yorigin = yorigin
-        self.q_pos_nanflow = q_pos_nanflow
-        self.r_pos_nanflow = r_pos_nanflow
+        self.qoverflow = qoverflow
+        self.roverflow = roverflow
 
     def _valid(self, shape):
-        qlen, = self.qinterval._valid(shape)
-        rlen, = self.rinterval._valid(shape)
-
-        if self.qinterval.pos_underflow != BinPosition.nonexistent and self.q_pos_nanflow != BinPosition.nonexistent and self.qinterval.pos_underflow == self.q_pos_nanflow:
-            raise ValueError("HexagonalBinning.qinterval.pos_underflow and HexagonalBinning.q_pos_nanflow must not be equal unless they are both nonexistent")
-        if self.rinterval.pos_underflow != BinPosition.nonexistent and self.r_pos_nanflow != BinPosition.nonexistent and self.rinterval.pos_underflow == self.r_pos_nanflow:
-            raise ValueError("HexagonalBinning.rinterval.pos_underflow and HexagonalBinning.r_pos_nanflow must not be equal unless they are both nonexistent")
-
-        qnan = int(self.q_pos_nanflow != BinPosition.nonexistent)
-        rnan = int(self.r_pos_nanflow != BinPosition.nonexistent)
-        return (qlen + qnan, rlen + rnan)
+        qnum = self.qmax - self.qmin + 1
+        rnum = self.rmax - self.rmin + 1
+        if self.qoverflow is None:
+            qoverflowdims, = RealOverflow()._valid(shape)
+        else:
+            qoverflowdims, = self.qoverflow._valid(shape)
+        if self.roverflow is None:
+            roverflowdims, = RealOverflow()._valid(shape)
+        else:
+            roverflowdims, = self.roverflow._valid(shape)
+        return (qnum + qoverflowdims, rnum + roverflowdims)
 
 ################################################# EdgesBinning
 
