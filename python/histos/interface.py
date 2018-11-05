@@ -125,15 +125,15 @@ def typedproperty(check):
         
     @property
     def prop(self):
-        private = "_" + check.param
+        private = "_" + check.paramname
         if not hasattr(self, private):
-            setattr(self, private, check.fromflatbuffers(getattr(self._flatbuffers, check.param.capitalize())()))
+            setattr(self, private, check.fromflatbuffers(getattr(self._flatbuffers, check.paramname.capitalize())()))
         return getattr(self, private)
 
     @prop.setter
     def prop(self, value):
         setparent(self, value)
-        private = "_" + check.param
+        private = "_" + check.paramname
         setattr(self, private, check(value))
 
     return prop
@@ -194,13 +194,13 @@ class Metadata(Histos):
     json = Enum("json", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
-    params = {
+    _params = {
         "data":     histos.checktype.CheckString("Metadata", "data", required=True),
         "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
-    data     = typedproperty(params["data"])
-    language = typedproperty(params["language"])
+    data     = typedproperty(_params["data"])
+    language = typedproperty(_params["language"])
 
     def __init__(self, data, language=unspecified):
         self.data = data
@@ -218,13 +218,13 @@ class Decoration(Histos):
     root_json   = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
     language = [unspecified, css, vega, root_json]
 
-    params = {
+    _params = {
         "data":     histos.checktype.CheckString("Metadata", "data", required=True),
         "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
-    data     = typedproperty(params["data"])
-    language = typedproperty(params["language"])
+    data     = typedproperty(_params["data"])
+    language = typedproperty(_params["language"])
 
     def __init__(self, data, language=unspecified):
         self.data = data
@@ -316,15 +316,15 @@ class InterpretedBuffer(object):
 ################################################# RawInlineBuffer
 
 class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
-    params = {
+    _params = {
         "buffer":           histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
         "filters":          histos.checktype.CheckVector("RawInlineBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
         }
 
-    buffer           = typedproperty(params["buffer"])
-    filters          = typedproperty(params["filters"])
-    postfilter_slice = typedproperty(params["postfilter_slice"])
+    buffer           = typedproperty(_params["buffer"])
+    filters          = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["postfilter_slice"])
 
     def __init__(self, buffer, filters=None, postfilter_slice=None):
         self.buffer = buffer
@@ -338,7 +338,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 ################################################# RawExternalBuffer
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
-    params = {
+    _params = {
         "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
         "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
@@ -346,11 +346,11 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
         }
 
-    pointer          = typedproperty(params["pointer"])
-    numbytes         = typedproperty(params["numbytes"])
-    external_type    = typedproperty(params["external_type"])
-    filters          = typedproperty(params["filters"])
-    postfilter_slice = typedproperty(params["postfilter_slice"])
+    pointer          = typedproperty(_params["pointer"])
+    numbytes         = typedproperty(_params["numbytes"])
+    external_type    = typedproperty(_params["external_type"])
+    filters          = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["postfilter_slice"])
 
     def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None):
         self.pointer = pointer
@@ -366,7 +366,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
 ################################################# InlineBuffer
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
-    params = {
+    _params = {
         "buffer":           histos.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
         "filters":          histos.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": histos.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
@@ -375,12 +375,12 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         "dimension_order":  histos.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         }
 
-    buffer           = typedproperty(params["buffer"])
-    filters          = typedproperty(params["filters"])
-    postfilter_slice = typedproperty(params["postfilter_slice"])
-    dtype            = typedproperty(params["dtype"])
-    endianness       = typedproperty(params["endianness"])
-    dimension_order  = typedproperty(params["dimension_order"])
+    buffer           = typedproperty(_params["buffer"])
+    filters          = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["postfilter_slice"])
+    dtype            = typedproperty(_params["dtype"])
+    endianness       = typedproperty(_params["endianness"])
+    dimension_order  = typedproperty(_params["dimension_order"])
 
     def __init__(self, buffer=None, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
         if buffer is None:
@@ -421,7 +421,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 ################################################# ExternalBuffer
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
-    params = {
+    _params = {
         "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
         "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
@@ -433,15 +433,15 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         "location":         histos.checktype.CheckString("ExternalBuffer", "location", required=False),
         }
 
-    pointer          = typedproperty(params["pointer"])
-    numbytes         = typedproperty(params["numbytes"])
-    external_type    = typedproperty(params["external_type"])
-    filters          = typedproperty(params["filters"])
-    postfilter_slice = typedproperty(params["postfilter_slice"])
-    dtype            = typedproperty(params["dtype"])
-    endianness       = typedproperty(params["endianness"])
-    dimension_order  = typedproperty(params["dimension_order"])
-    location         = typedproperty(params["location"])
+    pointer          = typedproperty(_params["pointer"])
+    numbytes         = typedproperty(_params["numbytes"])
+    external_type    = typedproperty(_params["external_type"])
+    filters          = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["postfilter_slice"])
+    dtype            = typedproperty(_params["dtype"])
+    endianness       = typedproperty(_params["endianness"])
+    dimension_order  = typedproperty(_params["dimension_order"])
+    location         = typedproperty(_params["location"])
 
     def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
         if pointer is None and numbytes is None:
@@ -482,11 +482,11 @@ class FractionalBinning(Binning):
     bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
     error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
-    params = {
+    _params = {
         "error_method": histos.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
         }
 
-    error_method = typedproperty(params["error_method"])
+    error_method = typedproperty(_params["error_method"])
 
     def __init__(self, error_method=normal):
         self.error_method = error_method
@@ -494,17 +494,17 @@ class FractionalBinning(Binning):
 ################################################# IntegerBinning
 
 class IntegerBinning(Binning):
-    params = {
+    _params = {
         "min":           histos.checktype.CheckInteger("IntegerBinning", "min", required=True),
         "max":           histos.checktype.CheckInteger("IntegerBinning", "max", required=True),
         "has_underflow": histos.checktype.CheckBool("IntegerBinning", "has_underflow", required=False),
         "has_overflow":  histos.checktype.CheckBool("IntegerBinning", "has_overflow", required=False),
         }
 
-    min           = typedproperty(params["min"])
-    max           = typedproperty(params["max"])
-    has_underflow = typedproperty(params["has_underflow"])
-    has_overflow  = typedproperty(params["has_overflow"])
+    min           = typedproperty(_params["min"])
+    max           = typedproperty(_params["max"])
+    has_underflow = typedproperty(_params["has_underflow"])
+    has_overflow  = typedproperty(_params["has_overflow"])
 
     def __init__(self, min, max, has_underflow=True, has_overflow=True):
         self.min = min
@@ -520,17 +520,17 @@ class IntegerBinning(Binning):
 ################################################# RealInterval
 
 class RealInterval(Histos):
-    params = {
+    _params = {
         "low":            histos.checktype.CheckNumber("RealInterval", "low", required=True),
         "high":           histos.checktype.CheckNumber("RealInterval", "high", required=True),
         "low_inclusive":  histos.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
         "high_inclusive": histos.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
 
-    low            = typedproperty(params["low"])
-    high           = typedproperty(params["high"])
-    low_inclusive  = typedproperty(params["low_inclusive"])
-    high_inclusive = typedproperty(params["high_inclusive"])
+    low            = typedproperty(_params["low"])
+    high           = typedproperty(_params["high"])
+    low_inclusive  = typedproperty(_params["low_inclusive"])
+    high_inclusive = typedproperty(_params["high_inclusive"])
 
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
         self.low = low
@@ -552,7 +552,7 @@ class RealOverflow(Histos):
     in_nanflow   = Enum("in_nanflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_nanflow)
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
-    params = {
+    _params = {
         "has_underflow": histos.checktype.CheckBool("RealOverflow", "has_underflow", required=False),
         "has_overflow":  histos.checktype.CheckBool("RealOverflow", "has_overflow", required=False),
         "has_nanflow":   histos.checktype.CheckBool("RealOverflow", "has_nanflow", required=False),
@@ -561,12 +561,12 @@ class RealOverflow(Histos):
         "nan_mapping":   histos.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
-    has_underflow = typedproperty(params["has_underflow"])
-    has_overflow  = typedproperty(params["has_overflow"])
-    has_nanflow   = typedproperty(params["has_nanflow"])
-    minf_mapping  = typedproperty(params["minf_mapping"])
-    pinf_mapping  = typedproperty(params["pinf_mapping"])
-    nan_mapping   = typedproperty(params["nan_mapping"])
+    has_underflow = typedproperty(_params["has_underflow"])
+    has_overflow  = typedproperty(_params["has_overflow"])
+    has_nanflow   = typedproperty(_params["has_nanflow"])
+    minf_mapping  = typedproperty(_params["minf_mapping"])
+    pinf_mapping  = typedproperty(_params["pinf_mapping"])
+    nan_mapping   = typedproperty(_params["nan_mapping"])
 
     def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
         self.has_underflow = has_underflow
@@ -579,17 +579,17 @@ class RealOverflow(Histos):
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
-    params = {
+    _params = {
         "num":      histos.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
         "interval": histos.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
         "overflow": histos.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
         "circular": histos.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
-    num      = typedproperty(params["num"])
-    interval = typedproperty(params["interval"])
-    overflow = typedproperty(params["overflow"])
-    circular = typedproperty(params["circular"])
+    num      = typedproperty(_params["num"])
+    interval = typedproperty(_params["interval"])
+    overflow = typedproperty(_params["overflow"])
+    circular = typedproperty(_params["circular"])
 
     def __init__(self, num, interval, overflow=None, circular=False):
         self.num = num
@@ -600,7 +600,7 @@ class RegularBinning(Binning):
 ################################################# TicTacToeOverflowBinning
 
 class TicTacToeOverflowBinning(Binning):
-    params = {
+    _params = {
         "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
         "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
         "x":         histos.checktype.CheckClass("TicTacToeOverflowBinning", "x", required=True, type=RealInterval),
@@ -609,12 +609,12 @@ class TicTacToeOverflowBinning(Binning):
         "yoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
 
-    xnum      = typedproperty(params["xnum"])
-    ynum      = typedproperty(params["ynum"])
-    x         = typedproperty(params["x"])
-    y         = typedproperty(params["y"])
-    xoverflow = typedproperty(params["xoverflow"])
-    yoverflow = typedproperty(params["yoverflow"])
+    xnum      = typedproperty(_params["xnum"])
+    ynum      = typedproperty(_params["ynum"])
+    x         = typedproperty(_params["x"])
+    y         = typedproperty(_params["y"])
+    xoverflow = typedproperty(_params["xoverflow"])
+    yoverflow = typedproperty(_params["yoverflow"])
 
     def __init__(self, xnum, ynum, x, y, xoverflow=None, yoverflow=None):
         self.xnum = xnum
@@ -634,7 +634,7 @@ class HexagonalBinning(Binning):
     cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
-    params = {
+    _params = {
         "q":           histos.checktype.CheckClass("HexagonalBinning", "q", required=True, type=IntegerBinning),
         "r":           histos.checktype.CheckClass("HexagonalBinning", "r", required=True, type=IntegerBinning),
         "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
@@ -642,11 +642,11 @@ class HexagonalBinning(Binning):
         "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False),
         }
 
-    q           = typedproperty(params["q"])
-    r           = typedproperty(params["r"])
-    coordinates = typedproperty(params["coordinates"])
-    xorigin     = typedproperty(params["xorigin"])
-    yorigin     = typedproperty(params["yorigin"])
+    q           = typedproperty(_params["q"])
+    r           = typedproperty(_params["r"])
+    coordinates = typedproperty(_params["coordinates"])
+    xorigin     = typedproperty(_params["xorigin"])
+    yorigin     = typedproperty(_params["yorigin"])
 
     def __init__(self, q, r, coordinates=offset, xorigin=0.0, yorigin=0.0):
         self.q = q
@@ -658,13 +658,13 @@ class HexagonalBinning(Binning):
 ################################################# VariableBinning
 
 class VariableBinning(Binning):
-    params = {
+    _params = {
         "intervals": histos.checktype.CheckVector("VariableBinning", "intervals", required=True, type=RealInterval),
         "overflow":  histos.checktype.CheckClass("VariableBinning", "overflow", required=False, type=RealOverflow),
         }
 
-    intervals = typedproperty(params["intervals"])
-    overflow  = typedproperty(params["overflow"])
+    intervals = typedproperty(_params["intervals"])
+    overflow  = typedproperty(_params["overflow"])
 
     def __init__(self, intervals, overflow=None):
         self.intervals = intervals
@@ -673,11 +673,11 @@ class VariableBinning(Binning):
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning):
-    params = {
+    _params = {
         "categories":  histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
         }
 
-    categories = typedproperty(params["categories"])
+    categories = typedproperty(_params["categories"])
 
     def __init__(self, categories):
         self.categories  = categories 
@@ -685,17 +685,17 @@ class CategoryBinning(Binning):
 ################################################# SparseRegularBinning
 
 class SparseRegularBinning(Binning):
-    params = {
+    _params = {
         "bins":        histos.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
         "bin_width":   histos.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
         "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
         "has_nanflow": histos.checktype.CheckBool("SparseRegularBinning", "has_nanflow", required=False),
         }
 
-    bins        = typedproperty(params["bins"])
-    bin_width   = typedproperty(params["bin_width"])
-    origin      = typedproperty(params["origin"])
-    has_nanflow = typedproperty(params["has_nanflow"])
+    bins        = typedproperty(_params["bins"])
+    bin_width   = typedproperty(_params["bin_width"])
+    origin      = typedproperty(_params["origin"])
+    has_nanflow = typedproperty(_params["has_nanflow"])
 
     def __init__(self, bins, bin_width, origin=0.0, has_nanflow=True):
         self.bins = bins
@@ -706,7 +706,7 @@ class SparseRegularBinning(Binning):
 ################################################# Axis
 
 class Axis(Histos):
-    params = {
+    _params = {
         "binning":    histos.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
         "expression": histos.checktype.CheckString("Axis", "expression", required=False),
         "title":      histos.checktype.CheckString("Axis", "title", required=False),
@@ -714,11 +714,11 @@ class Axis(Histos):
         "decoration": histos.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
 
-    binning    = typedproperty(params["binning"])
-    expression = typedproperty(params["expression"])
-    title      = typedproperty(params["title"])
-    metadata   = typedproperty(params["metadata"])
-    decoration = typedproperty(params["decoration"])
+    binning    = typedproperty(_params["binning"])
+    expression = typedproperty(_params["expression"])
+    title      = typedproperty(_params["title"])
+    metadata   = typedproperty(_params["metadata"])
+    decoration = typedproperty(_params["decoration"])
 
     def __init__(self, binning=None, expression="", title="", metadata=None, decoration=None):
         self.binning = binning
@@ -745,11 +745,11 @@ class Counts(Histos):
 ################################################# UnweightedCounts
 
 class UnweightedCounts(Counts):
-    params = {
+    _params = {
         "counts":  histos.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
-    counts = typedproperty(params["counts"])
+    counts = typedproperty(_params["counts"])
 
     def __init__(self, counts):
         self.counts = counts
@@ -757,15 +757,15 @@ class UnweightedCounts(Counts):
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
-    params = {
+    _params = {
         "sumw":   histos.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
         "sumw2":  histos.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
         "counts": histos.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
         }
 
-    sumw   = typedproperty(params["sumw"])
-    sumw2  = typedproperty(params["sumw2"])
-    counts = typedproperty(params["counts"])
+    sumw   = typedproperty(_params["sumw"])
+    sumw2  = typedproperty(_params["sumw2"])
+    counts = typedproperty(_params["counts"])
 
     def __init__(self, sumw, sumw2, counts=None):
         self.sumw = sumw
@@ -775,13 +775,13 @@ class WeightedCounts(Counts):
 ################################################# Correlation
 
 class Correlation(Histos):
-    params = {
+    _params = {
         "sumwx":   histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
         "sumwxy":  histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
         }
 
-    sumwx  = typedproperty(params["sumwx"])
-    sumwxy = typedproperty(params["sumwxy"])
+    sumwx  = typedproperty(_params["sumwx"])
+    sumwxy = typedproperty(_params["sumwxy"])
 
     def __init__(self, sumwx, sumwxy):
         self.sumwx = sumwx
@@ -790,7 +790,7 @@ class Correlation(Histos):
 ################################################# Extremes
 
 class Extremes(Histos):
-    params = {
+    _params = {
         "min":           histos.checktype.CheckClass("Extremes", "min", required=True, type=InterpretedBuffer),
         "max":           histos.checktype.CheckClass("Extremes", "max", required=True, type=InterpretedBuffer),
         "excludes_minf": histos.checktype.CheckBool("Extremes", "excludes_minf", required=False),
@@ -798,11 +798,11 @@ class Extremes(Histos):
         "excludes_nan":  histos.checktype.CheckBool("Extremes", "excludes_nan", required=False),
         }
 
-    min           = typedproperty(params["min"])
-    max           = typedproperty(params["max"])
-    excludes_minf = typedproperty(params["excludes_minf"])
-    excludes_pinf = typedproperty(params["excludes_pinf"])
-    excludes_nan  = typedproperty(params["excludes_nan"])
+    min           = typedproperty(_params["min"])
+    max           = typedproperty(_params["max"])
+    excludes_minf = typedproperty(_params["excludes_minf"])
+    excludes_pinf = typedproperty(_params["excludes_pinf"])
+    excludes_nan  = typedproperty(_params["excludes_nan"])
 
     def __init__(self, min, max, excludes_minf=False, excludes_pinf=False, excludes_nan=True):
         self.min = min
@@ -814,13 +814,13 @@ class Extremes(Histos):
 ################################################# Moments
 
 class Moments(Histos):
-    params = {
+    _params = {
         "sumwn": histos.checktype.CheckClass("Moments", "sumwn", required=True, type=InterpretedBuffer),
         "n":     histos.checktype.CheckInteger("Moments", "n", required=True, min=1),
         }
 
-    sumwn = typedproperty(params["sumwn"])
-    n     = typedproperty(params["n"])
+    sumwn = typedproperty(_params["sumwn"])
+    n     = typedproperty(_params["n"])
 
     def __init__(self, sumwn, n):
         self.sumwn = sumwn
@@ -829,13 +829,13 @@ class Moments(Histos):
 ################################################# Quantiles
 
 class Quantiles(Histos):
-    params = {
+    _params = {
         "values": histos.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
         "p":      histos.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
         }
 
-    values = typedproperty(params["values"])
-    p      = typedproperty(params["p"])
+    values = typedproperty(_params["values"])
+    p      = typedproperty(_params["p"])
 
     def __init__(self, values, p=0.5):
         self.values = values
@@ -844,13 +844,13 @@ class Quantiles(Histos):
 ################################################# GenericErrors
 
 class GenericErrors(Histos):
-    params = {
+    _params = {
         "errors": histos.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
         "p":      histos.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
         }
 
-    errors = typedproperty(params["errors"])
-    p      = typedproperty(params["p"])
+    errors = typedproperty(_params["errors"])
+    p      = typedproperty(_params["p"])
 
     def __init__(self, errors, p=0.6826894921370859):
         self.errors = errors
@@ -859,7 +859,7 @@ class GenericErrors(Histos):
 ################################################# DistributionStats
 
 class DistributionStats(Histos):
-    params = {
+    _params = {
         "correlation":    histos.checktype.CheckClass("DistributionStats", "correlation", required=False, type=Correlation),
         "extremes":       histos.checktype.CheckClass("DistributionStats", "extremes", required=False, type=Extremes),
         "moments":        histos.checktype.CheckVector("DistributionStats", "moments", required=False, type=Moments),
@@ -867,11 +867,11 @@ class DistributionStats(Histos):
         "generic_errors": histos.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
         }
 
-    correlation    = typedproperty(params["correlation"])
-    extremes       = typedproperty(params["extremes"])
-    moments        = typedproperty(params["moments"])
-    quantiles      = typedproperty(params["quantiles"])
-    generic_errors = typedproperty(params["generic_errors"])
+    correlation    = typedproperty(_params["correlation"])
+    extremes       = typedproperty(_params["extremes"])
+    moments        = typedproperty(_params["moments"])
+    quantiles      = typedproperty(_params["quantiles"])
+    generic_errors = typedproperty(_params["generic_errors"])
 
     def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
         self.correlation = correlation
@@ -883,13 +883,13 @@ class DistributionStats(Histos):
 ################################################# Distribution
 
 class Distribution(Histos):
-    params = {
+    _params = {
         "counts": histos.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
         "stats":  histos.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
         }
 
-    counts = typedproperty(params["counts"])
-    stats  = typedproperty(params["stats"])
+    counts = typedproperty(_params["counts"])
+    stats  = typedproperty(_params["stats"])
 
     def __init__(self, counts, stats=None):
         self.counts = counts
@@ -898,17 +898,17 @@ class Distribution(Histos):
 ################################################# Profile
 
 class Profile(Histos):
-    params = {
+    _params = {
         "expression": histos.checktype.CheckString("Profile", "expression", required=True),
         "title":      histos.checktype.CheckString("Profile", "title", required=False),
         "metadata":   histos.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
         "decoration": histos.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
-    expression = typedproperty(params["expression"])
-    title      = typedproperty(params["title"])
-    metadata   = typedproperty(params["metadata"])
-    decoration = typedproperty(params["decoration"])
+    expression = typedproperty(_params["expression"])
+    title      = typedproperty(_params["title"])
+    metadata   = typedproperty(_params["metadata"])
+    decoration = typedproperty(_params["decoration"])
 
     def __init__(self, expression, title="", metadata=None, decoration=None):
         self.expression = expression
@@ -919,13 +919,13 @@ class Profile(Histos):
 ################################################# Parameter
 
 class Parameter(Histos):
-    params = {
+    _params = {
         "identifier": histos.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
         "value":      histos.checktype.CheckNumber("Parameter", "value", required=True),
         }
 
-    identifier = typedproperty(params["identifier"])
-    value      = typedproperty(params["value"])
+    identifier = typedproperty(_params["identifier"])
+    value      = typedproperty(_params["value"])
 
     def __init__(self, identifier, value):
         self.identifier = identifier
@@ -949,7 +949,7 @@ class FunctionObject(Object):
 ################################################# ParameterizedFunction
 
 class ParameterizedFunction(Function, FunctionObject):
-    params = {
+    _params = {
         "identifier": histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
@@ -959,13 +959,13 @@ class ParameterizedFunction(Function, FunctionObject):
         "decoration": histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
         }
 
-    identifier = typedproperty(params["identifier"])
-    expression = typedproperty(params["expression"])
-    parameters = typedproperty(params["parameters"])
-    contours   = typedproperty(params["contours"])
-    title      = typedproperty(params["title"])
-    metadata   = typedproperty(params["metadata"])
-    decoration = typedproperty(params["decoration"])
+    identifier = typedproperty(_params["identifier"])
+    expression = typedproperty(_params["expression"])
+    parameters = typedproperty(_params["parameters"])
+    contours   = typedproperty(_params["contours"])
+    title      = typedproperty(_params["title"])
+    metadata   = typedproperty(_params["metadata"])
+    decoration = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -992,7 +992,7 @@ class ParameterizedFunction(Function, FunctionObject):
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
-    params = {
+    _params = {
         "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
         "values":         histos.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
         "derivatives":    histos.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
@@ -1002,13 +1002,13 @@ class EvaluatedFunction(Function):
         "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    values         = typedproperty(params["values"])
-    derivatives    = typedproperty(params["derivatives"])
-    generic_errors = typedproperty(params["generic_errors"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier     = typedproperty(_params["identifier"])
+    values         = typedproperty(_params["values"])
+    derivatives    = typedproperty(_params["derivatives"])
+    generic_errors = typedproperty(_params["generic_errors"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1022,9 +1022,9 @@ class EvaluatedFunction(Function):
 ################################################# BinnedEvaluatedFunction
 
 class BinnedEvaluatedFunction(FunctionObject):
-    params = {
+    _params = {
         "identifier":     histos.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
-        "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis),
+        "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
         "values":         histos.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
         "derivatives":    histos.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
         "generic_errors": histos.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
@@ -1033,14 +1033,14 @@ class BinnedEvaluatedFunction(FunctionObject):
         "decoration":     histos.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    axis           = typedproperty(params["axis"])
-    values         = typedproperty(params["values"])
-    derivatives    = typedproperty(params["derivatives"])
-    generic_errors = typedproperty(params["generic_errors"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier     = typedproperty(_params["identifier"])
+    axis           = typedproperty(_params["axis"])
+    values         = typedproperty(_params["values"])
+    derivatives    = typedproperty(_params["derivatives"])
+    generic_errors = typedproperty(_params["generic_errors"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, axis, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1066,9 +1066,9 @@ class BinnedEvaluatedFunction(FunctionObject):
 ################################################# Histogram
 
 class Histogram(Object):
-    params = {
+    _params = {
         "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
-        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis),
+        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
         "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
         "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
         "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
@@ -1079,16 +1079,16 @@ class Histogram(Object):
         "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    axis           = typedproperty(params["axis"])
-    distribution   = typedproperty(params["distribution"])
-    profiles       = typedproperty(params["profiles"])
-    unbinned_stats = typedproperty(params["unbinned_stats"])
-    profile_stats  = typedproperty(params["profile_stats"])
-    functions      = typedproperty(params["functions"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier     = typedproperty(_params["identifier"])
+    axis           = typedproperty(_params["axis"])
+    distribution   = typedproperty(_params["distribution"])
+    profiles       = typedproperty(_params["profiles"])
+    unbinned_stats = typedproperty(_params["unbinned_stats"])
+    profile_stats  = typedproperty(_params["profile_stats"])
+    functions      = typedproperty(_params["functions"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1105,11 +1105,11 @@ class Histogram(Object):
 ################################################# Page
 
 class Page(Histos):
-    params = {
+    _params = {
         "buffer":  histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
-    buffer = typedproperty(params["buffer"])
+    buffer = typedproperty(_params["buffer"])
 
     def __init__(self, buffer):
         self.buffer  = buffer 
@@ -1117,15 +1117,15 @@ class Page(Histos):
 ################################################# ColumnChunk
 
 class ColumnChunk(Histos):
-    params = {
+    _params = {
         "pages":         histos.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
         "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int),
         "page_extremes": histos.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
         }
 
-    pages         = typedproperty(params["pages"])
-    page_offsets  = typedproperty(params["page_offsets"])
-    page_extremes = typedproperty(params["page_extremes"])
+    pages         = typedproperty(_params["pages"])
+    page_offsets  = typedproperty(_params["page_offsets"])
+    page_extremes = typedproperty(_params["page_extremes"])
 
     def __init__(self, pages, page_offsets, page_extremes=None):
         self.pages = pages
@@ -1144,13 +1144,13 @@ class ColumnChunk(Histos):
 ################################################# Chunk
 
 class Chunk(Histos):
-    params = {
+    _params = {
         "columns":  histos.checktype.CheckVector("Chunk", "columns", required=True, type=ColumnChunk),
         "metadata": histos.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
-    columns  = typedproperty(params["columns"])
-    metadata = typedproperty(params["metadata"])
+    columns  = typedproperty(_params["columns"])
+    metadata = typedproperty(_params["metadata"])
 
     def __init__(self, columns, metadata=None):
         self.columns = columns
@@ -1159,7 +1159,7 @@ class Chunk(Histos):
 ################################################# Column
 
 class Column(Histos):
-    params = {
+    _params = {
         "identifier":      histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
         "dtype":           histos.checktype.CheckEnum("Column", "dtype", required=False, choices=InterpretedBuffer.dtypes),
         "endianness":      histos.checktype.CheckEnum("Column", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
@@ -1170,14 +1170,14 @@ class Column(Histos):
         "decoration":      histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
-    identifier      = typedproperty(params["identifier"])
-    dtype           = typedproperty(params["dtype"])
-    endianness      = typedproperty(params["endianness"])
-    dimension_order = typedproperty(params["dimension_order"])
-    filters         = typedproperty(params["filters"])
-    title           = typedproperty(params["title"])
-    metadata        = typedproperty(params["metadata"])
-    decoration      = typedproperty(params["decoration"])
+    identifier      = typedproperty(_params["identifier"])
+    dtype           = typedproperty(_params["dtype"])
+    endianness      = typedproperty(_params["endianness"])
+    dimension_order = typedproperty(_params["dimension_order"])
+    filters         = typedproperty(_params["filters"])
+    title           = typedproperty(_params["title"])
+    metadata        = typedproperty(_params["metadata"])
+    decoration      = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1192,7 +1192,7 @@ class Column(Histos):
 ################################################# Ntuple
 
 class Ntuple(Object):
-    params = {
+    _params = {
         "identifier":     histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
         "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column),
         "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
@@ -1204,15 +1204,15 @@ class Ntuple(Object):
         "decoration":     histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    columns        = typedproperty(params["columns"])
-    chunks         = typedproperty(params["chunks"])
-    chunk_offsets  = typedproperty(params["chunk_offsets"])
-    unbinned_stats = typedproperty(params["unbinned_stats"])
-    functions      = typedproperty(params["functions"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier     = typedproperty(_params["identifier"])
+    columns        = typedproperty(_params["columns"])
+    chunks         = typedproperty(_params["chunks"])
+    chunk_offsets  = typedproperty(_params["chunk_offsets"])
+    unbinned_stats = typedproperty(_params["unbinned_stats"])
+    functions      = typedproperty(_params["functions"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, columns, chunks, chunk_offsets, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1237,11 +1237,11 @@ class Ntuple(Object):
 ################################################# Region
 
 class Region(Histos):
-    params = {
+    _params = {
         "expressions":  histos.checktype.CheckVector("Region", "expressions", required=True, type=str),
         }
 
-    expressions = typedproperty(params["expressions"])
+    expressions = typedproperty(_params["expressions"])
 
     def __init__(self, expressions):
         self.expressions  = expressions 
@@ -1249,13 +1249,13 @@ class Region(Histos):
 ################################################# BinnedRegion
 
 class BinnedRegion(Histos):
-    params = {
+    _params = {
         "expression": histos.checktype.CheckString("BinnedRegion", "expression", required=True),
         "binning":    histos.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
         }
 
-    expression = typedproperty(params["expression"])
-    binning    = typedproperty(params["binning"])
+    expression = typedproperty(_params["expression"])
+    binning    = typedproperty(_params["binning"])
 
     def __init__(self, expression, binning):
         self.expression = expression
@@ -1264,13 +1264,13 @@ class BinnedRegion(Histos):
 ################################################# Assignment
 
 class Assignment(Histos):
-    params = {
+    _params = {
         "identifier": histos.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
         "expression": histos.checktype.CheckString("Assignment", "expression", required=True),
         }
 
-    identifier = typedproperty(params["identifier"])
-    expression = typedproperty(params["expression"])
+    identifier = typedproperty(_params["identifier"])
+    expression = typedproperty(_params["expression"])
 
     def __init__(self, identifier, expression):
         self.identifier = identifier
@@ -1279,15 +1279,15 @@ class Assignment(Histos):
 ################################################# Variation
 
 class Variation(Histos):
-    params = {
+    _params = {
         "assignments":         histos.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
         "systematic":          histos.checktype.CheckVector("Variation", "systematic", required=False, type=float),
         "category_systematic": histos.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
-    assignments         = typedproperty(params["assignments"])
-    systematic          = typedproperty(params["systematic"])
-    category_systematic = typedproperty(params["category_systematic"])
+    assignments         = typedproperty(_params["assignments"])
+    systematic          = typedproperty(_params["systematic"])
+    category_systematic = typedproperty(_params["category_systematic"])
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
         self.assignments = assignments
@@ -1365,7 +1365,7 @@ class Collection(Histos):
         offset, = struct.unpack("<Q", file[-12:-4])
         return cls.frombuffer(file[offset:-12])
 
-    params = {
+    _params = {
         "identifier":     histos.checktype.CheckString("Collection", "identifier", required=True),
         "objects":        histos.checktype.CheckVector("Collection", "objects", required=True, type=Object),
         "collections":    histos.checktype.CheckVector("Collection", "collections", required=False, type=None),
@@ -1377,15 +1377,15 @@ class Collection(Histos):
         "decoration":     histos.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    objects        = typedproperty(params["objects"])
-    collections    = typedproperty(params["collections"])
-    regions        = typedproperty(params["regions"])
-    binned_regions = typedproperty(params["binned_regions"])
-    variations     = typedproperty(params["variations"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier     = typedproperty(_params["identifier"])
+    objects        = typedproperty(_params["objects"])
+    collections    = typedproperty(_params["collections"])
+    regions        = typedproperty(_params["regions"])
+    binned_regions = typedproperty(_params["binned_regions"])
+    variations     = typedproperty(_params["variations"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
 
     def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
@@ -1434,4 +1434,4 @@ class Collection(Histos):
             histos.histos_generated.Collection.CollectionAddTitle(builder, title)
         return histos.histos_generated.Collection.CollectionEnd(builder)
 
-Collection.params["collections"].type = Collection
+Collection._params["collections"].type = Collection
