@@ -120,8 +120,19 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_has_nanflow=False, r_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [[0.0] * 4] * 5
 
-    def test_VariableBinning(self):
-        pass
+    def test_EdgesBinning(self):
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(EdgesBinning([3.3]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h.isvalid
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(EdgesBinning([1.1, 2.2, 3.3]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
+
+    def test_IrregularBinning(self):
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5)]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h.isvalid
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0]
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5), RealInterval(1.5, 1.5), RealInterval(0.0, 10.0)]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     def test_CategoryBinning(self):
         pass

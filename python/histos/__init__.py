@@ -51,7 +51,8 @@ from histos.interface import RealOverflow
 from histos.interface import RegularBinning
 from histos.interface import TicTacToeOverflowBinning
 from histos.interface import HexagonalBinning
-from histos.interface import VariableBinning
+from histos.interface import EdgesBinning
+from histos.interface import IrregularBinning
 from histos.interface import CategoryBinning
 from histos.interface import SparseRegularBinning
 from histos.interface import Axis

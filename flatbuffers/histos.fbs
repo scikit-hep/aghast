@@ -201,7 +201,12 @@ table HexagonalBinning {
   r_has_nanflow: bool = true;
 }
 
-table VariableBinning {
+table EdgesBinning {
+  edges: [double] (required);
+  overflow: RealOverflow;
+}
+
+table IrregularBinning {
   intervals: [RealInterval] (required);
   overflow: RealOverflow;
 }
@@ -223,7 +228,8 @@ union Binning {
   RegularBinning,
   TicTacToeOverflowBinning,
   HexagonalBinning,
-  VariableBinning,
+  EdgesBinning,
+  IrregularBinning,
   CategoryBinning,
   SparseRegularBinning
 }

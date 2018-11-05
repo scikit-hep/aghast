@@ -56,6 +56,7 @@ import histos.histos_generated.DimensionOrder
 import histos.histos_generated.Distribution
 import histos.histos_generated.DistributionStats
 import histos.histos_generated.DType
+import histos.histos_generated.EdgesBinning
 import histos.histos_generated.Endianness
 import histos.histos_generated.EvaluatedFunction
 import histos.histos_generated.ExternalType
@@ -75,6 +76,7 @@ import histos.histos_generated.IntegerBinning
 import histos.histos_generated.InterpretedBuffer
 import histos.histos_generated.InterpretedExternalBuffer
 import histos.histos_generated.InterpretedInlineBuffer
+import histos.histos_generated.IrregularBinning
 import histos.histos_generated.MetadataLanguage
 import histos.histos_generated.Metadata
 import histos.histos_generated.Moments
@@ -98,7 +100,6 @@ import histos.histos_generated.Slice
 import histos.histos_generated.SparseRegularBinning
 import histos.histos_generated.TicTacToeOverflowBinning
 import histos.histos_generated.UnweightedCounts
-import histos.histos_generated.VariableBinning
 import histos.histos_generated.Variation
 import histos.histos_generated.WeightedCounts
 
@@ -543,8 +544,10 @@ class RealInterval(Histos):
         self.high_inclusive = high_inclusive
 
     def _valid(self, shape):
-        if self.low >= self.high:
-            raise ValueError("RealInterval.low ({0}) must be strictly less than RealInterval.high ({1})".format(self.low, self.high))
+        if self.low > self.high:
+            raise ValueError("RealInterval.low ({0}) must be less than or equal to RealInterval.high ({1})".format(self.low, self.high))
+        if self.low == self.high and not self.low_inclusive and not self.high_inclusive:
+            raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
         return shape
 
 ################################################# RealOverflow
@@ -701,12 +704,38 @@ class HexagonalBinning(Binning):
         rnan = int(self.r_has_nanflow)
         return (qlen + qnan, rlen + rnan)
 
-################################################# VariableBinning
+################################################# EdgesBinning
 
-class VariableBinning(Binning):
+class EdgesBinning(Binning):
     _params = {
-        "intervals": histos.checktype.CheckVector("VariableBinning", "intervals", required=True, type=RealInterval),
-        "overflow":  histos.checktype.CheckClass("VariableBinning", "overflow", required=False, type=RealOverflow),
+        "edges":    histos.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
+        "overflow": histos.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        }
+
+    edges    = typedproperty(_params["edges"])
+    overflow = typedproperty(_params["overflow"])
+
+    def __init__(self, edges, overflow=None):
+        self.edges = edges
+        self.overflow = overflow
+
+    def _valid(self, shape):
+        if any(math.isinf(x) or math.isnan(x) for x in self.edges):
+            raise ValueError("EdgesBinning.edges must all be finite")
+        if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
+            raise ValueError("EdgesBinning.edges must be strictly increasing")
+        if self.overflow is None:
+            numoverflow, = RealOverflow()._valid(shape)
+        else:
+            numoverflow, = _valid(self.overflow, shape)
+        return (len(self.edges) - 1 + numoverflow,)
+
+################################################# EdgesBinning
+
+class IrregularBinning(Binning):
+    _params = {
+        "intervals": histos.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
+        "overflow":  histos.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
         }
 
     intervals = typedproperty(_params["intervals"])
@@ -716,17 +745,26 @@ class VariableBinning(Binning):
         self.intervals = intervals
         self.overflow = overflow
 
+    def _valid(self, shape):
+        for x in self.intervals:
+            _valid(x, shape)
+        if self.overflow is None:
+            numoverflow, = RealOverflow()._valid(shape)
+        else:
+            numoverflow, = _valid(self.overflow, shape)
+        return (len(self.intervals) + numoverflow,)
+
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning):
     _params = {
-        "categories":  histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
+        "categories": histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
         }
 
     categories = typedproperty(_params["categories"])
 
     def __init__(self, categories):
-        self.categories  = categories 
+        self.categories = categories
 
 ################################################# SparseRegularBinning
 
