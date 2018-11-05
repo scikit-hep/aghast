@@ -136,11 +136,21 @@ table FractionBinning {
   error_method: FractionalErrorMethod = frac_normal;
 }
 
+enum BinPosition: int8 {
+  pos_below3 = -3,
+  pos_below2 = -2,
+  pos_below1 = -1,
+  pos_nonexistent = 0,
+  pos_above1 = 1,
+  pos_above2 = 2,
+  pos_above3 = 3
+}
+
 table IntegerBinning {
   min: long;   // assumed to be inclusive (if not, change its value!)
   max: long;
-  has_underflow: bool = true;
-  has_overflow: bool = true;
+  pos_underflow: BinPosition = pos_nonexistent;
+  pos_overflow: BinPosition = pos_nonexistent;
 }
 
 table RealInterval {
@@ -158,9 +168,9 @@ enum NonRealMapping: byte {
 }
 
 table RealOverflow {
-  has_underflow: bool = true;
-  has_overflow: bool = true;
-  has_nanflow: bool = true;
+  pos_underflow: BinPosition = pos_nonexistent;
+  pos_overflow: BinPosition = pos_nonexistent;
+  pos_nanflow: BinPosition = pos_nonexistent;
   minf_mapping: NonRealMapping = in_underflow;
   pinf_mapping: NonRealMapping = in_overflow;
   nan_mapping: NonRealMapping = in_nanflow;
@@ -197,8 +207,8 @@ table HexagonalBinning {
   coordinates: HexagonalCoordinates = hex_offset;
   xorigin: double = 0.0;    // x coordinate of (q, r) == (0, 0)
   yorigin: double = 0.0;    // y coordinate of (q, r) == (0, 0)
-  q_has_nanflow: bool = true;
-  r_has_nanflow: bool = true;
+  q_pos_nanflow: BinPosition = pos_nonexistent;
+  r_pos_nanflow: BinPosition = pos_nonexistent;
 }
 
 table EdgesBinning {
@@ -219,7 +229,7 @@ table SparseRegularBinning {
   bins: [long] (required);
   bin_width: double;
   origin: double = 0.0;
-  has_nanflow: bool = true;
+  pos_nanflow: BinPosition = pos_nonexistent;
 }
 
 union Binning {

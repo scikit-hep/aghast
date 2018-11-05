@@ -43,6 +43,7 @@ import histos.histos_generated.Axis
 import histos.histos_generated.BinnedEvaluatedFunction
 import histos.histos_generated.BinnedRegion
 import histos.histos_generated.Binning
+import histos.histos_generated.BinPosition
 import histos.histos_generated.CategoryBinning
 import histos.histos_generated.Chunk
 import histos.histos_generated.Collection
@@ -496,31 +497,47 @@ class FractionalBinning(Binning):
     def _valid(self, shape):
         return shape
 
+################################################# BinPosition
+
+class BinPosition(object):
+    below3 = Enum("below3", histos.histos_generated.BinPosition.BinPosition.pos_below3)
+    below2 = Enum("below2", histos.histos_generated.BinPosition.BinPosition.pos_below2)
+    below1 = Enum("below1", histos.histos_generated.BinPosition.BinPosition.pos_below1)
+    nonexistent = Enum("nonexistent", histos.histos_generated.BinPosition.BinPosition.pos_nonexistent)
+    above1 = Enum("above1", histos.histos_generated.BinPosition.BinPosition.pos_above1)
+    above2 = Enum("above2", histos.histos_generated.BinPosition.BinPosition.pos_above2)
+    above3 = Enum("above3", histos.histos_generated.BinPosition.BinPosition.pos_above3)
+    positions = [below3, below2, below1, nonexistent, above1, above2, above3]
+
 ################################################# IntegerBinning
 
-class IntegerBinning(Binning):
+class IntegerBinning(Binning, BinPosition):
     _params = {
         "min":           histos.checktype.CheckInteger("IntegerBinning", "min", required=True),
         "max":           histos.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "has_underflow": histos.checktype.CheckBool("IntegerBinning", "has_underflow", required=False),
-        "has_overflow":  histos.checktype.CheckBool("IntegerBinning", "has_overflow", required=False),
+        "pos_underflow": histos.checktype.CheckEnum("IntegerBinning", "pos_underflow", required=False, choices=BinPosition.positions),
+        "pos_overflow":  histos.checktype.CheckEnum("IntegerBinning", "pos_overflow", required=False, choices=BinPosition.positions),
         }
 
     min           = typedproperty(_params["min"])
     max           = typedproperty(_params["max"])
-    has_underflow = typedproperty(_params["has_underflow"])
-    has_overflow  = typedproperty(_params["has_overflow"])
+    pos_underflow = typedproperty(_params["pos_underflow"])
+    pos_overflow  = typedproperty(_params["pos_overflow"])
 
-    def __init__(self, min, max, has_underflow=True, has_overflow=True):
+    def __init__(self, min, max, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent):
         self.min = min
         self.max = max
-        self.has_underflow = has_underflow
-        self.has_overflow = has_overflow
+        self.pos_underflow = pos_underflow
+        self.pos_overflow = pos_overflow
 
     def _valid(self, shape):
         if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
-        return (self.max - self.min + 1 + int(self.has_underflow) + int(self.has_overflow),)
+
+        if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
+            raise ValueError("IntegerBinning.pos_underflow and IntegerBinning.pos_overflow must not be equal unless they are both nonexistent")
+
+        return (self.max - self.min + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# RealInterval
 
@@ -552,7 +569,7 @@ class RealInterval(Histos):
 
 ################################################# RealOverflow
 
-class RealOverflow(Histos):
+class RealOverflow(Histos, BinPosition):
     missing      = Enum("missing", histos.histos_generated.NonRealMapping.NonRealMapping.missing)
     in_underflow = Enum("in_underflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_underflow)
     in_overflow  = Enum("in_overflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_overflow)
@@ -560,31 +577,38 @@ class RealOverflow(Histos):
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "has_underflow": histos.checktype.CheckBool("RealOverflow", "has_underflow", required=False),
-        "has_overflow":  histos.checktype.CheckBool("RealOverflow", "has_overflow", required=False),
-        "has_nanflow":   histos.checktype.CheckBool("RealOverflow", "has_nanflow", required=False),
+        "pos_underflow": histos.checktype.CheckEnum("RealOverflow", "pos_underflow", required=False, choices=BinPosition.positions),
+        "pos_overflow":  histos.checktype.CheckEnum("RealOverflow", "pos_overflow", required=False, choices=BinPosition.positions),
+        "pos_nanflow":   histos.checktype.CheckEnum("RealOverflow", "pos_nanflow", required=False, choices=BinPosition.positions),
         "minf_mapping":  histos.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
         "pinf_mapping":  histos.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
         "nan_mapping":   histos.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
-    has_underflow = typedproperty(_params["has_underflow"])
-    has_overflow  = typedproperty(_params["has_overflow"])
-    has_nanflow   = typedproperty(_params["has_nanflow"])
+    pos_underflow = typedproperty(_params["pos_underflow"])
+    pos_overflow  = typedproperty(_params["pos_overflow"])
+    pos_nanflow   = typedproperty(_params["pos_nanflow"])
     minf_mapping  = typedproperty(_params["minf_mapping"])
     pinf_mapping  = typedproperty(_params["pinf_mapping"])
     nan_mapping   = typedproperty(_params["nan_mapping"])
 
-    def __init__(self, has_underflow=True, has_overflow=True, has_nanflow=True, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
-        self.has_underflow = has_underflow
-        self.has_overflow = has_overflow
-        self.has_nanflow = has_nanflow
+    def __init__(self, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent, pos_nanflow=BinPosition.nonexistent, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
+        self.pos_underflow = pos_underflow
+        self.pos_overflow = pos_overflow
+        self.pos_nanflow = pos_nanflow
         self.minf_mapping = minf_mapping
         self.pinf_mapping = pinf_mapping
         self.nan_mapping = nan_mapping
 
     def _valid(self, shape):
-        return (int(self.has_underflow) + int(self.has_overflow) + int(self.has_nanflow),)
+        if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
+            raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_overflow must not be equal unless they are both nonexistent")
+        if self.pos_underflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_underflow == self.pos_nanflow:
+            raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
+        if self.pos_overflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_overflow == self.pos_nanflow:
+            raise ValueError("RealOverflow.pos_overflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
+
+        return (int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent) + int(self.pos_nanflow != BinPosition.nonexistent),)
 
 ################################################# RegularBinning
 
@@ -662,7 +686,7 @@ class TicTacToeOverflowBinning(Binning):
         
 ################################################# HexagonalBinning
 
-class HexagonalBinning(Binning):
+class HexagonalBinning(Binning, BinPosition):
     offset         = Enum("offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
     doubled_offset = Enum("doubled_offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
     cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
@@ -676,8 +700,8 @@ class HexagonalBinning(Binning):
         "coordinates":   histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
         "xorigin":       histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
         "yorigin":       histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "q_has_nanflow": histos.checktype.CheckBool("HexagonalBinning", "q_has_nanflow", required=False),
-        "r_has_nanflow": histos.checktype.CheckBool("HexagonalBinning", "r_has_nanflow", required=False),
+        "q_pos_nanflow": histos.checktype.CheckEnum("HexagonalBinning", "q_pos_nanflow", required=False, choices=BinPosition.positions),
+        "r_pos_nanflow": histos.checktype.CheckEnum("HexagonalBinning", "r_pos_nanflow", required=False, choices=BinPosition.positions),
         }
 
     qinterval     = typedproperty(_params["qinterval"])
@@ -685,23 +709,29 @@ class HexagonalBinning(Binning):
     coordinates   = typedproperty(_params["coordinates"])
     xorigin       = typedproperty(_params["xorigin"])
     yorigin       = typedproperty(_params["yorigin"])
-    q_has_nanflow = typedproperty(_params["q_has_nanflow"])
-    r_has_nanflow = typedproperty(_params["r_has_nanflow"])
+    q_pos_nanflow = typedproperty(_params["q_pos_nanflow"])
+    r_pos_nanflow = typedproperty(_params["r_pos_nanflow"])
 
-    def __init__(self, qinterval, rinterval, coordinates=offset, xorigin=0.0, yorigin=0.0, q_has_nanflow=True, r_has_nanflow=True):
+    def __init__(self, qinterval, rinterval, coordinates=offset, xorigin=0.0, yorigin=0.0, q_pos_nanflow=BinPosition.nonexistent, r_pos_nanflow=BinPosition.nonexistent):
         self.qinterval = qinterval
         self.rinterval = rinterval
         self.coordinates = coordinates
         self.xorigin = xorigin
         self.yorigin = yorigin
-        self.q_has_nanflow = q_has_nanflow
-        self.r_has_nanflow = r_has_nanflow
+        self.q_pos_nanflow = q_pos_nanflow
+        self.r_pos_nanflow = r_pos_nanflow
 
     def _valid(self, shape):
         qlen, = self.qinterval._valid(shape)
         rlen, = self.rinterval._valid(shape)
-        qnan = int(self.q_has_nanflow)
-        rnan = int(self.r_has_nanflow)
+
+        if self.qinterval.pos_underflow != BinPosition.nonexistent and self.q_pos_nanflow != BinPosition.nonexistent and self.qinterval.pos_underflow == self.q_pos_nanflow:
+            raise ValueError("HexagonalBinning.qinterval.pos_underflow and HexagonalBinning.q_pos_nanflow must not be equal unless they are both nonexistent")
+        if self.rinterval.pos_underflow != BinPosition.nonexistent and self.r_pos_nanflow != BinPosition.nonexistent and self.rinterval.pos_underflow == self.r_pos_nanflow:
+            raise ValueError("HexagonalBinning.rinterval.pos_underflow and HexagonalBinning.r_pos_nanflow must not be equal unless they are both nonexistent")
+
+        qnan = int(self.q_pos_nanflow != BinPosition.nonexistent)
+        rnan = int(self.r_pos_nanflow != BinPosition.nonexistent)
         return (qlen + qnan, rlen + rnan)
 
 ################################################# EdgesBinning
@@ -768,24 +798,24 @@ class CategoryBinning(Binning):
 
 ################################################# SparseRegularBinning
 
-class SparseRegularBinning(Binning):
+class SparseRegularBinning(Binning, BinPosition):
     _params = {
         "bins":        histos.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
         "bin_width":   histos.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
         "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "has_nanflow": histos.checktype.CheckBool("SparseRegularBinning", "has_nanflow", required=False),
+        "pos_nanflow": histos.checktype.CheckEnum("SparseRegularBinning", "pos_nanflow", required=False, choices=BinPosition.positions),
         }
 
     bins        = typedproperty(_params["bins"])
     bin_width   = typedproperty(_params["bin_width"])
     origin      = typedproperty(_params["origin"])
-    has_nanflow = typedproperty(_params["has_nanflow"])
+    pos_nanflow = typedproperty(_params["pos_nanflow"])
 
-    def __init__(self, bins, bin_width, origin=0.0, has_nanflow=True):
+    def __init__(self, bins, bin_width, origin=0.0, pos_nanflow=BinPosition.nonexistent):
         self.bins = bins
         self.bin_width = bin_width
         self.origin = origin
-        self.has_nanflow = has_nanflow
+        self.pos_nanflow = pos_nanflow
 
 ################################################# Axis
 

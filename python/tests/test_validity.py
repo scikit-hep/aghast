@@ -70,13 +70,13 @@ class Test(unittest.TestCase):
         assert h.isvalid
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(20, 10))], InterpretedInlineBuffer())])
         assert not h.isvalid
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, has_underflow=False, has_overflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.nonexistent, pos_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 11
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, has_underflow=True, has_overflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.below1, pos_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 12
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, has_underflow=False, has_overflow=True))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.nonexistent, pos_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 12
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, has_underflow=True, has_overflow=True))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.below1, pos_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 13
 
     def test_RealInterval(self):
@@ -86,17 +86,17 @@ class Test(unittest.TestCase):
         assert not h.isvalid
 
     def test_RealOverflow(self):
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=False, has_overflow=False, has_nanflow=False)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 10
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=True, has_overflow=False, has_nanflow=False)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 11
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=False, has_overflow=True, has_nanflow=False)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.above1, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 11
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=False, has_overflow=False, has_nanflow=True)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 11
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=True, has_overflow=False, has_nanflow=True)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.above2)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 12
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(has_underflow=True, has_overflow=True, has_nanflow=True)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.above2, pos_nanflow=RealOverflow.above3)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0] * 13
 
     def test_RegularBinning(self):
@@ -104,35 +104,35 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_TicTacToeOverflowBinning(self):
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [[0.0, 0.0, 0.0, 0.0, 0.0]] * 5
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(False, False, False), RealOverflow(False, False, False)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [[0.0, 0.0], [0.0, 0.0]]
 
     def test_HexagonalBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid
-        assert h["id"].values.numpy_array.tolist() == [[0.0] * 5] * 6
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-        assert h["id"].values.numpy_array.tolist() == [[0.0] * 5] * 5
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), r_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-        assert h["id"].values.numpy_array.tolist() == [[0.0] * 4] * 6
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_has_nanflow=False, r_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-        assert h["id"].values.numpy_array.tolist() == [[0.0] * 4] * 5
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 2] * 3
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_pos_nanflow=IntegerBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 2] * 4
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), r_pos_nanflow=IntegerBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 3] * 3
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_pos_nanflow=IntegerBinning.above1, r_pos_nanflow=IntegerBinning.above2))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 3] * 4
 
     def test_EdgesBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(EdgesBinning([3.3]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid
-        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
+        assert h["id"].values.numpy_array.tolist() == []
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(EdgesBinning([1.1, 2.2, 3.3]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0]
 
     def test_IrregularBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5)]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid
-        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0]
+        assert h["id"].values.numpy_array.tolist() == [0.0]
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5), RealInterval(1.5, 1.5), RealInterval(0.0, 10.0)]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
 
     def test_CategoryBinning(self):
         pass
