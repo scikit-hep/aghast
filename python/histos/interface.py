@@ -31,6 +31,7 @@
 import ctypes
 import functools
 import operator
+import math
 import struct
 import sys
 
@@ -605,6 +606,10 @@ class RegularBinning(Binning):
 
     def _valid(self, shape):
         self.interval._valid(shape)
+        if math.isinf(self.interval.low) or math.isnan(self.interval.low):
+            raise ValueError("RegularBinning.interval.low must be finite")
+        if math.isinf(self.interval.high) or math.isnan(self.interval.high):
+            raise ValueError("RegularBinning.interval.high must be finite")
         if self.overflow is None:
             overflowdims, = RealOverflow()._valid(shape)
         else:
@@ -663,25 +668,38 @@ class HexagonalBinning(Binning):
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
-        "q":           histos.checktype.CheckClass("HexagonalBinning", "q", required=True, type=IntegerBinning),
-        "r":           histos.checktype.CheckClass("HexagonalBinning", "r", required=True, type=IntegerBinning),
-        "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
-        "xorigin":     histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False),
-        "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False),
+        "qinterval":     histos.checktype.CheckClass("HexagonalBinning", "qinterval", required=True, type=IntegerBinning),
+        "rinterval":     histos.checktype.CheckClass("HexagonalBinning", "rinterval", required=True, type=IntegerBinning),
+        "coordinates":   histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":       histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "yorigin":       histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "q_has_nanflow": histos.checktype.CheckBool("HexagonalBinning", "q_has_nanflow", required=False),
+        "r_has_nanflow": histos.checktype.CheckBool("HexagonalBinning", "r_has_nanflow", required=False),
         }
 
-    q           = typedproperty(_params["q"])
-    r           = typedproperty(_params["r"])
-    coordinates = typedproperty(_params["coordinates"])
-    xorigin     = typedproperty(_params["xorigin"])
-    yorigin     = typedproperty(_params["yorigin"])
+    qinterval     = typedproperty(_params["qinterval"])
+    rinterval     = typedproperty(_params["rinterval"])
+    coordinates   = typedproperty(_params["coordinates"])
+    xorigin       = typedproperty(_params["xorigin"])
+    yorigin       = typedproperty(_params["yorigin"])
+    q_has_nanflow = typedproperty(_params["q_has_nanflow"])
+    r_has_nanflow = typedproperty(_params["r_has_nanflow"])
 
-    def __init__(self, q, r, coordinates=offset, xorigin=0.0, yorigin=0.0):
-        self.q = q
-        self.r = r
+    def __init__(self, qinterval, rinterval, coordinates=offset, xorigin=0.0, yorigin=0.0, q_has_nanflow=True, r_has_nanflow=True):
+        self.qinterval = qinterval
+        self.rinterval = rinterval
         self.coordinates = coordinates
         self.xorigin = xorigin
         self.yorigin = yorigin
+        self.q_has_nanflow = q_has_nanflow
+        self.r_has_nanflow = r_has_nanflow
+
+    def _valid(self, shape):
+        qlen, = self.qinterval._valid(shape)
+        rlen, = self.rinterval._valid(shape)
+        qnan = int(self.q_has_nanflow)
+        rnan = int(self.r_has_nanflow)
+        return (qlen + qnan, rlen + rnan)
 
 ################################################# VariableBinning
 

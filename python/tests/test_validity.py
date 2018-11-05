@@ -106,9 +106,19 @@ class Test(unittest.TestCase):
     def test_TicTacToeOverflowBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [[0.0, 0.0, 0.0, 0.0, 0.0]] * 5
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(False, False, False), RealOverflow(False, False, False)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0, 0.0], [0.0, 0.0]]
 
     def test_HexagonalBinning(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4)))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h.isvalid
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 5] * 6
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 5] * 5
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), r_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 4] * 6
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(IntegerBinning(3, 5), IntegerBinning(-5, -4), q_has_nanflow=False, r_has_nanflow=False))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [[0.0] * 4] * 5
 
     def test_VariableBinning(self):
         pass

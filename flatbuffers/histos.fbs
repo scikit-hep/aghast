@@ -192,11 +192,13 @@ enum HexagonalCoordinates: byte {
 }
 
 table HexagonalBinning {
-  q: IntegerBinning (required);
-  r: IntegerBinning (required);
+  qinterval: IntegerBinning (required);
+  rinterval: IntegerBinning (required);
   coordinates: HexagonalCoordinates = hex_offset;
   xorigin: double = 0.0;    // x coordinate of (q, r) == (0, 0)
   yorigin: double = 0.0;    // y coordinate of (q, r) == (0, 0)
+  q_has_nanflow: bool = true;
+  r_has_nanflow: bool = true;
 }
 
 table VariableBinning {
