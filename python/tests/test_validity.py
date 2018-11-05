@@ -153,9 +153,6 @@ class Test(unittest.TestCase):
         assert h.isvalid
         assert h["id"].axis[0].expression == "x"
 
-    def test_Counts(self):
-        pass
-
     def test_UnweightedCounts(self):
         pass
 
@@ -221,7 +218,7 @@ class Test(unittest.TestCase):
         pass
 
     def test_Ntuple(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [], [0])])
 
     def test_Region(self):
         pass

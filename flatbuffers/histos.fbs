@@ -404,7 +404,6 @@ table Column {
   identifier: string (key);
   dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
-  dimension_order: DimensionOrder = c_order;
   filters: [Filter];
   title: string;
   metadata: Metadata;

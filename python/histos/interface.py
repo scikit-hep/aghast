@@ -291,7 +291,7 @@ class DimensionOrderEnum(Enum):
         super(DimensionOrderEnum, self).__init__(name, value)
         self.dimension_order = dimension_order
 
-class InterpretedBuffer(object):
+class Interpretation(object):
     none    = DTypeEnum("none", histos.histos_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
     int8    = DTypeEnum("int8", histos.histos_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
     uint8   = DTypeEnum("uint8", histos.histos_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
@@ -309,16 +309,17 @@ class InterpretedBuffer(object):
     big_endian    = EndiannessEnum("big_endian", histos.histos_generated.Endianness.Endianness.big_endian, ">")
     endiannesses = [little_endian, big_endian]
 
+    @property
+    def numpy_dtype(self):
+        return self.dtype.dtype.newbyteorder(self._endianness.endianness)
+
+class InterpretedBuffer(Interpretation):
     c_order       = DimensionOrderEnum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order, "C")
     fortran_order = DimensionOrderEnum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
     orders = [c_order, fortran_order]
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
-
-    @property
-    def numpy_dtype(self):
-        return self.dtype.dtype.newbyteorder(self._endianness.endianness)
 
 ################################################# RawInlineBuffer
 
@@ -1305,32 +1306,29 @@ class Chunk(Histos):
 
 ################################################# Column
 
-class Column(Histos):
+class Column(Histos, Interpretation):
     _params = {
         "identifier":      histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
-        "dtype":           histos.checktype.CheckEnum("Column", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":      histos.checktype.CheckEnum("Column", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order": histos.checktype.CheckEnum("Column", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "dtype":           histos.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
+        "endianness":      histos.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
         "filters":         histos.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
         "title":           histos.checktype.CheckString("Column", "title", required=False),
         "metadata":        histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
         "decoration":      histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
-    identifier      = typedproperty(_params["identifier"])
-    dtype           = typedproperty(_params["dtype"])
-    endianness      = typedproperty(_params["endianness"])
-    dimension_order = typedproperty(_params["dimension_order"])
-    filters         = typedproperty(_params["filters"])
-    title           = typedproperty(_params["title"])
-    metadata        = typedproperty(_params["metadata"])
-    decoration      = typedproperty(_params["decoration"])
+    identifier = typedproperty(_params["identifier"])
+    dtype      = typedproperty(_params["dtype"])
+    endianness = typedproperty(_params["endianness"])
+    filters    = typedproperty(_params["filters"])
+    title      = typedproperty(_params["title"])
+    metadata   = typedproperty(_params["metadata"])
+    decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.dtype = dtype
         self.endianness = endianness
-        self.dimension_order = dimension_order
         self.filters = filters
         self.title = title
         self.metadata = metadata
@@ -1341,9 +1339,9 @@ class Column(Histos):
 class Ntuple(Object):
     _params = {
         "identifier":     histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
-        "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column),
+        "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
         "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=True, type=int),
+        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=True, type=int, minlen=1),
         "unbinned_stats": histos.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
         "functions":      histos.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         "title":          histos.checktype.CheckString("Ntuple", "title", required=False),
@@ -1373,8 +1371,6 @@ class Ntuple(Object):
         self.decoration = decoration
 
     def _valid(self, seen, shape):
-        if len(self.chunk_offsets) == 0:
-            raise ValueError("Ntuple.chunk_offsets must not be empty")
         if self.chunk_offsets[0] != 0:
             raise ValueError("Ntuple.chunk_offsets must start with 0")
         if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
