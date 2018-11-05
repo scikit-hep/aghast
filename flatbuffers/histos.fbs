@@ -26,39 +26,7 @@ table Decoration {
   language: DecorationLanguage = deco_unspecified;
 }
 
-///////////////////////////////////////////////// Functions
-
-table Parameter {
-  identifier: string (key);
-  value: double;
-}
-
-table ParameterizedFunction {
-  expression: string (required);
-  parameters: [Parameter] (required);
-  contours: [double];
-}
-
-table EvaluatedFunction {
-  values: [double] (required);
-  derivatives: [double];
-  generic_errors: [GenericErrors];
-}
-
-union FunctionData {
-  ParameterizedFunction,
-  EvaluatedFunction
-}
-
-table Function {
-  identifier: string (key);
-  data: FunctionData (required);
-  title: string;
-  metadata: Metadata;
-  decoration: Decoration;
-}
-
-///////////////////////////////////////////////// Histogram
+///////////////////////////////////////////////// everything needed for Histogram
 
 enum DType: byte {
   dtype_none = 0,
@@ -329,16 +297,37 @@ table Profile {
   decoration: Decoration;
 }
 
-table Histogram {
-  axis: [Axis] (required);
-  distribution: Distribution (required);
-  profiles: [Profile];
-  unbinned_stats: [DistributionStats];
-  profile_stats: [DistributionStats];
-  functions: [Function];
+///////////////////////////////////////////////// Functions
+
+table Parameter {
+  identifier: string (key);
+  value: double;
 }
 
-///////////////////////////////////////////////// FunctionObject
+table ParameterizedFunction {
+  expression: string (required);
+  parameters: [Parameter] (required);
+  contours: [double];
+}
+
+table EvaluatedFunction {
+  values: InterpretedBuffer (required);
+  derivatives: InterpretedBuffer;
+  generic_errors: [GenericErrors];
+}
+
+union FunctionData {
+  ParameterizedFunction,
+  EvaluatedFunction
+}
+
+table Function {
+  identifier: string (key);
+  data: FunctionData (required);
+  title: string;
+  metadata: Metadata;
+  decoration: Decoration;
+}
 
 table BinnedEvaluatedFunction {
   axis: [Axis] (required);
@@ -352,6 +341,17 @@ union FunctionObjectData {
 
 table FunctionObject {
   data: FunctionObjectData (required);
+}
+
+///////////////////////////////////////////////// Histogram itself
+
+table Histogram {
+  axis: [Axis] (required);
+  distribution: Distribution (required);
+  profiles: [Profile];
+  unbinned_stats: [DistributionStats];
+  profile_stats: [DistributionStats];
+  functions: [Function];
 }
 
 ///////////////////////////////////////////////// Ntuple

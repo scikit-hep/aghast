@@ -114,6 +114,12 @@ def typedproperty(check):
 
     return prop
 
+def _valid(obj, multiplicity):
+    if obj is None:
+        pass
+    else:
+        obj._valid(multiplicity)
+
 class Histos(object):
     @property
     def isvalid(self):
@@ -166,6 +172,9 @@ class Metadata(Histos):
         self.data = data
         self.language = language
 
+    def _valid(self, multiplicity):
+        pass
+
 ################################################# Decoration
 
 class Decoration(Histos):
@@ -187,36 +196,12 @@ class Decoration(Histos):
         self.data = data
         self.language = language
 
+    def _valid(self, multiplicity):
+        pass
+
 ################################################# Object
 
 class Object(Histos):
-    def __init__(self):
-        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
-
-################################################# Parameter
-
-class Parameter(Histos):
-    params = {
-        "identifier": histos.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
-        "value":      histos.checktype.CheckNumber("Parameter", "value", required=True),
-        }
-
-    identifier = typedproperty(params["identifier"])
-    value      = typedproperty(params["value"])
-
-    def __init__(self, identifier, value):
-        self.identifier = identifier
-        self.value = value
-
-################################################# Function
-
-class Function(Histos):
-    def __init__(self):
-        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
-
-################################################# FunctionObject
-
-class FunctionObject(Object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -566,8 +551,8 @@ class HexagonalBinning(Binning):
         self.q = q
         self.r = r
         self.coordinates = coordinates
-        self.originx = originx
-        self.originy = originy
+        self.xorigin = xorigin
+        self.yorigin = yorigin
 
 ################################################# VariableBinning
 
@@ -758,7 +743,7 @@ class GenericErrors(Histos):
     p      = typedproperty(params["p"])
 
     def __init__(self, errors, p=0.6826894921370859):
-        self.error = error
+        self.errors = errors
         self.p = p
 
 ################################################# DistributionStats
@@ -821,44 +806,35 @@ class Profile(Histos):
         self.metadata = metadata
         self.decoration = decoration
 
-################################################# Histogram
+################################################# Parameter
 
-class Histogram(Object):
+class Parameter(Histos):
     params = {
-        "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
-        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis),
-        "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
-        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
-        "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
-        "profile_stats":  histos.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
-        "functions":      histos.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
-        "title":          histos.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "identifier": histos.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
+        "value":      histos.checktype.CheckNumber("Parameter", "value", required=True),
         }
 
-    identifier     = typedproperty(params["identifier"])
-    axis           = typedproperty(params["axis"])
-    distribution   = typedproperty(params["distribution"])
-    profiles       = typedproperty(params["profiles"])
-    unbinned_stats = typedproperty(params["unbinned_stats"])
-    profile_stats  = typedproperty(params["profile_stats"])
-    functions      = typedproperty(params["functions"])
-    title          = typedproperty(params["title"])
-    metadata       = typedproperty(params["metadata"])
-    decoration     = typedproperty(params["decoration"])
+    identifier = typedproperty(params["identifier"])
+    value      = typedproperty(params["value"])
 
-    def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, value):
         self.identifier = identifier
-        self.axis = axis
-        self.distribution = distribution
-        self.profiles = profiles
-        self.unbinned_stats = unbinned_stats
-        self.profile_stats = profile_stats
-        self.functions = functions
-        self.title = title
-        self.metadata = metadata
-        self.decoration = decoration
+        self.value = value
+
+    def _valid(self, multiplier):
+        pass
+
+################################################# Function
+
+class Function(Histos):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+################################################# FunctionObject
+
+class FunctionObject(Object):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# ParameterizedFunction
 
@@ -882,7 +858,25 @@ class ParameterizedFunction(Function, FunctionObject):
     decoration = typedproperty(params["decoration"])
 
     def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
+        self.identifier = identifier
         self.expression = expression
+        self.parameters = parameters
+        self.contours = contours
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+
+    def _valid(self, multiplicity):
+        if len(set(x.identifier for x in self._parameters)) != len(self._parameters):
+            raise ValueError("ParameterizedFunction.parameters keys must be unique")
+
+        for x in self._parameters:
+            _valid(x, multiplicity)
+
+        contours = getattr(self, "_contours", None)
+        if contours is not None:
+            if len(contours) != len(numpy.unique(contours)):
+                raise ValueError("ParameterizedFunction.contours must be unique")
 
 ################################################# EvaluatedFunction
 
@@ -920,8 +914,8 @@ class BinnedEvaluatedFunction(FunctionObject):
     params = {
         "identifier":     histos.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
         "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis),
-        "values":         histos.checktype.CheckVector("BinnedEvaluatedFunction", "values", required=True, type=float),
-        "derivatives":    histos.checktype.CheckVector("BinnedEvaluatedFunction", "derivatives", required=False, type=float),
+        "values":         histos.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives":    histos.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
         "generic_errors": histos.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
         "title":          histos.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
         "metadata":       histos.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
@@ -943,6 +937,45 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.values = values
         self.derivatives = derivatives
         self.generic_errors = generic_errors
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+
+################################################# Histogram
+
+class Histogram(Object):
+    params = {
+        "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
+        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis),
+        "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
+        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
+        "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
+        "profile_stats":  histos.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
+        "functions":      histos.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "title":          histos.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":       histos.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        }
+
+    identifier     = typedproperty(params["identifier"])
+    axis           = typedproperty(params["axis"])
+    distribution   = typedproperty(params["distribution"])
+    profiles       = typedproperty(params["profiles"])
+    unbinned_stats = typedproperty(params["unbinned_stats"])
+    profile_stats  = typedproperty(params["profile_stats"])
+    functions      = typedproperty(params["functions"])
+    title          = typedproperty(params["title"])
+    metadata       = typedproperty(params["metadata"])
+    decoration     = typedproperty(params["decoration"])
+
+    def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
+        self.identifier = identifier
+        self.axis = axis
+        self.distribution = distribution
+        self.profiles = profiles
+        self.unbinned_stats = unbinned_stats
+        self.profile_stats = profile_stats
+        self.functions = functions
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1242,8 +1275,15 @@ class Collection(Histos):
         self.decoration = decoration
 
     def _valid(self, multiplicity):
-        pass
+        if len(set(x.identifier for x in self._objects)) != len(self._objects):
+            raise ValueError("Collection.objects keys must be unique")
 
+        for x in self._objects:
+            _valid(x, multiplicity)
+
+        _valid(getattr(self, "_metadata", None), multiplicity)
+        _valid(getattr(self, "_decoration", None), multiplicity)
+            
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
 
