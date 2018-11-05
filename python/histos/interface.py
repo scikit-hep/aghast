@@ -28,7 +28,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import ctypes
+import functools
+import operator
 import struct
+import sys
 
 import numpy
 import flatbuffers
@@ -100,6 +104,25 @@ import histos.histos_generated.WeightedCounts
 import histos.checktype
 
 def typedproperty(check):
+    def setparent(self, value):
+        if isinstance(value, Histos):
+            if hasattr(value, "_parent"):
+                raise ValueError("object is already attached to another hierarchy: {0}".format(repr(value)))
+            else:
+                value._parent = self
+
+        elif ((sys.version_info[0] >= 3 and isinstance(value, (str, bytes))) or (sys.version_info[0] < 3 and isinstance(value, basestring))):
+            pass
+
+        else:
+            try:
+                value = list(value)
+            except TypeError:
+                pass
+            else:
+                for x in value:
+                    setparent(self, x)
+        
     @property
     def prop(self):
         private = "_" + check.param
@@ -109,29 +132,40 @@ def typedproperty(check):
 
     @prop.setter
     def prop(self, value):
+        setparent(self, value)
         private = "_" + check.param
         setattr(self, private, check(value))
 
     return prop
 
-def _valid(obj, multiplicity):
+def _valid(obj, shape):
     if obj is None:
         pass
     else:
-        obj._valid(multiplicity)
+        obj._valid(shape)
+
+def _getbykey(self, field, where):
+    lookup = "_lookup_" + field
+    if not hasattr(self, lookup):
+        setattr(self, lookup, {x.identifier: x for x in getattr(self, field)})
+        if len(getattr(self, lookup)) != len(getattr(self, field)):
+            raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
+    return getattr(self, lookup)[where]
 
 class Histos(object):
-    @property
-    def isvalid(self):
-        try:
-            self._valid(None)
-        except ValueError:
-            return False
-        else:
-            return True
-
     def __repr__(self):
         return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
+
+    def _top(self):
+        out = self
+        seen = set([id(out)])
+        while hasattr(out, "_parent"):
+            out = out._parent
+            if id(out) in seen:
+                raise ValueError("hierarchy is recursively nested")
+        if not isinstance(out, Collection):
+            raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
+        return out
 
 class Enum(object):
     def __init__(self, name, value):
@@ -172,7 +206,7 @@ class Metadata(Histos):
         self.data = data
         self.language = language
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         pass
 
 ################################################# Decoration
@@ -196,7 +230,7 @@ class Decoration(Histos):
         self.data = data
         self.language = language
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         pass
 
 ################################################# Object
@@ -235,30 +269,49 @@ class RawBuffer(object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+class DTypeEnum(Enum):
+    def __init__(self, name, value, dtype):
+        super(DTypeEnum, self).__init__(name, value)
+        self.dtype = dtype
+
+class EndiannessEnum(Enum):
+    def __init__(self, name, value, endianness):
+        super(EndiannessEnum, self).__init__(name, value)
+        self.endianness = endianness
+
+class DimensionOrderEnum(Enum):
+    def __init__(self, name, value, dimension_order):
+        super(DimensionOrderEnum, self).__init__(name, value)
+        self.dimension_order = dimension_order
+
 class InterpretedBuffer(object):
-    none    = Enum("none", histos.histos_generated.DType.DType.dtype_none)
-    int8    = Enum("int8", histos.histos_generated.DType.DType.dtype_int8)
-    uint8   = Enum("uint8", histos.histos_generated.DType.DType.dtype_uint8)
-    int16   = Enum("int16", histos.histos_generated.DType.DType.dtype_int16)
-    uint16  = Enum("uint16", histos.histos_generated.DType.DType.dtype_uint16)
-    int32   = Enum("int32", histos.histos_generated.DType.DType.dtype_int32)
-    uint32  = Enum("uint32", histos.histos_generated.DType.DType.dtype_uint32)
-    int64   = Enum("int64", histos.histos_generated.DType.DType.dtype_int64)
-    uint64  = Enum("uint64", histos.histos_generated.DType.DType.dtype_uint64)
-    float32 = Enum("float32", histos.histos_generated.DType.DType.dtype_float32)
-    float64 = Enum("float64", histos.histos_generated.DType.DType.dtype_float64)
+    none    = DTypeEnum("none", histos.histos_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    int8    = DTypeEnum("int8", histos.histos_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
+    uint8   = DTypeEnum("uint8", histos.histos_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
+    int16   = DTypeEnum("int16", histos.histos_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
+    uint16  = DTypeEnum("uint16", histos.histos_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
+    int32   = DTypeEnum("int32", histos.histos_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
+    uint32  = DTypeEnum("uint32", histos.histos_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
+    int64   = DTypeEnum("int64", histos.histos_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
+    uint64  = DTypeEnum("uint64", histos.histos_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
+    float32 = DTypeEnum("float32", histos.histos_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
+    float64 = DTypeEnum("float64", histos.histos_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
     dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
-    little_endian = Enum("little_endian", histos.histos_generated.Endianness.Endianness.little_endian)
-    big_endian    = Enum("big_endian", histos.histos_generated.Endianness.Endianness.big_endian)
+    little_endian = EndiannessEnum("little_endian", histos.histos_generated.Endianness.Endianness.little_endian, "<")
+    big_endian    = EndiannessEnum("big_endian", histos.histos_generated.Endianness.Endianness.big_endian, ">")
     endiannesses = [little_endian, big_endian]
 
-    c_order       = Enum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order)
-    fortran_order = Enum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order)
+    c_order       = DimensionOrderEnum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order, "C")
+    fortran_order = DimensionOrderEnum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
     orders = [c_order, fortran_order]
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+    @property
+    def numpy_dtype(self):
+        return self.dtype.dtype.newbyteorder(self._endianness.endianness)
 
 ################################################# RawInlineBuffer
 
@@ -277,6 +330,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         self.buffer = buffer
         self.filters = filters
         self.postfilter_slice = postfilter_slice
+
+    @property
+    def numpy_array(self):
+        return numpy.frombuffer(self.buffer, dtype=InterpretedBuffer.none.dtype)
 
 ################################################# RawExternalBuffer
 
@@ -302,6 +359,10 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.filters = filters
         self.postfilter_slice = postfilter_slice
 
+    @property
+    def numpy_array(self):
+        return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+
 ################################################# InlineBuffer
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
@@ -321,13 +382,41 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     endianness       = typedproperty(params["endianness"])
     dimension_order  = typedproperty(params["dimension_order"])
 
-    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
-        self.buffer = buffer
+    def __init__(self, buffer=None, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
+        if buffer is None:
+            self._buffer = None     # placeholder for auto-generated buffer
+        else:
+            self.buffer = buffer
         self.filters = filters
         self.postfilter_slice = postfilter_slice
         self.dtype = dtype
         self.endianness = endianness
         self.dimension_order = dimension_order
+
+    def _valid(self, shape):
+        if self._buffer is None:
+            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype)
+        elif len(self.buffer.shape) != 1:
+            raise ValueError("InterpretedInlineBuffer.buffer shape is {0} but only one-dimensional arrays are allowed".format(self.buffer.shape))
+        elif len(self.buffer) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.buffer), functools.reduce(operator.mul, shape, 1)))
+        elif self.buffer.dtype != self.numpy_dtype:
+            raise ValueError("InterpretedInlineBuffer.buffer dtype is {0} but expecting {1}".format(self.buffer.dtype, self.numpy_dtype))
+        self._shape = shape
+
+        filters = getattr(self, "filters", None)
+        if filters is not None:
+            raise NotImplementedError
+
+        postfilter_slice = getattr(self, "postfilter_slice", None)
+        if postfilter_slice is not None:
+            if postfilter_slice.step == 0:
+                raise ValueError("slice step cannot be zero")
+
+    @property
+    def numpy_array(self):
+        self._top().isvalid    # assigns _shape
+        return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
 
@@ -354,9 +443,13 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     dimension_order  = typedproperty(params["dimension_order"])
     location         = typedproperty(params["location"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
-        self.pointer = pointer
-        self.numbytes = numbytes
+    def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
+        if pointer is None and numbytes is None:
+            self._pointer = None    # placeholder for auto-generated buffer
+            self._numbytes = None
+        else:
+            self.pointer = pointer
+            self.numbytes = numbytes
         self.external_type = external_type
         self.filters = filters
         self.postfilter_slice = postfilter_slice
@@ -364,6 +457,12 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.endianness = endianness
         self.dimension_order = dimension_order
         self.location = location
+
+    @property
+    def numpy_array(self):
+        self._top().isvalid    # assigns _shape
+        out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+        return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# Binning
 
@@ -413,7 +512,7 @@ class IntegerBinning(Binning):
         self.has_underflow = has_underflow
         self.has_overflow = has_overflow
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         if min >= max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
 
@@ -438,7 +537,7 @@ class RealInterval(Histos):
         self.low_inclusive = low_inclusive
         self.high_inclusive = high_inclusive
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         if self.low >= self.high:
             raise ValueError("RealInterval.low ({0}) must be strictly less than RealInterval.high ({1})".format(self.low, self.high))
 
@@ -866,12 +965,12 @@ class ParameterizedFunction(Function, FunctionObject):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, multiplicity):
-        if len(set(x.identifier for x in self._parameters)) != len(self._parameters):
+    def _valid(self, shape):
+        if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
             raise ValueError("ParameterizedFunction.parameters keys must be unique")
 
-        for x in self._parameters:
-            _valid(x, multiplicity)
+        for x in self.parameters:
+            _valid(x, shape)
 
         contours = getattr(self, "_contours", None)
         if contours is not None:
@@ -940,6 +1039,15 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+
+    def _valid(self, shape):
+        for x in self.axis:
+            _valid(x, shape)
+        _valid(self.values, shape)
+        _valid(getattr(self, "derivatives", None), shape)
+        _valid(getattr(self, "generic_errors", None), shape)
+        _valid(getattr(self, "metadata", None), shape)
+        _valid(getattr(self, "decoration", None), shape)
 
 ################################################# Histogram
 
@@ -1010,7 +1118,7 @@ class ColumnChunk(Histos):
         self.page_offsets = page_offsets
         self.page_extremes = page_extremes
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         if len(self.page_offsets) == 0:
             raise ValueError("ColumnChunk.page_offsets must not be empty")
         if self.page_offsets[0] != 0:
@@ -1102,7 +1210,7 @@ class Ntuple(Object):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, multiplicity):
+    def _valid(self, shape):
         if len(self.chunk_offsets) == 0:
             raise ValueError("Ntuple.chunk_offsets must not be empty")
         if self.chunk_offsets[0] != 0:
@@ -1174,7 +1282,7 @@ class Variation(Histos):
 
 class Collection(Histos):
     def tobuffer(self):
-        self._valid(1)
+        self._valid(())
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, None))
         return builder.Output()
@@ -1193,7 +1301,7 @@ class Collection(Histos):
         return cls.frombuffer(array)
 
     def tofile(self, file):
-        self._valid(1)
+        self._valid(())
 
         opened = False
         if not hasattr(file, "write"):
@@ -1274,18 +1382,30 @@ class Collection(Histos):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, multiplicity):
-        if len(set(x.identifier for x in self._objects)) != len(self._objects):
+    def _valid(self, shape):
+        if len(set(x.identifier for x in self.objects)) != len(self.objects):
             raise ValueError("Collection.objects keys must be unique")
 
-        for x in self._objects:
-            _valid(x, multiplicity)
+        for x in self.objects:
+            _valid(x, shape)
 
-        _valid(getattr(self, "_metadata", None), multiplicity)
-        _valid(getattr(self, "_decoration", None), multiplicity)
-            
+        _valid(getattr(self, "metadata", None), shape)
+        _valid(getattr(self, "decoration", None), shape)
+
+    def __getitem__(self, where):
+        return _getbykey(self, "objects", where)
+
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
+
+    @property
+    def isvalid(self):
+        try:
+            self._valid(())
+        except ValueError:
+            return False
+        else:
+            return True
 
     def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)
