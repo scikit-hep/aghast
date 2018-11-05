@@ -218,13 +218,21 @@ table EdgesBinning {
   overflow: RealOverflow;
 }
 
+enum OverlappingFillStrategy: byte {
+  overfill_all = 0,
+  overfill_first = 1,
+  overfill_last = 2
+}
+
 table IrregularBinning {
   intervals: [RealInterval] (required);
   overflow: RealOverflow;
+  overlapping_fill: OverlappingFillStrategy = overfill_all;
 }
 
 table CategoryBinning {
   categories: [string] (required);
+  pos_overflow: BinPosition = pos_nonexistent;
 }
 
 table SparseRegularBinning {

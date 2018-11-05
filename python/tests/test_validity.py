@@ -134,13 +134,19 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5), RealInterval(1.5, 1.5), RealInterval(0.0, 10.0)]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
 
-    # def test_CategoryBinning(self):
-    #     h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(CategoryBinning(["one", "two", "three"]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
-    #     assert h.isvalid
-    #     assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
+    def test_CategoryBinning(self):
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(CategoryBinning(["one", "two", "three"]))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h.isvalid
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0]
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(CategoryBinning(["one", "two", "three"], pos_overflow=CategoryBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0]
 
     def test_SparseRegularBinning(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h.isvalid
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0]
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, pos_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
     def test_Axis(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer())])

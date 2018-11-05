@@ -85,6 +85,7 @@ import histos.histos_generated.NonRealMapping
 import histos.histos_generated.Ntuple
 import histos.histos_generated.ObjectData
 import histos.histos_generated.Object
+import histos.histos_generated.OverlappingFillStrategy
 import histos.histos_generated.Page
 import histos.histos_generated.ParameterizedFunction
 import histos.histos_generated.Parameter
@@ -769,17 +770,25 @@ class EdgesBinning(Binning):
 ################################################# EdgesBinning
 
 class IrregularBinning(Binning):
+    all = Enum("all", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first = Enum("first", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last = Enum("last", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    overlapping_fill_strategies = [all, first, last]
+
     _params = {
-        "intervals": histos.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
-        "overflow":  histos.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
+        "intervals":        histos.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval),
+        "overflow":         histos.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
+        "overlapping_fill": histos.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
         }
 
-    intervals = typedproperty(_params["intervals"])
-    overflow  = typedproperty(_params["overflow"])
+    intervals        = typedproperty(_params["intervals"])
+    overflow         = typedproperty(_params["overflow"])
+    overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    def __init__(self, intervals, overflow=None):
+    def __init__(self, intervals, overflow=None, overlapping_fill=all):
         self.intervals = intervals
         self.overflow = overflow
+        self.overlapping_fill = overlapping_fill
 
     def _valid(self, shape):
         for x in self.intervals:
@@ -792,15 +801,23 @@ class IrregularBinning(Binning):
 
 ################################################# CategoryBinning
 
-class CategoryBinning(Binning):
+class CategoryBinning(Binning, BinPosition):
     _params = {
         "categories": histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
+        "pos_overflow":  histos.checktype.CheckEnum("CategoryBinning", "pos_overflow", required=False, choices=BinPosition.positions),
         }
 
     categories = typedproperty(_params["categories"])
+    pos_overflow = typedproperty(_params["pos_overflow"])
 
-    def __init__(self, categories):
+    def __init__(self, categories, pos_overflow=BinPosition.nonexistent):
         self.categories = categories
+        self.pos_overflow = pos_overflow
+
+    def _valid(self, shape):
+        if len(self.categories) != len(set(self.categories)):
+            raise ValueError("SparseRegularBinning.bins must be unique")
+        return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# SparseRegularBinning
 
@@ -822,6 +839,11 @@ class SparseRegularBinning(Binning, BinPosition):
         self.bin_width = bin_width
         self.origin = origin
         self.pos_nanflow = pos_nanflow
+
+    def _valid(self, shape):
+        if len(self.bins) != len(numpy.unique(self.bins)):
+            raise ValueError("SparseRegularBinning.bins must be unique")
+        return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
 
 ################################################# Axis
 
