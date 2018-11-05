@@ -142,11 +142,11 @@ def typedproperty(check):
 
     return prop
 
-def _valid(obj, shape):
+def _valid(obj, seen, shape):
     if obj is None:
         return shape
     else:
-        return obj._valid(shape)
+        return obj._valid(seen, shape)
 
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
@@ -210,7 +210,7 @@ class Metadata(Histos):
         self.data = data
         self.language = language
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         return shape
 
 ################################################# Decoration
@@ -234,7 +234,7 @@ class Decoration(Histos):
         self.data = data
         self.language = language
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         return shape
 
 ################################################# Object
@@ -397,7 +397,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.endianness = endianness
         self.dimension_order = dimension_order
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if self._buffer is None:
             self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype)
         elif len(self.buffer.shape) != 1:
@@ -419,7 +419,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(())
+        self._top()._valid(set(), ())
         return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
@@ -464,7 +464,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(())
+        self._top()._valid(set(), ())
         out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
         return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
@@ -495,7 +495,7 @@ class FractionalBinning(Binning):
     def __init__(self, error_method=normal):
         self.error_method = error_method
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         return shape
 
 ################################################# BinPosition
@@ -531,7 +531,7 @@ class IntegerBinning(Binning, BinPosition):
         self.pos_underflow = pos_underflow
         self.pos_overflow = pos_overflow
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
 
@@ -561,7 +561,7 @@ class RealInterval(Histos):
         self.low_inclusive = low_inclusive
         self.high_inclusive = high_inclusive
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if self.low > self.high:
             raise ValueError("RealInterval.low ({0}) must be less than or equal to RealInterval.high ({1})".format(self.low, self.high))
         if self.low == self.high and not self.low_inclusive and not self.high_inclusive:
@@ -601,7 +601,7 @@ class RealOverflow(Histos, BinPosition):
         self.pinf_mapping = pinf_mapping
         self.nan_mapping = nan_mapping
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
             raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_overflow must not be equal unless they are both nonexistent")
         if self.pos_underflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_underflow == self.pos_nanflow:
@@ -632,16 +632,16 @@ class RegularBinning(Binning):
         self.overflow = overflow
         self.circular = circular
 
-    def _valid(self, shape):
-        self.interval._valid(shape)
+    def _valid(self, seen, shape):
+        _valid(self.interval, seen, shape)
         if math.isinf(self.interval.low) or math.isnan(self.interval.low):
             raise ValueError("RegularBinning.interval.low must be finite")
         if math.isinf(self.interval.high) or math.isnan(self.interval.high):
             raise ValueError("RegularBinning.interval.high must be finite")
         if self.overflow is None:
-            overflowdims, = RealOverflow()._valid(shape)
+            overflowdims, = RealOverflow()._valid(set(), shape)
         else:
-            overflowdims, = self.overflow._valid(shape)
+            overflowdims, = _valid(self.overflow, seen, shape)
         return (self.num + overflowdims,)
 
 ################################################# TicTacToeOverflowBinning
@@ -671,17 +671,17 @@ class TicTacToeOverflowBinning(Binning):
         self.xoverflow = xoverflow
         self.yoverflow = yoverflow
 
-    def _valid(self, shape):
-        self.xinterval._valid(shape)
-        self.yinterval._valid(shape)
+    def _valid(self, seen, shape):
+        _valid(self.xinterval, seen, shape)
+        _valid(self.yinterval, seen, shape)
         if self.xoverflow is None:
-            xoverflowdims, = RealOverflow()._valid(shape)
+            xoverflowdims, = RealOverflow()._valid(set(), shape)
         else:
-            xoverflowdims, = self.xoverflow._valid(shape)
+            xoverflowdims, = _valid(self.xoverflow, seen, shape)
         if self.yoverflow is None:
-            yoverflowdims, = RealOverflow()._valid(shape)
+            yoverflowdims, = RealOverflow()._valid(set(), shape)
         else:
-            yoverflowdims, = self.yoverflow._valid(shape)
+            yoverflowdims, = _valid(self.yoverflow, seen, shape)
 
         return (self.xnum + xoverflowdims, self.ynum + yoverflowdims)
         
@@ -730,17 +730,17 @@ class HexagonalBinning(Binning):
         self.qoverflow = qoverflow
         self.roverflow = roverflow
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         qnum = self.qmax - self.qmin + 1
         rnum = self.rmax - self.rmin + 1
         if self.qoverflow is None:
-            qoverflowdims, = RealOverflow()._valid(shape)
+            qoverflowdims, = RealOverflow()._valid(set(), shape)
         else:
-            qoverflowdims, = self.qoverflow._valid(shape)
+            qoverflowdims, = _valid(self.qoverflow, seen, shape)
         if self.roverflow is None:
-            roverflowdims, = RealOverflow()._valid(shape)
+            roverflowdims, = RealOverflow()._valid(set(), shape)
         else:
-            roverflowdims, = self.roverflow._valid(shape)
+            roverflowdims, = _valid(self.roverflow, seen, shape)
         return (qnum + qoverflowdims, rnum + roverflowdims)
 
 ################################################# EdgesBinning
@@ -758,15 +758,15 @@ class EdgesBinning(Binning):
         self.edges = edges
         self.overflow = overflow
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if any(math.isinf(x) or math.isnan(x) for x in self.edges):
             raise ValueError("EdgesBinning.edges must all be finite")
         if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
             raise ValueError("EdgesBinning.edges must be strictly increasing")
         if self.overflow is None:
-            numoverflow, = RealOverflow()._valid(shape)
+            numoverflow, = RealOverflow()._valid(set(), shape)
         else:
-            numoverflow, = _valid(self.overflow, shape)
+            numoverflow, = _valid(self.overflow, seen, shape)
         return (len(self.edges) - 1 + numoverflow,)
 
 ################################################# EdgesBinning
@@ -792,13 +792,13 @@ class IrregularBinning(Binning):
         self.overflow = overflow
         self.overlapping_fill = overlapping_fill
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         for x in self.intervals:
-            _valid(x, shape)
+            _valid(x, seen, shape)
         if self.overflow is None:
-            numoverflow, = RealOverflow()._valid(shape)
+            numoverflow, = RealOverflow()._valid(set(), shape)
         else:
-            numoverflow, = _valid(self.overflow, shape)
+            numoverflow, = _valid(self.overflow, seen, shape)
         return (len(self.intervals) + numoverflow,)
 
 ################################################# CategoryBinning
@@ -816,7 +816,7 @@ class CategoryBinning(Binning, BinPosition):
         self.categories = categories
         self.pos_overflow = pos_overflow
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(self.categories) != len(set(self.categories)):
             raise ValueError("SparseRegularBinning.bins must be unique")
         return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
@@ -842,7 +842,7 @@ class SparseRegularBinning(Binning, BinPosition):
         self.origin = origin
         self.pos_nanflow = pos_nanflow
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
@@ -871,13 +871,13 @@ class Axis(Histos):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if self.binning is None:
             binshape = (1,)
         else:
-            binshape = _valid(self.binning, shape)
-        _valid(self.metadata, shape)
-        _valid(self.decoration, shape)
+            binshape = _valid(self.binning, seen, shape)
+        _valid(self.metadata, seen, shape)
+        _valid(self.decoration, seen, shape)
         return binshape
 
 ################################################# Counts
@@ -1075,7 +1075,7 @@ class Parameter(Histos):
         self.identifier = identifier
         self.value = value
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         return shape
 
 ################################################# Function
@@ -1120,12 +1120,12 @@ class ParameterizedFunction(Function, FunctionObject):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
             raise ValueError("ParameterizedFunction.parameters keys must be unique")
 
         for x in self.parameters:
-            _valid(x, shape)
+            _valid(x, seen, shape)
 
         if self.contours is not None:
             if len(self.contours) != len(numpy.unique(self.contours)):
@@ -1196,15 +1196,15 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         binshape = ()
         for x in self.axis:
-            binshape = binshape + _valid(x, shape)
-        _valid(self.values, shape + binshape)
-        _valid(self.derivatives, shape)
-        _valid(self.generic_errors, shape)
-        _valid(self.metadata, shape)
-        _valid(self.decoration, shape)
+            binshape = binshape + _valid(x, seen, shape)
+        _valid(self.values, seen, shape + binshape)
+        _valid(self.derivatives, seen, shape)
+        _valid(self.generic_errors, seen, shape)
+        _valid(self.metadata, seen, shape)
+        _valid(self.decoration, seen, shape)
         return shape
 
 ################################################# Histogram
@@ -1276,7 +1276,7 @@ class ColumnChunk(Histos):
         self.page_offsets = page_offsets
         self.page_extremes = page_extremes
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(self.page_offsets) == 0:
             raise ValueError("ColumnChunk.page_offsets must not be empty")
         if self.page_offsets[0] != 0:
@@ -1369,7 +1369,7 @@ class Ntuple(Object):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(self.chunk_offsets) == 0:
             raise ValueError("Ntuple.chunk_offsets must not be empty")
         if self.chunk_offsets[0] != 0:
@@ -1442,7 +1442,7 @@ class Variation(Histos):
 
 class Collection(Histos):
     def tobuffer(self):
-        self._valid(())
+        self._valid(set(), ())
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, None))
         return builder.Output()
@@ -1461,7 +1461,7 @@ class Collection(Histos):
         return cls.frombuffer(array)
 
     def tofile(self, file):
-        self._valid(())
+        self._valid(set(), ())
 
         opened = False
         if not hasattr(file, "write"):
@@ -1542,15 +1542,15 @@ class Collection(Histos):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, shape):
+    def _valid(self, seen, shape):
         if len(set(x.identifier for x in self.objects)) != len(self.objects):
             raise ValueError("Collection.objects keys must be unique")
 
         for x in self.objects:
-            _valid(x, shape)
+            _valid(x, seen, shape)
 
-        _valid(self.metadata, shape)
-        _valid(self.decoration, shape)
+        _valid(self.metadata, seen, shape)
+        _valid(self.decoration, seen, shape)
         return shape
 
     def __getitem__(self, where):
@@ -1562,14 +1562,14 @@ class Collection(Histos):
     @property
     def isvalid(self):
         try:
-            self._valid(())
+            self._valid(set(), ())
         except ValueError:
             return False
         else:
             return True
 
     def checkvalid(self):
-        self._valid(())
+        self._valid(set(), ())
 
     def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)
