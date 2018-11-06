@@ -149,6 +149,7 @@ def _valid(obj, seen, only, shape):
         if id(obj) in seen:
             raise ValueError("hierarchy is recursively nested")
         seen.add(id(obj))
+        obj._validtypes()
         return obj._valid(seen, only, shape)
 
 def _getbykey(self, field, where):
@@ -174,6 +175,15 @@ class Histos(object):
         if not isinstance(out, Collection):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
         return out, seen
+
+    def _topvalid(self):
+        top, only = self._top()
+        top._valid(set(), only, ())
+
+    def _validtypes(self):
+        for n, x in self._params.items():
+            if not isinstance(x, histos.checktype.CheckBuffer):
+                x(getattr(self, n))
 
 class Enum(object):
     def __init__(self, name, value):
@@ -420,8 +430,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        top, only = self._top()
-        top._valid(set(), only, ())
+        self._topvalid()
         return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
@@ -466,8 +475,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        top, only = self._top()
-        top._valid(set(), only, ())
+        self._topvalid()
         out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
         return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
@@ -733,6 +741,7 @@ class HexagonalBinning(Binning):
         self.coordinates = coordinates
         self.xorigin = xorigin
         self.yorigin = yorigin
+        self.qangle = qangle
         self.qoverflow = qoverflow
         self.roverflow = roverflow
 
@@ -1207,19 +1216,22 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.decoration = decoration
 
     def _valid(self, seen, only, shape):
-        binshape = ()
+        binshape = shape
         for x in self.axis:
             binshape = binshape + _valid(x, seen, only, shape)
+
         if only is None or id(self.values) in only:
-            _valid(self.values, seen, only, shape + binshape)
+            _valid(self.values, seen, only, binshape)
         if only is None or id(self.derivatives) in only:
-            _valid(self.derivatives, seen, only, shape)
+            _valid(self.derivatives, seen, only, binshape)
         if only is None or id(self.generic_errors) in only:
-            _valid(self.generic_errors, seen, only, shape)
+            _valid(self.generic_errors, seen, only, binshape)
+
         if only is None or id(self.metadata) in only:
             _valid(self.metadata, seen, only, shape)
         if only is None or id(self.decoration) in only:
             _valid(self.decoration, seen, only, shape)
+
         return shape
 
 ################################################# Histogram
@@ -1275,8 +1287,7 @@ class Page(Histos):
 
     @property
     def numpy_array(self):
-        top, only = self._top()
-        top._valid(set(), only, ())
+        self._topvalid()
         return self._array
 
     def _valid(self, seen, only, shape, column, numentries):
@@ -1331,6 +1342,7 @@ class ColumnChunk(Histos):
 
         for i, x in enumerate(self.pages):
             if only is None or id(x) in only:
+                x._validtypes()
                 x._valid(seen, only, shape, column, self.page_offsets[i + 1] - self.page_offsets[i])
 
         if self.page_extremes is not None:
@@ -1371,11 +1383,14 @@ class Chunk(Histos):
 
         for x, y in zip(self.columns, columns):
             if only is None or id(x) in only:
+                x._validtypes()
                 num = x._valid(seen, only, shape, y)
                 if numentries is not None and num != numentries:
                     raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
 
-        _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+
         return numentries
 
 ################################################# Column
@@ -1464,6 +1479,7 @@ class Ntuple(Object):
         if self.chunk_offsets is None:
             for x in self.chunks:
                 if only is None or id(x) in only:
+                    x._validtypes()
                     x._valid(seen, only, shape, self.columns, None)
 
         else:
@@ -1477,6 +1493,7 @@ class Ntuple(Object):
 
             for i, x in enumerate(self.chunks):
                 if only is None or id(x) in only:
+                    x._validtypes()
                     x._valid(seen, only, shape, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
         if self.unbinned_stats is not None:
@@ -1560,7 +1577,7 @@ class Variation(Histos):
 
 class Collection(Histos):
     def tobuffer(self):
-        self._valid(set(), None, ())
+        self.checkvalid()
         builder = flatbuffers.Builder(1024)
         builder.Finish(self._toflatbuffers(builder, None))
         return builder.Output()
@@ -1579,7 +1596,7 @@ class Collection(Histos):
         return cls.frombuffer(array)
 
     def tofile(self, file):
-        self._valid(set(), None, ())
+        self.checkvalid()
 
         opened = False
         if not hasattr(file, "write"):
@@ -1683,7 +1700,7 @@ class Collection(Histos):
     @property
     def isvalid(self):
         try:
-            self._valid(set(), None, ())
+            self.checkvalid()
         except ValueError:
             return False
         else:
