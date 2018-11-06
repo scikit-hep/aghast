@@ -1285,11 +1285,6 @@ class Page(Histos):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    @property
-    def numpy_array(self):
-        self._topvalid()
-        return self._array
-
     def _valid(self, seen, only, shape, column, numentries):
         buf = self.buffer.numpy_array
         if column.filters is not None:
@@ -1307,6 +1302,11 @@ class Page(Histos):
         self._array = buf.view(column.numpy_dtype).reshape((numentries,))
 
         return numentries
+
+    @property
+    def numpy_array(self):
+        self._topvalid()
+        return self._array
 
 ################################################# ColumnChunk
 
@@ -1357,6 +1357,20 @@ class ColumnChunk(Histos):
 
         return self.page_offsets[-1]
 
+    @property
+    def numpy_array(self):
+        out = [x.numpy_array for x in self.pages]
+        if len(out) == 0:
+            self._topvalid()
+            column = self._parent._parent.columns[self._parent.columns.index(self)]
+            return numpy.empty(0, column.numpy_dtype)
+
+        elif len(out) == 1:
+            return out[0]
+
+        else:
+            return numpy.concatenate(out)
+
 ################################################# Chunk
 
 class Chunk(Histos):
@@ -1392,6 +1406,16 @@ class Chunk(Histos):
             _valid(self.metadata, seen, only, shape)
 
         return numentries
+
+    @property
+    def numpy_arrays(self):
+        if not isinstance(self._parent, Ntuple):
+            raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
+
+        if len(self.columns) != len(self._parent.columns):
+            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(self._parent.columns)))
+
+        return {y.identifier: x.numpy_array for x, y in zip(self.columns, self._parent.columns)}
 
 ################################################# Column
 
@@ -1512,6 +1536,12 @@ class Ntuple(Object):
             _valid(self.decoration, seen, only, shape)
 
         return shape
+
+    @property
+    def numpy_arrays(self):
+        self._valid(set(), None, ())
+        for x in self.chunks:
+            yield x.numpy_arrays
 
 ################################################# Region
 
