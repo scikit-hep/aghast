@@ -180,9 +180,10 @@ class Histos(object):
         top, only = self._top()
         top._valid(set(), only, ())
 
+    _validtypesskip = ()
     def _validtypes(self):
         for n, x in self._params.items():
-            if not isinstance(x, histos.checktype.CheckBuffer):
+            if n not in self._validtypesskip:
                 x(getattr(self, n))
 
 class Enum(object):
@@ -389,6 +390,8 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     endianness       = typedproperty(_params["endianness"])
     dimension_order  = typedproperty(_params["dimension_order"])
 
+    _validtypesskip = ("buffer",)
+
     def __init__(self, buffer=None, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
         if buffer is None:
             self._buffer = None     # placeholder for auto-generated buffer
@@ -455,6 +458,8 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     endianness       = typedproperty(_params["endianness"])
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
+
+    _validtypesskip = ("pointer", "numbytes")
 
     def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
         if pointer is None and numbytes is None:
