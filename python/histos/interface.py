@@ -1344,7 +1344,7 @@ class Page(Histos):
         self.buffer = buffer
 
     def _valid(self, seen, only, shape, column, numentries):
-        self.buffer._valid(seen, only, shape, column.numpy_dtype.itemsize * numentries)
+        self.buffer._valid(seen, only, None, column.numpy_dtype.itemsize * numentries)
         buf = self.buffer._array
 
         if column.filters is not None:
@@ -1403,7 +1403,7 @@ class ColumnChunk(Histos):
         for i, x in enumerate(self.pages):
             if only is None or id(x) in only:
                 x._validtypes()
-                x._valid(seen, only, shape, column, self.page_offsets[i + 1] - self.page_offsets[i])
+                x._valid(seen, only, None, column, self.page_offsets[i + 1] - self.page_offsets[i])
 
         if self.page_extremes is not None:
             if len(self.page_extremes) != len(self.pages):
@@ -1411,7 +1411,7 @@ class ColumnChunk(Histos):
 
             for x in self.page_extremes:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, shape)
+                    _valid(x, seen, only, None)
 
             raise NotImplementedError("check extremes")
 
@@ -1458,12 +1458,12 @@ class Chunk(Histos):
         for x, y in zip(self.columns, columns):
             if only is None or id(x) in only:
                 x._validtypes()
-                num = x._valid(seen, only, shape, y)
+                num = x._valid(seen, only, None, y)
                 if numentries is not None and num != numentries:
                     raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
 
         if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
+            _valid(self.metadata, seen, only, None)
 
         return numentries
 
@@ -1514,7 +1514,6 @@ class Column(Histos, Interpretation):
         if self.postfilter_slice is not None:
             if self.postfilter_slice.step == 0:
                 raise ValueError("slice step cannot be zero")
-        return shape
 
 ################################################# Ntuple
 
@@ -1558,13 +1557,13 @@ class Ntuple(Object):
 
         for x in self.columns:
             if only is None or id(x) in only:
-                _valid(x, seen, only, shape)
+                _valid(x, seen, only, None)
 
         if self.chunk_offsets is None:
             for x in self.chunks:
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, shape, self.columns, None)
+                    x._valid(seen, only, None, self.columns, None)
 
         else:
             if self.chunk_offsets[0] != 0:
@@ -1578,22 +1577,22 @@ class Ntuple(Object):
             for i, x in enumerate(self.chunks):
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, shape, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+                    x._valid(seen, only, None, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
         if self.unbinned_stats is not None:
             for x in self.unbinned_stats:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, shape)
+                    _valid(x, seen, only, None)
 
         if self.functions is not None:
             for x in self.functions:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, shape)
+                    _valid(x, seen, only, None)
 
         if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
+            _valid(self.metadata, seen, only, None)
         if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, shape)
+            _valid(self.decoration, seen, only, None)
 
         return shape
 
