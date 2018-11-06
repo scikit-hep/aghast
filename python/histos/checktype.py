@@ -48,7 +48,7 @@ class Check(object):
 
     def __call__(self, obj):
         if obj is None and self.required:
-            raise TypeError("{0}.{1} is required, cannot pass {1}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} is required, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
         else:
             return obj
 

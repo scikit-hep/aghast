@@ -401,37 +401,35 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dimension_order = dimension_order
 
     def _valid(self, seen, only, shape):
-        if self.filters is None:
-            if self._buffer is None:
-                self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype).view(InterpretedBuffer.none.dtype)
-                buf = None
-            else:
-                buf = self.buffer
+        if self._buffer is None:
+            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype).view(InterpretedBuffer.none.dtype)
 
+        if self.filters is None:
+            self._array = self._buffer
         else:
             raise NotImplementedError(self.filters)
 
-        if buf is not None:
-            if len(buf.shape) != 1:
-                raise ValueError("InterpretedInlineBuffer.buffer shape is {0} but only one-dimensional arrays are allowed".format(buf.shape))
-            elif buf.dtype != InterpretedBuffer.none.dtype:
-                raise ValueError("InterpretedInlineBuffer.buffer underlying dtype is {0} but should be {1} (untyped)".format(buf.dtype, InterpretedBuffer.none.dtype))
-            elif len(buf) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
-                raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(buf), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
-
-        self._shape = shape
+        if self._array.dtype.itemsize != 1:
+            self._array = self._array.view(InterpretedBuffer.none.dtype)
+        if len(self._array.shape) != 1:
+            self._array = self._array.reshape(-1)
 
         if self.postfilter_slice is not None:
-            if self.postfilter_slice.step == 0:
-                raise ValueError("slice step cannot be zero")
-            raise NotImplementedError("handle postfilter_slice")
+            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
+            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
+            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
+            self._array = self._array[start:stop:step]
 
+        if len(self._array) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
+            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+
+        self._array = self._array.view(self.numpy_dtype).reshape(shape, order=self.dimension_order.dimension_order)
         return shape
 
     @property
     def numpy_array(self):
         self._topvalid()
-        return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
+        return self._array
 
 ################################################# ExternalBuffer
 
@@ -473,11 +471,35 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.dimension_order = dimension_order
         self.location = location
 
+    def _valid(self, seen, only, shape):
+        if self._pointer is None or self._numbytes is None:
+            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
+            self._pointer = self._buffer.ctypes.data
+            self._numbytes = self._buffer.nbytes
+        else:
+            self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+
+        if self.filters is None:
+            self._array = self._buffer
+        else:
+            raise NotImplementedError(self.filters)
+
+        if self.postfilter_slice is not None:
+            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
+            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
+            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
+            self._array = self._array[start:stop:step]
+
+        if len(self._array) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
+            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+
+        self._array = self._array.view(self.numpy_dtype).reshape(shape, order=self.dimension_order.dimension_order)
+        return shape
+
     @property
     def numpy_array(self):
         self._topvalid()
-        out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
-        return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
+        return self._array
 
 ################################################# Binning
 
@@ -1291,9 +1313,9 @@ class Page(Histos):
             raise NotImplementedError("handle column.filters")
 
         if column.postfilter_slice is not None:
-            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
-            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
-            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
+            start = column.postfilter_slice.start if column.postfilter_slice.has_start else None
+            stop = column.postfilter_slice.stop if column.postfilter_slice.has_stop else None
+            step = column.postfilter_slice.step if column.postfilter_slice.has_step else None
             buf = buf[start:stop:step]
 
         if len(buf) != column.numpy_dtype.itemsize * numentries:

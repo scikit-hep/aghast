@@ -30,6 +30,8 @@
 
 import unittest
 
+import numpy
+
 from histos import *
 
 class Test(unittest.TestCase):
@@ -55,10 +57,19 @@ class Test(unittest.TestCase):
         pass
 
     def test_InterpretedInlineBuffer(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.int32))])
+        assert h["id"].values.numpy_array.tolist() == [0]
+
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(b"\x07\x00\x00\x00", dtype=InterpretedInlineBuffer.int32))])
+        assert h["id"].values.numpy_array.tolist() == [7]
 
     def test_InterpretedExternalBuffer(self):
-        pass
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [0.0]
+
+        buf = numpy.array([3.14], dtype=numpy.float64)
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))])
+        assert h["id"].values.numpy_array.tolist() == [3.14]
 
     def test_FractionalBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(FractionalBinning())], InterpretedInlineBuffer())])
