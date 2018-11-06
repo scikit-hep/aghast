@@ -419,7 +419,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(set(), ())
+        self._top().checkvalid()
         return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
@@ -464,7 +464,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(set(), ())
+        self._top().checkvalid()
         out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
         return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
@@ -1258,19 +1258,26 @@ class Page(Histos):
     def __init__(self, buffer):
         self.buffer = buffer
 
+    @property
+    def numpy_array(self):
+        self._top().checkvalid()
+        return self._array
+
     def _valid(self, seen, shape, column, numentries):
         buf = self.buffer.numpy_array
         if column.filters is not None:
             raise NotImplementedError("handle column.filters")
 
+        if column.postfilter_slice is not None:
+            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
+            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
+            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
+            buf = buf[start:stop:step]
+
         if len(buf) != column.numpy_dtype.itemsize * numentries:
             raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), numentries, column.numpy_dtype.itemsize))
 
-        self._dtype = column.numpy_dtype
-        self._shape = (numentries,)
-
-        if column.postfilter_slice is not None:
-            raise NotImplementedError("handle postfilter_slice")
+        self._array = buf.view(column.numpy_dtype).reshape((numentries,))
 
         return numentries
 

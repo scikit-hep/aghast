@@ -207,7 +207,8 @@ class Test(unittest.TestCase):
 
     def test_Page(self):
         h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-        h.checkvalid()
+        assert h.isvalid
+        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
 
     def test_Chunk(self):
         h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [Chunk([ColumnChunk([], [0])])])])
