@@ -325,19 +325,13 @@ class InterpretedBuffer(Interpretation):
 
 class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     _params = {
-        "buffer":           histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
-        "filters":          histos.checktype.CheckVector("RawInlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("RawInlineBuffer", "postfilter_slice", required=False),
+        "buffer": histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
         }
 
-    buffer           = typedproperty(_params["buffer"])
-    filters          = typedproperty(_params["filters"])
-    postfilter_slice = typedproperty(_params["postfilter_slice"])
+    buffer = typedproperty(_params["buffer"])
 
-    def __init__(self, buffer, filters=None, postfilter_slice=None):
+    def __init__(self, buffer):
         self.buffer = buffer
-        self.filters = filters
-        self.postfilter_slice = postfilter_slice
 
     @property
     def numpy_array(self):
@@ -350,22 +344,16 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
         "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
-        "filters":          histos.checktype.CheckVector("RawExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("RawExternalBuffer", "postfilter_slice", required=False),
         }
 
-    pointer          = typedproperty(_params["pointer"])
-    numbytes         = typedproperty(_params["numbytes"])
-    external_type    = typedproperty(_params["external_type"])
-    filters          = typedproperty(_params["filters"])
-    postfilter_slice = typedproperty(_params["postfilter_slice"])
+    pointer       = typedproperty(_params["pointer"])
+    numbytes      = typedproperty(_params["numbytes"])
+    external_type = typedproperty(_params["external_type"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None):
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory):
         self.pointer = pointer
         self.numbytes = numbytes
         self.external_type = external_type
-        self.filters = filters
-        self.postfilter_slice = postfilter_slice
 
     @property
     def numpy_array(self):
@@ -1273,17 +1261,15 @@ class Page(Histos):
     def _valid(self, seen, shape, column, numentries):
         buf = self.buffer.numpy_array
         if column.filters is not None:
-            raise NotImplementedError(column.filters)
+            raise NotImplementedError("handle column.filters")
 
         if len(buf) != column.numpy_dtype.itemsize * numentries:
-            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), column.numpy_dtype.itemsize * numentries, column.numpy_dtype.itemsize))
+            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), numentries, column.numpy_dtype.itemsize))
 
         self._dtype = column.numpy_dtype
         self._shape = (numentries,)
 
-        if self.postfilter_slice is not None:
-            if self.postfilter_slice.step == 0:
-                raise ValueError("slice step cannot be zero")
+        if column.postfilter_slice is not None:
             raise NotImplementedError("handle postfilter_slice")
 
         return numentries
@@ -1370,33 +1356,39 @@ class Chunk(Histos):
 
 class Column(Histos, Interpretation):
     _params = {
-        "identifier":      histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
-        "dtype":           histos.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
-        "endianness":      histos.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
-        "filters":         histos.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
-        "title":           histos.checktype.CheckString("Column", "title", required=False),
-        "metadata":        histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
-        "decoration":      histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
+        "identifier":       histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
+        "dtype":            histos.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
+        "endianness":       histos.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
+        "filters":          histos.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": histos.checktype.CheckSlice("Column", "postfilter_slice", required=False),
+        "title":            histos.checktype.CheckString("Column", "title", required=False),
+        "metadata":         histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
+        "decoration":       histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
-    identifier = typedproperty(_params["identifier"])
-    dtype      = typedproperty(_params["dtype"])
-    endianness = typedproperty(_params["endianness"])
-    filters    = typedproperty(_params["filters"])
-    title      = typedproperty(_params["title"])
-    metadata   = typedproperty(_params["metadata"])
-    decoration = typedproperty(_params["decoration"])
+    identifier       = typedproperty(_params["identifier"])
+    dtype            = typedproperty(_params["dtype"])
+    endianness       = typedproperty(_params["endianness"])
+    filters          = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["filters"])
+    title            = typedproperty(_params["title"])
+    metadata         = typedproperty(_params["metadata"])
+    decoration       = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, postfilter_slice=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.dtype = dtype
         self.endianness = endianness
         self.filters = filters
+        self.postfilter_slice = postfilter_slice
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
 
     def _valid(self, seen, shape):
+        if self.postfilter_slice is not None:
+            if self.postfilter_slice.step == 0:
+                raise ValueError("slice step cannot be zero")
         return shape
 
 ################################################# Ntuple

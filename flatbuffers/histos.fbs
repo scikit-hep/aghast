@@ -78,16 +78,12 @@ enum ExternalType: int {
 
 table RawInlineBuffer {
   buffer: [ubyte] (required);
-  filters: [Filter];
-  postfilter_slice: Slice;
 }
 
 table RawExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
   external_type: ExternalType = external_memory;
-  filters: [Filter];
-  postfilter_slice: Slice;
   location: string;
 }
 
@@ -405,6 +401,7 @@ table Column {
   dtype: DType = dtype_none;
   endianness: Endianness = little_endian;
   filters: [Filter];
+  postfilter_slice: Slice;
   title: string;
   metadata: Metadata;
   decoration: Decoration;
