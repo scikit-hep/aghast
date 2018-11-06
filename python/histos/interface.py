@@ -47,12 +47,12 @@ import histos.histos_generated.BinPosition
 import histos.histos_generated.CategoryBinning
 import histos.histos_generated.Chunk
 import histos.histos_generated.Collection
-import histos.histos_generated.ColumnChunk
 import histos.histos_generated.Column
+import histos.histos_generated.ColumnChunk
 import histos.histos_generated.Correlation
 import histos.histos_generated.Counts
-import histos.histos_generated.DecorationLanguage
 import histos.histos_generated.Decoration
+import histos.histos_generated.DecorationLanguage
 import histos.histos_generated.DimensionOrder
 import histos.histos_generated.Distribution
 import histos.histos_generated.DistributionStats
@@ -65,10 +65,10 @@ import histos.histos_generated.Extremes
 import histos.histos_generated.Filter
 import histos.histos_generated.FractionalErrorMethod
 import histos.histos_generated.FractionBinning
-import histos.histos_generated.FunctionData
-import histos.histos_generated.FunctionObjectData
-import histos.histos_generated.FunctionObject
 import histos.histos_generated.Function
+import histos.histos_generated.FunctionData
+import histos.histos_generated.FunctionObject
+import histos.histos_generated.FunctionObjectData
 import histos.histos_generated.GenericErrors
 import histos.histos_generated.HexagonalBinning
 import histos.histos_generated.HexagonalCoordinates
@@ -78,17 +78,18 @@ import histos.histos_generated.InterpretedBuffer
 import histos.histos_generated.InterpretedExternalBuffer
 import histos.histos_generated.InterpretedInlineBuffer
 import histos.histos_generated.IrregularBinning
-import histos.histos_generated.MetadataLanguage
 import histos.histos_generated.Metadata
+import histos.histos_generated.MetadataLanguage
 import histos.histos_generated.Moments
 import histos.histos_generated.NonRealMapping
 import histos.histos_generated.Ntuple
-import histos.histos_generated.ObjectData
+import histos.histos_generated.NtupleInstance
 import histos.histos_generated.Object
+import histos.histos_generated.ObjectData
 import histos.histos_generated.OverlappingFillStrategy
 import histos.histos_generated.Page
-import histos.histos_generated.ParameterizedFunction
 import histos.histos_generated.Parameter
+import histos.histos_generated.ParameterizedFunction
 import histos.histos_generated.Profile
 import histos.histos_generated.Quantiles
 import histos.histos_generated.RawBuffer
@@ -350,7 +351,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         else:
             self.buffer = buffer
 
-    def _valid(self, seen, only, shape, numbytes):
+    def _valid(self, seen, only, numbytes):
         if self._buffer is None:
             self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
         self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
@@ -384,7 +385,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
             self.numbytes = numbytes
         self.external_type = external_type
 
-    def _valid(self, seen, only, shape, numbytes):
+    def _valid(self, seen, only, numbytes):
         if self._pointer is None or self._numbytes is None:
             self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
             self._pointer = self._buffer.ctypes.data
@@ -1343,8 +1344,8 @@ class Page(Histos):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only, shape, column, numentries):
-        self.buffer._valid(seen, only, None, column.numpy_dtype.itemsize * numentries)
+    def _valid(self, seen, only, column, numentries):
+        self.buffer._valid(seen, only, column.numpy_dtype.itemsize * numentries)
         buf = self.buffer._array
 
         if column.filters is not None:
@@ -1386,7 +1387,7 @@ class ColumnChunk(Histos):
         self.page_offsets = page_offsets
         self.page_extremes = page_extremes
 
-    def _valid(self, seen, only, shape, column):
+    def _valid(self, seen, only, column):
         # have to do recursive check because ColumnChunk._valid is called directly by Chunk._valid
         if id(self) in seen:
             raise ValueError("hierarchy is recursively nested")
@@ -1403,7 +1404,7 @@ class ColumnChunk(Histos):
         for i, x in enumerate(self.pages):
             if only is None or id(x) in only:
                 x._validtypes()
-                x._valid(seen, only, None, column, self.page_offsets[i + 1] - self.page_offsets[i])
+                x._valid(seen, only, column, self.page_offsets[i + 1] - self.page_offsets[i])
 
         if self.page_extremes is not None:
             if len(self.page_extremes) != len(self.pages):
@@ -1411,7 +1412,7 @@ class ColumnChunk(Histos):
 
             for x in self.page_extremes:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, None)
+                    _valid(x, seen, only, ())
 
             raise NotImplementedError("check extremes")
 
@@ -1422,7 +1423,7 @@ class ColumnChunk(Histos):
         out = [x.numpy_array for x in self.pages]
         if len(out) == 0:
             self._topvalid()
-            column = self._parent._parent.columns[self._parent.columns.index(self)]
+            column = self._parent._parent._parent.columns[self._parent.columns.index(self)]
             return numpy.empty(0, column.numpy_dtype)
 
         elif len(out) == 1:
@@ -1446,7 +1447,7 @@ class Chunk(Histos):
         self.columns = columns
         self.metadata = metadata
 
-    def _valid(self, seen, only, shape, columns, numentries):
+    def _valid(self, seen, only, columns, numentries):
         # have to do recursive check because Chunk._valid is called directly by Ntuple._valid
         if id(self) in seen:
             raise ValueError("hierarchy is recursively nested")
@@ -1458,24 +1459,24 @@ class Chunk(Histos):
         for x, y in zip(self.columns, columns):
             if only is None or id(x) in only:
                 x._validtypes()
-                num = x._valid(seen, only, None, y)
+                num = x._valid(seen, only, y)
                 if numentries is not None and num != numentries:
                     raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
 
         if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, None)
+            _valid(self.metadata, seen, only, ())
 
         return numentries
 
     @property
     def numpy_arrays(self):
-        if not isinstance(self._parent, Ntuple):
+        if not isinstance(getattr(self, "_parent", None), NtupleInstance) or not isinstance(getattr(self._parent, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
 
-        if len(self.columns) != len(self._parent.columns):
-            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(self._parent.columns)))
+        if len(self.columns) != len(self._parent._parent.columns):
+            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(self._parent._parent.columns)))
 
-        return {y.identifier: x.numpy_array for x, y in zip(self.columns, self._parent.columns)}
+        return {y.identifier: x.numpy_array for x, y in zip(self.columns, self._parent._parent.columns)}
 
 ################################################# Column
 
@@ -1510,60 +1511,41 @@ class Column(Histos, Interpretation):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, seen, only, shape):
+    def _valid(self, seen, only):
         if self.postfilter_slice is not None:
             if self.postfilter_slice.step == 0:
                 raise ValueError("slice step cannot be zero")
 
-################################################# Ntuple
+################################################# NtupleInstance
 
-class Ntuple(Object):
+class NtupleInstance(Histos):
     _params = {
-        "identifier":     histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
-        "columns":        histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
         "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
         "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
         "unbinned_stats": histos.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
         "functions":      histos.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
-        "title":          histos.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(_params["identifier"])
-    columns        = typedproperty(_params["columns"])
     chunks         = typedproperty(_params["chunks"])
     chunk_offsets  = typedproperty(_params["chunk_offsets"])
     unbinned_stats = typedproperty(_params["unbinned_stats"])
     functions      = typedproperty(_params["functions"])
-    title          = typedproperty(_params["title"])
-    metadata       = typedproperty(_params["metadata"])
-    decoration     = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, columns, chunks, chunk_offsets=None, unbinned_stats=None, functions=None, title="", metadata=None, decoration=None):
-        self.identifier = identifier
-        self.columns = columns
+    def __init__(self, chunks, chunk_offsets=None, unbinned_stats=None, functions=None):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
         self.unbinned_stats = unbinned_stats
         self.functions = functions
-        self.title = title
-        self.metadata = metadata
-        self.decoration = decoration
 
-    def _valid(self, seen, only, shape):
-        if len(set(x.identifier for x in self.columns)) != len(self.columns):
-            raise ValueError("Ntuple.columns keys must be unique")
-
-        for x in self.columns:
-            if only is None or id(x) in only:
-                _valid(x, seen, only, None)
+    def _valid(self, seen, only):
+        if not isinstance(getattr(self, "_parent", None), Ntuple):
+            raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
 
         if self.chunk_offsets is None:
             for x in self.chunks:
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, None, self.columns, None)
+                    x._valid(seen, only, self._parent.columns, None)
 
         else:
             if self.chunk_offsets[0] != 0:
@@ -1577,17 +1559,67 @@ class Ntuple(Object):
             for i, x in enumerate(self.chunks):
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, None, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+                    x._valid(seen, only, self._parent.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
         if self.unbinned_stats is not None:
             for x in self.unbinned_stats:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, None)
+                    _valid(x, seen, only, ())
 
         if self.functions is not None:
             for x in self.functions:
                 if only is None or id(x) in only:
-                    _valid(x, seen, only, None)
+                    _valid(x, seen, only, ())
+
+    @property
+    def numpy_arrays(self):
+        self._valid(set(), None)
+        for x in self.chunks:
+            yield x.numpy_arrays
+
+################################################# Ntuple
+
+class Ntuple(Object):
+    _params = {
+        "identifier": histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
+        "columns":    histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":  histos.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "title":      histos.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":   histos.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration": histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        }
+
+    identifier = typedproperty(_params["identifier"])
+    columns    = typedproperty(_params["columns"])
+    instances  = typedproperty(_params["instances"])
+    title      = typedproperty(_params["title"])
+    metadata   = typedproperty(_params["metadata"])
+    decoration = typedproperty(_params["decoration"])
+
+    def __init__(self, identifier, columns, instances, title="", metadata=None, decoration=None):
+        self.identifier = identifier
+        self.columns = columns
+        self.instances = instances
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+
+    def _valid(self, seen, only, shape):
+        if len(set(x.identifier for x in self.columns)) != len(self.columns):
+            raise ValueError("Ntuple.columns keys must be unique")
+
+        for x in self.columns:
+            if only is None or id(x) in only:
+                x._validtypes()
+                x._valid(seen, only)
+
+        if len(self.instances) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
+
+        for x in self.instances:
+            if only is None or id(x) in only:
+                x._validtypes()
+                x._valid(seen, only)
 
         if only is None or id(self.metadata) in only:
             _valid(self.metadata, seen, only, None)
@@ -1595,12 +1627,6 @@ class Ntuple(Object):
             _valid(self.decoration, seen, only, None)
 
         return shape
-
-    @property
-    def numpy_arrays(self):
-        self._valid(set(), None, ())
-        for x in self.chunks:
-            yield x.numpy_arrays
 
 ################################################# Region
 

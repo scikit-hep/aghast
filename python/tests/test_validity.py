@@ -51,19 +51,19 @@ class Test(unittest.TestCase):
         assert h.decoration.css == Decoration.css
 
     def test_RawInlineBuffer(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer())], [0, 1])])])])
-        assert len(h["id"].chunks[0].columns[0].pages[0].numpy_array) == 1
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer())], [0, 1])])])])])
+        assert len(h["id"].instances[0].chunks[0].columns[0].pages[0].numpy_array) == 1
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])])
+        assert h["id"].instances[0].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
 
     def test_RawExternalBuffer(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawExternalBuffer())], [0, 1])])])])
-        assert len(h["id"].chunks[0].columns[0].pages[0].numpy_array) == 1
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer())], [0, 1])])])])])
+        assert len(h["id"].instances[0].chunks[0].columns[0].pages[0].numpy_array) == 1
 
         buf = numpy.array([3.14], dtype=numpy.float64)
-        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
-        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [3.14]
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])])
+        assert h["id"].instances[0].chunks[0].columns[0].pages[0].numpy_array.tolist() == [3.14]
 
     def test_InterpretedInlineBuffer(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.int32))])
@@ -226,54 +226,54 @@ class Test(unittest.TestCase):
         assert h["id"].values.numpy_array.tolist() == [[0.0]]
 
     def test_Page(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])])
         assert h.isvalid
-        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
+        assert h["id"].instances[0].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([], [0])])])])
-        assert h["id"].chunks[0].columns[0].numpy_array.tolist() == []
-        assert {n: x.tolist() for n, x in h["id"].chunks[0].numpy_arrays.items()} == {"one": []}
-        for arrays in h["id"].numpy_arrays: pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])])
+        assert h["id"].instances[0].chunks[0].columns[0].numpy_array.tolist() == []
+        assert {n: x.tolist() for n, x in h["id"].instances[0].chunks[0].numpy_arrays.items()} == {"one": []}
+        for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": []}
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-        assert h["id"].chunks[0].columns[0].numpy_array.tolist() == [5]
-        assert {n: x.tolist() for n, x in h["id"].chunks[0].numpy_arrays.items()} == {"one": [5]}
-        for arrays in h["id"].numpy_arrays: pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])])
+        assert h["id"].instances[0].chunks[0].columns[0].numpy_array.tolist() == [5]
+        assert {n: x.tolist() for n, x in h["id"].instances[0].chunks[0].numpy_arrays.items()} == {"one": [5]}
+        for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00")), Page(RawInlineBuffer(b"\x04\x00\x00\x00\x03\x00\x00\x00"))], [0, 1, 3])])])])
-        assert h["id"].chunks[0].columns[0].numpy_array.tolist() == [5, 4, 3]
-        assert {n: x.tolist() for n, x in h["id"].chunks[0].numpy_arrays.items()} == {"one": [5, 4, 3]}
-        for arrays in h["id"].numpy_arrays: pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00")), Page(RawInlineBuffer(b"\x04\x00\x00\x00\x03\x00\x00\x00"))], [0, 1, 3])])])])])
+        assert h["id"].instances[0].chunks[0].columns[0].numpy_array.tolist() == [5, 4, 3]
+        assert {n: x.tolist() for n, x in h["id"].instances[0].chunks[0].numpy_arrays.items()} == {"one": [5, 4, 3]}
+        for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5, 4, 3]}
 
     def test_Chunk(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [Chunk([ColumnChunk([], [0])])])])
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])])
         assert h.isvalid
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [])])
-        for arrays in h["id"].numpy_arrays:
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([])])])
+        for arrays in h["id"].instances[0].numpy_arrays:
             assert False
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-        for arrays in h["id"].numpy_arrays: pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])])
+        for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])]), Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-        for arrays in h["id"].numpy_arrays:
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])]), Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])])
+        for arrays in h["id"].instances[0].numpy_arrays:
             assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
 
     def test_Column(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.float64), Column("two", Column.int32)], [])])
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64), Column("two", Column.int32)], [NtupleInstance([])])])
         assert h.isvalid
 
-        h = Collection("id", [Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])])
-        for arrays in h["id"].numpy_arrays: pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])])])
+        for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5], "two": [3]}
 
     def test_Ntuple(self):
-        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [])])
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([])])])
         assert h.isvalid
 
     def test_Region(self):

@@ -75,6 +75,7 @@ from histos.interface import Page
 from histos.interface import ColumnChunk
 from histos.interface import Chunk
 from histos.interface import Column
+from histos.interface import NtupleInstance
 from histos.interface import Ntuple
 from histos.interface import Region
 from histos.interface import BinnedRegion

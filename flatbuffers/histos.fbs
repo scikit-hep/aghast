@@ -407,12 +407,16 @@ table Column {
   decoration: Decoration;
 }
 
-table Ntuple {
-  columns: [Column] (required);
+table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
   unbinned_stats: [DistributionStats];
   functions: [FunctionObject];
+}
+
+table Ntuple {
+  columns: [Column] (required);
+  instances: [NtupleInstance] (required);
 }
 
 ///////////////////////////////////////////////// objects
