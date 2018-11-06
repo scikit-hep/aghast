@@ -78,6 +78,7 @@ import histos.histos_generated.InterpretedBuffer
 import histos.histos_generated.InterpretedExternalBuffer
 import histos.histos_generated.InterpretedInlineBuffer
 import histos.histos_generated.IrregularBinning
+import histos.histos_generated.MatrixLayout
 import histos.histos_generated.Metadata
 import histos.histos_generated.MetadataLanguage
 import histos.histos_generated.Moments
@@ -996,17 +997,26 @@ class WeightedCounts(Counts):
 ################################################# Correlation
 
 class Correlation(Histos):
+    diagonal = Enum("diagonal", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_diagonal)
+    antisymmetric = Enum("antisymmetric", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_antisymmetric)
+    symmetric = Enum("symmetric", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_symmetric)
+    full = Enum("full", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_full)
+    matrixlayouts = [diagonal, antisymmetric, symmetric, full]
+
     _params = {
-        "sumwx":   histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
-        "sumwxy":  histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "sumwx":  histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
+        "sumwxy": histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "layout": histos.checktype.CheckEnum("Correlation", "layout", required=False, choices=matrixlayouts),
         }
 
     sumwx  = typedproperty(_params["sumwx"])
     sumwxy = typedproperty(_params["sumwxy"])
+    layout = typedproperty(_params["layout"])
 
-    def __init__(self, sumwx, sumwxy):
+    def __init__(self, sumwx, sumwxy, layout=diagonal):
         self.sumwx = sumwx
-        self.sumwxy  = sumwxy 
+        self.sumwxy = sumwxy
+        self.layout = layout
 
 ################################################# Extremes
 
@@ -1300,8 +1310,8 @@ class Histogram(Object):
         "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
         "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
         "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
-        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
         "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
+        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
         "profile_stats":  histos.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
         "functions":      histos.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
         "title":          histos.checktype.CheckString("Histogram", "title", required=False),
@@ -1312,15 +1322,15 @@ class Histogram(Object):
     identifier     = typedproperty(_params["identifier"])
     axis           = typedproperty(_params["axis"])
     distribution   = typedproperty(_params["distribution"])
-    profiles       = typedproperty(_params["profiles"])
     unbinned_stats = typedproperty(_params["unbinned_stats"])
+    profiles       = typedproperty(_params["profiles"])
     profile_stats  = typedproperty(_params["profile_stats"])
     functions      = typedproperty(_params["functions"])
     title          = typedproperty(_params["title"])
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, axis, distribution, profiles=None, unbinned_stats=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, distribution, unbinned_stats=None, profiles=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.axis = axis
         self.distribution = distribution

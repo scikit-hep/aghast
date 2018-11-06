@@ -274,9 +274,17 @@ union Counts {
   WeightedCounts
 }
 
+enum MatrixLayout: byte {
+  matrix_diagonal = 0,
+  matrix_antisymmetric = 1,
+  matrix_symmetric = 2,
+  matrix_full = 3
+}
+
 table Correlation {
-  sumwx: InterpretedBuffer (required);
-  sumwxy: InterpretedBuffer (required);   // symmetric matrix: N*(N+1) elements
+  sumwx: InterpretedBuffer (required);    // N elements
+  sumwxy: InterpretedBuffer (required);   // N, N*(N-1), N*(N+1), or N**2 elements
+  layout: MatrixLayout = matrix_diagonal;
 }
 
 table Extremes {
@@ -373,8 +381,8 @@ table FunctionObject {
 table Histogram {
   axis: [Axis] (required);
   distribution: Distribution (required);
-  profiles: [Profile];
   unbinned_stats: [DistributionStats];
+  profiles: [Profile];
   profile_stats: [DistributionStats];
   functions: [Function];
 }
