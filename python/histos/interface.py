@@ -170,9 +170,10 @@ class Histos(object):
             out = out._parent
             if id(out) in seen:
                 raise ValueError("hierarchy is recursively nested")
+            seen.add(id(out))
         if not isinstance(out, Collection):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-        return out
+        return out, seen
 
 class Enum(object):
     def __init__(self, name, value):
@@ -419,7 +420,8 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(set(), None, ())
+        top, only = self._top()
+        top._valid(set(), only, ())
         return self._buffer.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
@@ -464,7 +466,8 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        self._top()._valid(set(), None, ())
+        top, only = self._top()
+        top._valid(set(), only, ())
         out = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
         return out.view(self.numpy_dtype).reshape(self._shape, order=self.dimension_order.dimension_order)
 
@@ -633,7 +636,8 @@ class RegularBinning(Binning):
         self.circular = circular
 
     def _valid(self, seen, only, shape):
-        _valid(self.interval, seen, only, shape)
+        if only is None or id(self.interval) in only:
+            _valid(self.interval, seen, only, shape)
         if math.isinf(self.interval.low) or math.isnan(self.interval.low):
             raise ValueError("RegularBinning.interval.low must be finite")
         if math.isinf(self.interval.high) or math.isnan(self.interval.high):
@@ -672,8 +676,10 @@ class TicTacToeOverflowBinning(Binning):
         self.yoverflow = yoverflow
 
     def _valid(self, seen, only, shape):
-        _valid(self.xinterval, seen, only, shape)
-        _valid(self.yinterval, seen, only, shape)
+        if only is None or id(self.xinterval) in only:
+            _valid(self.xinterval, seen, only, shape)
+        if only is None or id(self.yinterval) in only:
+            _valid(self.yinterval, seen, only, shape)
         if self.xoverflow is None:
             xoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
@@ -794,7 +800,8 @@ class IrregularBinning(Binning):
 
     def _valid(self, seen, only, shape):
         for x in self.intervals:
-            _valid(x, seen, only, shape)
+            if only is None or id(x) in only:
+                _valid(x, seen, only, shape)
         if self.overflow is None:
             numoverflow, = RealOverflow()._valid(set(), None, shape)
         else:
@@ -876,8 +883,10 @@ class Axis(Histos):
             binshape = (1,)
         else:
             binshape = _valid(self.binning, seen, only, shape)
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.decoration) in only:
+            _valid(self.decoration, seen, only, shape)
         return binshape
 
 ################################################# Counts
@@ -1125,7 +1134,8 @@ class ParameterizedFunction(Function, FunctionObject):
             raise ValueError("ParameterizedFunction.parameters keys must be unique")
 
         for x in self.parameters:
-            _valid(x, seen, only, shape)
+            if only is None or id(x) in only:
+                _valid(x, seen, only, shape)
 
         if self.contours is not None:
             if len(self.contours) != len(numpy.unique(self.contours)):
@@ -1200,11 +1210,16 @@ class BinnedEvaluatedFunction(FunctionObject):
         binshape = ()
         for x in self.axis:
             binshape = binshape + _valid(x, seen, only, shape)
-        _valid(self.values, seen, only, shape + binshape)
-        _valid(self.derivatives, seen, only, shape)
-        _valid(self.generic_errors, seen, only, shape)
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
+        if only is None or id(self.values) in only:
+            _valid(self.values, seen, only, shape + binshape)
+        if only is None or id(self.derivatives) in only:
+            _valid(self.derivatives, seen, only, shape)
+        if only is None or id(self.generic_errors) in only:
+            _valid(self.generic_errors, seen, only, shape)
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.decoration) in only:
+            _valid(self.decoration, seen, only, shape)
         return shape
 
 ################################################# Histogram
@@ -1260,7 +1275,8 @@ class Page(Histos):
 
     @property
     def numpy_array(self):
-        self._top()._valid(set(), None, ())
+        top, only = self._top()
+        top._valid(set(), only, ())
         return self._array
 
     def _valid(self, seen, only, shape, column, numentries):
@@ -1314,14 +1330,16 @@ class ColumnChunk(Histos):
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
 
         for i, x in enumerate(self.pages):
-            x._valid(seen, only, shape, column, self.page_offsets[i + 1] - self.page_offsets[i])
+            if only is None or id(x) in only:
+                x._valid(seen, only, shape, column, self.page_offsets[i + 1] - self.page_offsets[i])
 
         if self.page_extremes is not None:
             if len(self.page_extremes) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_extremes), len(self.pages)))
 
             for x in self.page_extremes:
-                _valid(x, seen, only, shape)
+                if only is None or id(x) in only:
+                    _valid(x, seen, only, shape)
 
             raise NotImplementedError("check extremes")
 
@@ -1352,9 +1370,10 @@ class Chunk(Histos):
             raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(columns)))
 
         for x, y in zip(self.columns, columns):
-            num = x._valid(seen, only, shape, y)
-            if numentries is not None and num != numentries:
-                raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
+            if only is None or id(x) in only:
+                num = x._valid(seen, only, shape, y)
+                if numentries is not None and num != numentries:
+                    raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
 
         _valid(self.metadata, seen, only, shape)
         return numentries
@@ -1439,11 +1458,13 @@ class Ntuple(Object):
             raise ValueError("Ntuple.columns keys must be unique")
 
         for x in self.columns:
-            _valid(x, seen, only, shape)
+            if only is None or id(x) in only:
+                _valid(x, seen, only, shape)
 
         if self.chunk_offsets is None:
             for x in self.chunks:
-                x._valid(seen, only, shape, self.columns, None)
+                if only is None or id(x) in only:
+                    x._valid(seen, only, shape, self.columns, None)
 
         else:
             if self.chunk_offsets[0] != 0:
@@ -1455,18 +1476,23 @@ class Ntuple(Object):
                 raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
 
             for i, x in enumerate(self.chunks):
-                x._valid(seen, only, shape, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+                if only is None or id(x) in only:
+                    x._valid(seen, only, shape, self.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
         if self.unbinned_stats is not None:
             for x in self.unbinned_stats:
-                _valid(x, seen, only, shape)
+                if only is None or id(x) in only:
+                    _valid(x, seen, only, shape)
 
         if self.functions is not None:
             for x in self.functions:
-                _valid(x, seen, only, shape)
+                if only is None or id(x) in only:
+                    _valid(x, seen, only, shape)
 
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.decoration) in only:
+            _valid(self.decoration, seen, only, shape)
 
         return shape
 
@@ -1639,10 +1665,13 @@ class Collection(Histos):
             raise ValueError("Collection.objects keys must be unique")
 
         for x in self.objects:
-            _valid(x, seen, only, shape)
+            if only is None or id(x) in only:
+                _valid(x, seen, only, shape)
 
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.decoration) in only:
+            _valid(self.decoration, seen, only, shape)
         return shape
 
     def __getitem__(self, where):
