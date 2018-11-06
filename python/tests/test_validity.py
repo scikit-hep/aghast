@@ -51,10 +51,19 @@ class Test(unittest.TestCase):
         assert h.decoration.css == Decoration.css
 
     def test_RawInlineBuffer(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer())], [0, 1])])])])
+        assert len(h["id"].chunks[0].columns[0].pages[0].numpy_array) == 1
+
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [5]
 
     def test_RawExternalBuffer(self):
-        pass
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32)], [Chunk([ColumnChunk([Page(RawExternalBuffer())], [0, 1])])])])
+        assert len(h["id"].chunks[0].columns[0].pages[0].numpy_array) == 1
+
+        buf = numpy.array([3.14], dtype=numpy.float64)
+        h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
+        assert h["id"].chunks[0].columns[0].pages[0].numpy_array.tolist() == [3.14]
 
     def test_InterpretedInlineBuffer(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.int32))])

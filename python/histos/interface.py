@@ -183,7 +183,7 @@ class Histos(object):
     _validtypesskip = ()
     def _validtypes(self):
         for n, x in self._params.items():
-            if n not in self._validtypesskip:
+            if not (n in self._validtypesskip and getattr(self, n) is None):
                 x(getattr(self, n))
 
 class Enum(object):
@@ -342,12 +342,23 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    def __init__(self, buffer):
-        self.buffer = buffer
+    _validtypesskip = ("buffer",)
+
+    def __init__(self, buffer=None):
+        if buffer is None:
+            self._buffer = None     # placeholder for auto-generated buffer
+        else:
+            self.buffer = buffer
+
+    def _valid(self, seen, only, shape, numbytes):
+        if self._buffer is None:
+            self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
+        self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
 
     @property
     def numpy_array(self):
-        return numpy.frombuffer(self.buffer, dtype=InterpretedBuffer.none.dtype)
+        self._topvalid()
+        return self._array
 
 ################################################# RawExternalBuffer
 
@@ -362,14 +373,34 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     numbytes      = typedproperty(_params["numbytes"])
     external_type = typedproperty(_params["external_type"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory):
-        self.pointer = pointer
-        self.numbytes = numbytes
+    _validtypesskip = ("pointer", "numbytes")
+
+    def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory):
+        if pointer is None and numbytes is None:
+            self._pointer = None    # placeholder for auto-generated buffer
+            self._numbytes = None
+        else:
+            self.pointer = pointer
+            self.numbytes = numbytes
         self.external_type = external_type
+
+    def _valid(self, seen, only, shape, numbytes):
+        if self._pointer is None or self._numbytes is None:
+            self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
+            self._pointer = self._buffer.ctypes.data
+            self._numbytes = self._buffer.nbytes
+        else:
+            self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+
+        if len(self._buffer) != numbytes:
+            raise ValueError("RawExternalBuffer.buffer length is {0} but it should be {1} bytes".format(len(self._buffer), numbytes))
+
+        self._array = self._buffer
 
     @property
     def numpy_array(self):
-        return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+        self._topvalid()
+        return self._buffer
 
 ################################################# InlineBuffer
 
@@ -405,7 +436,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     def _valid(self, seen, only, shape):
         if self._buffer is None:
-            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, 1), dtype=self.numpy_dtype).view(InterpretedBuffer.none.dtype)
+            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
 
         if self.filters is None:
             self._array = self._buffer
@@ -496,7 +527,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             self._array = self._array[start:stop:step]
 
         if len(self._array) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
-            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+            raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
 
         self._array = self._array.view(self.numpy_dtype).reshape(shape, order=self.dimension_order.dimension_order)
         return shape
@@ -1313,7 +1344,9 @@ class Page(Histos):
         self.buffer = buffer
 
     def _valid(self, seen, only, shape, column, numentries):
-        buf = self.buffer.numpy_array
+        self.buffer._valid(seen, only, shape, column.numpy_dtype.itemsize * numentries)
+        buf = self.buffer._array
+
         if column.filters is not None:
             raise NotImplementedError("handle column.filters")
 
