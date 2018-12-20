@@ -210,11 +210,17 @@ class Test(unittest.TestCase):
     def test_Statistics(self):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])
         assert h.isvalid
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])], column_statistics=[Statistics()])])])
+        assert h.isvalid
 
     def test_Correlations(self):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), axis_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])])
         assert h.isvalid
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1000))), axis_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1))), Correlations(0, 2, InterpretedInlineBuffer.fromarray(numpy.arange(1))), Correlations(1, 2, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)])), Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))], profile_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])])
+        assert h.isvalid
+        h = Collection("id", [Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])], column_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])])])
         assert h.isvalid
 
     def test_Profile(self):
@@ -290,6 +296,7 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
         h = Collection("id", [Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])])])
+        assert h.isvalid
         for arrays in h["id"].instances[0].numpy_arrays: pass
         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5], "two": [3]}
 

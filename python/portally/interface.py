@@ -1774,7 +1774,7 @@ class NtupleInstance(Portally):
         if self.column_correlations is not None:
             Correlations._validindexes(self.column_correlations, len(self._parent.columns))
             for x in self.column_correlations:
-                _valid(x, seen, only, shape)
+                _valid(x, seen, only, ())
 
         if self.functions is not None:
             for x in self.functions:
