@@ -64,9 +64,9 @@ from portally.interface import Extremes
 from portally.interface import Moments
 from portally.interface import Quantiles
 from portally.interface import GenericErrors
-from portally.interface import DistributionStats
+from portally.interface import Descriptive
 from portally.interface import Distribution
-from portally.interface import Profile
+from portally.interface import ProfileAxis
 from portally.interface import Histogram
 from portally.interface import ParameterizedFunction
 from portally.interface import EvaluatedFunction

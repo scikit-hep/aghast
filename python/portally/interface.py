@@ -53,9 +53,9 @@ import portally.portally_generated.Correlation
 import portally.portally_generated.Counts
 import portally.portally_generated.Decoration
 import portally.portally_generated.DecorationLanguage
+import portally.portally_generated.Descriptive
 import portally.portally_generated.DimensionOrder
 import portally.portally_generated.Distribution
-import portally.portally_generated.DistributionStats
 import portally.portally_generated.DType
 import portally.portally_generated.EdgesBinning
 import portally.portally_generated.Endianness
@@ -91,7 +91,7 @@ import portally.portally_generated.OverlappingFillStrategy
 import portally.portally_generated.Page
 import portally.portally_generated.Parameter
 import portally.portally_generated.ParameterizedFunction
-import portally.portally_generated.Profile
+import portally.portally_generated.ProfileAxis
 import portally.portally_generated.Quantiles
 import portally.portally_generated.RawBuffer
 import portally.portally_generated.RawExternalBuffer
@@ -1103,15 +1103,15 @@ class Extremes(Portally):
 
 class Moments(Portally):
     _params = {
-        "sumwn": portally.checktype.CheckClass("Moments", "sumwn", required=True, type=InterpretedBuffer),
-        "n":     portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
+        "sumwxn": portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
+        "n":      portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
         }
 
-    sumwn = typedproperty(_params["sumwn"])
-    n     = typedproperty(_params["n"])
+    sumwxn = typedproperty(_params["sumwxn"])
+    n      = typedproperty(_params["n"])
 
-    def __init__(self, sumwn, n):
-        self.sumwn = sumwn
+    def __init__(self, sumwxn, n):
+        self.sumwxn = sumwxn
         self.n = n
 
 ################################################# Quantiles
@@ -1144,28 +1144,31 @@ class GenericErrors(Portally):
         self.errors = errors
         self.p = p
 
-################################################# DistributionStats
+################################################# Descriptive
 
-class DistributionStats(Portally):
+class Descriptive(Portally):
     _params = {
-        "correlation":    portally.checktype.CheckClass("DistributionStats", "correlation", required=False, type=Correlation),
-        "extremes":       portally.checktype.CheckClass("DistributionStats", "extremes", required=False, type=Extremes),
-        "moments":        portally.checktype.CheckVector("DistributionStats", "moments", required=False, type=Moments),
-        "quantiles":      portally.checktype.CheckVector("DistributionStats", "quantiles", required=False, type=Quantiles),
-        "generic_errors": portally.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
+        "moments":        portally.checktype.CheckVector("Descriptive", "moments", required=False, type=Moments),
+        "correlation":    portally.checktype.CheckClass("Descriptive", "correlation", required=False, type=Correlation),
+        "extremes":       portally.checktype.CheckClass("Descriptive", "extremes", required=False, type=Extremes),
+        "quantiles":      portally.checktype.CheckVector("Descriptive", "quantiles", required=False, type=Quantiles),
+        "modes":          portally.checktype.CheckClass("Descriptive", "modes", required=False, type=InterpretedBuffer),
+        "generic_errors": portally.checktype.CheckVector("Descriptive", "generic_errors", required=False, type=GenericErrors),
         }
 
+    moments        = typedproperty(_params["moments"])
     correlation    = typedproperty(_params["correlation"])
     extremes       = typedproperty(_params["extremes"])
-    moments        = typedproperty(_params["moments"])
     quantiles      = typedproperty(_params["quantiles"])
+    modes          = typedproperty(_params["modes"])
     generic_errors = typedproperty(_params["generic_errors"])
 
-    def __init__(self, correlation=None, extremes=None, moments=None, quantiles=None, generic_errors=None):
+    def __init__(self, moments=None, correlation=None, extremes=None, quantiles=None, modes=None, generic_errors=None):
+        self.moments = moments
         self.correlation = correlation
         self.extremes = extremes
-        self.moments = moments
         self.quantiles = quantiles
+        self.modes = modes
         self.generic_errors = generic_errors
 
     def _valid(self, seen, only, shape):
@@ -1175,31 +1178,31 @@ class DistributionStats(Portally):
 
 class Distribution(Portally):
     _params = {
-        "counts": portally.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
-        "stats":  portally.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
+        "counts":      portally.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
+        "descriptive": portally.checktype.CheckClass("Distribution", "descriptive", required=False, type=Descriptive),
         }
 
-    counts = typedproperty(_params["counts"])
-    stats  = typedproperty(_params["stats"])
+    counts      = typedproperty(_params["counts"])
+    descriptive = typedproperty(_params["descriptive"])
 
-    def __init__(self, counts, stats=None):
+    def __init__(self, counts, descriptive=None):
         self.counts = counts
-        self.stats = stats
+        self.descriptive = descriptive
 
     def _valid(self, seen, only, shape):
         if only is None or id(self.counts) in only:
             _valid(self.counts, seen, only, shape)
-        if only is None or id(self.stats) in only:
-            _valid(self.stats, seen, only, shape)
+        if only is None or id(self.descriptive) in only:
+            _valid(self.descriptive, seen, only, shape)
 
-################################################# Profile
+################################################# ProfileAxis
 
-class Profile(Portally):
+class ProfileAxis(Portally):
     _params = {
-        "expression": portally.checktype.CheckString("Profile", "expression", required=True),
-        "title":      portally.checktype.CheckString("Profile", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
+        "expression": portally.checktype.CheckString("ProfileAxis", "expression", required=True),
+        "title":      portally.checktype.CheckString("ProfileAxis", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("ProfileAxis", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("ProfileAxis", "decoration", required=False, type=Decoration),
         }
 
     expression = typedproperty(_params["expression"])
@@ -1373,36 +1376,33 @@ class BinnedEvaluatedFunction(FunctionObject):
 
 class Histogram(Object):
     _params = {
-        "identifier":     portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
-        "axis":           portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "distribution":   portally.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
-        "unbinned_stats": portally.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
-        "profiles":       portally.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
-        "profile_stats":  portally.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
-        "functions":      portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
-        "title":          portally.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":       portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":     portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "identifier":   portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
+        "axis":         portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "distribution": portally.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
+        "profile_axis": portally.checktype.CheckVector("Histogram", "profile_axis", required=False, type=ProfileAxis),
+        "profile":      portally.checktype.CheckClass("Histogram", "profile", required=False, type=Descriptive),
+        "functions":    portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "title":        portally.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":     portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":   portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(_params["identifier"])
-    axis           = typedproperty(_params["axis"])
-    distribution   = typedproperty(_params["distribution"])
-    unbinned_stats = typedproperty(_params["unbinned_stats"])
-    profiles       = typedproperty(_params["profiles"])
-    profile_stats  = typedproperty(_params["profile_stats"])
-    functions      = typedproperty(_params["functions"])
-    title          = typedproperty(_params["title"])
-    metadata       = typedproperty(_params["metadata"])
-    decoration     = typedproperty(_params["decoration"])
+    identifier   = typedproperty(_params["identifier"])
+    axis         = typedproperty(_params["axis"])
+    distribution = typedproperty(_params["distribution"])
+    profile_axis = typedproperty(_params["profile_axis"])
+    profile      = typedproperty(_params["profile"])
+    functions    = typedproperty(_params["functions"])
+    title        = typedproperty(_params["title"])
+    metadata     = typedproperty(_params["metadata"])
+    decoration   = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, axis, distribution, unbinned_stats=None, profiles=None, profile_stats=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, distribution, profile_axis=None, profile=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.axis = axis
         self.distribution = distribution
-        self.profiles = profiles
-        self.unbinned_stats = unbinned_stats
-        self.profile_stats = profile_stats
+        self.profile_axis = profile_axis
+        self.profile = profile
         self.functions = functions
         self.title = title
         self.metadata = metadata
@@ -1415,12 +1415,9 @@ class Histogram(Object):
 
         if only is None or id(self.distribution) in only:
             _valid(self.distribution, seen, only, binshape)
-        if only is None or id(self.unbinned_stats) in only:
-            _valid(self.unbinned_stats, seen, only, binshape)
-        if only is None or id(self.profiles) in only:
-            _valid(self.profiles, seen, only, binshape)
-        if only is None or id(self.profile_stats) in only:
-            _valid(self.profile_stats, seen, only, binshape)
+            
+        if self.profile_axis is not None or self.profile is not None:
+            raise NotImplementedError
 
         if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
             raise ValueError("Histogram.functions keys must be unique")
@@ -1622,21 +1619,21 @@ class Column(Portally, Interpretation):
 
 class NtupleInstance(Portally):
     _params = {
-        "chunks":         portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":  portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
-        "unbinned_stats": portally.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
-        "functions":      portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "chunks":        portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
+        "chunk_offsets": portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
+        "descriptive":   portally.checktype.CheckVector("Ntuple", "descriptive", required=False, type=Descriptive),
+        "functions":     portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         }
 
-    chunks         = typedproperty(_params["chunks"])
-    chunk_offsets  = typedproperty(_params["chunk_offsets"])
-    unbinned_stats = typedproperty(_params["unbinned_stats"])
-    functions      = typedproperty(_params["functions"])
+    chunks        = typedproperty(_params["chunks"])
+    chunk_offsets = typedproperty(_params["chunk_offsets"])
+    descriptive   = typedproperty(_params["descriptive"])
+    functions     = typedproperty(_params["functions"])
 
-    def __init__(self, chunks, chunk_offsets=None, unbinned_stats=None, functions=None):
+    def __init__(self, chunks, chunk_offsets=None, descriptive=None, functions=None):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
-        self.unbinned_stats = unbinned_stats
+        self.descriptive = descriptive
         self.functions = functions
 
     def _valid(self, seen, only):
@@ -1663,8 +1660,8 @@ class NtupleInstance(Portally):
                     x._validtypes()
                     x._valid(seen, only, self._parent.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
-        if self.unbinned_stats is not None:
-            for x in self.unbinned_stats:
+        if self.descriptive is not None:
+            for x in self.descriptive:
                 if only is None or id(x) in only:
                     _valid(x, seen, only, ())
 

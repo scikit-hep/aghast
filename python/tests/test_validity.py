@@ -204,9 +204,10 @@ class Test(unittest.TestCase):
         pass
 
     def test_Distribution(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100)))), )])  # HERE
+        assert h.isvalid
 
-    def test_Profile(self):
+    def test_ProfileAxis(self):
         pass
 
     def test_Histogram(self):

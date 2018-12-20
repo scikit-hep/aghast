@@ -296,7 +296,7 @@ table Extremes {
 }
 
 table Moments {
-  sumwn: InterpretedBuffer (required);
+  sumwxn: InterpretedBuffer (required);
   n: int;
 }
 
@@ -310,20 +310,21 @@ table GenericErrors {
   p: double = 0.6826894921370859;    // +1 sigma
 }
 
-table DistributionStats {
+table Descriptive {
+  moments: [Moments];
   correlation: Correlation;
   extremes: Extremes;
-  moments: [Moments];
   quantiles: [Quantiles];
+  modes: InterpretedBuffer;
   generic_errors: [GenericErrors];
 }
 
 table Distribution {
   counts: Counts (required);
-  stats: DistributionStats;
+  descriptive: Descriptive;
 }
 
-table Profile {
+table ProfileAxis {
   expression: string (required);
   title: string;
   metadata: Metadata;
@@ -381,9 +382,8 @@ table FunctionObject {
 table Histogram {
   axis: [Axis] (required);
   distribution: Distribution (required);
-  unbinned_stats: [DistributionStats];
-  profiles: [Profile];
-  profile_stats: [DistributionStats];
+  profile_axis: [ProfileAxis];
+  profile: Descriptive;
   functions: [Function];
 }
 
@@ -418,7 +418,7 @@ table Column {
 table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
-  unbinned_stats: [DistributionStats];
+  descriptive: [Descriptive];
   functions: [FunctionObject];
 }
 
