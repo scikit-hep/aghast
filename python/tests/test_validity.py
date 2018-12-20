@@ -234,11 +234,13 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_Parameter(self):
-        h = Collection("id", [ParameterizedFunction("id", "x**2", [Parameter("x", 5), Parameter("y", 6)])])
+        h = Collection("id", [ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])])
         assert h.isvalid
 
     def test_ParameterizedFunction(self):
-        h = Collection("id", [ParameterizedFunction("id", "x**2", [])])
+        h = Collection("id", [ParameterizedFunction("id", "x**2")])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])])])
         assert h.isvalid
 
     def test_EvaluatedFunction(self):

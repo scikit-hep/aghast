@@ -1324,17 +1324,22 @@ class WeightedCounts(Counts):
 class Parameter(Portally):
     _params = {
         "identifier": portally.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
-        "value":      portally.checktype.CheckNumber("Parameter", "value", required=True),
+        "values":     portally.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
         }
 
     identifier = typedproperty(_params["identifier"])
-    value      = typedproperty(_params["value"])
+    values     = typedproperty(_params["values"])
 
-    def __init__(self, identifier, value):
+    def __init__(self, identifier, values):
         self.identifier = identifier
-        self.value = value
+        self.values = values
 
     def _valid(self, seen, only, shape):
+        if shape == ():
+            parshape = (1,)
+        else:
+            parshape = shape
+        _valid(self.values, seen, only, parshape)
         return shape
 
 ################################################# Function
@@ -1361,7 +1366,7 @@ class ParameterizedFunction(Function, FunctionObject):
     _params = {
         "identifier": portally.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": portally.checktype.CheckString("ParameterizedFunction", "expression", required=True),
-        "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
+        "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
         "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
         "metadata":   portally.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
@@ -1374,7 +1379,7 @@ class ParameterizedFunction(Function, FunctionObject):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, expression, parameters, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, expression, parameters=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.expression = expression
         self.parameters = parameters
@@ -1383,11 +1388,11 @@ class ParameterizedFunction(Function, FunctionObject):
         self.decoration = decoration
 
     def _valid(self, seen, only, shape):
-        if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
-            raise ValueError("ParameterizedFunction.parameters keys must be unique")
-
-        for x in self.parameters:
-            _valid(x, seen, only, shape)
+        if self.parameters is not None:
+            if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
+                raise ValueError("ParameterizedFunction.parameters keys must be unique")
+            for x in self.parameters:
+                _valid(x, seen, only, shape)
 
         return shape
 
