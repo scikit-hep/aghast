@@ -265,8 +265,8 @@ table UnweightedCounts {
 
 table WeightedCounts {
   sumw: InterpretedBuffer (required);
-  sumw2: InterpretedBuffer (required);
-  counts: UnweightedCounts;               // optional
+  sumw2: InterpretedBuffer;               // optional
+  unweighted: UnweightedCounts;           // optional
 }
 
 union Counts {

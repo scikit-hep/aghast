@@ -1013,7 +1013,7 @@ class Counts(Portally):
 
 class UnweightedCounts(Counts):
     _params = {
-        "counts":  portally.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
+        "counts": portally.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
     counts = typedproperty(_params["counts"])
@@ -1029,22 +1029,27 @@ class UnweightedCounts(Counts):
 
 class WeightedCounts(Counts):
     _params = {
-        "sumw":   portally.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
-        "sumw2":  portally.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
-        "counts": portally.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
+        "sumw":       portally.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
+        "sumw2":      portally.checktype.CheckClass("WeightedCounts", "sumw2", required=False, type=InterpretedBuffer),
+        "unweighted": portally.checktype.CheckClass("WeightedCounts", "unweighted", required=False, type=UnweightedCounts),
         }
 
-    sumw   = typedproperty(_params["sumw"])
-    sumw2  = typedproperty(_params["sumw2"])
-    counts = typedproperty(_params["counts"])
+    sumw       = typedproperty(_params["sumw"])
+    sumw2      = typedproperty(_params["sumw2"])
+    unweighted = typedproperty(_params["unweighted"])
 
-    def __init__(self, sumw, sumw2, counts=None):
+    def __init__(self, sumw, sumw2=None, unweighted=None):
         self.sumw = sumw
         self.sumw2 = sumw2
-        self.counts = counts
+        self.unweighted = unweighted
 
     def _valid(self, seen, only, shape):
-        HERE
+        if only is None or id(self.sumw) in only:
+            _valid(self.sumw, seen, only, shape)
+        if only is None or id(self.sumw2) in only:
+            _valid(self.sumw2, seen, only, shape)
+        if only is None or id(self.unweighted) in only:
+            _valid(self.unweighted, seen, only, shape)
 
 ################################################# Correlation
 
