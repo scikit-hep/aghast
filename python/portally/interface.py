@@ -63,7 +63,8 @@ import portally.portally_generated.EvaluatedFunction
 import portally.portally_generated.ExternalType
 import portally.portally_generated.Extremes
 import portally.portally_generated.Filter
-import portally.portally_generated.FractionalErrorMethod
+import portally.portally_generated.FractionErrorMethod
+import portally.portally_generated.FractionLayout
 import portally.portally_generated.FractionBinning
 import portally.portally_generated.Function
 import portally.portally_generated.FunctionData
@@ -592,30 +593,6 @@ class Binning(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-################################################# FractionalBinning
-
-class FractionalBinning(Binning):
-    normal           = Enum("normal", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
-    clopper_pearson  = Enum("clopper_pearson", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_clopper_pearson)
-    wilson           = Enum("wilson", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_wilson)
-    agresti_coull    = Enum("agresti_coull", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_agresti_coull)
-    feldman_cousins  = Enum("feldman_cousins", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_feldman_cousins)
-    jeffrey          = Enum("jeffrey", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
-    bayesian_uniform = Enum("bayesian_uniform", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
-    error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
-
-    _params = {
-        "error_method": portally.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
-        }
-
-    error_method = typedproperty(_params["error_method"])
-
-    def __init__(self, error_method=normal):
-        self.error_method = error_method
-
-    def _valid(self, seen, only, shape):
-        return shape
-
 ################################################# BinPosition
 
 class BinPosition(object):
@@ -975,6 +952,41 @@ class SparseRegularBinning(Binning, BinPosition):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
+
+################################################# FractionBinning
+
+class FractionBinning(Binning):
+    passall = Enum("passall", portally.portally_generated.FractionLayout.FractionLayout.frac_passall)
+    failall = Enum("failall", portally.portally_generated.FractionLayout.FractionLayout.frac_failall)
+    passfail = Enum("passfail", portally.portally_generated.FractionLayout.FractionLayout.frac_passfail)
+    layouts = [passall, failall, passfail]
+
+    normal           = Enum("normal", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
+    clopper_pearson  = Enum("clopper_pearson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
+    wilson           = Enum("wilson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
+    agresti_coull    = Enum("agresti_coull", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
+    feldman_cousins  = Enum("feldman_cousins", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
+    jeffrey          = Enum("jeffrey", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
+    bayesian_uniform = Enum("bayesian_uniform", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
+    error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
+
+    _params = {
+        "layout": portally.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
+        "layout_reversed": portally.checktype.CheckBool("FractionBinning", "layout_reversed", required=False),
+        "error_method": portally.checktype.CheckEnum("FractionBinning", "error_method", required=False, choices=error_methods),
+        }
+
+    layout          = typedproperty(_params["layout"])
+    layout_reversed = typedproperty(_params["layout_reversed"])
+    error_method    = typedproperty(_params["error_method"])
+
+    def __init__(self, layout=passall, layout_reversed=False, error_method=normal):
+        self.layout = layout
+        self.layout_reversed = layout_reversed
+        self.error_method = error_method
+
+    def _valid(self, seen, only, shape):
+        return (2,)
 
 ################################################# Axis
 

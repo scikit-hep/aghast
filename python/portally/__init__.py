@@ -44,7 +44,6 @@ from portally.interface import RawExternalBuffer
 from portally.interface import InterpretedInlineBuffer
 from portally.interface import InterpretedExternalBuffer
 from portally.interface import Binning
-from portally.interface import FractionalBinning
 from portally.interface import IntegerBinning
 from portally.interface import RealInterval
 from portally.interface import RealOverflow
@@ -55,6 +54,7 @@ from portally.interface import EdgesBinning
 from portally.interface import IrregularBinning
 from portally.interface import CategoryBinning
 from portally.interface import SparseRegularBinning
+from portally.interface import FractionBinning
 from portally.interface import Axis
 from portally.interface import Counts
 from portally.interface import UnweightedCounts

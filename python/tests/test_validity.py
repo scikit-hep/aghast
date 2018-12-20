@@ -80,11 +80,6 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [3.14]
 
-    def test_FractionalBinning(self):
-        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(FractionalBinning())], InterpretedInlineBuffer())])
-        assert h.isvalid
-        assert h["id"].axis[0].binning.error_method == FractionalBinning.normal
-
     def test_IntegerBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer())])
         assert h.isvalid
@@ -168,6 +163,11 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, pos_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
+    def test_FractionalBinning(self):
+        h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(FractionBinning())], InterpretedInlineBuffer())])
+        assert h.isvalid
+        assert h["id"].axis[0].binning.error_method == FractionBinning.normal
+
     def test_Axis(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer())])
         assert h.isvalid
@@ -185,6 +185,9 @@ class Test(unittest.TestCase):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
         assert h.isvalid
 
+    def test_DescriptiveFilter(self):
+        pass
+
     def test_Moments(self):
         pass
 
@@ -194,7 +197,7 @@ class Test(unittest.TestCase):
     def test_Quantiles(self):
         pass
 
-    def test_GenericErrors(self):
+    def test_Modes(self):
         pass
 
     def test_Descriptive(self):

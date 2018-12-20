@@ -118,20 +118,6 @@ union InterpretedBuffer {
   InterpretedExternalBuffer
 }
 
-enum FractionalErrorMethod: byte {
-  frac_normal = 0,
-  frac_clopper_pearson = 1,
-  frac_wilson = 2,
-  frac_agresti_coull = 3,
-  frac_feldman_cousins = 4,
-  frac_jeffrey = 5,
-  frac_bayesian_uniform = 6
-}
-
-table FractionBinning {
-  error_method: FractionalErrorMethod = frac_normal;
-}
-
 enum BinPosition: int8 {
   pos_below3 = -3,
   pos_below2 = -2,
@@ -239,8 +225,29 @@ table SparseRegularBinning {
   pos_nanflow: BinPosition = pos_nonexistent;
 }
 
+enum FractionLayout: byte {
+  frac_passall = 0,
+  frac_failall = 1,
+  frac_passfail = 2
+}
+
+enum FractionErrorMethod: byte {
+  frac_normal = 0,
+  frac_clopper_pearson = 1,
+  frac_wilson = 2,
+  frac_agresti_coull = 3,
+  frac_feldman_cousins = 4,
+  frac_jeffrey = 5,
+  frac_bayesian_uniform = 6
+}
+
+table FractionBinning {
+  layout: FractionLayout = frac_passall;
+  layout_reversed: bool = false;
+  error_method: FractionErrorMethod = frac_normal;
+}
+
 union Binning {
-  FractionBinning,
   IntegerBinning,
   RegularBinning,
   TicTacToeOverflowBinning,
@@ -248,11 +255,12 @@ union Binning {
   EdgesBinning,
   IrregularBinning,
   CategoryBinning,
-  SparseRegularBinning
+  SparseRegularBinning,
+  FractionBinning
 }
 
 table Axis {
-  binning: Binning;      // note: no binning is allowed
+  binning: Binning;      // note: it's allowed to have no binning
   expression: string;
   title: string;
   metadata: Metadata;
