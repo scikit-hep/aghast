@@ -147,12 +147,15 @@ def _valid(obj, seen, only, shape):
     if obj is None:
         return shape
     else:
-        if id(obj) in seen:
-            raise ValueError("hierarchy is recursively nested")
-        seen.add(id(obj))
-        obj._validtypes()
-        return obj._valid(seen, only, shape)
-
+        if only is None or id(obj) in only:
+            if id(obj) in seen:
+                raise ValueError("hierarchy is recursively nested")
+            seen.add(id(obj))
+            obj._validtypes()
+            return obj._valid(seen, only, shape)
+        else:
+            return shape
+        
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
     if not hasattr(self, lookup):
@@ -679,8 +682,10 @@ class RealInterval(Portally):
     def _valid(self, seen, only, shape):
         if self.low > self.high:
             raise ValueError("RealInterval.low ({0}) must be less than or equal to RealInterval.high ({1})".format(self.low, self.high))
+
         if self.low == self.high and not self.low_inclusive and not self.high_inclusive:
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
+
         return shape
 
 ################################################# RealOverflow
@@ -719,8 +724,10 @@ class RealOverflow(Portally, BinPosition):
     def _valid(self, seen, only, shape):
         if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
             raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_overflow must not be equal unless they are both nonexistent")
+
         if self.pos_underflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_underflow == self.pos_nanflow:
             raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
+
         if self.pos_overflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_overflow == self.pos_nanflow:
             raise ValueError("RealOverflow.pos_overflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
 
@@ -750,14 +757,18 @@ class RegularBinning(Binning):
     def _valid(self, seen, only, shape):
         if only is None or id(self.interval) in only:
             _valid(self.interval, seen, only, shape)
-        if math.isinf(self.interval.low) or math.isnan(self.interval.low):
+
+        if math.isinf(self.interval.low):
             raise ValueError("RegularBinning.interval.low must be finite")
-        if math.isinf(self.interval.high) or math.isnan(self.interval.high):
+
+        if math.isinf(self.interval.high):
             raise ValueError("RegularBinning.interval.high must be finite")
+
         if self.overflow is None:
             overflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
-            overflowdims, = _valid(self.overflow, seen, only, shape)
+            overflowdims, = _valid(self.overflow, seen, None, shape)
+
         return (self.num + overflowdims,)
 
 ################################################# TicTacToeOverflowBinning
@@ -789,17 +800,17 @@ class TicTacToeOverflowBinning(Binning):
 
     def _valid(self, seen, only, shape):
         if only is None or id(self.xinterval) in only:
-            _valid(self.xinterval, seen, only, shape)
+            _valid(self.xinterval, seen, None, shape)
         if only is None or id(self.yinterval) in only:
-            _valid(self.yinterval, seen, only, shape)
+            _valid(self.yinterval, seen, None, shape)
         if self.xoverflow is None:
             xoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
-            xoverflowdims, = _valid(self.xoverflow, seen, only, shape)
+            xoverflowdims, = _valid(self.xoverflow, seen, None, shape)
         if self.yoverflow is None:
             yoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
-            yoverflowdims, = _valid(self.yoverflow, seen, only, shape)
+            yoverflowdims, = _valid(self.yoverflow, seen, None, shape)
 
         return (self.xnum + xoverflowdims, self.ynum + yoverflowdims)
         
@@ -855,11 +866,11 @@ class HexagonalBinning(Binning):
         if self.qoverflow is None:
             qoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
-            qoverflowdims, = _valid(self.qoverflow, seen, only, shape)
+            qoverflowdims, = _valid(self.qoverflow, seen, None, shape)
         if self.roverflow is None:
             roverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
-            roverflowdims, = _valid(self.roverflow, seen, only, shape)
+            roverflowdims, = _valid(self.roverflow, seen, None, shape)
         return (qnum + qoverflowdims, rnum + roverflowdims)
 
 ################################################# EdgesBinning
@@ -878,14 +889,14 @@ class EdgesBinning(Binning):
         self.overflow = overflow
 
     def _valid(self, seen, only, shape):
-        if any(math.isinf(x) or math.isnan(x) for x in self.edges):
+        if numpy.isinf(self.edges).any():
             raise ValueError("EdgesBinning.edges must all be finite")
         if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
             raise ValueError("EdgesBinning.edges must be strictly increasing")
         if self.overflow is None:
             numoverflow, = RealOverflow()._valid(set(), None, shape)
         else:
-            numoverflow, = _valid(self.overflow, seen, only, shape)
+            numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.edges) - 1 + numoverflow,)
 
 ################################################# EdgesBinning
@@ -918,7 +929,7 @@ class IrregularBinning(Binning):
         if self.overflow is None:
             numoverflow, = RealOverflow()._valid(set(), None, shape)
         else:
-            numoverflow, = _valid(self.overflow, seen, only, shape)
+            numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.intervals) + numoverflow,)
 
 ################################################# CategoryBinning
@@ -939,6 +950,7 @@ class CategoryBinning(Binning, BinPosition):
     def _valid(self, seen, only, shape):
         if len(self.categories) != len(set(self.categories)):
             raise ValueError("SparseRegularBinning.bins must be unique")
+
         return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# SparseRegularBinning
@@ -965,6 +977,7 @@ class SparseRegularBinning(Binning, BinPosition):
     def _valid(self, seen, only, shape):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
+
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
 
 ################################################# Axis
@@ -995,11 +1008,14 @@ class Axis(Portally):
         if self.binning is None:
             binshape = (1,)
         else:
-            binshape = _valid(self.binning, seen, only, shape)
+            binshape = _valid(self.binning, seen, None, shape)
+
         if only is None or id(self.metadata) in only:
             _valid(self.metadata, seen, only, shape)
+
         if only is None or id(self.decoration) in only:
             _valid(self.decoration, seen, only, shape)
+
         return binshape
 
 ################################################# Counts
@@ -1346,7 +1362,7 @@ class BinnedEvaluatedFunction(FunctionObject):
     def _valid(self, seen, only, shape):
         binshape = shape
         for x in self.axis:
-            binshape = binshape + _valid(x, seen, only, shape)
+            binshape = binshape + _valid(x, seen, None, shape)
 
         if only is None or id(self.values) in only:
             _valid(self.values, seen, only, binshape)
@@ -1407,7 +1423,7 @@ class Histogram(Object):
     def _valid(self, seen, only, shape):
         binshape = shape
         for x in self.axis:
-            binshape = binshape + _valid(x, seen, only, shape)
+            binshape = binshape + _valid(x, seen, None, shape)
 
         if only is None or id(self.counts) in only:
             _valid(self.counts, seen, only, binshape)
@@ -1449,7 +1465,7 @@ class Page(Portally):
         self.buffer = buffer
 
     def _valid(self, seen, only, column, numentries):
-        self.buffer._valid(seen, only, column.numpy_dtype.itemsize * numentries)
+        self.buffer._valid(seen, None, column.numpy_dtype.itemsize * numentries)
         buf = self.buffer._array
 
         if column.filters is not None:

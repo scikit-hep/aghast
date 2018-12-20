@@ -86,7 +86,7 @@ class CheckNumber(Check):
         super(CheckNumber, self).__call__(obj)
         if obj is None:
             return obj
-        elif not isinstance(obj, (numbers.Real, numpy.floating, numpy.integer)):
+        elif not isinstance(obj, (numbers.Real, numpy.floating, numpy.integer)) or numpy.isnan(obj):
             raise TypeError("{0}.{1} must be a number, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
         elif self.min_inclusive and not self.min <= obj:
             raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.min, repr(obj)))
