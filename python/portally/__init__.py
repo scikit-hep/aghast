@@ -40,7 +40,7 @@ from portally.interface import Extremes
 from portally.interface import Quantiles
 from portally.interface import Modes
 from portally.interface import Statistics
-from portally.interface import Correlation
+from portally.interface import Correlations
 from portally.interface import IntegerBinning
 from portally.interface import RealInterval
 from portally.interface import RealOverflow

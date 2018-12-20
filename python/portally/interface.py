@@ -60,7 +60,7 @@ import portally.portally_generated.Extremes
 import portally.portally_generated.Quantiles
 import portally.portally_generated.Modes
 import portally.portally_generated.Statistics
-import portally.portally_generated.Correlation
+import portally.portally_generated.Correlations
 import portally.portally_generated.BinPosition
 import portally.portally_generated.IntegerBinning
 import portally.portally_generated.RealInterval
@@ -743,32 +743,44 @@ class Statistics(Portally):
 
         return shape
         
-################################################# Correlation
+################################################# Correlations
 
-class Correlation(Portally):
+class Correlations(Portally):
     _params = {
-        "sumwxy": portally.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "xindex": portally.checktype.CheckInteger("Correlations", "xindex", required=True, min=0),
+        "yindex": portally.checktype.CheckInteger("Correlations", "yindex", required=True, min=0),
+        "sumwxy": portally.checktype.CheckClass("Correlations", "sumwxy", required=True, type=InterpretedBuffer),
         "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
+    xindex = typedproperty(_params["xindex"])
+    yindex = typedproperty(_params["yindex"])
     sumwxy = typedproperty(_params["sumwxy"])
     filter = typedproperty(_params["filter"])
 
-    def __init__(self, sumwxy, filter=None):
+    def __init__(self, xindex, yindex, sumwxy, filter=None):
+        self.xindex = xindex
+        self.yindex = yindex
         self.sumwxy = sumwxy
         self.filter = filter
 
-    def _valid(self, seen, only, shape, numvar):
+    def _valid(self, seen, only, shape):
         if shape == ():
             corrshape = (1,)
         else:
             corrshape = shape
-
-        if numvar < 2:
-            raise ValueError("Correlation cannot be provided for less than two axis/columns")
-
-        _valid(self.sumwxy, seen, only, corrshape + (numvar * (numvar - 1) // 2,))
+        _valid(self.sumwxy, seen, only, corrshape)
         return shape
+
+    @staticmethod
+    def _validindexes(correlations, numvars):
+        pairs = [(x.xindex, x.yindex) for x in correlations]
+        if len(set(pairs)) != len(pairs):
+            raise ValueError("Correlations.xindex, yindex pairs must be unique")
+        if any(x.xindex >= numvars for x in correlations):
+            raise ValueError("Correlations.xindex must all be less than the number of axis or column variables {}".format(numvars))
+        if any(x.yindex >= numvars for x in correlations):
+            raise ValueError("Correlations.yindex must all be less than the number of axis or column variables {}".format(numvars))
 
 ################################################# Binning
 
@@ -1464,36 +1476,36 @@ class BinnedEvaluatedFunction(FunctionObject):
 
 class Histogram(Object):
     _params = {
-        "identifier":          portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
-        "axis":                portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "counts":              portally.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
-        "profile":             portally.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
-        "axis_correlation":    portally.checktype.CheckClass("Histogram", "axis_correlation", required=False, type=Correlation),
-        "profile_correlation": portally.checktype.CheckClass("Histogram", "profile_correlation", required=False, type=Correlation),
-        "functions":           portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
-        "title":               portally.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":            portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":          portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "identifier":           portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
+        "axis":                 portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "counts":               portally.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
+        "profile":              portally.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
+        "axis_correlations":    portally.checktype.CheckVector("Histogram", "axis_correlations", required=False, type=Correlations),
+        "profile_correlations": portally.checktype.CheckVector("Histogram", "profile_correlations", required=False, type=Correlations),
+        "functions":            portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "title":                portally.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":             portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":           portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
 
-    identifier          = typedproperty(_params["identifier"])
-    axis                = typedproperty(_params["axis"])
-    counts              = typedproperty(_params["counts"])
-    profile             = typedproperty(_params["profile"])
-    axis_correlation    = typedproperty(_params["axis_correlation"])
-    profile_correlation = typedproperty(_params["profile_correlation"])
-    functions           = typedproperty(_params["functions"])
-    title               = typedproperty(_params["title"])
-    metadata            = typedproperty(_params["metadata"])
-    decoration          = typedproperty(_params["decoration"])
+    identifier           = typedproperty(_params["identifier"])
+    axis                 = typedproperty(_params["axis"])
+    counts               = typedproperty(_params["counts"])
+    profile              = typedproperty(_params["profile"])
+    axis_correlations    = typedproperty(_params["axis_correlations"])
+    profile_correlations = typedproperty(_params["profile_correlations"])
+    functions            = typedproperty(_params["functions"])
+    title                = typedproperty(_params["title"])
+    metadata             = typedproperty(_params["metadata"])
+    decoration           = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, axis, counts, profile=None, axis_correlation=None, profile_correlation=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.axis = axis
         self.counts = counts
         self.profile = profile
-        self.axis_correlation = axis_correlation
-        self.profile_correlation = profile_correlation
+        self.axis_correlations = axis_correlations
+        self.profile_correlations = profile_correlations
         self.functions = functions
         self.title = title
         self.metadata = metadata
@@ -1506,16 +1518,22 @@ class Histogram(Object):
 
         _valid(self.counts, seen, only, binshape)
 
-        if self.axis_correlation is not None:
-            _valid(self.axis_correlation, seen, only, shape, len(binshape) - len(shape))
+        if self.axis_correlations is not None:
+            Correlations._validindexes(self.axis_correlations, len(binshape) - len(shape))
+            for x in self.axis_correlations:
+                _valid(x, seen, only, shape)
 
         if self.profile is not None:
+            numprofile = len(self.profile)
             for x in self.profile:
                 _valid(x, seen, only, binshape)
-            _valid(self.profile_correlation, seen, only, binshape, len(self.profile))
         else:
-            if self.profile_correlation is not None:
-                raise ValueError("Histogram.profile_correlation cannot be provided without Histogram.profile")
+            numprofile = 0
+
+        if self.profile_correlations is not None:
+            Correlations._validindexes(self.profile_correlations, numprofile)
+            for x in self.profile_correlations:
+                _valid(x, seen, only, shape)
 
         if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
             raise ValueError("Histogram.functions keys must be unique")
@@ -1705,24 +1723,24 @@ class Column(Portally, Interpretation):
 
 class NtupleInstance(Portally):
     _params = {
-        "chunks":             portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":      portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
-        "column_statistics":  portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
-        "column_correlation": portally.checktype.CheckVector("Ntuple", "column_correlation", required=False, type=Correlation),
-        "functions":          portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "chunks":              portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
+        "chunk_offsets":       portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
+        "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "column_correlations": portally.checktype.CheckVector("Ntuple", "column_correlations", required=False, type=Correlations),
+        "functions":           portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         }
 
-    chunks             = typedproperty(_params["chunks"])
-    chunk_offsets      = typedproperty(_params["chunk_offsets"])
-    column_statistics  = typedproperty(_params["column_statistics"])
-    column_correlation = typedproperty(_params["column_correlation"])
-    functions          = typedproperty(_params["functions"])
+    chunks              = typedproperty(_params["chunks"])
+    chunk_offsets       = typedproperty(_params["chunk_offsets"])
+    column_statistics   = typedproperty(_params["column_statistics"])
+    column_correlations = typedproperty(_params["column_correlations"])
+    functions           = typedproperty(_params["functions"])
 
-    def __init__(self, chunks, chunk_offsets=None, column_statistics=None, column_correlation=None, functions=None):
+    def __init__(self, chunks, chunk_offsets=None, column_statistics=None, column_correlations=None, functions=None):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
         self.column_statistics = column_statistics
-        self.column_correlation = column_correlation
+        self.column_correlations = column_correlations
         self.functions = functions
 
     def _valid(self, seen, only):
@@ -1752,10 +1770,11 @@ class NtupleInstance(Portally):
         if self.column_statistics is not None:
             for x in self.column_statistics:
                 _valid(x, seen, only, ())
-            _valid(self.column_correlation, seen, only, (), len(self._parent.columns))
-        else:
-            if self.column_correlation is not None:
-                raise ValueError("NtupleInstance.column_correlation cannot be provided without NtupleInstance.column_statistics")
+
+        if self.column_correlations is not None:
+            Correlations._validindexes(self.column_correlations, len(self._parent.columns))
+            for x in self.column_correlations:
+                _valid(x, seen, only, shape)
 
         if self.functions is not None:
             for x in self.functions:

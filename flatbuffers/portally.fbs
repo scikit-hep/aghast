@@ -158,8 +158,10 @@ table Statistics {
   maxima: Extremes;
 }
 
-table Correlation {
-  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
+table Correlations {
+  xindex: int;
+  yindex: int;
+  sumwxy: InterpretedBuffer (required);   // one of the N*(N-1) elements
   filter: StatisticFilter;
 }
 
@@ -394,8 +396,8 @@ table Histogram {
   axis: [Axis] (required);
   counts: Counts (required);
   profile: [Profile];
-  axis_correlation: Correlation;
-  profile_correlation: Correlation;
+  axis_correlations: [Correlations];
+  profile_correlations: [Correlations];
   functions: [Function];
 }
 
@@ -431,7 +433,7 @@ table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
   column_statistics: [Statistics];
-  column_correlation: Correlation;
+  column_correlations: Correlations;
   functions: [FunctionObject];
 }
 
