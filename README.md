@@ -1,2 +1,3 @@
-# histos
-A memory/RPC format for sharing collections of histograms
+# portally
+
+Portable "tallies," nested collections of counts, sums, histograms, profiles, and ntuples.
