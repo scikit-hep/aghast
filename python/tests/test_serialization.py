@@ -30,7 +30,7 @@
 
 import unittest
 
-from histos import *
+from portally import *
 
 class Test(unittest.TestCase):
     def runTest(self):
