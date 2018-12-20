@@ -238,7 +238,7 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_ParameterizedFunction(self):
-        h = Collection("id", [ParameterizedFunction("id", "x**2", [], contours=[1.1, 2.2, 3.3])])
+        h = Collection("id", [ParameterizedFunction("id", "x**2", [])])
         assert h.isvalid
 
     def test_EvaluatedFunction(self):

@@ -354,7 +354,6 @@ table Parameter {
 table ParameterizedFunction {
   expression: string (required);
   parameters: [Parameter] (required);
-  contours: [double];
 }
 
 table EvaluatedFunction {
@@ -363,9 +362,12 @@ table EvaluatedFunction {
   errors: [Quantiles];
 }
 
+// FIXME: ContourFunction? Has to specify its own number of points because it can't be determined by position
+
 union FunctionData {
   ParameterizedFunction,
   EvaluatedFunction
+  // ContourFunction
 }
 
 table Function {
@@ -384,6 +386,7 @@ table BinnedEvaluatedFunction {
 union FunctionObjectData {
   ParameterizedFunction,
   BinnedEvaluatedFunction
+  // ContourFunction
 }
 
 table FunctionObject {

@@ -1362,7 +1362,6 @@ class ParameterizedFunction(Function, FunctionObject):
         "identifier": portally.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": portally.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
-        "contours":   portally.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
         "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
         "metadata":   portally.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
@@ -1371,16 +1370,14 @@ class ParameterizedFunction(Function, FunctionObject):
     identifier = typedproperty(_params["identifier"])
     expression = typedproperty(_params["expression"])
     parameters = typedproperty(_params["parameters"])
-    contours   = typedproperty(_params["contours"])
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, expression, parameters, contours=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, expression, parameters, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.expression = expression
         self.parameters = parameters
-        self.contours = contours
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1391,10 +1388,6 @@ class ParameterizedFunction(Function, FunctionObject):
 
         for x in self.parameters:
             _valid(x, seen, only, shape)
-
-        if self.contours is not None:
-            if len(self.contours) != len(numpy.unique(self.contours)):
-                raise ValueError("ParameterizedFunction.contours must be unique")
 
         return shape
 
@@ -1476,7 +1469,9 @@ class BinnedEvaluatedFunction(FunctionObject):
 
         _valid(self.values, seen, only, binshape)
         _valid(self.derivatives, seen, only, binshape)
-        _valid(self.errors, seen, only, binshape)
+        if self.errors is not None:
+            for x in self.errors:
+                _valid(x, seen, only, binshape)
 
         return shape
 
