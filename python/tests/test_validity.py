@@ -189,7 +189,8 @@ class Test(unittest.TestCase):
         pass
 
     def test_Moments(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
 
     def test_Extremes(self):
         pass

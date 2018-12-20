@@ -626,6 +626,9 @@ class Moments(Portally):
         self.n = n
         self.filter = filter
 
+    def _valid(self, seen, only, shape):
+        return _valid(self.sumwxn, seen, only, shape)
+
 ################################################# Extremes
 
 class Extremes(Portally):
@@ -699,17 +702,22 @@ class Statistics(Portally):
         self.maxima = maxima
 
     def _valid(self, seen, only, shape):
+        if shape == ():
+            momentshape = (1,)
+        else:
+            momentshape = shape
+
         if self.moments is not None:
             for x in self.moments:
-                _valid(x, seen, only, shape)
+                _valid(x, seen, only, momentshape)
 
         if self.quantiles is not None:
             for x in self.quantiles:
-                _valid(x, seen, only, shape)
+                _valid(x, seen, only, momentshape)
 
-        _valid(self.modes, seen, only, shape)
-        _valid(self.minima, seen, only, shape)
-        _valid(self.maxima, seen, only, shape)
+        _valid(self.modes, seen, only, momentshape)
+        _valid(self.minima, seen, only, momentshape)
+        _valid(self.maxima, seen, only, momentshape)
 
         return shape
         
@@ -1188,6 +1196,8 @@ class Axis(Portally):
             binshape = (1,)
         else:
             binshape = _valid(self.binning, seen, None, shape)
+
+        _valid(self.statistics, seen, only, shape)
 
         _valid(self.metadata, seen, only, shape)
         _valid(self.decoration, seen, only, shape)
