@@ -186,20 +186,26 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_StatisticFilter(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1, filter=StatisticFilter(excludes_nan=False))]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
 
     def test_Moments(self):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
         assert h.isvalid
 
     def test_Extremes(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), maxima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
 
     def test_Quantiles(self):
-        pass
-
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
+        
     def test_Modes(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(modes=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
+        assert h.isvalid
 
     def test_Statistics(self):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])

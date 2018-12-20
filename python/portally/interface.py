@@ -191,6 +191,9 @@ class Portally(object):
             if not (n in self._validtypesskip and getattr(self, n) is None):
                 x(getattr(self, n))
 
+    def _valid(self, seen, only, shape):
+        raise NotImplementedError("missing _valid implementation")
+
 class Enum(object):
     def __init__(self, name, value):
         self.name = name
@@ -644,6 +647,9 @@ class Extremes(Portally):
         self.values = values
         self.filter = filter
 
+    def _valid(self, seen, only, shape):
+        return _valid(self.values, seen, only, shape)
+
 ################################################# Quantiles
 
 class Quantiles(Portally):
@@ -662,6 +668,9 @@ class Quantiles(Portally):
         self.p = p
         self.filter = filter
 
+    def _valid(self, seen, only, shape):
+        return _valid(self.values, seen, only, shape)
+
 ################################################# Modes
 
 class Modes(Portally):
@@ -676,6 +685,9 @@ class Modes(Portally):
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
+
+    def _valid(self, seen, only, shape):
+        return _valid(self.values, seen, only, shape)
 
 ################################################# Statistics
 
@@ -1199,9 +1211,6 @@ class Axis(Portally):
 
         _valid(self.statistics, seen, only, shape)
 
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
-
         return binshape
 
 ################################################# Profile
@@ -1422,8 +1431,6 @@ class BinnedEvaluatedFunction(FunctionObject):
         _valid(self.values, seen, only, binshape)
         _valid(self.derivatives, seen, only, binshape)
         _valid(self.errors, seen, only, binshape)
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
 
         return shape
 
@@ -1485,9 +1492,6 @@ class Histogram(Object):
         if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
             raise ValueError("Histogram.functions keys must be unique")
         _valid(self.functions, seen, only, binshape)
-
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
 
         return shape
 
@@ -1618,8 +1622,6 @@ class Chunk(Portally):
                 num = x._valid(seen, only, y)
                 if numentries is not None and num != numentries:
                     raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
-
-        _valid(self.metadata, seen, only, ())
 
         return numentries
 
@@ -1780,9 +1782,6 @@ class Ntuple(Object):
             if only is None or id(x) in only:
                 x._validtypes()
                 x._valid(seen, only)
-
-        _valid(self.metadata, seen, only, None)
-        _valid(self.decoration, seen, only, None)
 
         return shape
 
@@ -1956,9 +1955,6 @@ class Collection(Portally):
 
         for x in self.objects:
             _valid(x, seen, only, shape)
-
-        _valid(self.metadata, seen, only, shape)
-        _valid(self.decoration, seen, only, shape)
 
         return shape
 
