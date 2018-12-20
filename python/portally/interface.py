@@ -1725,23 +1725,14 @@ class NtupleInstance(Portally):
     _params = {
         "chunks":              portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
         "chunk_offsets":       portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
-        "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
-        "column_correlations": portally.checktype.CheckVector("Ntuple", "column_correlations", required=False, type=Correlations),
-        "functions":           portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         }
 
     chunks              = typedproperty(_params["chunks"])
     chunk_offsets       = typedproperty(_params["chunk_offsets"])
-    column_statistics   = typedproperty(_params["column_statistics"])
-    column_correlations = typedproperty(_params["column_correlations"])
-    functions           = typedproperty(_params["functions"])
 
-    def __init__(self, chunks, chunk_offsets=None, column_statistics=None, column_correlations=None, functions=None):
+    def __init__(self, chunks, chunk_offsets=None):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
-        self.column_statistics = column_statistics
-        self.column_correlations = column_correlations
-        self.functions = functions
 
     def _valid(self, seen, only):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
@@ -1767,19 +1758,6 @@ class NtupleInstance(Portally):
                     x._validtypes()
                     x._valid(seen, only, self._parent.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
 
-        if self.column_statistics is not None:
-            for x in self.column_statistics:
-                _valid(x, seen, only, ())
-
-        if self.column_correlations is not None:
-            Correlations._validindexes(self.column_correlations, len(self._parent.columns))
-            for x in self.column_correlations:
-                _valid(x, seen, only, ())
-
-        if self.functions is not None:
-            for x in self.functions:
-                _valid(x, seen, only, ())
-
     @property
     def numpy_arrays(self):
         self._valid(set(), None)
@@ -1790,25 +1768,34 @@ class NtupleInstance(Portally):
 
 class Ntuple(Object):
     _params = {
-        "identifier": portally.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
-        "columns":    portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":  portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "title":      portally.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "identifier":          portally.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
+        "columns":             portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":           portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "column_correlations": portally.checktype.CheckVector("Ntuple", "column_correlations", required=False, type=Correlations),
+        "functions":           portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":               portally.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":            portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":          portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
 
-    identifier = typedproperty(_params["identifier"])
-    columns    = typedproperty(_params["columns"])
-    instances  = typedproperty(_params["instances"])
-    title      = typedproperty(_params["title"])
-    metadata   = typedproperty(_params["metadata"])
-    decoration = typedproperty(_params["decoration"])
+    identifier          = typedproperty(_params["identifier"])
+    columns             = typedproperty(_params["columns"])
+    instances           = typedproperty(_params["instances"])
+    column_statistics   = typedproperty(_params["column_statistics"])
+    column_correlations = typedproperty(_params["column_correlations"])
+    functions           = typedproperty(_params["functions"])
+    title               = typedproperty(_params["title"])
+    metadata            = typedproperty(_params["metadata"])
+    decoration          = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, columns, instances, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.columns = columns
         self.instances = instances
+        self.column_statistics = column_statistics
+        self.column_correlations = column_correlations
+        self.functions = functions
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1829,6 +1816,19 @@ class Ntuple(Object):
             if only is None or id(x) in only:
                 x._validtypes()
                 x._valid(seen, only)
+
+        if self.column_statistics is not None:
+            for x in self.column_statistics:
+                _valid(x, seen, only, shape)
+
+        if self.column_correlations is not None:
+            Correlations._validindexes(self.column_correlations, len(self.columns))
+            for x in self.column_correlations:
+                _valid(x, seen, only, shape)
+
+        if self.functions is not None:
+            for x in self.functions:
+                _valid(x, seen, only, shape)
 
         return shape
 
