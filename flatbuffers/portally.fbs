@@ -477,6 +477,6 @@ table Collection {
   decoration: Decoration;
 }
 
-file_extension "pty";
-file_identifier "pty";
+file_extension "port";
+file_identifier "port";
 root_type Collection;
