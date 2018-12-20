@@ -274,17 +274,8 @@ union Counts {
   WeightedCounts
 }
 
-enum MatrixLayout: byte {
-  matrix_diagonal = 0,
-  matrix_antisymmetric = 1,
-  matrix_symmetric = 2,
-  matrix_full = 3
-}
-
 table Correlation {
-  sumwx: InterpretedBuffer (required);    // N elements
-  sumwxy: InterpretedBuffer (required);   // N, N*(N-1), N*(N+1), or N**2 elements
-  layout: MatrixLayout = matrix_diagonal;
+  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
 }
 
 table Extremes {
@@ -312,20 +303,15 @@ table GenericErrors {
 
 table Descriptive {
   moments: [Moments];
-  correlation: Correlation;
   extremes: Extremes;
   quantiles: [Quantiles];
   modes: InterpretedBuffer;
   generic_errors: [GenericErrors];
 }
 
-table Distribution {
-  counts: Counts (required);
-  descriptive: Descriptive;
-}
-
-table ProfileAxis {
+table Profile {
   expression: string (required);
+  descriptive: Descriptive (required);
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -381,9 +367,11 @@ table FunctionObject {
 
 table Histogram {
   axis: [Axis] (required);
-  distribution: Distribution (required);
-  profile_axis: [ProfileAxis];
-  profile: Descriptive;
+  counts: Counts (required);
+  descriptive: Descriptive;
+  correlation: Correlation;
+  profile: [Profile];
+  profile_correlation: Correlation;
   functions: [Function];
 }
 
@@ -419,6 +407,7 @@ table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
   descriptive: [Descriptive];
+  correlation: Correlation;
   functions: [FunctionObject];
 }
 

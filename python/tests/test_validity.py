@@ -174,15 +174,15 @@ class Test(unittest.TestCase):
         assert h["id"].axis[0].expression == "x"
 
     def test_UnweightedCounts(self):
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
         assert h.isvalid
 
     def test_WeightedCounts(self):
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))])
         assert h.isvalid
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2))))])
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2)))])
         assert h.isvalid
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))))])
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
         assert h.isvalid
 
     def test_Correlation(self):
@@ -200,18 +200,14 @@ class Test(unittest.TestCase):
     def test_GenericErrors(self):
         pass
 
-    def test_DistributionStats(self):
+    def test_Descriptive(self):
         pass
-
-    def test_Distribution(self):
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100)))), )])  # HERE
-        assert h.isvalid
 
     def test_ProfileAxis(self):
         pass
 
     def test_Histogram(self):
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100)))))])
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])
         assert h.isvalid
 
     def test_Parameter(self):
