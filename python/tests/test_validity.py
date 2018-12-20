@@ -204,7 +204,8 @@ class Test(unittest.TestCase):
         pass
 
     def test_Histogram(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], Distribution(UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
+        assert h.isvalid
 
     def test_Parameter(self):
         h = Collection("id", [ParameterizedFunction("id", "x**2", [Parameter("x", 5), Parameter("y", 6)])])

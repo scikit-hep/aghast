@@ -327,6 +327,45 @@ class Interpretation(object):
     def numpy_dtype(self):
         return self.dtype.dtype.newbyteorder(self._endianness.endianness)
 
+    @classmethod
+    def from_numpy_dtype(cls, dtype):
+        dtype = numpy.dtype(dtype)
+
+        if dtype.byteorder == "=":
+            endianness = cls.little_endian if sys.byteorder == "little" else cls.big_endian
+        elif dtype.byteorder == ">":
+            endianness = cls.big_endian
+        elif dtype.byteorder == "<":
+            endianness = cls.little_endian
+
+        if dtype.kind == "i":
+            if dtype.itemsize == 1:
+                return cls.int8, endianness
+            elif dtype.itemsize == 2:
+                return cls.int16, endianness
+            elif dtype.itemsize == 4:
+                return cls.int32, endianness
+            elif dtype.itemsize == 8:
+                return cls.int64, endianness
+
+        elif dtype.kind == "u":
+            if dtype.itemsize == 1:
+                return cls.uint8, endianness
+            elif dtype.itemsize == 2:
+                return cls.uint16, endianness
+            elif dtype.itemsize == 4:
+                return cls.uint32, endianness
+            elif dtype.itemsize == 8:
+                return cls.uint64, endianness
+
+        elif dtype.kind == "f":
+            if dtype.itemsize == 4:
+                return cls.float32, endianness
+            elif dtype.itemsize == 8:
+                return cls.float64, endianness
+
+        raise ValueError("numpy dtype {0} does not correspond to any Interpretation dtype, endianness pair".format(str(dtype)))
+
 class InterpretedBuffer(Interpretation):
     c_order       = DimensionOrderEnum("c_order", portally.portally_generated.DimensionOrder.DimensionOrder.c_order, "C")
     fortran_order = DimensionOrderEnum("fortran", portally.portally_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
@@ -435,6 +474,12 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dtype = dtype
         self.endianness = endianness
         self.dimension_order = dimension_order
+
+    @classmethod
+    def fromarray(cls, array):
+        dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
+        order = InterpretedBuffer.fortran_order if numpy.isfortran(array) else InterpretedBuffer.c_order
+        return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
 
     def _valid(self, seen, only, shape):
         if self._buffer is None:
@@ -976,6 +1021,10 @@ class UnweightedCounts(Counts):
     def __init__(self, counts):
         self.counts = counts
 
+    def _valid(self, seen, only, shape):
+        if only is None or id(self.counts) in only:
+            _valid(self.counts, seen, only, shape)
+
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
@@ -993,6 +1042,9 @@ class WeightedCounts(Counts):
         self.sumw = sumw
         self.sumw2 = sumw2
         self.counts = counts
+
+    def _valid(self, seen, only, shape):
+        HERE
 
 ################################################# Correlation
 
@@ -1111,6 +1163,9 @@ class DistributionStats(Portally):
         self.quantiles = quantiles
         self.generic_errors = generic_errors
 
+    def _valid(self, seen, only, shape):
+        HERE
+
 ################################################# Distribution
 
 class Distribution(Portally):
@@ -1125,6 +1180,12 @@ class Distribution(Portally):
     def __init__(self, counts, stats=None):
         self.counts = counts
         self.stats = stats
+
+    def _valid(self, seen, only, shape):
+        if only is None or id(self.counts) in only:
+            _valid(self.counts, seen, only, shape)
+        if only is None or id(self.stats) in only:
+            _valid(self.stats, seen, only, shape)
 
 ################################################# Profile
 
@@ -1341,6 +1402,32 @@ class Histogram(Object):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+
+    def _valid(self, seen, only, shape):
+        binshape = shape
+        for x in self.axis:
+            binshape = binshape + _valid(x, seen, only, shape)
+
+        if only is None or id(self.distribution) in only:
+            _valid(self.distribution, seen, only, binshape)
+        if only is None or id(self.unbinned_stats) in only:
+            _valid(self.unbinned_stats, seen, only, binshape)
+        if only is None or id(self.profiles) in only:
+            _valid(self.profiles, seen, only, binshape)
+        if only is None or id(self.profile_stats) in only:
+            _valid(self.profile_stats, seen, only, binshape)
+
+        if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
+            raise ValueError("Histogram.functions keys must be unique")
+        if only is None or id(self.functions) in only:
+            _valid(self.functions, seen, only, binshape)
+
+        if only is None or id(self.metadata) in only:
+            _valid(self.metadata, seen, only, shape)
+        if only is None or id(self.decoration) in only:
+            _valid(self.decoration, seen, only, shape)
+
+        return shape
 
 ################################################# Page
 
