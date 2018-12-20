@@ -503,11 +503,16 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
             step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
             self._array = self._array[start:stop:step]
+        
+        try:
+            self._array = self._array.view(self.numpy_dtype)
+        except ValueError:
+            raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
 
-        if len(self._array) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
-            raise ValueError("InterpretedInlineBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+        if len(self._array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(self._array), functools.reduce(operator.mul, shape, 1)))
 
-        self._array = self._array.view(self.numpy_dtype).reshape(shape, order=self.dimension_order.dimension_order)
+        self._array = self._array.reshape(shape, order=self.dimension_order.dimension_order)
         return shape
 
     @property
@@ -576,10 +581,15 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
             self._array = self._array[start:stop:step]
 
-        if len(self._array) != functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize):
-            raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize)))
+        try:
+            self._array = self._array.view(self.numpy_dtype)
+        except ValueError:
+            raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
 
-        self._array = self._array.view(self.numpy_dtype).reshape(shape, order=self.dimension_order.dimension_order)
+        if len(self._array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, 1)))
+
+        self._array = self._array.reshape(shape, order=self.dimension_order.dimension_order)
         return shape
 
     @property
@@ -1218,7 +1228,7 @@ class Axis(Portally):
 class Profile(Portally):
     _params = {
         "expression": portally.checktype.CheckString("Profile", "expression", required=True),
-        "statistics": portally.checktype.CheckString("Profile", "statistics", required=True),
+        "statistics": portally.checktype.CheckClass("Profile", "statistics", required=True, type=Statistics),
         "title":      portally.checktype.CheckString("Profile", "title", required=False),
         "metadata":   portally.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
@@ -1236,6 +1246,10 @@ class Profile(Portally):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+
+    def _valid(self, seen, only, shape):
+        _valid(self.statistics, seen, only, shape)
+        return shape
 
 ################################################# Counts
 
