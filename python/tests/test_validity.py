@@ -185,13 +185,10 @@ class Test(unittest.TestCase):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
         assert h.isvalid
 
-    def test_Correlation(self):
+    def test_Moments(self):
         pass
 
     def test_Extremes(self):
-        pass
-
-    def test_Moments(self):
         pass
 
     def test_Quantiles(self):
@@ -203,7 +200,10 @@ class Test(unittest.TestCase):
     def test_Descriptive(self):
         pass
 
-    def test_ProfileAxis(self):
+    def test_Correlation(self):
+        pass
+
+    def test_Profile(self):
         pass
 
     def test_Histogram(self):

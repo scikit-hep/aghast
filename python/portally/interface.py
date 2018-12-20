@@ -54,6 +54,7 @@ import portally.portally_generated.Counts
 import portally.portally_generated.Decoration
 import portally.portally_generated.DecorationLanguage
 import portally.portally_generated.Descriptive
+import portally.portally_generated.DescriptiveFilter
 import portally.portally_generated.DimensionOrder
 import portally.portally_generated.DType
 import portally.portally_generated.EdgesBinning
@@ -68,7 +69,6 @@ import portally.portally_generated.Function
 import portally.portally_generated.FunctionData
 import portally.portally_generated.FunctionObject
 import portally.portally_generated.FunctionObjectData
-import portally.portally_generated.GenericErrors
 import portally.portally_generated.HexagonalBinning
 import portally.portally_generated.HexagonalCoordinates
 import portally.portally_generated.Histogram
@@ -79,6 +79,7 @@ import portally.portally_generated.InterpretedInlineBuffer
 import portally.portally_generated.IrregularBinning
 import portally.portally_generated.Metadata
 import portally.portally_generated.MetadataLanguage
+import portally.portally_generated.Modes
 import portally.portally_generated.Moments
 import portally.portally_generated.NonRealMapping
 import portally.portally_generated.Ntuple
@@ -1049,38 +1050,26 @@ class WeightedCounts(Counts):
         if only is None or id(self.unweighted) in only:
             _valid(self.unweighted, seen, only, shape)
 
-################################################# Correlation
+################################################# DescriptiveFilter
 
-class Correlation(Portally):
+class DescriptiveFilter(Portally):
     _params = {
-        "sumwxy": portally.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "minimum": portally.checktype.CheckNumber("DescriptiveFilter", "minimum", required=False),
+        "maximum": portally.checktype.CheckNumber("DescriptiveFilter", "maximum", required=False),
+        "excludes_minf": portally.checktype.CheckBool("DescriptiveFilter", "excludes_minf", required=False),
+        "excludes_pinf": portally.checktype.CheckBool("DescriptiveFilter", "excludes_pinf", required=False),
+        "excludes_nan":  portally.checktype.CheckBool("DescriptiveFilter", "excludes_nan", required=False),
         }
 
-    sumwxy = typedproperty(_params["sumwxy"])
-
-    def __init__(self, sumwxy):
-        self.sumwxy = sumwxy
-
-################################################# Extremes
-
-class Extremes(Portally):
-    _params = {
-        "min":           portally.checktype.CheckClass("Extremes", "min", required=True, type=InterpretedBuffer),
-        "max":           portally.checktype.CheckClass("Extremes", "max", required=True, type=InterpretedBuffer),
-        "excludes_minf": portally.checktype.CheckBool("Extremes", "excludes_minf", required=False),
-        "excludes_pinf": portally.checktype.CheckBool("Extremes", "excludes_pinf", required=False),
-        "excludes_nan":  portally.checktype.CheckBool("Extremes", "excludes_nan", required=False),
-        }
-
-    min           = typedproperty(_params["min"])
-    max           = typedproperty(_params["max"])
+    minimum       = typedproperty(_params["minimum"])
+    maximum       = typedproperty(_params["maximum"])
     excludes_minf = typedproperty(_params["excludes_minf"])
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
-    def __init__(self, min, max, excludes_minf=False, excludes_pinf=False, excludes_nan=True):
-        self.min = min
-        self.max = max
+    def __init__(self, minimum=None, maximum=None, excludes_minf=None, excludes_pinf=None, excludes_nan=None):
+        self.minimum = minimum
+        self.maximum = maximum
         self.excludes_minf = excludes_minf
         self.excludes_pinf = excludes_pinf
         self.excludes_nan = excludes_nan
@@ -1091,14 +1080,32 @@ class Moments(Portally):
     _params = {
         "sumwxn": portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
         "n":      portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
+        "filter": portally.checktype.CheckClass("Moments", "filter", required=False, type=DescriptiveFilter),
         }
 
     sumwxn = typedproperty(_params["sumwxn"])
     n      = typedproperty(_params["n"])
+    filter = typedproperty(_params["filter"])
 
-    def __init__(self, sumwxn, n):
+    def __init__(self, sumwxn, n, filter=None):
         self.sumwxn = sumwxn
         self.n = n
+        self.filter = filter
+
+################################################# Extremes
+
+class Extremes(Portally):
+    _params = {
+        "values": portally.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
+        "filter": portally.checktype.CheckClass("Extremes", "filter", required=False, type=DescriptiveFilter),
+        }
+
+    values = typedproperty(_params["values"])
+    filter = typedproperty(_params["filter"])
+
+    def __init__(self, values, filter=None):
+        self.values = values
+        self.filter = filter
 
 ################################################# Quantiles
 
@@ -1106,59 +1113,74 @@ class Quantiles(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
         "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=DescriptiveFilter),
         }
 
     values = typedproperty(_params["values"])
     p      = typedproperty(_params["p"])
+    filter = typedproperty(_params["filter"])
 
-    def __init__(self, values, p=0.5):
+    def __init__(self, values, p=0.5, filter=None):
         self.values = values
         self.p = p
+        self.filter = filter
 
-################################################# GenericErrors
+################################################# Modes
 
-class GenericErrors(Portally):
+class Modes(Portally):
     _params = {
-        "errors": portally.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
-        "p":      portally.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
+        "values": portally.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
+        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=DescriptiveFilter),
         }
 
-    errors = typedproperty(_params["errors"])
-    p      = typedproperty(_params["p"])
+    values = typedproperty(_params["values"])
+    filter = typedproperty(_params["filter"])
 
-    def __init__(self, errors, p=math.erf(math.sqrt(0.5))):
-        self.errors = errors
-        self.p = p
+    def __init__(self, values, filter=None):
+        self.values = values
+        self.filter = filter
 
 ################################################# Descriptive
 
 class Descriptive(Portally):
     _params = {
-        "moments":        portally.checktype.CheckVector("Descriptive", "moments", required=False, type=Moments),
-        "correlation":    portally.checktype.CheckClass("Descriptive", "correlation", required=False, type=Correlation),
-        "extremes":       portally.checktype.CheckClass("Descriptive", "extremes", required=False, type=Extremes),
-        "quantiles":      portally.checktype.CheckVector("Descriptive", "quantiles", required=False, type=Quantiles),
-        "modes":          portally.checktype.CheckClass("Descriptive", "modes", required=False, type=InterpretedBuffer),
-        "generic_errors": portally.checktype.CheckVector("Descriptive", "generic_errors", required=False, type=GenericErrors),
+        "moments":   portally.checktype.CheckVector("Descriptive", "moments", required=False, type=Moments),
+        "quantiles": portally.checktype.CheckVector("Descriptive", "quantiles", required=False, type=Quantiles),
+        "modes":     portally.checktype.CheckClass("Descriptive", "modes", required=False, type=Modes),
+        "minima":    portally.checktype.CheckClass("Descriptive", "minima", required=False, type=Extremes),
+        "maxima":    portally.checktype.CheckClass("Descriptive", "maxima", required=False, type=Extremes),
         }
 
-    moments        = typedproperty(_params["moments"])
-    correlation    = typedproperty(_params["correlation"])
-    extremes       = typedproperty(_params["extremes"])
-    quantiles      = typedproperty(_params["quantiles"])
-    modes          = typedproperty(_params["modes"])
-    generic_errors = typedproperty(_params["generic_errors"])
+    moments   = typedproperty(_params["moments"])
+    quantiles = typedproperty(_params["quantiles"])
+    modes     = typedproperty(_params["modes"])
+    minima    = typedproperty(_params["minima"])
+    maxima    = typedproperty(_params["maxima"])
 
-    def __init__(self, moments=None, correlation=None, extremes=None, quantiles=None, modes=None, generic_errors=None):
+    def __init__(self, moments=None, quantiles=None, modes=None, minima=None, maxima=None):
         self.moments = moments
-        self.correlation = correlation
-        self.extremes = extremes
         self.quantiles = quantiles
         self.modes = modes
-        self.generic_errors = generic_errors
+        self.minima = minima
+        self.maxima = maxima
 
     def _valid(self, seen, only, shape):
         HERE
+
+################################################# Correlation
+
+class Correlation(Portally):
+    _params = {
+        "sumwxy": portally.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=DescriptiveFilter),
+        }
+
+    sumwxy = typedproperty(_params["sumwxy"])
+    filter = typedproperty(_params["filter"])
+
+    def __init__(self, sumwxy, filter=None):
+        self.sumwxy = sumwxy
+        self.filter = filter
 
 ################################################# Profile
 
@@ -1262,28 +1284,28 @@ class ParameterizedFunction(Function, FunctionObject):
 
 class EvaluatedFunction(Function):
     _params = {
-        "identifier":     portally.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
-        "values":         portally.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
-        "derivatives":    portally.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
-        "generic_errors": portally.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
-        "title":          portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":       portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     portally.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "identifier":  portally.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "values":      portally.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
+        "derivatives": portally.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
+        "errors":      portally.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":    portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  portally.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(_params["identifier"])
-    values         = typedproperty(_params["values"])
-    derivatives    = typedproperty(_params["derivatives"])
-    generic_errors = typedproperty(_params["generic_errors"])
-    title          = typedproperty(_params["title"])
-    metadata       = typedproperty(_params["metadata"])
-    decoration     = typedproperty(_params["decoration"])
+    identifier  = typedproperty(_params["identifier"])
+    values      = typedproperty(_params["values"])
+    derivatives = typedproperty(_params["derivatives"])
+    errors      = typedproperty(_params["errors"])
+    title       = typedproperty(_params["title"])
+    metadata    = typedproperty(_params["metadata"])
+    decoration  = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, values, derivatives=None, errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.values = values
         self.derivatives = derivatives
-        self.generic_errors = generic_errors
+        self.errors = errors
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1292,31 +1314,31 @@ class EvaluatedFunction(Function):
 
 class BinnedEvaluatedFunction(FunctionObject):
     _params = {
-        "identifier":     portally.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
-        "axis":           portally.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
-        "values":         portally.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives":    portally.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "generic_errors": portally.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
-        "title":          portally.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
-        "metadata":       portally.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     portally.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        "identifier":  portally.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
+        "axis":        portally.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
+        "values":      portally.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": portally.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "errors":      portally.checktype.CheckVector("BinnedEvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       portally.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
+        "metadata":    portally.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  portally.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
-    identifier     = typedproperty(_params["identifier"])
-    axis           = typedproperty(_params["axis"])
-    values         = typedproperty(_params["values"])
-    derivatives    = typedproperty(_params["derivatives"])
-    generic_errors = typedproperty(_params["generic_errors"])
-    title          = typedproperty(_params["title"])
-    metadata       = typedproperty(_params["metadata"])
-    decoration     = typedproperty(_params["decoration"])
+    identifier  = typedproperty(_params["identifier"])
+    axis        = typedproperty(_params["axis"])
+    values      = typedproperty(_params["values"])
+    derivatives = typedproperty(_params["derivatives"])
+    errors      = typedproperty(_params["errors"])
+    title       = typedproperty(_params["title"])
+    metadata    = typedproperty(_params["metadata"])
+    decoration  = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, axis, values, derivatives=None, generic_errors=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None):
         self.identifier = identifier
         self.axis = axis
         self.values = values
         self.derivatives = derivatives
-        self.generic_errors = generic_errors
+        self.errors = errors
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1330,8 +1352,8 @@ class BinnedEvaluatedFunction(FunctionObject):
             _valid(self.values, seen, only, binshape)
         if only is None or id(self.derivatives) in only:
             _valid(self.derivatives, seen, only, binshape)
-        if only is None or id(self.generic_errors) in only:
-            _valid(self.generic_errors, seen, only, binshape)
+        if only is None or id(self.errors) in only:
+            _valid(self.errors, seen, only, binshape)
 
         if only is None or id(self.metadata) in only:
             _valid(self.metadata, seen, only, shape)

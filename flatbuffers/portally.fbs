@@ -274,39 +274,47 @@ union Counts {
   WeightedCounts
 }
 
-table Correlation {
-  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
-}
-
-table Extremes {
-  min: InterpretedBuffer (required);
-  max: InterpretedBuffer (required);
-  excludes_minf: bool = false;
-  excludes_pinf: bool = false;
-  excludes_nan: bool = true;
+table DescriptiveFilter {
+  minimum: double;
+  maximum: double;
+  excludes_minf: bool;
+  excludes_pinf: bool;
+  excludes_nan: bool;
 }
 
 table Moments {
   sumwxn: InterpretedBuffer (required);
   n: int;
+  filter: DescriptiveFilter;
+}
+
+table Extremes {
+  values: InterpretedBuffer (required);
+  filter: DescriptiveFilter;
 }
 
 table Quantiles {
   values: InterpretedBuffer (required);
   p: double = 0.5;    // 0.0 <= p <= 1.0
+  filter: DescriptiveFilter;
 }
 
-table GenericErrors {
-  errors: InterpretedBuffer (required);
-  p: double = 0.6826894921370859;    // +1 sigma
+table Modes {
+  values: InterpretedBuffer (required);
+  filter: DescriptiveFilter;
 }
 
 table Descriptive {
   moments: [Moments];
-  extremes: Extremes;
   quantiles: [Quantiles];
-  modes: InterpretedBuffer;
-  generic_errors: [GenericErrors];
+  modes: Modes;
+  minima: Extremes;
+  maxima: Extremes;
+}
+
+table Correlation {
+  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
+  filter: DescriptiveFilter;
 }
 
 table Profile {
@@ -333,7 +341,7 @@ table ParameterizedFunction {
 table EvaluatedFunction {
   values: InterpretedBuffer (required);
   derivatives: InterpretedBuffer;
-  generic_errors: [GenericErrors];
+  errors: [Quantiles];
 }
 
 union FunctionData {

@@ -59,12 +59,13 @@ from portally.interface import Axis
 from portally.interface import Counts
 from portally.interface import UnweightedCounts
 from portally.interface import WeightedCounts
-from portally.interface import Correlation
-from portally.interface import Extremes
+from portally.interface import DescriptiveFilter
 from portally.interface import Moments
+from portally.interface import Extremes
 from portally.interface import Quantiles
-from portally.interface import GenericErrors
+from portally.interface import Modes
 from portally.interface import Descriptive
+from portally.interface import Correlation
 from portally.interface import Profile
 from portally.interface import Histogram
 from portally.interface import ParameterizedFunction
