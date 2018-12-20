@@ -120,7 +120,7 @@ union InterpretedBuffer {
 
 ///////////////////////////////////////////////// descriptive statistics
 
-table DescriptiveFilter {
+table StatisticFilter {
   minimum: double;
   maximum: double;
   excludes_minf: bool;
@@ -131,26 +131,26 @@ table DescriptiveFilter {
 table Moments {
   sumwxn: InterpretedBuffer (required);
   n: int;
-  filter: DescriptiveFilter;
+  filter: StatisticFilter;
 }
 
 table Extremes {
   values: InterpretedBuffer (required);
-  filter: DescriptiveFilter;
+  filter: StatisticFilter;
 }
 
 table Quantiles {
   values: InterpretedBuffer (required);
   p: double = 0.5;    // 0.0 <= p <= 1.0
-  filter: DescriptiveFilter;
+  filter: StatisticFilter;
 }
 
 table Modes {
   values: InterpretedBuffer (required);
-  filter: DescriptiveFilter;
+  filter: StatisticFilter;
 }
 
-table Descriptive {
+table Statistics {
   moments: [Moments];
   quantiles: [Quantiles];
   modes: Modes;
@@ -160,7 +160,7 @@ table Descriptive {
 
 table Correlation {
   sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
-  filter: DescriptiveFilter;
+  filter: StatisticFilter;
 }
 
 ///////////////////////////////////////////////// binning
@@ -311,7 +311,7 @@ union Binning {
 table Axis {
   binning: Binning;      // note: it's allowed to have no binning
   expression: string;
-  statistic: Descriptive;
+  statistics: Statistics;
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -319,7 +319,7 @@ table Axis {
 
 table Profile {
   expression: string (required);
-  statistic: Descriptive (required);
+  statistics: Statistics (required);
   title: string;
   metadata: Metadata;
   decoration: Decoration;
@@ -430,7 +430,7 @@ table Column {
 table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
-  column_statistics: [Descriptive];
+  column_statistics: [Statistics];
   column_correlation: Correlation;
   functions: [FunctionObject];
 }

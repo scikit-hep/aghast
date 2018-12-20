@@ -34,12 +34,12 @@ from portally.interface import RawInlineBuffer
 from portally.interface import RawExternalBuffer
 from portally.interface import InterpretedInlineBuffer
 from portally.interface import InterpretedExternalBuffer
-from portally.interface import DescriptiveFilter
+from portally.interface import StatisticFilter
 from portally.interface import Moments
 from portally.interface import Extremes
 from portally.interface import Quantiles
 from portally.interface import Modes
-from portally.interface import Descriptive
+from portally.interface import Statistics
 from portally.interface import Correlation
 from portally.interface import IntegerBinning
 from portally.interface import RealInterval

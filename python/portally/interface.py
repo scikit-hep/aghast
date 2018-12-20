@@ -54,12 +54,12 @@ import portally.portally_generated.InterpretedInlineBuffer
 import portally.portally_generated.InterpretedExternalBuffer
 import portally.portally_generated.RawBuffer
 import portally.portally_generated.InterpretedBuffer
-import portally.portally_generated.DescriptiveFilter
+import portally.portally_generated.StatisticFilter
 import portally.portally_generated.Moments
 import portally.portally_generated.Extremes
 import portally.portally_generated.Quantiles
 import portally.portally_generated.Modes
-import portally.portally_generated.Descriptive
+import portally.portally_generated.Statistics
 import portally.portally_generated.Correlation
 import portally.portally_generated.BinPosition
 import portally.portally_generated.IntegerBinning
@@ -584,15 +584,15 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self._topvalid()
         return self._array
 
-################################################# DescriptiveFilter
+################################################# StatisticFilter
 
-class DescriptiveFilter(Portally):
+class StatisticFilter(Portally):
     _params = {
-        "minimum": portally.checktype.CheckNumber("DescriptiveFilter", "minimum", required=False),
-        "maximum": portally.checktype.CheckNumber("DescriptiveFilter", "maximum", required=False),
-        "excludes_minf": portally.checktype.CheckBool("DescriptiveFilter", "excludes_minf", required=False),
-        "excludes_pinf": portally.checktype.CheckBool("DescriptiveFilter", "excludes_pinf", required=False),
-        "excludes_nan":  portally.checktype.CheckBool("DescriptiveFilter", "excludes_nan", required=False),
+        "minimum": portally.checktype.CheckNumber("StatisticFilter", "minimum", required=False),
+        "maximum": portally.checktype.CheckNumber("StatisticFilter", "maximum", required=False),
+        "excludes_minf": portally.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
+        "excludes_pinf": portally.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
+        "excludes_nan":  portally.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
         }
 
     minimum       = typedproperty(_params["minimum"])
@@ -614,7 +614,7 @@ class Moments(Portally):
     _params = {
         "sumwxn": portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
         "n":      portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
-        "filter": portally.checktype.CheckClass("Moments", "filter", required=False, type=DescriptiveFilter),
+        "filter": portally.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }
 
     sumwxn = typedproperty(_params["sumwxn"])
@@ -631,7 +631,7 @@ class Moments(Portally):
 class Extremes(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Extremes", "filter", required=False, type=DescriptiveFilter),
+        "filter": portally.checktype.CheckClass("Extremes", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -647,7 +647,7 @@ class Quantiles(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
         "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
-        "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=DescriptiveFilter),
+        "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -664,7 +664,7 @@ class Quantiles(Portally):
 class Modes(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=DescriptiveFilter),
+        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -674,15 +674,15 @@ class Modes(Portally):
         self.values = values
         self.filter = filter
 
-################################################# Descriptive
+################################################# Statistics
 
-class Descriptive(Portally):
+class Statistics(Portally):
     _params = {
-        "moments":   portally.checktype.CheckVector("Descriptive", "moments", required=False, type=Moments),
-        "quantiles": portally.checktype.CheckVector("Descriptive", "quantiles", required=False, type=Quantiles),
-        "modes":     portally.checktype.CheckClass("Descriptive", "modes", required=False, type=Modes),
-        "minima":    portally.checktype.CheckClass("Descriptive", "minima", required=False, type=Extremes),
-        "maxima":    portally.checktype.CheckClass("Descriptive", "maxima", required=False, type=Extremes),
+        "moments":   portally.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
+        "quantiles": portally.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
+        "modes":     portally.checktype.CheckClass("Statistics", "modes", required=False, type=Modes),
+        "minima":    portally.checktype.CheckClass("Statistics", "minima", required=False, type=Extremes),
+        "maxima":    portally.checktype.CheckClass("Statistics", "maxima", required=False, type=Extremes),
         }
 
     moments   = typedproperty(_params["moments"])
@@ -718,7 +718,7 @@ class Descriptive(Portally):
 class Correlation(Portally):
     _params = {
         "sumwxy": portally.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=DescriptiveFilter),
+        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
     sumwxy = typedproperty(_params["sumwxy"])
@@ -1162,7 +1162,7 @@ class Axis(Portally):
     _params = {
         "binning":    portally.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
         "expression": portally.checktype.CheckString("Axis", "expression", required=False),
-        "statistic":  portally.checktype.CheckClass("Axis", "statistic", required=False, type=Descriptive),
+        "statistics": portally.checktype.CheckClass("Axis", "statistics", required=False, type=Statistics),
         "title":      portally.checktype.CheckString("Axis", "title", required=False),
         "metadata":   portally.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
@@ -1170,15 +1170,15 @@ class Axis(Portally):
 
     binning    = typedproperty(_params["binning"])
     expression = typedproperty(_params["expression"])
-    statistic  = typedproperty(_params["statistic"])
+    statistics = typedproperty(_params["statistics"])
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, binning=None, expression="", statistic=None, title="", metadata=None, decoration=None):
+    def __init__(self, binning=None, expression="", statistics=None, title="", metadata=None, decoration=None):
         self.binning = binning
         self.expression = expression
-        self.statistic = statistic
+        self.statistics = statistics
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1199,21 +1199,21 @@ class Axis(Portally):
 class Profile(Portally):
     _params = {
         "expression": portally.checktype.CheckString("Profile", "expression", required=True),
-        "statistic":  portally.checktype.CheckString("Profile", "statistic", required=True),
+        "statistics": portally.checktype.CheckString("Profile", "statistics", required=True),
         "title":      portally.checktype.CheckString("Profile", "title", required=False),
         "metadata":   portally.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
     expression = typedproperty(_params["expression"])
-    statistic  = typedproperty(_params["statistic"])
+    statistics = typedproperty(_params["statistics"])
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, expression, statistic, title="", metadata=None, decoration=None):
+    def __init__(self, expression, statistics, title="", metadata=None, decoration=None):
         self.expression = expression
-        self.statistic = statistic
+        self.statistics = statistics
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1667,7 +1667,7 @@ class NtupleInstance(Portally):
     _params = {
         "chunks":             portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
         "chunk_offsets":      portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
-        "column_statistics":  portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Descriptive),
+        "column_statistics":  portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
         "column_correlation": portally.checktype.CheckVector("Ntuple", "column_correlation", required=False, type=Correlation),
         "functions":          portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         }

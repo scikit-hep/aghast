@@ -185,7 +185,7 @@ class Test(unittest.TestCase):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))])
         assert h.isvalid
 
-    def test_DescriptiveFilter(self):
+    def test_StatisticFilter(self):
         pass
 
     def test_Moments(self):
@@ -200,8 +200,8 @@ class Test(unittest.TestCase):
     def test_Modes(self):
         pass
 
-    def test_Descriptive(self):
-        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistic=Descriptive()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistic=Descriptive())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])
+    def test_Statistics(self):
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])
         assert h.isvalid
 
     def test_Correlation(self):
