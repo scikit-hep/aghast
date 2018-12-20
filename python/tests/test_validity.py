@@ -163,7 +163,7 @@ class Test(unittest.TestCase):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, pos_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])
         assert h["id"].values.numpy_array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
-    def test_FractionalBinning(self):
+    def test_FractionBinning(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(FractionBinning())], InterpretedInlineBuffer())])
         assert h.isvalid
         assert h["id"].axis[0].binning.error_method == FractionBinning.normal
@@ -242,7 +242,12 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_EvaluatedFunction(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)))])])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)), [Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.75)])])])
+        assert h.isvalid
 
     def test_BinnedEvaluatedFunction(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(dtype=InterpretedInlineBuffer.float64))])

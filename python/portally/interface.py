@@ -1403,8 +1403,8 @@ class ParameterizedFunction(Function, FunctionObject):
 class EvaluatedFunction(Function):
     _params = {
         "identifier":  portally.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
-        "values":      portally.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
-        "derivatives": portally.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
+        "values":      portally.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": portally.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
         "errors":      portally.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
         "title":       portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
         "metadata":    portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
@@ -1427,6 +1427,14 @@ class EvaluatedFunction(Function):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+
+    def _valid(self, seen, only, shape):
+        _valid(self.values, seen, only, shape)
+        _valid(self.derivatives, seen, only, shape)
+        if self.errors is not None:
+            for x in self.errors:
+                _valid(x, seen, only, shape)
+        return shape
 
 ################################################# BinnedEvaluatedFunction
 
@@ -1535,9 +1543,11 @@ class Histogram(Object):
             for x in self.profile_correlations:
                 _valid(x, seen, only, shape)
 
-        if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
-            raise ValueError("Histogram.functions keys must be unique")
-        _valid(self.functions, seen, only, binshape)
+        if self.functions is not None:
+            if len(set(x.identifier for x in self.functions)) != len(self.functions):
+                raise ValueError("Histogram.functions keys must be unique")
+            for x in self.functions:
+                _valid(x, seen, only, binshape)
 
         return shape
 
