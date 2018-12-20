@@ -758,6 +758,18 @@ class Correlation(Portally):
         self.sumwxy = sumwxy
         self.filter = filter
 
+    def _valid(self, seen, only, shape, numvar):
+        if shape == ():
+            corrshape = (1,)
+        else:
+            corrshape = shape
+
+        if numvar < 2:
+            raise ValueError("Correlation cannot be provided for less than two axis/columns")
+
+        _valid(self.sumwxy, seen, only, corrshape + (numvar * (numvar - 1) // 2,))
+        return shape
+
 ################################################# Binning
 
 class Binning(Portally):
@@ -1493,7 +1505,9 @@ class Histogram(Object):
             binshape = binshape + _valid(x, seen, None, shape)
 
         _valid(self.counts, seen, only, binshape)
-        _valid(self.axis_correlation, seen, only, shape, len(binshape) - len(shape))
+
+        if self.axis_correlation is not None:
+            _valid(self.axis_correlation, seen, only, shape, len(binshape) - len(shape))
 
         if self.profile is not None:
             for x in self.profile:

@@ -212,7 +212,10 @@ class Test(unittest.TestCase):
         assert h.isvalid
 
     def test_Correlation(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), axis_correlation=Correlation(InterpretedInlineBuffer.fromarray(numpy.arange(1))))])
+        assert h.isvalid
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1000))), axis_correlation=Correlation(InterpretedInlineBuffer.fromarray(numpy.arange(3))))])
+        assert h.isvalid
 
     def test_Profile(self):
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))])])
