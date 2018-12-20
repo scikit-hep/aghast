@@ -201,7 +201,8 @@ class Test(unittest.TestCase):
         pass
 
     def test_Descriptive(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistic=Descriptive()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistic=Descriptive())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))])
+        assert h.isvalid
 
     def test_Correlation(self):
         pass

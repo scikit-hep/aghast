@@ -1,6 +1,6 @@
 namespace portally_generated;
 
-///////////////////////////////////////////////// Metadata
+///////////////////////////////////////////////// metadata
 
 enum MetadataLanguage: uint {
   meta_unspecified = 0,
@@ -12,7 +12,7 @@ table Metadata {
   language: MetadataLanguage = meta_unspecified;
 }
 
-///////////////////////////////////////////////// Decoration
+///////////////////////////////////////////////// decoration
 
 enum DecorationLanguage: uint {
   deco_unspecified = 0,
@@ -26,7 +26,7 @@ table Decoration {
   language: DecorationLanguage = deco_unspecified;
 }
 
-///////////////////////////////////////////////// everything needed for Histogram
+///////////////////////////////////////////////// buffers
 
 enum DType: byte {
   dtype_none = 0,
@@ -118,6 +118,53 @@ union InterpretedBuffer {
   InterpretedExternalBuffer
 }
 
+///////////////////////////////////////////////// descriptive statistics
+
+table DescriptiveFilter {
+  minimum: double;
+  maximum: double;
+  excludes_minf: bool;
+  excludes_pinf: bool;
+  excludes_nan: bool;
+}
+
+table Moments {
+  sumwxn: InterpretedBuffer (required);
+  n: int;
+  filter: DescriptiveFilter;
+}
+
+table Extremes {
+  values: InterpretedBuffer (required);
+  filter: DescriptiveFilter;
+}
+
+table Quantiles {
+  values: InterpretedBuffer (required);
+  p: double = 0.5;    // 0.0 <= p <= 1.0
+  filter: DescriptiveFilter;
+}
+
+table Modes {
+  values: InterpretedBuffer (required);
+  filter: DescriptiveFilter;
+}
+
+table Descriptive {
+  moments: [Moments];
+  quantiles: [Quantiles];
+  modes: Modes;
+  minima: Extremes;
+  maxima: Extremes;
+}
+
+table Correlation {
+  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
+  filter: DescriptiveFilter;
+}
+
+///////////////////////////////////////////////// binning
+
 enum BinPosition: int8 {
   pos_below3 = -3,
   pos_below2 = -2,
@@ -129,8 +176,8 @@ enum BinPosition: int8 {
 }
 
 table IntegerBinning {
-  min: long;   // assumed to be inclusive (if not, change its value!)
-  max: long;
+  minimum: long;   // assumed to be inclusive (if not, change its value!)
+  maximum: long;
   pos_underflow: BinPosition = pos_nonexistent;
   pos_overflow: BinPosition = pos_nonexistent;
 }
@@ -259,13 +306,26 @@ union Binning {
   FractionBinning
 }
 
+///////////////////////////////////////////////// axis
+
 table Axis {
   binning: Binning;      // note: it's allowed to have no binning
   expression: string;
+  statistic: Descriptive;
   title: string;
   metadata: Metadata;
   decoration: Decoration;
 }
+
+table Profile {
+  expression: string (required);
+  statistic: Descriptive (required);
+  title: string;
+  metadata: Metadata;
+  decoration: Decoration;
+}
+
+///////////////////////////////////////////////// distributions
 
 table UnweightedCounts {
   counts: InterpretedBuffer (required);
@@ -282,58 +342,7 @@ union Counts {
   WeightedCounts
 }
 
-table DescriptiveFilter {
-  minimum: double;
-  maximum: double;
-  excludes_minf: bool;
-  excludes_pinf: bool;
-  excludes_nan: bool;
-}
-
-table Moments {
-  sumwxn: InterpretedBuffer (required);
-  n: int;
-  filter: DescriptiveFilter;
-}
-
-table Extremes {
-  values: InterpretedBuffer (required);
-  filter: DescriptiveFilter;
-}
-
-table Quantiles {
-  values: InterpretedBuffer (required);
-  p: double = 0.5;    // 0.0 <= p <= 1.0
-  filter: DescriptiveFilter;
-}
-
-table Modes {
-  values: InterpretedBuffer (required);
-  filter: DescriptiveFilter;
-}
-
-table Descriptive {
-  moments: [Moments];
-  quantiles: [Quantiles];
-  modes: Modes;
-  minima: Extremes;
-  maxima: Extremes;
-}
-
-table Correlation {
-  sumwxy: InterpretedBuffer (required);   // N*(N-1) elements
-  filter: DescriptiveFilter;
-}
-
-table Profile {
-  expression: string (required);
-  descriptive: Descriptive (required);
-  title: string;
-  metadata: Metadata;
-  decoration: Decoration;
-}
-
-///////////////////////////////////////////////// Functions
+///////////////////////////////////////////////// functions
 
 table Parameter {
   identifier: string (key);
@@ -379,19 +388,18 @@ table FunctionObject {
   data: FunctionObjectData (required);
 }
 
-///////////////////////////////////////////////// Histogram itself
+///////////////////////////////////////////////// histogram
 
 table Histogram {
   axis: [Axis] (required);
   counts: Counts (required);
-  descriptive: Descriptive;
-  correlation: Correlation;
   profile: [Profile];
+  axis_correlation: Correlation;
   profile_correlation: Correlation;
   functions: [Function];
 }
 
-///////////////////////////////////////////////// Ntuple
+///////////////////////////////////////////////// ntuple
 
 table Page {
   buffer: RawBuffer (required);
@@ -422,8 +430,8 @@ table Column {
 table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
-  descriptive: [Descriptive];
-  correlation: Correlation;
+  column_statistics: [Descriptive];
+  column_correlation: Correlation;
   functions: [FunctionObject];
 }
 
