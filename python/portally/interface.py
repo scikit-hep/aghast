@@ -143,19 +143,19 @@ def typedproperty(check):
 
     return prop
 
-def _valid(obj, seen, only, shape):
+def _valid(obj, seen, only, *args):
     if obj is None:
-        return shape
+        return args[0]
     else:
         if only is None or id(obj) in only:
             if id(obj) in seen:
                 raise ValueError("hierarchy is recursively nested")
             seen.add(id(obj))
             obj._validtypes()
-            return obj._valid(seen, only, shape)
+            return obj._valid(seen, only, *args)
         else:
-            return shape
-        
+            return args[0]
+
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
     if not hasattr(self, lookup):
@@ -755,8 +755,7 @@ class RegularBinning(Binning):
         self.circular = circular
 
     def _valid(self, seen, only, shape):
-        if only is None or id(self.interval) in only:
-            _valid(self.interval, seen, only, shape)
+        _valid(self.interval, seen, only, shape)
 
         if math.isinf(self.interval.low):
             raise ValueError("RegularBinning.interval.low must be finite")
@@ -799,10 +798,8 @@ class TicTacToeOverflowBinning(Binning):
         self.yoverflow = yoverflow
 
     def _valid(self, seen, only, shape):
-        if only is None or id(self.xinterval) in only:
-            _valid(self.xinterval, seen, None, shape)
-        if only is None or id(self.yinterval) in only:
-            _valid(self.yinterval, seen, None, shape)
+        _valid(self.xinterval, seen, None, shape)
+        _valid(self.yinterval, seen, None, shape)
         if self.xoverflow is None:
             xoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
@@ -924,8 +921,7 @@ class IrregularBinning(Binning):
 
     def _valid(self, seen, only, shape):
         for x in self.intervals:
-            if only is None or id(x) in only:
-                _valid(x, seen, only, shape)
+            _valid(x, seen, only, shape)
         if self.overflow is None:
             numoverflow, = RealOverflow()._valid(set(), None, shape)
         else:
@@ -1010,11 +1006,8 @@ class Axis(Portally):
         else:
             binshape = _valid(self.binning, seen, None, shape)
 
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
-
-        if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, shape)
+        _valid(self.metadata, seen, only, shape)
+        _valid(self.decoration, seen, only, shape)
 
         return binshape
 
@@ -1037,8 +1030,7 @@ class UnweightedCounts(Counts):
         self.counts = counts
 
     def _valid(self, seen, only, shape):
-        if only is None or id(self.counts) in only:
-            _valid(self.counts, seen, only, shape)
+        _valid(self.counts, seen, only, shape)
 
 ################################################# WeightedCounts
 
@@ -1059,12 +1051,9 @@ class WeightedCounts(Counts):
         self.unweighted = unweighted
 
     def _valid(self, seen, only, shape):
-        if only is None or id(self.sumw) in only:
-            _valid(self.sumw, seen, only, shape)
-        if only is None or id(self.sumw2) in only:
-            _valid(self.sumw2, seen, only, shape)
-        if only is None or id(self.unweighted) in only:
-            _valid(self.unweighted, seen, only, shape)
+        _valid(self.sumw, seen, only, shape)
+        _valid(self.sumw2, seen, only, shape)
+        _valid(self.unweighted, seen, only, shape)
 
 ################################################# DescriptiveFilter
 
@@ -1287,8 +1276,7 @@ class ParameterizedFunction(Function, FunctionObject):
             raise ValueError("ParameterizedFunction.parameters keys must be unique")
 
         for x in self.parameters:
-            if only is None or id(x) in only:
-                _valid(x, seen, only, shape)
+            _valid(x, seen, only, shape)
 
         if self.contours is not None:
             if len(self.contours) != len(numpy.unique(self.contours)):
@@ -1364,17 +1352,11 @@ class BinnedEvaluatedFunction(FunctionObject):
         for x in self.axis:
             binshape = binshape + _valid(x, seen, None, shape)
 
-        if only is None or id(self.values) in only:
-            _valid(self.values, seen, only, binshape)
-        if only is None or id(self.derivatives) in only:
-            _valid(self.derivatives, seen, only, binshape)
-        if only is None or id(self.errors) in only:
-            _valid(self.errors, seen, only, binshape)
-
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
-        if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, shape)
+        _valid(self.values, seen, only, binshape)
+        _valid(self.derivatives, seen, only, binshape)
+        _valid(self.errors, seen, only, binshape)
+        _valid(self.metadata, seen, only, shape)
+        _valid(self.decoration, seen, only, shape)
 
         return shape
 
@@ -1425,8 +1407,7 @@ class Histogram(Object):
         for x in self.axis:
             binshape = binshape + _valid(x, seen, None, shape)
 
-        if only is None or id(self.counts) in only:
-            _valid(self.counts, seen, only, binshape)
+        _valid(self.counts, seen, only, binshape)
 
         if self.descriptive is not None:
             HERE
@@ -1442,13 +1423,9 @@ class Histogram(Object):
 
         if self.functions is not None and len(set(x.identifier for x in self.functions)) != len(self.functions):
             raise ValueError("Histogram.functions keys must be unique")
-        if only is None or id(self.functions) in only:
-            _valid(self.functions, seen, only, binshape)
-
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
-        if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, shape)
+        _valid(self.functions, seen, only, binshape)
+        _valid(self.metadata, seen, only, shape)
+        _valid(self.decoration, seen, only, shape)
 
         return shape
 
@@ -1465,7 +1442,7 @@ class Page(Portally):
         self.buffer = buffer
 
     def _valid(self, seen, only, column, numentries):
-        self.buffer._valid(seen, None, column.numpy_dtype.itemsize * numentries)
+        _valid(self.buffer, seen, None, column.numpy_dtype.itemsize * numentries)
         buf = self.buffer._array
 
         if column.filters is not None:
@@ -1522,17 +1499,14 @@ class ColumnChunk(Portally):
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
 
         for i, x in enumerate(self.pages):
-            if only is None or id(x) in only:
-                x._validtypes()
-                x._valid(seen, only, column, self.page_offsets[i + 1] - self.page_offsets[i])
+            _valid(x, seen, only, column, self.page_offsets[i + 1] - self.page_offsets[i])
 
         if self.page_extremes is not None:
             if len(self.page_extremes) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_extremes), len(self.pages)))
 
             for x in self.page_extremes:
-                if only is None or id(x) in only:
-                    _valid(x, seen, only, ())
+                _valid(x, seen, only, ())
 
             raise NotImplementedError("check extremes")
 
@@ -1583,8 +1557,7 @@ class Chunk(Portally):
                 if numentries is not None and num != numentries:
                     raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
 
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, ())
+        _valid(self.metadata, seen, only, ())
 
         return numentries
 
@@ -1686,16 +1659,14 @@ class NtupleInstance(Portally):
 
         if self.descriptive is not None:
             for x in self.descriptive:
-                if only is None or id(x) in only:
-                    _valid(x, seen, only, ())
+                _valid(x, seen, only, ())
 
         if self.correlation is not None:
             raise NotImplementedError
 
         if self.functions is not None:
             for x in self.functions:
-                if only is None or id(x) in only:
-                    _valid(x, seen, only, ())
+                _valid(x, seen, only, ())
 
     @property
     def numpy_arrays(self):
@@ -1747,10 +1718,8 @@ class Ntuple(Object):
                 x._validtypes()
                 x._valid(seen, only)
 
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, None)
-        if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, None)
+        _valid(self.metadata, seen, only, None)
+        _valid(self.decoration, seen, only, None)
 
         return shape
 
@@ -1923,13 +1892,11 @@ class Collection(Portally):
             raise ValueError("Collection.objects keys must be unique")
 
         for x in self.objects:
-            if only is None or id(x) in only:
-                _valid(x, seen, only, shape)
+            _valid(x, seen, only, shape)
 
-        if only is None or id(self.metadata) in only:
-            _valid(self.metadata, seen, only, shape)
-        if only is None or id(self.decoration) in only:
-            _valid(self.decoration, seen, only, shape)
+        _valid(self.metadata, seen, only, shape)
+        _valid(self.decoration, seen, only, shape)
+
         return shape
 
     def __getitem__(self, where):
