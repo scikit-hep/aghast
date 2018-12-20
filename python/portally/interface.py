@@ -38,80 +38,80 @@ import sys
 import numpy
 import flatbuffers
 
-import histos.histos_generated.Assignment
-import histos.histos_generated.Axis
-import histos.histos_generated.BinnedEvaluatedFunction
-import histos.histos_generated.BinnedRegion
-import histos.histos_generated.Binning
-import histos.histos_generated.BinPosition
-import histos.histos_generated.CategoryBinning
-import histos.histos_generated.Chunk
-import histos.histos_generated.Collection
-import histos.histos_generated.Column
-import histos.histos_generated.ColumnChunk
-import histos.histos_generated.Correlation
-import histos.histos_generated.Counts
-import histos.histos_generated.Decoration
-import histos.histos_generated.DecorationLanguage
-import histos.histos_generated.DimensionOrder
-import histos.histos_generated.Distribution
-import histos.histos_generated.DistributionStats
-import histos.histos_generated.DType
-import histos.histos_generated.EdgesBinning
-import histos.histos_generated.Endianness
-import histos.histos_generated.EvaluatedFunction
-import histos.histos_generated.ExternalType
-import histos.histos_generated.Extremes
-import histos.histos_generated.Filter
-import histos.histos_generated.FractionalErrorMethod
-import histos.histos_generated.FractionBinning
-import histos.histos_generated.Function
-import histos.histos_generated.FunctionData
-import histos.histos_generated.FunctionObject
-import histos.histos_generated.FunctionObjectData
-import histos.histos_generated.GenericErrors
-import histos.histos_generated.HexagonalBinning
-import histos.histos_generated.HexagonalCoordinates
-import histos.histos_generated.Histogram
-import histos.histos_generated.IntegerBinning
-import histos.histos_generated.InterpretedBuffer
-import histos.histos_generated.InterpretedExternalBuffer
-import histos.histos_generated.InterpretedInlineBuffer
-import histos.histos_generated.IrregularBinning
-import histos.histos_generated.MatrixLayout
-import histos.histos_generated.Metadata
-import histos.histos_generated.MetadataLanguage
-import histos.histos_generated.Moments
-import histos.histos_generated.NonRealMapping
-import histos.histos_generated.Ntuple
-import histos.histos_generated.NtupleInstance
-import histos.histos_generated.Object
-import histos.histos_generated.ObjectData
-import histos.histos_generated.OverlappingFillStrategy
-import histos.histos_generated.Page
-import histos.histos_generated.Parameter
-import histos.histos_generated.ParameterizedFunction
-import histos.histos_generated.Profile
-import histos.histos_generated.Quantiles
-import histos.histos_generated.RawBuffer
-import histos.histos_generated.RawExternalBuffer
-import histos.histos_generated.RawInlineBuffer
-import histos.histos_generated.RealInterval
-import histos.histos_generated.RealOverflow
-import histos.histos_generated.Region
-import histos.histos_generated.RegularBinning
-import histos.histos_generated.Slice
-import histos.histos_generated.SparseRegularBinning
-import histos.histos_generated.TicTacToeOverflowBinning
-import histos.histos_generated.UnweightedCounts
-import histos.histos_generated.Variation
-import histos.histos_generated.WeightedCounts
+import portally.portally_generated.Assignment
+import portally.portally_generated.Axis
+import portally.portally_generated.BinnedEvaluatedFunction
+import portally.portally_generated.BinnedRegion
+import portally.portally_generated.Binning
+import portally.portally_generated.BinPosition
+import portally.portally_generated.CategoryBinning
+import portally.portally_generated.Chunk
+import portally.portally_generated.Collection
+import portally.portally_generated.Column
+import portally.portally_generated.ColumnChunk
+import portally.portally_generated.Correlation
+import portally.portally_generated.Counts
+import portally.portally_generated.Decoration
+import portally.portally_generated.DecorationLanguage
+import portally.portally_generated.DimensionOrder
+import portally.portally_generated.Distribution
+import portally.portally_generated.DistributionStats
+import portally.portally_generated.DType
+import portally.portally_generated.EdgesBinning
+import portally.portally_generated.Endianness
+import portally.portally_generated.EvaluatedFunction
+import portally.portally_generated.ExternalType
+import portally.portally_generated.Extremes
+import portally.portally_generated.Filter
+import portally.portally_generated.FractionalErrorMethod
+import portally.portally_generated.FractionBinning
+import portally.portally_generated.Function
+import portally.portally_generated.FunctionData
+import portally.portally_generated.FunctionObject
+import portally.portally_generated.FunctionObjectData
+import portally.portally_generated.GenericErrors
+import portally.portally_generated.HexagonalBinning
+import portally.portally_generated.HexagonalCoordinates
+import portally.portally_generated.Histogram
+import portally.portally_generated.IntegerBinning
+import portally.portally_generated.InterpretedBuffer
+import portally.portally_generated.InterpretedExternalBuffer
+import portally.portally_generated.InterpretedInlineBuffer
+import portally.portally_generated.IrregularBinning
+import portally.portally_generated.MatrixLayout
+import portally.portally_generated.Metadata
+import portally.portally_generated.MetadataLanguage
+import portally.portally_generated.Moments
+import portally.portally_generated.NonRealMapping
+import portally.portally_generated.Ntuple
+import portally.portally_generated.NtupleInstance
+import portally.portally_generated.Object
+import portally.portally_generated.ObjectData
+import portally.portally_generated.OverlappingFillStrategy
+import portally.portally_generated.Page
+import portally.portally_generated.Parameter
+import portally.portally_generated.ParameterizedFunction
+import portally.portally_generated.Profile
+import portally.portally_generated.Quantiles
+import portally.portally_generated.RawBuffer
+import portally.portally_generated.RawExternalBuffer
+import portally.portally_generated.RawInlineBuffer
+import portally.portally_generated.RealInterval
+import portally.portally_generated.RealOverflow
+import portally.portally_generated.Region
+import portally.portally_generated.RegularBinning
+import portally.portally_generated.Slice
+import portally.portally_generated.SparseRegularBinning
+import portally.portally_generated.TicTacToeOverflowBinning
+import portally.portally_generated.UnweightedCounts
+import portally.portally_generated.Variation
+import portally.portally_generated.WeightedCounts
 
-import histos.checktype
+import portally.checktype
 
 def typedproperty(check):
     def setparent(self, value):
-        if isinstance(value, Histos):
+        if isinstance(value, Portally):
             if hasattr(value, "_parent"):
                 raise ValueError("object is already attached to another hierarchy: {0}".format(repr(value)))
             else:
@@ -162,7 +162,7 @@ def _getbykey(self, field, where):
             raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
     return getattr(self, lookup)[where]
 
-class Histos(object):
+class Portally(object):
     def __repr__(self):
         return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
 
@@ -210,14 +210,14 @@ class Enum(object):
     
 ################################################# Metadata
 
-class Metadata(Histos):
-    unspecified = Enum("unspecified", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
-    json = Enum("json", histos.histos_generated.MetadataLanguage.MetadataLanguage.meta_json)
+class Metadata(Portally):
+    unspecified = Enum("unspecified", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
+    json = Enum("json", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
     _params = {
-        "data":     histos.checktype.CheckString("Metadata", "data", required=True),
-        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
+        "data":     portally.checktype.CheckString("Metadata", "data", required=True),
+        "language": portally.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -232,16 +232,16 @@ class Metadata(Histos):
 
 ################################################# Decoration
 
-class Decoration(Histos):
-    unspecified = Enum("unspecified", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
-    css         = Enum("css", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_css)
-    vega        = Enum("vega", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    root_json   = Enum("root_json", histos.histos_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+class Decoration(Portally):
+    unspecified = Enum("unspecified", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
+    css         = Enum("css", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega        = Enum("vega", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    root_json   = Enum("root_json", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
     language = [unspecified, css, vega, root_json]
 
     _params = {
-        "data":     histos.checktype.CheckString("Metadata", "data", required=True),
-        "language": histos.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
+        "data":     portally.checktype.CheckString("Metadata", "data", required=True),
+        "language": portally.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -256,17 +256,17 @@ class Decoration(Histos):
 
 ################################################# Object
 
-class Object(Histos):
+class Object(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# Buffers
 
-class Buffer(Histos):
-    none = Enum("none", histos.histos_generated.Filter.Filter.filter_none)
-    gzip = Enum("gzip", histos.histos_generated.Filter.Filter.filter_gzip)
-    lzma = Enum("lzma", histos.histos_generated.Filter.Filter.filter_lzma)
-    lz4  = Enum("lz4", histos.histos_generated.Filter.Filter.filter_lz4)
+class Buffer(Portally):
+    none = Enum("none", portally.portally_generated.Filter.Filter.filter_none)
+    gzip = Enum("gzip", portally.portally_generated.Filter.Filter.filter_gzip)
+    lzma = Enum("lzma", portally.portally_generated.Filter.Filter.filter_lzma)
+    lz4  = Enum("lz4", portally.portally_generated.Filter.Filter.filter_lz4)
     filters = [none, gzip, lzma, lz4]
 
     def __init__(self):
@@ -277,10 +277,10 @@ class InlineBuffer(object):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 class ExternalBuffer(object):
-    memory   = Enum("memory", histos.histos_generated.ExternalType.ExternalType.external_memory)
-    samefile = Enum("samefile", histos.histos_generated.ExternalType.ExternalType.external_samefile)
-    file     = Enum("file", histos.histos_generated.ExternalType.ExternalType.external_file)
-    url      = Enum("url", histos.histos_generated.ExternalType.ExternalType.external_url)
+    memory   = Enum("memory", portally.portally_generated.ExternalType.ExternalType.external_memory)
+    samefile = Enum("samefile", portally.portally_generated.ExternalType.ExternalType.external_samefile)
+    file     = Enum("file", portally.portally_generated.ExternalType.ExternalType.external_file)
+    url      = Enum("url", portally.portally_generated.ExternalType.ExternalType.external_url)
     types = [memory, samefile, file, url]
 
     def __init__(self):
@@ -306,21 +306,21 @@ class DimensionOrderEnum(Enum):
         self.dimension_order = dimension_order
 
 class Interpretation(object):
-    none    = DTypeEnum("none", histos.histos_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
-    int8    = DTypeEnum("int8", histos.histos_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
-    uint8   = DTypeEnum("uint8", histos.histos_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
-    int16   = DTypeEnum("int16", histos.histos_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
-    uint16  = DTypeEnum("uint16", histos.histos_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
-    int32   = DTypeEnum("int32", histos.histos_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
-    uint32  = DTypeEnum("uint32", histos.histos_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
-    int64   = DTypeEnum("int64", histos.histos_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
-    uint64  = DTypeEnum("uint64", histos.histos_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
-    float32 = DTypeEnum("float32", histos.histos_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
-    float64 = DTypeEnum("float64", histos.histos_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
+    none    = DTypeEnum("none", portally.portally_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    int8    = DTypeEnum("int8", portally.portally_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
+    uint8   = DTypeEnum("uint8", portally.portally_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
+    int16   = DTypeEnum("int16", portally.portally_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
+    uint16  = DTypeEnum("uint16", portally.portally_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
+    int32   = DTypeEnum("int32", portally.portally_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
+    uint32  = DTypeEnum("uint32", portally.portally_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
+    int64   = DTypeEnum("int64", portally.portally_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
+    uint64  = DTypeEnum("uint64", portally.portally_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
+    float32 = DTypeEnum("float32", portally.portally_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
+    float64 = DTypeEnum("float64", portally.portally_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
     dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
-    little_endian = EndiannessEnum("little_endian", histos.histos_generated.Endianness.Endianness.little_endian, "<")
-    big_endian    = EndiannessEnum("big_endian", histos.histos_generated.Endianness.Endianness.big_endian, ">")
+    little_endian = EndiannessEnum("little_endian", portally.portally_generated.Endianness.Endianness.little_endian, "<")
+    big_endian    = EndiannessEnum("big_endian", portally.portally_generated.Endianness.Endianness.big_endian, ">")
     endiannesses = [little_endian, big_endian]
 
     @property
@@ -328,8 +328,8 @@ class Interpretation(object):
         return self.dtype.dtype.newbyteorder(self._endianness.endianness)
 
 class InterpretedBuffer(Interpretation):
-    c_order       = DimensionOrderEnum("c_order", histos.histos_generated.DimensionOrder.DimensionOrder.c_order, "C")
-    fortran_order = DimensionOrderEnum("fortran", histos.histos_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
+    c_order       = DimensionOrderEnum("c_order", portally.portally_generated.DimensionOrder.DimensionOrder.c_order, "C")
+    fortran_order = DimensionOrderEnum("fortran", portally.portally_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
     orders = [c_order, fortran_order]
 
     def __init__(self):
@@ -339,7 +339,7 @@ class InterpretedBuffer(Interpretation):
 
 class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     _params = {
-        "buffer": histos.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
+        "buffer": portally.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -366,9 +366,9 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
-        "pointer":          histos.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         histos.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    histos.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
+        "pointer":          portally.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         portally.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
+        "external_type":    portally.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
         }
 
     pointer       = typedproperty(_params["pointer"])
@@ -408,12 +408,12 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
-        "buffer":           histos.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
-        "filters":          histos.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
-        "dtype":            histos.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       histos.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  histos.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "buffer":           portally.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
+        "filters":          portally.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": portally.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
+        "dtype":            portally.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       portally.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  portally.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         }
 
     buffer           = typedproperty(_params["buffer"])
@@ -471,15 +471,15 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
-        "pointer":          histos.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         histos.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    histos.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
-        "filters":          histos.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
-        "dtype":            histos.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       histos.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  histos.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
-        "location":         histos.checktype.CheckString("ExternalBuffer", "location", required=False),
+        "pointer":          portally.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         portally.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
+        "external_type":    portally.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
+        "filters":          portally.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": portally.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
+        "dtype":            portally.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       portally.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  portally.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "location":         portally.checktype.CheckString("ExternalBuffer", "location", required=False),
         }
 
     pointer          = typedproperty(_params["pointer"])
@@ -541,24 +541,24 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
 ################################################# Binning
 
-class Binning(Histos):
+class Binning(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# FractionalBinning
 
 class FractionalBinning(Binning):
-    normal           = Enum("normal", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
-    clopper_pearson  = Enum("clopper_pearson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_clopper_pearson)
-    wilson           = Enum("wilson", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_wilson)
-    agresti_coull    = Enum("agresti_coull", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_agresti_coull)
-    feldman_cousins  = Enum("feldman_cousins", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_feldman_cousins)
-    jeffrey          = Enum("jeffrey", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
-    bayesian_uniform = Enum("bayesian_uniform", histos.histos_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
+    normal           = Enum("normal", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_normal)
+    clopper_pearson  = Enum("clopper_pearson", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_clopper_pearson)
+    wilson           = Enum("wilson", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_wilson)
+    agresti_coull    = Enum("agresti_coull", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_agresti_coull)
+    feldman_cousins  = Enum("feldman_cousins", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_feldman_cousins)
+    jeffrey          = Enum("jeffrey", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_jeffrey)
+    bayesian_uniform = Enum("bayesian_uniform", portally.portally_generated.FractionalErrorMethod.FractionalErrorMethod.frac_bayesian_uniform)
     error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
-        "error_method": histos.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
+        "error_method": portally.checktype.CheckEnum("FractionalBinning", "error_method", required=False, choices=error_methods),
         }
 
     error_method = typedproperty(_params["error_method"])
@@ -572,23 +572,23 @@ class FractionalBinning(Binning):
 ################################################# BinPosition
 
 class BinPosition(object):
-    below3 = Enum("below3", histos.histos_generated.BinPosition.BinPosition.pos_below3)
-    below2 = Enum("below2", histos.histos_generated.BinPosition.BinPosition.pos_below2)
-    below1 = Enum("below1", histos.histos_generated.BinPosition.BinPosition.pos_below1)
-    nonexistent = Enum("nonexistent", histos.histos_generated.BinPosition.BinPosition.pos_nonexistent)
-    above1 = Enum("above1", histos.histos_generated.BinPosition.BinPosition.pos_above1)
-    above2 = Enum("above2", histos.histos_generated.BinPosition.BinPosition.pos_above2)
-    above3 = Enum("above3", histos.histos_generated.BinPosition.BinPosition.pos_above3)
+    below3 = Enum("below3", portally.portally_generated.BinPosition.BinPosition.pos_below3)
+    below2 = Enum("below2", portally.portally_generated.BinPosition.BinPosition.pos_below2)
+    below1 = Enum("below1", portally.portally_generated.BinPosition.BinPosition.pos_below1)
+    nonexistent = Enum("nonexistent", portally.portally_generated.BinPosition.BinPosition.pos_nonexistent)
+    above1 = Enum("above1", portally.portally_generated.BinPosition.BinPosition.pos_above1)
+    above2 = Enum("above2", portally.portally_generated.BinPosition.BinPosition.pos_above2)
+    above3 = Enum("above3", portally.portally_generated.BinPosition.BinPosition.pos_above3)
     positions = [below3, below2, below1, nonexistent, above1, above2, above3]
 
 ################################################# IntegerBinning
 
 class IntegerBinning(Binning, BinPosition):
     _params = {
-        "min":           histos.checktype.CheckInteger("IntegerBinning", "min", required=True),
-        "max":           histos.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "pos_underflow": histos.checktype.CheckEnum("IntegerBinning", "pos_underflow", required=False, choices=BinPosition.positions),
-        "pos_overflow":  histos.checktype.CheckEnum("IntegerBinning", "pos_overflow", required=False, choices=BinPosition.positions),
+        "min":           portally.checktype.CheckInteger("IntegerBinning", "min", required=True),
+        "max":           portally.checktype.CheckInteger("IntegerBinning", "max", required=True),
+        "pos_underflow": portally.checktype.CheckEnum("IntegerBinning", "pos_underflow", required=False, choices=BinPosition.positions),
+        "pos_overflow":  portally.checktype.CheckEnum("IntegerBinning", "pos_overflow", required=False, choices=BinPosition.positions),
         }
 
     min           = typedproperty(_params["min"])
@@ -613,12 +613,12 @@ class IntegerBinning(Binning, BinPosition):
 
 ################################################# RealInterval
 
-class RealInterval(Histos):
+class RealInterval(Portally):
     _params = {
-        "low":            histos.checktype.CheckNumber("RealInterval", "low", required=True),
-        "high":           histos.checktype.CheckNumber("RealInterval", "high", required=True),
-        "low_inclusive":  histos.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
-        "high_inclusive": histos.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
+        "low":            portally.checktype.CheckNumber("RealInterval", "low", required=True),
+        "high":           portally.checktype.CheckNumber("RealInterval", "high", required=True),
+        "low_inclusive":  portally.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
+        "high_inclusive": portally.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
 
     low            = typedproperty(_params["low"])
@@ -641,20 +641,20 @@ class RealInterval(Histos):
 
 ################################################# RealOverflow
 
-class RealOverflow(Histos, BinPosition):
-    missing      = Enum("missing", histos.histos_generated.NonRealMapping.NonRealMapping.missing)
-    in_underflow = Enum("in_underflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_underflow)
-    in_overflow  = Enum("in_overflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_overflow)
-    in_nanflow   = Enum("in_nanflow", histos.histos_generated.NonRealMapping.NonRealMapping.in_nanflow)
+class RealOverflow(Portally, BinPosition):
+    missing      = Enum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
+    in_underflow = Enum("in_underflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_underflow)
+    in_overflow  = Enum("in_overflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_overflow)
+    in_nanflow   = Enum("in_nanflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_nanflow)
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "pos_underflow": histos.checktype.CheckEnum("RealOverflow", "pos_underflow", required=False, choices=BinPosition.positions),
-        "pos_overflow":  histos.checktype.CheckEnum("RealOverflow", "pos_overflow", required=False, choices=BinPosition.positions),
-        "pos_nanflow":   histos.checktype.CheckEnum("RealOverflow", "pos_nanflow", required=False, choices=BinPosition.positions),
-        "minf_mapping":  histos.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
-        "pinf_mapping":  histos.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
-        "nan_mapping":   histos.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
+        "pos_underflow": portally.checktype.CheckEnum("RealOverflow", "pos_underflow", required=False, choices=BinPosition.positions),
+        "pos_overflow":  portally.checktype.CheckEnum("RealOverflow", "pos_overflow", required=False, choices=BinPosition.positions),
+        "pos_nanflow":   portally.checktype.CheckEnum("RealOverflow", "pos_nanflow", required=False, choices=BinPosition.positions),
+        "minf_mapping":  portally.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
+        "pinf_mapping":  portally.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
+        "nan_mapping":   portally.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
     pos_underflow = typedproperty(_params["pos_underflow"])
@@ -686,10 +686,10 @@ class RealOverflow(Histos, BinPosition):
 
 class RegularBinning(Binning):
     _params = {
-        "num":      histos.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
-        "interval": histos.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
-        "overflow": histos.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
-        "circular": histos.checktype.CheckBool("RegularBinning", "circular", required=False),
+        "num":      portally.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
+        "interval": portally.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
+        "overflow": portally.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
+        "circular": portally.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
     num      = typedproperty(_params["num"])
@@ -720,12 +720,12 @@ class RegularBinning(Binning):
 
 class TicTacToeOverflowBinning(Binning):
     _params = {
-        "xnum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
-        "ynum":      histos.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
-        "xinterval": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
-        "yinterval": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
-        "xoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
-        "yoverflow": histos.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
+        "xnum":      portally.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
+        "ynum":      portally.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
+        "xinterval": portally.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
+        "yinterval": portally.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
+        "xoverflow": portally.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
+        "yoverflow": portally.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
 
     xnum      = typedproperty(_params["xnum"])
@@ -762,24 +762,24 @@ class TicTacToeOverflowBinning(Binning):
 ################################################# HexagonalBinning
 
 class HexagonalBinning(Binning):
-    offset         = Enum("offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
-    doubled_offset = Enum("doubled_offset", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
-    cube_xy        = Enum("cube_xy", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
-    cube_yz        = Enum("cube_yz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
-    cube_xz        = Enum("cube_xz", histos.histos_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
+    offset         = Enum("offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
+    doubled_offset = Enum("doubled_offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
+    cube_xy        = Enum("cube_xy", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
+    cube_yz        = Enum("cube_yz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
+    cube_xz        = Enum("cube_xz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
-        "qmin":        histos.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
-        "qmax":        histos.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
-        "rmin":        histos.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
-        "rmax":        histos.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
-        "coordinates": histos.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
-        "xorigin":     histos.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "yorigin":     histos.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "qangle":      histos.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
-        "qoverflow":   histos.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
-        "roverflow":   histos.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
+        "qmin":        portally.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
+        "qmax":        portally.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
+        "rmin":        portally.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
+        "rmax":        portally.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
+        "coordinates": portally.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":     portally.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "yorigin":     portally.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "qangle":      portally.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
+        "qoverflow":   portally.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
+        "roverflow":   portally.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
         }
 
     qmin        = typedproperty(_params["qmin"])
@@ -822,8 +822,8 @@ class HexagonalBinning(Binning):
 
 class EdgesBinning(Binning):
     _params = {
-        "edges":    histos.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
-        "overflow": histos.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        "edges":    portally.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
+        "overflow": portally.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
         }
 
     edges    = typedproperty(_params["edges"])
@@ -847,15 +847,15 @@ class EdgesBinning(Binning):
 ################################################# EdgesBinning
 
 class IrregularBinning(Binning):
-    all = Enum("all", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first = Enum("first", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last = Enum("last", histos.histos_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    all = Enum("all", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first = Enum("first", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last = Enum("last", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
     overlapping_fill_strategies = [all, first, last]
 
     _params = {
-        "intervals":        histos.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval),
-        "overflow":         histos.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
-        "overlapping_fill": histos.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
+        "intervals":        portally.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval),
+        "overflow":         portally.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
+        "overlapping_fill": portally.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
         }
 
     intervals        = typedproperty(_params["intervals"])
@@ -881,8 +881,8 @@ class IrregularBinning(Binning):
 
 class CategoryBinning(Binning, BinPosition):
     _params = {
-        "categories": histos.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
-        "pos_overflow":  histos.checktype.CheckEnum("CategoryBinning", "pos_overflow", required=False, choices=BinPosition.positions),
+        "categories": portally.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
+        "pos_overflow":  portally.checktype.CheckEnum("CategoryBinning", "pos_overflow", required=False, choices=BinPosition.positions),
         }
 
     categories = typedproperty(_params["categories"])
@@ -901,10 +901,10 @@ class CategoryBinning(Binning, BinPosition):
 
 class SparseRegularBinning(Binning, BinPosition):
     _params = {
-        "bins":        histos.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
-        "bin_width":   histos.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
-        "origin":      histos.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "pos_nanflow": histos.checktype.CheckEnum("SparseRegularBinning", "pos_nanflow", required=False, choices=BinPosition.positions),
+        "bins":        portally.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
+        "bin_width":   portally.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        "origin":      portally.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        "pos_nanflow": portally.checktype.CheckEnum("SparseRegularBinning", "pos_nanflow", required=False, choices=BinPosition.positions),
         }
 
     bins        = typedproperty(_params["bins"])
@@ -925,13 +925,13 @@ class SparseRegularBinning(Binning, BinPosition):
 
 ################################################# Axis
 
-class Axis(Histos):
+class Axis(Portally):
     _params = {
-        "binning":    histos.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
-        "expression": histos.checktype.CheckString("Axis", "expression", required=False),
-        "title":      histos.checktype.CheckString("Axis", "title", required=False),
-        "metadata":   histos.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
-        "decoration": histos.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
+        "binning":    portally.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
+        "expression": portally.checktype.CheckString("Axis", "expression", required=False),
+        "title":      portally.checktype.CheckString("Axis", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
 
     binning    = typedproperty(_params["binning"])
@@ -960,7 +960,7 @@ class Axis(Histos):
 
 ################################################# Counts
 
-class Counts(Histos):
+class Counts(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -968,7 +968,7 @@ class Counts(Histos):
 
 class UnweightedCounts(Counts):
     _params = {
-        "counts":  histos.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
+        "counts":  portally.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
     counts = typedproperty(_params["counts"])
@@ -980,9 +980,9 @@ class UnweightedCounts(Counts):
 
 class WeightedCounts(Counts):
     _params = {
-        "sumw":   histos.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
-        "sumw2":  histos.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
-        "counts": histos.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
+        "sumw":   portally.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
+        "sumw2":  portally.checktype.CheckClass("WeightedCounts", "sumw2", required=True, type=InterpretedBuffer),
+        "counts": portally.checktype.CheckClass("WeightedCounts", "counts", required=False, type=UnweightedCounts),
         }
 
     sumw   = typedproperty(_params["sumw"])
@@ -996,17 +996,17 @@ class WeightedCounts(Counts):
 
 ################################################# Correlation
 
-class Correlation(Histos):
-    diagonal = Enum("diagonal", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_diagonal)
-    antisymmetric = Enum("antisymmetric", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_antisymmetric)
-    symmetric = Enum("symmetric", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_symmetric)
-    full = Enum("full", histos.histos_generated.MatrixLayout.MatrixLayout.matrix_full)
+class Correlation(Portally):
+    diagonal = Enum("diagonal", portally.portally_generated.MatrixLayout.MatrixLayout.matrix_diagonal)
+    antisymmetric = Enum("antisymmetric", portally.portally_generated.MatrixLayout.MatrixLayout.matrix_antisymmetric)
+    symmetric = Enum("symmetric", portally.portally_generated.MatrixLayout.MatrixLayout.matrix_symmetric)
+    full = Enum("full", portally.portally_generated.MatrixLayout.MatrixLayout.matrix_full)
     matrixlayouts = [diagonal, antisymmetric, symmetric, full]
 
     _params = {
-        "sumwx":  histos.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
-        "sumwxy": histos.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
-        "layout": histos.checktype.CheckEnum("Correlation", "layout", required=False, choices=matrixlayouts),
+        "sumwx":  portally.checktype.CheckClass("Correlation", "sumwx", required=True, type=InterpretedBuffer),
+        "sumwxy": portally.checktype.CheckClass("Correlation", "sumwxy", required=True, type=InterpretedBuffer),
+        "layout": portally.checktype.CheckEnum("Correlation", "layout", required=False, choices=matrixlayouts),
         }
 
     sumwx  = typedproperty(_params["sumwx"])
@@ -1020,13 +1020,13 @@ class Correlation(Histos):
 
 ################################################# Extremes
 
-class Extremes(Histos):
+class Extremes(Portally):
     _params = {
-        "min":           histos.checktype.CheckClass("Extremes", "min", required=True, type=InterpretedBuffer),
-        "max":           histos.checktype.CheckClass("Extremes", "max", required=True, type=InterpretedBuffer),
-        "excludes_minf": histos.checktype.CheckBool("Extremes", "excludes_minf", required=False),
-        "excludes_pinf": histos.checktype.CheckBool("Extremes", "excludes_pinf", required=False),
-        "excludes_nan":  histos.checktype.CheckBool("Extremes", "excludes_nan", required=False),
+        "min":           portally.checktype.CheckClass("Extremes", "min", required=True, type=InterpretedBuffer),
+        "max":           portally.checktype.CheckClass("Extremes", "max", required=True, type=InterpretedBuffer),
+        "excludes_minf": portally.checktype.CheckBool("Extremes", "excludes_minf", required=False),
+        "excludes_pinf": portally.checktype.CheckBool("Extremes", "excludes_pinf", required=False),
+        "excludes_nan":  portally.checktype.CheckBool("Extremes", "excludes_nan", required=False),
         }
 
     min           = typedproperty(_params["min"])
@@ -1044,10 +1044,10 @@ class Extremes(Histos):
 
 ################################################# Moments
 
-class Moments(Histos):
+class Moments(Portally):
     _params = {
-        "sumwn": histos.checktype.CheckClass("Moments", "sumwn", required=True, type=InterpretedBuffer),
-        "n":     histos.checktype.CheckInteger("Moments", "n", required=True, min=1),
+        "sumwn": portally.checktype.CheckClass("Moments", "sumwn", required=True, type=InterpretedBuffer),
+        "n":     portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
         }
 
     sumwn = typedproperty(_params["sumwn"])
@@ -1059,10 +1059,10 @@ class Moments(Histos):
 
 ################################################# Quantiles
 
-class Quantiles(Histos):
+class Quantiles(Portally):
     _params = {
-        "values": histos.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
-        "p":      histos.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
+        "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
         }
 
     values = typedproperty(_params["values"])
@@ -1074,10 +1074,10 @@ class Quantiles(Histos):
 
 ################################################# GenericErrors
 
-class GenericErrors(Histos):
+class GenericErrors(Portally):
     _params = {
-        "errors": histos.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
-        "p":      histos.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
+        "errors": portally.checktype.CheckClass("GenericErrors", "errors", required=True, type=InterpretedBuffer),
+        "p":      portally.checktype.CheckNumber("GenericErrors", "p", required=False, min=0.0, max=1.0),
         }
 
     errors = typedproperty(_params["errors"])
@@ -1089,13 +1089,13 @@ class GenericErrors(Histos):
 
 ################################################# DistributionStats
 
-class DistributionStats(Histos):
+class DistributionStats(Portally):
     _params = {
-        "correlation":    histos.checktype.CheckClass("DistributionStats", "correlation", required=False, type=Correlation),
-        "extremes":       histos.checktype.CheckClass("DistributionStats", "extremes", required=False, type=Extremes),
-        "moments":        histos.checktype.CheckVector("DistributionStats", "moments", required=False, type=Moments),
-        "quantiles":      histos.checktype.CheckVector("DistributionStats", "quantiles", required=False, type=Quantiles),
-        "generic_errors": histos.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
+        "correlation":    portally.checktype.CheckClass("DistributionStats", "correlation", required=False, type=Correlation),
+        "extremes":       portally.checktype.CheckClass("DistributionStats", "extremes", required=False, type=Extremes),
+        "moments":        portally.checktype.CheckVector("DistributionStats", "moments", required=False, type=Moments),
+        "quantiles":      portally.checktype.CheckVector("DistributionStats", "quantiles", required=False, type=Quantiles),
+        "generic_errors": portally.checktype.CheckVector("DistributionStats", "generic_errors", required=False, type=GenericErrors),
         }
 
     correlation    = typedproperty(_params["correlation"])
@@ -1113,10 +1113,10 @@ class DistributionStats(Histos):
 
 ################################################# Distribution
 
-class Distribution(Histos):
+class Distribution(Portally):
     _params = {
-        "counts": histos.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
-        "stats":  histos.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
+        "counts": portally.checktype.CheckClass("Distribution", "counts", required=True, type=Counts),
+        "stats":  portally.checktype.CheckClass("Distribution", "stats", required=False, type=DistributionStats),
         }
 
     counts = typedproperty(_params["counts"])
@@ -1128,12 +1128,12 @@ class Distribution(Histos):
 
 ################################################# Profile
 
-class Profile(Histos):
+class Profile(Portally):
     _params = {
-        "expression": histos.checktype.CheckString("Profile", "expression", required=True),
-        "title":      histos.checktype.CheckString("Profile", "title", required=False),
-        "metadata":   histos.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
-        "decoration": histos.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
+        "expression": portally.checktype.CheckString("Profile", "expression", required=True),
+        "title":      portally.checktype.CheckString("Profile", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
     expression = typedproperty(_params["expression"])
@@ -1149,10 +1149,10 @@ class Profile(Histos):
 
 ################################################# Parameter
 
-class Parameter(Histos):
+class Parameter(Portally):
     _params = {
-        "identifier": histos.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
-        "value":      histos.checktype.CheckNumber("Parameter", "value", required=True),
+        "identifier": portally.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
+        "value":      portally.checktype.CheckNumber("Parameter", "value", required=True),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1167,7 +1167,7 @@ class Parameter(Histos):
 
 ################################################# Function
 
-class Function(Histos):
+class Function(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -1181,13 +1181,13 @@ class FunctionObject(Object):
 
 class ParameterizedFunction(Function, FunctionObject):
     _params = {
-        "identifier": histos.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
-        "expression": histos.checktype.CheckString("ParameterizedFunction", "expression", required=True),
-        "parameters": histos.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
-        "contours":   histos.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
-        "title":      histos.checktype.CheckString("ParameterizedFunction", "title", required=False),
-        "metadata":   histos.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
-        "decoration": histos.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        "identifier": portally.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
+        "expression": portally.checktype.CheckString("ParameterizedFunction", "expression", required=True),
+        "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=True, type=Parameter),
+        "contours":   portally.checktype.CheckVector("ParameterizedFunction", "contours", required=False, type=float),
+        "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1225,13 +1225,13 @@ class ParameterizedFunction(Function, FunctionObject):
 
 class EvaluatedFunction(Function):
     _params = {
-        "identifier":     histos.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
-        "values":         histos.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
-        "derivatives":    histos.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
-        "generic_errors": histos.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
-        "title":          histos.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "identifier":     portally.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
+        "values":         portally.checktype.CheckVector("EvaluatedFunction", "values", required=True, type=float),
+        "derivatives":    portally.checktype.CheckVector("EvaluatedFunction", "derivatives", required=False, type=float),
+        "generic_errors": portally.checktype.CheckVector("EvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
+        "title":          portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":       portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     portally.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
     identifier     = typedproperty(_params["identifier"])
@@ -1255,14 +1255,14 @@ class EvaluatedFunction(Function):
 
 class BinnedEvaluatedFunction(FunctionObject):
     _params = {
-        "identifier":     histos.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
-        "axis":           histos.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
-        "values":         histos.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives":    histos.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "generic_errors": histos.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
-        "title":          histos.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        "identifier":     portally.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
+        "axis":           portally.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
+        "values":         portally.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives":    portally.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "generic_errors": portally.checktype.CheckVector("BinnedEvaluatedFunction", "generic_errors", required=False, type=GenericErrors),
+        "title":          portally.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
+        "metadata":       portally.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":     portally.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
         }
 
     identifier     = typedproperty(_params["identifier"])
@@ -1307,16 +1307,16 @@ class BinnedEvaluatedFunction(FunctionObject):
 
 class Histogram(Object):
     _params = {
-        "identifier":     histos.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
-        "axis":           histos.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "distribution":   histos.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
-        "unbinned_stats": histos.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
-        "profiles":       histos.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
-        "profile_stats":  histos.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
-        "functions":      histos.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
-        "title":          histos.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "identifier":     portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
+        "axis":           portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "distribution":   portally.checktype.CheckClass("Histogram", "distribution", required=True, type=Distribution),
+        "unbinned_stats": portally.checktype.CheckVector("Histogram", "unbinned_stats", required=False, type=DistributionStats),
+        "profiles":       portally.checktype.CheckVector("Histogram", "profiles", required=False, type=Profile),
+        "profile_stats":  portally.checktype.CheckVector("Histogram", "profile_stats", required=False, type=DistributionStats),
+        "functions":      portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "title":          portally.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":       portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":     portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         }
 
     identifier     = typedproperty(_params["identifier"])
@@ -1344,9 +1344,9 @@ class Histogram(Object):
 
 ################################################# Page
 
-class Page(Histos):
+class Page(Portally):
     _params = {
-        "buffer": histos.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
+        "buffer": portally.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -1381,11 +1381,11 @@ class Page(Histos):
 
 ################################################# ColumnChunk
 
-class ColumnChunk(Histos):
+class ColumnChunk(Portally):
     _params = {
-        "pages":         histos.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
-        "page_offsets":  histos.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_extremes": histos.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
+        "pages":         portally.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
+        "page_offsets":  portally.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
+        "page_extremes": portally.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
         }
 
     pages         = typedproperty(_params["pages"])
@@ -1444,10 +1444,10 @@ class ColumnChunk(Histos):
 
 ################################################# Chunk
 
-class Chunk(Histos):
+class Chunk(Portally):
     _params = {
-        "columns":  histos.checktype.CheckVector("Chunk", "columns", required=True, type=ColumnChunk),
-        "metadata": histos.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
+        "columns":  portally.checktype.CheckVector("Chunk", "columns", required=True, type=ColumnChunk),
+        "metadata": portally.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
     columns  = typedproperty(_params["columns"])
@@ -1490,16 +1490,16 @@ class Chunk(Histos):
 
 ################################################# Column
 
-class Column(Histos, Interpretation):
+class Column(Portally, Interpretation):
     _params = {
-        "identifier":       histos.checktype.CheckKey("Column", "identifier", required=True, type=str),
-        "dtype":            histos.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
-        "endianness":       histos.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
-        "filters":          histos.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": histos.checktype.CheckSlice("Column", "postfilter_slice", required=False),
-        "title":            histos.checktype.CheckString("Column", "title", required=False),
-        "metadata":         histos.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
-        "decoration":       histos.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
+        "identifier":       portally.checktype.CheckKey("Column", "identifier", required=True, type=str),
+        "dtype":            portally.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
+        "endianness":       portally.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
+        "filters":          portally.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": portally.checktype.CheckSlice("Column", "postfilter_slice", required=False),
+        "title":            portally.checktype.CheckString("Column", "title", required=False),
+        "metadata":         portally.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
+        "decoration":       portally.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
     identifier       = typedproperty(_params["identifier"])
@@ -1528,12 +1528,12 @@ class Column(Histos, Interpretation):
 
 ################################################# NtupleInstance
 
-class NtupleInstance(Histos):
+class NtupleInstance(Portally):
     _params = {
-        "chunks":         histos.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":  histos.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
-        "unbinned_stats": histos.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
-        "functions":      histos.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "chunks":         portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
+        "chunk_offsets":  portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
+        "unbinned_stats": portally.checktype.CheckVector("Ntuple", "unbinned_stats", required=False, type=DistributionStats),
+        "functions":      portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
         }
 
     chunks         = typedproperty(_params["chunks"])
@@ -1591,12 +1591,12 @@ class NtupleInstance(Histos):
 
 class Ntuple(Object):
     _params = {
-        "identifier": histos.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
-        "columns":    histos.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":  histos.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "title":      histos.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":   histos.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration": histos.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "identifier": portally.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
+        "columns":    portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":  portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "title":      portally.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1640,9 +1640,9 @@ class Ntuple(Object):
 
 ################################################# Region
 
-class Region(Histos):
+class Region(Portally):
     _params = {
-        "expressions":  histos.checktype.CheckVector("Region", "expressions", required=True, type=str),
+        "expressions":  portally.checktype.CheckVector("Region", "expressions", required=True, type=str),
         }
 
     expressions = typedproperty(_params["expressions"])
@@ -1652,10 +1652,10 @@ class Region(Histos):
 
 ################################################# BinnedRegion
 
-class BinnedRegion(Histos):
+class BinnedRegion(Portally):
     _params = {
-        "expression": histos.checktype.CheckString("BinnedRegion", "expression", required=True),
-        "binning":    histos.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
+        "expression": portally.checktype.CheckString("BinnedRegion", "expression", required=True),
+        "binning":    portally.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
         }
 
     expression = typedproperty(_params["expression"])
@@ -1667,10 +1667,10 @@ class BinnedRegion(Histos):
 
 ################################################# Assignment
 
-class Assignment(Histos):
+class Assignment(Portally):
     _params = {
-        "identifier": histos.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
-        "expression": histos.checktype.CheckString("Assignment", "expression", required=True),
+        "identifier": portally.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
+        "expression": portally.checktype.CheckString("Assignment", "expression", required=True),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1682,11 +1682,11 @@ class Assignment(Histos):
 
 ################################################# Variation
 
-class Variation(Histos):
+class Variation(Portally):
     _params = {
-        "assignments":         histos.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
-        "systematic":          histos.checktype.CheckVector("Variation", "systematic", required=False, type=float),
-        "category_systematic": histos.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
+        "assignments":         portally.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
+        "systematic":          portally.checktype.CheckVector("Variation", "systematic", required=False, type=float),
+        "category_systematic": portally.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
     assignments         = typedproperty(_params["assignments"])
@@ -1700,7 +1700,7 @@ class Variation(Histos):
 
 ################################################# Collection
 
-class Collection(Histos):
+class Collection(Portally):
     def tobuffer(self):
         self.checkvalid()
         builder = flatbuffers.Builder(1024)
@@ -1710,7 +1710,7 @@ class Collection(Histos):
     @classmethod
     def frombuffer(cls, buffer, offset=0):
         out = cls.__new__(cls)
-        out._flatbuffers = histos.histos_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
+        out._flatbuffers = portally.portally_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
         return out
 
     def toarray(self):
@@ -1770,15 +1770,15 @@ class Collection(Histos):
         return cls.frombuffer(file[offset:-12])
 
     _params = {
-        "identifier":     histos.checktype.CheckString("Collection", "identifier", required=True),
-        "objects":        histos.checktype.CheckVector("Collection", "objects", required=True, type=Object),
-        "collections":    histos.checktype.CheckVector("Collection", "collections", required=False, type=None),
-        "regions":        histos.checktype.CheckVector("Collection", "regions", required=False, type=Region),
-        "binned_regions": histos.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
-        "variations":     histos.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
-        "title":          histos.checktype.CheckString("Collection", "title", required=False),
-        "metadata":       histos.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
-        "decoration":     histos.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
+        "objects":        portally.checktype.CheckVector("Collection", "objects", required=True, type=Object),
+        "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
+        "regions":        portally.checktype.CheckVector("Collection", "regions", required=False, type=Region),
+        "binned_regions": portally.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
+        "variations":     portally.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
+        "title":          portally.checktype.CheckString("Collection", "title", required=False),
+        "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
         }
 
     identifier     = typedproperty(_params["identifier"])
@@ -1838,10 +1838,10 @@ class Collection(Histos):
         identifier = builder.CreateString(self._identifier)
         if len(self._title) > 0:
             title = builder.CreateString(self._title)
-        histos.histos_generated.Collection.CollectionStart(builder)
-        histos.histos_generated.Collection.CollectionAddIdentifier(builder, identifier)
+        portally.portally_generated.Collection.CollectionStart(builder)
+        portally.portally_generated.Collection.CollectionAddIdentifier(builder, identifier)
         if len(self._title) > 0:
-            histos.histos_generated.Collection.CollectionAddTitle(builder, title)
-        return histos.histos_generated.Collection.CollectionEnd(builder)
+            portally.portally_generated.Collection.CollectionAddTitle(builder, title)
+        return portally.portally_generated.Collection.CollectionEnd(builder)
 
 Collection._params["collections"].type = Collection

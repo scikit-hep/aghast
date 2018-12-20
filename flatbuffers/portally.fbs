@@ -1,4 +1,4 @@
-namespace histos_generated;
+namespace portally_generated;
 
 ///////////////////////////////////////////////// Metadata
 
@@ -477,6 +477,6 @@ table Collection {
   decoration: Decoration;
 }
 
-file_extension "hist";
-file_identifier "hist";
+file_extension "pty";
+file_identifier "pty";
 root_type Collection;

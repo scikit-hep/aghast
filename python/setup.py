@@ -35,22 +35,22 @@ from setuptools import setup
 
 def get_version():
     g = {}
-    exec(open(os.path.join("histos", "version.py")).read(), g)
+    exec(open(os.path.join("portally", "version.py")).read(), g)
     return g["__version__"]
 
-setup(name = "awkward",
+setup(name = "portally",
       version = get_version(),
       packages = find_packages(exclude = ["tests"]),
       scripts = [],
       data_files = ["README.rst"],
-      description = "A memory/RPC format for sharing collections of histograms.",
+      description = "Portable \"tallies,\" nested collections of counts, sums, histograms, profiles, and ntuples.",
       long_description = "",
       author = "Jim Pivarski (DIANA-HEP)",
       author_email = "pivarski@fnal.gov",
       maintainer = "Jim Pivarski (DIANA-HEP)",
       maintainer_email = "pivarski@fnal.gov",
-      url = "https://github.com/diana-hep/histos",
-      download_url = "https://github.com/diana-hep/histos/releases",
+      url = "https://github.com/diana-hep/portally",
+      download_url = "https://github.com/diana-hep/portally/releases",
       license = "BSD 3-clause",
       test_suite = "tests",
       install_requires = ["flatbuffers>=1.8.0", "numpy"],
