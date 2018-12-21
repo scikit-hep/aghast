@@ -199,11 +199,9 @@ class Portally(object):
         top, only = self._top()
         top._valid(set(), only, ())
 
-    _validtypesskip = ()
     def _validtypes(self):
         for n, x in self._params.items():
-            if not (n in self._validtypesskip and getattr(self, n) is None):
-                x(getattr(self, n))
+            x(getattr(self, n))
 
     def _valid(self, seen, only, shape):
         raise NotImplementedError("missing _valid implementation")
@@ -408,17 +406,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    _validtypesskip = ("buffer",)
-
-    def __init__(self, buffer=None):
-        if buffer is None:
-            self._buffer = None     # placeholder for auto-generated buffer
-        else:
-            self.buffer = buffer
+    def __init__(self, buffer):
+        self.buffer = buffer
 
     def _valid(self, seen, only, numbytes):
-        if self._buffer is None:
-            self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
         self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
 
     @property
@@ -439,24 +430,13 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     numbytes      = typedproperty(_params["numbytes"])
     external_type = typedproperty(_params["external_type"])
 
-    _validtypesskip = ("pointer", "numbytes")
-
-    def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory):
-        if pointer is None and numbytes is None:
-            self._pointer = None    # placeholder for auto-generated buffer
-            self._numbytes = None
-        else:
-            self.pointer = pointer
-            self.numbytes = numbytes
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory):
+        self.pointer = pointer
+        self.numbytes = numbytes
         self.external_type = external_type
 
     def _valid(self, seen, only, numbytes):
-        if self._pointer is None or self._numbytes is None:
-            self._buffer = numpy.empty(numbytes, dtype=InterpretedBuffer.none.dtype)
-            self._pointer = self._buffer.ctypes.data
-            self._numbytes = self._buffer.nbytes
-        else:
-            self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+        self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
         if len(self._buffer) != numbytes:
             raise ValueError("RawExternalBuffer.buffer length is {0} but it should be {1} bytes".format(len(self._buffer), numbytes))
@@ -487,13 +467,8 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     endianness       = typedproperty(_params["endianness"])
     dimension_order  = typedproperty(_params["dimension_order"])
 
-    _validtypesskip = ("buffer",)
-
-    def __init__(self, buffer=None, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
-        if buffer is None:
-            self._buffer = None     # placeholder for auto-generated buffer
-        else:
-            self.buffer = buffer
+    def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
+        self.buffer = buffer
         self.filters = filters
         self.postfilter_slice = postfilter_slice
         self.dtype = dtype
@@ -502,9 +477,6 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     def _valid(self, seen, only, shape):
         shape = self._shape((), ())
-
-        if self._buffer is None:
-            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
 
         if self.filters is None:
             self._array = self._buffer
@@ -569,15 +541,9 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
 
-    _validtypesskip = ("pointer", "numbytes")
-
-    def __init__(self, pointer=None, numbytes=None, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
-        if pointer is None and numbytes is None:
-            self._pointer = None    # placeholder for auto-generated buffer
-            self._numbytes = None
-        else:
-            self.pointer = pointer
-            self.numbytes = numbytes
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
+        self.pointer = pointer
+        self.numbytes = numbytes
         self.external_type = external_type
         self.filters = filters
         self.postfilter_slice = postfilter_slice
@@ -589,12 +555,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     def _valid(self, seen, only, shape):
         shape = self._shape((), ())
 
-        if self._pointer is None or self._numbytes is None:
-            self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
-            self._pointer = self._buffer.ctypes.data
-            self._numbytes = self._buffer.nbytes
-        else:
-            self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+        self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
         if self.filters is None:
             self._array = self._buffer
