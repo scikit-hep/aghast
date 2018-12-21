@@ -393,7 +393,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         return len(self.buffer)
 
     @property
-    def numpy_array(self):
+    def array(self):
         return numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
 
 ################################################# RawExternalBuffer
@@ -415,7 +415,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.external_type = external_type
 
     @property
-    def numpy_array(self):
+    def array(self):
         return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
 ################################################# InlineBuffer
@@ -448,7 +448,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     def _valid(self, seen, recursive):
         if self.postfilter_slice is not None and self.postfilter_slice.has_step and self.postfilter_slice.step == 0:
             raise ValueError("slice step cannot be zero")
-        self.numpy_array
+        self.array
 
     @classmethod
     def fromarray(cls, array):
@@ -457,7 +457,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
 
     @property
-    def numpy_array(self):
+    def array(self):
         shape = self._shape((), ())
 
         if self.filters is None:
@@ -525,10 +525,10 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     def _valid(self, seen, recursive):
         if self.postfilter_slice is not None and self.postfilter_slice.has_step and self.postfilter_slice.step == 0:
             raise ValueError("slice step cannot be zero")
-        self.numpy_array
+        self.array
 
     @property
-    def numpy_array(self):
+    def array(self):
         shape = self._shape((), ())
 
         self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
@@ -1566,7 +1566,7 @@ class Page(Portally):
         self.buffer = buffer
 
     def _valid(self, seen, recursive):
-        self.numpy_array
+        self.array
 
     def numentries(self):
         if not hasattr(self, "_parent"):
@@ -1586,8 +1586,8 @@ class Page(Portally):
         return self._parent.column
 
     @property
-    def numpy_array(self):
-        array = self.buffer.numpy_array
+    def array(self):
+        array = self.buffer.array
         column = self.column
 
         if column.filters is not None:
@@ -1680,8 +1680,8 @@ class ColumnChunk(Portally):
         return self._parent._parent._parent.columns[columnid]   # FIXME: go through intermediate columns properties
 
     @property
-    def numpy_array(self):
-        out = [x.numpy_array for x in self.pages]
+    def array(self):
+        out = [x.array for x in self.pages]
         if len(out) == 0:
             return numpy.empty(0, self.column.numpy_dtype)
         elif len(out) == 1:
@@ -1718,12 +1718,12 @@ class Chunk(Portally):
         return self._parent.columns
 
     @property
-    def numpy_arrays(self):
+    def arrays(self):
         if not isinstance(getattr(self, "_parent", None), NtupleInstance) or not isinstance(getattr(self._parent, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
         if len(self.column_chunks) != len(self._parent._parent.columns):
             raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(self._parent._parent.columns)))
-        return {y.identifier: x.numpy_array for x, y in zip(self.column_chunks, self._parent._parent.columns)}
+        return {y.identifier: x.array for x, y in zip(self.column_chunks, self._parent._parent.columns)}
 
 ################################################# Column
 
@@ -1821,9 +1821,9 @@ class NtupleInstance(Portally):
                 raise TypeError("chunkid must be None (for total number of entries) or an integer (for number of entries in a chunk)")
 
     @property
-    def numpy_arrays(self):
+    def arrays(self):
         for x in self.chunks:
-            yield x.numpy_arrays
+            yield x.arrays
 
 ################################################# Ntuple
 
