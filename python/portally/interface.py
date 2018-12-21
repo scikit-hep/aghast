@@ -170,22 +170,17 @@ class Portally(object):
     def __repr__(self):
         return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
 
-    def _shapebit(self):
-        return ()
-
-    def _shape(self):
-        node = self
-        seen = set([id(node)])
-        shape = node._shapebit()
-        while hasattr(node, "_parent"):
-            node = node._parent
-            if id(node) in seen:
+    def _shape(self, path, shape):
+        for x in path:
+            if self is x:
                 raise ValueError("hierarchy is recursively nested")
-            seen.add(id(node))
-            shape = node._shapebit() + shape
-        if shape == ():
-            shape = (1,)
-        return shape
+        path = (self,) + path
+        if hasattr(self, "_parent"):
+            return self._parent._shape(path, shape)
+        elif shape == ():
+            return (1,)
+        else:
+            return shape
 
     def _top(self):
         out = self
@@ -529,6 +524,9 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         except ValueError:
             raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
 
+        tmp = self._shape((), ())
+        assert shape == tmp, "{} != {}".format(shape, tmp)
+
         if len(self._array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(self._array), functools.reduce(operator.mul, shape, 1)))
 
@@ -833,7 +831,7 @@ class Binning(Portally):
 
     @property
     def dimensions(self):
-        return 1
+        return len(self._binshape())
 
 ################################################# BinPosition
 
@@ -882,7 +880,7 @@ class IntegerBinning(Binning, BinPosition):
 
         return (self.maximum - self.minimum + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
 
-    def _shapebit(self):
+    def _binshape(self):
         return (self.maximum - self.minimum + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# RealInterval
@@ -1002,7 +1000,7 @@ class RegularBinning(Binning):
 
         return (self.num + overflowdims,)
 
-    def _shapebit(self):
+    def _binshape(self):
         if self.overflow is None:
             numoverflowbins = 0
         else:
@@ -1050,22 +1048,16 @@ class TicTacToeOverflowBinning(Binning):
 
         return (self.xnum + xoverflowdims, self.ynum + yoverflowdims)
 
-    def _shapebit(self):
+    def _binshape(self):
         if self.xoverflow is None:
             numxoverflowbins = 0
         else:
             numxoverflowbins = self.xoverflow._numbins()
-
         if self.yoverflow is None:
             numyoverflowbins = 0
         else:
             numyoverflowbins = self.yoverflow._numbins()
-
-        return (self.xnum + numxoverflowdims, self.ynum + numyoverflowdims)
-
-    @property
-    def dimensions(self):
-        return 2
+        return (self.xnum + numxoverflowbins, self.ynum + numyoverflowbins)
         
 ################################################# HexagonalBinning
 
@@ -1116,8 +1108,13 @@ class HexagonalBinning(Binning):
         self.roverflow = roverflow
 
     def _valid(self, seen, only, shape):
+        if self.qmin >= self.qmax:
+            raise ValueError("HexagonalBinning.qmin ({0}) must be strictly less than HexagonalBinning.qmax ({1})".format(self.qmin, self.qmax))
+        if self.rmin >= self.rmax:
+            raise ValueError("HexagonalBinning.rmin ({0}) must be strictly less than HexagonalBinning.rmax ({1})".format(self.rmin, self.rmax))
         qnum = self.qmax - self.qmin + 1
         rnum = self.rmax - self.rmin + 1
+
         if self.qoverflow is None:
             qoverflowdims, = RealOverflow()._valid(set(), None, shape)
         else:
@@ -1128,22 +1125,18 @@ class HexagonalBinning(Binning):
             roverflowdims, = _valid(self.roverflow, seen, None, shape)
         return (qnum + qoverflowdims, rnum + roverflowdims)
 
-    @property
-    def dimensions(self):
-        return 2
-
-    def _shapebit(self):
+    def _binshape(self):
+        qnum = self.qmax - self.qmin + 1
+        rnum = self.rmax - self.rmin + 1
         if self.qoverflow is None:
             numqoverflowbins = 0
         else:
             numqoverflowbins = self.qoverflow._numbins()
-
         if self.roverflow is None:
             numroverflowbins = 0
         else:
             numroverflowbins = self.roverflow._numbins()
-
-        return (self.qnum + numqoverflowdims, self.rnum + numroverflowdims)
+        return (qnum + numqoverflowbins, rnum + numroverflowbins)
 
 ################################################# EdgesBinning
 
@@ -1171,7 +1164,7 @@ class EdgesBinning(Binning):
             numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.edges) - 1 + numoverflow,)
 
-    def _shapebit(self):
+    def _binshape(self):
         if self.overflow is None:
             numoverflowbins = 0
         else:
@@ -1212,7 +1205,7 @@ class IrregularBinning(Binning):
             numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.intervals) + numoverflow,)
 
-    def _shapebit(self):
+    def _binshape(self):
         if self.overflow is None:
             numoverflowbins = 0
         else:
@@ -1244,7 +1237,7 @@ class CategoryBinning(Binning, BinPosition):
     def isnumerical(self):
         return False
 
-    def _shapebit(self):
+    def _binshape(self):
         return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# SparseRegularBinning
@@ -1274,7 +1267,7 @@ class SparseRegularBinning(Binning, BinPosition):
 
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
 
-    def _shapebit(self):
+    def _binshape(self):
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
 
 ################################################# FractionBinning
@@ -1320,7 +1313,7 @@ class FractionBinning(Binning):
     def isnumerical(self):
         return False
 
-    def _shapebit(self):
+    def _binshape(self):
         return (2,)
 
 ################################################# Axis
@@ -1360,11 +1353,11 @@ class Axis(Portally):
 
         return binshape
 
-    def _shapebit(self):
+    def _binshape(self):
         if self.binning is None:
             return (1,)
         else:
-            return ()
+            return self.binning._binshape()
 
 ################################################# Profile
 
@@ -1608,11 +1601,19 @@ class BinnedEvaluatedFunction(FunctionObject):
 
         return shape
 
-    def _shapebit(self):
+    def _shape(self, path, shape):
         shape = ()
-        for x in self.axis:
-            shape = shape + x._shapebit()
-        return shape
+        if len(path) > 0 and isinstance(path[0], (InterpretedBuffer, Quantiles)):
+            for x in self.axis:
+                shape = shape + x._binshape()
+
+        path = (self,) + path
+        if hasattr(self, "_parent"):
+            return self._parent._shape(path, shape)
+        elif shape == ():
+            return (1,)
+        else:
+            return shape
 
 ################################################# Histogram
 
@@ -1688,11 +1689,19 @@ class Histogram(Object):
 
         return shape
 
-    def _shapebit(self):
+    def _shape(self, path, shape):
         shape = ()
-        for x in self.axis:
-            shape = shape + x._shapebit()
-        return shape
+        if len(path) > 0 and isinstance(path[0], (Counts, Profile, Function)):
+            for x in self.axis:
+                shape = shape + x._binshape()
+
+        path = (self,) + path
+        if hasattr(self, "_parent"):
+            return self._parent._shape(path, shape)
+        elif shape == ():
+            return (1,)
+        else:
+            return shape
 
 ################################################# Page
 
