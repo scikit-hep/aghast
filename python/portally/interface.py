@@ -394,7 +394,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         pass
 
     @property
@@ -423,7 +423,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.numbytes = numbytes
         self.external_type = external_type
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         pass
 
     @property
@@ -1645,8 +1645,8 @@ class Page(Portally):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only):
-        _valid(self.buffer, seen, only)
+    def _valid(self, seen, only, shape):
+        _valid(self.buffer, seen, only, shape)
 
         numbytes = self.buffer.numbytes
         numentries = self.numentries()
@@ -1713,7 +1713,7 @@ class ColumnChunk(Portally):
         self.page_minima = page_minima
         self.page_maxima = page_maxima
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         if self.page_offsets[0] != 0:
             raise ValueError("ColumnChunk.page_offsets must start with 0")
         if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
@@ -1723,20 +1723,20 @@ class ColumnChunk(Portally):
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
 
         for x in self.pages:
-            _valid(x, seen, only)
+            _valid(x, seen, only, shape)
 
         if self.page_minima is not None:
             if len(self.page_minima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_minima), len(self.pages)))
             for x in self.page_minima:
-                _valid(x, seen, only, ())
+                _valid(x, seen, only, shape)
             raise NotImplementedError("check minima")
 
         if self.page_maxima is not None:
             if len(self.page_maxima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_maxima), len(self.pages)))
             for x in self.page_maxima:
-                _valid(x, seen, only, ())
+                _valid(x, seen, only, shape)
             raise NotImplementedError("check maxima")
 
     def numentries(self, pageid=None):
@@ -1796,16 +1796,14 @@ class Chunk(Portally):
         self.column_chunks = column_chunks
         self.metadata = metadata
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         columns = self.columns
 
         if len(self.column_chunks) != len(columns):
             raise ValueError("Chunk.column_chunks has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(columns)))
 
         for x in self.column_chunks:
-            if only is None or id(x) in only:
-                x._validtypes()
-                x._valid(seen, only)
+            _valid(x, seen, only, shape)
 
     @property
     def columns(self):
@@ -1856,7 +1854,7 @@ class Column(Portally, Interpretation):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         if self.postfilter_slice is not None:
             if self.postfilter_slice.step == 0:
                 raise ValueError("slice step cannot be zero")
@@ -1876,15 +1874,13 @@ class NtupleInstance(Portally):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
 
-    def _valid(self, seen, only):
+    def _valid(self, seen, only, shape):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
 
         if self.chunk_offsets is None:
             for x in self.chunks:
-                if only is None or id(x) in only:
-                    x._validtypes()
-                    x._valid(seen, only)
+                _valid(x, seen, only, shape)
 
         else:
             if self.chunk_offsets[0] != 0:
@@ -1895,10 +1891,8 @@ class NtupleInstance(Portally):
             if len(self.chunk_offsets) != len(self.chunks) + 1:
                 raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
 
-            for i, x in enumerate(self.chunks):
-                if only is None or id(x) in only:
-                    x._validtypes()
-                    x._valid(seen, only)
+            for x in self.chunks:
+                _valid(x, seen, only, shape)
 
     @property
     def columns(self):
@@ -1928,7 +1922,6 @@ class NtupleInstance(Portally):
 
     @property
     def numpy_arrays(self):
-        self._valid(set(), None)
         for x in self.chunks:
             yield x.numpy_arrays
 
@@ -1978,13 +1971,13 @@ class Ntuple(Object):
             raise ValueError("Ntuple.columns keys must be unique")
 
         for x in self.columns:
-            _valid(x, seen, only)
+            _valid(x, seen, only, shape)
 
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
 
         for x in self.instances:
-            _valid(x, seen, only)
+            _valid(x, seen, only, shape)
 
         if self.column_statistics is not None:
             for x in self.column_statistics:
