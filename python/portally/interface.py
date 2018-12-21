@@ -174,6 +174,7 @@ class Portally(object):
         for x in path:
             if self is x:
                 raise ValueError("hierarchy is recursively nested")
+
         path = (self,) + path
         if hasattr(self, "_parent"):
             return self._parent._shape(path, shape)
@@ -609,6 +610,9 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             self._array = self._array.view(self.numpy_dtype)
         except ValueError:
             raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
+
+        tmp = self._shape((), ())
+        assert shape == tmp, "{} != {}".format(shape, tmp)
 
         if len(self._array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, 1)))
@@ -1606,14 +1610,7 @@ class BinnedEvaluatedFunction(FunctionObject):
         if len(path) > 0 and isinstance(path[0], (InterpretedBuffer, Quantiles)):
             for x in self.axis:
                 shape = shape + x._binshape()
-
-        path = (self,) + path
-        if hasattr(self, "_parent"):
-            return self._parent._shape(path, shape)
-        elif shape == ():
-            return (1,)
-        else:
-            return shape
+        return super(BinnedEvaluatedFunction, self)._shape(path, shape)
 
 ################################################# Histogram
 
@@ -1694,14 +1691,7 @@ class Histogram(Object):
         if len(path) > 0 and isinstance(path[0], (Counts, Profile, Function)):
             for x in self.axis:
                 shape = shape + x._binshape()
-
-        path = (self,) + path
-        if hasattr(self, "_parent"):
-            return self._parent._shape(path, shape)
-        elif shape == ():
-            return (1,)
-        else:
-            return shape
+        return super(Histogram, self)._shape(path, shape)
 
 ################################################# Page
 
@@ -1973,6 +1963,9 @@ class Ntuple(Object):
             if only is None or id(x) in only:
                 x._validtypes()
                 x._valid(seen, only)
+
+        tmp = self._shape((), ())
+        assert shape == tmp or (shape == () and tmp == (1,)), "{} != {}".format(shape, tmp)
 
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
