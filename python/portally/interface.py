@@ -216,9 +216,11 @@ class Enum(object):
     
 ################################################# Metadata
 
+class MetadataLanguageEnum(Enum): pass
+
 class Metadata(Portally):
-    unspecified = Enum("unspecified", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
-    json = Enum("json", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_json)
+    unspecified = MetadataLanguageEnum("unspecified", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
+    json = MetadataLanguageEnum("json", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
     _params = {
@@ -238,11 +240,13 @@ class Metadata(Portally):
 
 ################################################# Decoration
 
+class DecorationLanguageEnum(Enum): pass
+
 class Decoration(Portally):
-    unspecified = Enum("unspecified", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
-    css         = Enum("css", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_css)
-    vega        = Enum("vega", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    root_json   = Enum("root_json", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+    unspecified = DecorationLanguageEnum("unspecified", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
+    css         = DecorationLanguageEnum("css", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega        = DecorationLanguageEnum("vega", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    root_json   = DecorationLanguageEnum("root_json", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
     language = [unspecified, css, vega, root_json]
 
     _params = {
@@ -262,11 +266,13 @@ class Decoration(Portally):
 
 ################################################# Buffers
 
+class BufferFilterEnum(Enum): pass
+
 class Buffer(Portally):
-    none = Enum("none", portally.portally_generated.Filter.Filter.filter_none)
-    gzip = Enum("gzip", portally.portally_generated.Filter.Filter.filter_gzip)
-    lzma = Enum("lzma", portally.portally_generated.Filter.Filter.filter_lzma)
-    lz4  = Enum("lz4", portally.portally_generated.Filter.Filter.filter_lz4)
+    none = BufferFilterEnum("none", portally.portally_generated.Filter.Filter.filter_none)
+    gzip = BufferFilterEnum("gzip", portally.portally_generated.Filter.Filter.filter_gzip)
+    lzma = BufferFilterEnum("lzma", portally.portally_generated.Filter.Filter.filter_lzma)
+    lz4  = BufferFilterEnum("lz4", portally.portally_generated.Filter.Filter.filter_lz4)
     filters = [none, gzip, lzma, lz4]
 
     def __init__(self):
@@ -276,11 +282,13 @@ class InlineBuffer(object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+class ExternalTypeEnum(Enum): pass
+
 class ExternalBuffer(object):
-    memory   = Enum("memory", portally.portally_generated.ExternalType.ExternalType.external_memory)
-    samefile = Enum("samefile", portally.portally_generated.ExternalType.ExternalType.external_samefile)
-    file     = Enum("file", portally.portally_generated.ExternalType.ExternalType.external_file)
-    url      = Enum("url", portally.portally_generated.ExternalType.ExternalType.external_url)
+    memory   = ExternalTypeEnum("memory", portally.portally_generated.ExternalType.ExternalType.external_memory)
+    samefile = ExternalTypeEnum("samefile", portally.portally_generated.ExternalType.ExternalType.external_samefile)
+    file     = ExternalTypeEnum("file", portally.portally_generated.ExternalType.ExternalType.external_file)
+    url      = ExternalTypeEnum("url", portally.portally_generated.ExternalType.ExternalType.external_url)
     types = [memory, samefile, file, url]
 
     def __init__(self):
@@ -299,11 +307,6 @@ class EndiannessEnum(Enum):
     def __init__(self, name, value, endianness):
         super(EndiannessEnum, self).__init__(name, value)
         self.endianness = endianness
-
-class DimensionOrderEnum(Enum):
-    def __init__(self, name, value, dimension_order):
-        super(DimensionOrderEnum, self).__init__(name, value)
-        self.dimension_order = dimension_order
 
 class Interpretation(object):
     none    = DTypeEnum("none", portally.portally_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
@@ -368,6 +371,11 @@ class Interpretation(object):
                 return cls.float64, endianness
 
         raise ValueError("numpy dtype {0} does not correspond to any Interpretation dtype, endianness pair".format(str(dtype)))
+
+class DimensionOrderEnum(Enum):
+    def __init__(self, name, value, dimension_order):
+        super(DimensionOrderEnum, self).__init__(name, value)
+        self.dimension_order = dimension_order
 
 class InterpretedBuffer(Interpretation):
     c_order       = DimensionOrderEnum("c_order", portally.portally_generated.DimensionOrder.DimensionOrder.c_order, "C")
@@ -811,14 +819,16 @@ class Binning(Portally):
 
 ################################################# BinPosition
 
+class BinPositionEnum(Enum): pass
+
 class BinPosition(object):
-    below3 = Enum("below3", portally.portally_generated.BinPosition.BinPosition.pos_below3)
-    below2 = Enum("below2", portally.portally_generated.BinPosition.BinPosition.pos_below2)
-    below1 = Enum("below1", portally.portally_generated.BinPosition.BinPosition.pos_below1)
-    nonexistent = Enum("nonexistent", portally.portally_generated.BinPosition.BinPosition.pos_nonexistent)
-    above1 = Enum("above1", portally.portally_generated.BinPosition.BinPosition.pos_above1)
-    above2 = Enum("above2", portally.portally_generated.BinPosition.BinPosition.pos_above2)
-    above3 = Enum("above3", portally.portally_generated.BinPosition.BinPosition.pos_above3)
+    below3      = BinPositionEnum("below3", portally.portally_generated.BinPosition.BinPosition.pos_below3)
+    below2      = BinPositionEnum("below2", portally.portally_generated.BinPosition.BinPosition.pos_below2)
+    below1      = BinPositionEnum("below1", portally.portally_generated.BinPosition.BinPosition.pos_below1)
+    nonexistent = BinPositionEnum("nonexistent", portally.portally_generated.BinPosition.BinPosition.pos_nonexistent)
+    above1      = BinPositionEnum("above1", portally.portally_generated.BinPosition.BinPosition.pos_above1)
+    above2      = BinPositionEnum("above2", portally.portally_generated.BinPosition.BinPosition.pos_above2)
+    above3      = BinPositionEnum("above3", portally.portally_generated.BinPosition.BinPosition.pos_above3)
     positions = [below3, below2, below1, nonexistent, above1, above2, above3]
 
     def __init__(self):
@@ -886,11 +896,13 @@ class RealInterval(Portally):
 
 ################################################# RealOverflow
 
+class NonRealMappingEnum(Enum): pass
+
 class RealOverflow(Portally, BinPosition):
-    missing      = Enum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
-    in_underflow = Enum("in_underflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_underflow)
-    in_overflow  = Enum("in_overflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_overflow)
-    in_nanflow   = Enum("in_nanflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_nanflow)
+    missing      = NonRealMappingEnum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
+    in_underflow = NonRealMappingEnum("in_underflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_underflow)
+    in_overflow  = NonRealMappingEnum("in_overflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_overflow)
+    in_nanflow   = NonRealMappingEnum("in_nanflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_nanflow)
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
@@ -1013,12 +1025,14 @@ class TicTacToeOverflowBinning(Binning):
         
 ################################################# HexagonalBinning
 
+class HexagonalCoordinatesEnum(Enum): pass
+
 class HexagonalBinning(Binning):
-    offset         = Enum("offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
-    doubled_offset = Enum("doubled_offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
-    cube_xy        = Enum("cube_xy", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
-    cube_yz        = Enum("cube_yz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
-    cube_xz        = Enum("cube_xz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
+    offset         = HexagonalCoordinatesEnum("offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
+    doubled_offset = HexagonalCoordinatesEnum("doubled_offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
+    cube_xy        = HexagonalCoordinatesEnum("cube_xy", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
+    cube_yz        = HexagonalCoordinatesEnum("cube_yz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
+    cube_xz        = HexagonalCoordinatesEnum("cube_xz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
@@ -1102,10 +1116,12 @@ class EdgesBinning(Binning):
 
 ################################################# EdgesBinning
 
+class OverlappingFillStrategyEnum(Enum): pass
+
 class IrregularBinning(Binning):
-    all = Enum("all", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first = Enum("first", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last = Enum("last", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    all   = OverlappingFillStrategyEnum("all", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first = OverlappingFillStrategyEnum("first", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last  = OverlappingFillStrategyEnum("last", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
     overlapping_fill_strategies = [all, first, last]
 
     _params = {
@@ -1186,19 +1202,23 @@ class SparseRegularBinning(Binning, BinPosition):
 
 ################################################# FractionBinning
 
+class FractionLayoutEnum(Enum): pass
+
+class FractionErrorMethodEnum(Enum): pass
+
 class FractionBinning(Binning):
-    passall = Enum("passall", portally.portally_generated.FractionLayout.FractionLayout.frac_passall)
-    failall = Enum("failall", portally.portally_generated.FractionLayout.FractionLayout.frac_failall)
-    passfail = Enum("passfail", portally.portally_generated.FractionLayout.FractionLayout.frac_passfail)
+    passall  = FractionLayoutEnum("passall", portally.portally_generated.FractionLayout.FractionLayout.frac_passall)
+    failall  = FractionLayoutEnum("failall", portally.portally_generated.FractionLayout.FractionLayout.frac_failall)
+    passfail = FractionLayoutEnum("passfail", portally.portally_generated.FractionLayout.FractionLayout.frac_passfail)
     layouts = [passall, failall, passfail]
 
-    normal           = Enum("normal", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
-    clopper_pearson  = Enum("clopper_pearson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
-    wilson           = Enum("wilson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
-    agresti_coull    = Enum("agresti_coull", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
-    feldman_cousins  = Enum("feldman_cousins", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
-    jeffrey          = Enum("jeffrey", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
-    bayesian_uniform = Enum("bayesian_uniform", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
+    normal           = FractionErrorMethodEnum("normal", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
+    clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
+    wilson           = FractionErrorMethodEnum("wilson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
+    agresti_coull    = FractionErrorMethodEnum("agresti_coull", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
+    feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
+    jeffrey          = FractionErrorMethodEnum("jeffrey", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
+    bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
     error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
@@ -1933,6 +1953,51 @@ class Variation(Portally):
 ################################################# Collection
 
 class Collection(Portally):
+    _params = {
+        "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
+        "objects":        portally.checktype.CheckVector("Collection", "objects", required=True, type=Object),
+        "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
+        "regions":        portally.checktype.CheckVector("Collection", "regions", required=False, type=Region),
+        "binned_regions": portally.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
+        "variations":     portally.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
+        "title":          portally.checktype.CheckString("Collection", "title", required=False),
+        "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "script":         portally.checktype.CheckString("Collection", "script", required=False),
+        }
+
+    identifier     = typedproperty(_params["identifier"])
+    objects        = typedproperty(_params["objects"])
+    collections    = typedproperty(_params["collections"])
+    regions        = typedproperty(_params["regions"])
+    binned_regions = typedproperty(_params["binned_regions"])
+    variations     = typedproperty(_params["variations"])
+    title          = typedproperty(_params["title"])
+    metadata       = typedproperty(_params["metadata"])
+    decoration     = typedproperty(_params["decoration"])
+    script         = typedproperty(_params["script"])
+
+    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None, script=""):
+        self.identifier = identifier
+        self.objects = objects
+        self.collections = collections
+        self.regions = regions
+        self.binned_regions = binned_regions
+        self.variations = variations
+        self.title = title
+        self.metadata = metadata
+        self.decoration = decoration
+        self.script = script
+
+    def _valid(self, seen, only, shape):
+        if len(set(x.identifier for x in self.objects)) != len(self.objects):
+            raise ValueError("Collection.objects keys must be unique")
+
+        for x in self.objects:
+            _valid(x, seen, only, shape)
+
+        return shape
+
     def tobuffer(self):
         self.checkvalid()
         builder = flatbuffers.Builder(1024)
@@ -2000,51 +2065,6 @@ class Collection(Portally):
             raise OSError("file does not end with magic 'hist'")
         offset, = struct.unpack("<Q", file[-12:-4])
         return cls.frombuffer(file[offset:-12])
-
-    _params = {
-        "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
-        "objects":        portally.checktype.CheckVector("Collection", "objects", required=True, type=Object),
-        "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
-        "regions":        portally.checktype.CheckVector("Collection", "regions", required=False, type=Region),
-        "binned_regions": portally.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
-        "variations":     portally.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
-        "title":          portally.checktype.CheckString("Collection", "title", required=False),
-        "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
-        "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
-        "script":         portally.checktype.CheckString("Collection", "script", required=False),
-        }
-
-    identifier     = typedproperty(_params["identifier"])
-    objects        = typedproperty(_params["objects"])
-    collections    = typedproperty(_params["collections"])
-    regions        = typedproperty(_params["regions"])
-    binned_regions = typedproperty(_params["binned_regions"])
-    variations     = typedproperty(_params["variations"])
-    title          = typedproperty(_params["title"])
-    metadata       = typedproperty(_params["metadata"])
-    decoration     = typedproperty(_params["decoration"])
-    script         = typedproperty(_params["script"])
-
-    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
-        self.objects = objects
-        self.collections = collections
-        self.regions = regions
-        self.binned_regions = binned_regions
-        self.variations = variations
-        self.title = title
-        self.metadata = metadata
-        self.decoration = decoration
-        self.script = script
-
-    def _valid(self, seen, only, shape):
-        if len(set(x.identifier for x in self.objects)) != len(self.objects):
-            raise ValueError("Collection.objects keys must be unique")
-
-        for x in self.objects:
-            _valid(x, seen, only, shape)
-
-        return shape
 
     def __getitem__(self, where):
         return _getbykey(self, "objects", where)
