@@ -30,8 +30,9 @@
 
 import ctypes
 import functools
-import operator
 import math
+import numbers
+import operator
 import struct
 import sys
 
@@ -183,21 +184,21 @@ class Portally(object):
         else:
             return shape
 
-    def _top(self):
-        out = self
-        seen = set([id(out)])
-        while hasattr(out, "_parent"):
-            out = out._parent
-            if id(out) in seen:
-                raise ValueError("hierarchy is recursively nested")
-            seen.add(id(out))
-        if not isinstance(out, Collection):
-            raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-        return out, seen
+    # def _top(self):
+    #     out = self
+    #     seen = set([id(out)])
+    #     while hasattr(out, "_parent"):
+    #         out = out._parent
+    #         if id(out) in seen:
+    #             raise ValueError("hierarchy is recursively nested")
+    #         seen.add(id(out))
+    #     if not isinstance(out, Collection):
+    #         raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
+    #     return out, seen
 
-    def _topvalid(self):
-        top, only = self._top()
-        top._valid(set(), only, ())
+    # def _topvalid(self):
+    #     top, only = self._top()
+    #     top._valid(set(), only, ())
 
     def _validtypes(self):
         for n, x in self._params.items():
@@ -410,12 +411,13 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         self.buffer = buffer
 
     def _valid(self, seen, only, numbytes):
-        self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
+        # self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
+        pass
 
     @property
     def numpy_array(self):
-        self._topvalid()
-        return self._array
+        # self._topvalid()
+        return numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
 
 ################################################# RawExternalBuffer
 
@@ -436,17 +438,17 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.external_type = external_type
 
     def _valid(self, seen, only, numbytes):
-        self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
+        # self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
-        if len(self._buffer) != numbytes:
+        if self.numbytes != numbytes:
             raise ValueError("RawExternalBuffer.buffer length is {0} but it should be {1} bytes".format(len(self._buffer), numbytes))
 
-        self._array = self._buffer
+        # self._array = self._buffer
 
     @property
     def numpy_array(self):
-        self._topvalid()
-        return self._buffer
+        # self._topvalid()
+        return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
 ################################################# InlineBuffer
 
@@ -476,33 +478,6 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dimension_order = dimension_order
 
     def _valid(self, seen, only, shape):
-        shape = self._shape((), ())
-
-        if self.filters is None:
-            self._array = self._buffer
-        else:
-            raise NotImplementedError(self.filters)
-
-        if self._array.dtype.itemsize != 1:
-            self._array = self._array.view(InterpretedBuffer.none.dtype)
-        if len(self._array.shape) != 1:
-            self._array = self._array.reshape(-1)
-
-        if self.postfilter_slice is not None:
-            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
-            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
-            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
-            self._array = self._array[start:stop:step]
-        
-        try:
-            self._array = self._array.view(self.numpy_dtype)
-        except ValueError:
-            raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy_dtype.itemsize))
-
-        if len(self._array) != functools.reduce(operator.mul, shape, 1):
-            raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(self._array), functools.reduce(operator.mul, shape, 1)))
-
-        self._array = self._array.reshape(shape, order=self.dimension_order.dimension_order)
         return shape
 
     @classmethod
@@ -513,8 +488,35 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        self._topvalid()
-        return self._array
+        # self._topvalid()
+        shape = self._shape((), ())
+
+        if self.filters is None:
+            array = self._buffer
+        else:
+            raise NotImplementedError(self.filters)
+
+        if array.dtype.itemsize != 1:
+            array = array.view(InterpretedBuffer.none.dtype)
+        if len(array.shape) != 1:
+            array = array.reshape(-1)
+
+        if self.postfilter_slice is not None:
+            start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
+            stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
+            step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
+            array = array[start:stop:step]
+        
+        try:
+            array = array.view(self.numpy_dtype)
+        except ValueError:
+            raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
+
+        if len(array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
+
+        array = array.reshape(shape, order=self.dimension_order.dimension_order)
+        return array
 
 ################################################# ExternalBuffer
 
@@ -553,12 +555,18 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.location = location
 
     def _valid(self, seen, only, shape):
+        return shape
+
+    @property
+    def numpy_array(self):
+        # self._topvalid()
+
         shape = self._shape((), ())
 
         self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
         if self.filters is None:
-            self._array = self._buffer
+            array = self._buffer
         else:
             raise NotImplementedError(self.filters)
 
@@ -566,23 +574,19 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             start = self.postfilter_slice.start if self.postfilter_slice.has_start else None
             stop = self.postfilter_slice.stop if self.postfilter_slice.has_stop else None
             step = self.postfilter_slice.step if self.postfilter_slice.has_step else None
-            self._array = self._array[start:stop:step]
+            array = array[start:stop:step]
 
         try:
-            self._array = self._array.view(self.numpy_dtype)
+            array = array.view(self.numpy_dtype)
         except ValueError:
-            raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy_dtype.itemsize))
+            raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
 
-        if len(self._array) != functools.reduce(operator.mul, shape, 1):
-            raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, 1)))
+        if len(array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(array), functools.reduce(operator.mul, shape, 1)))
 
-        self._array = self._array.reshape(shape, order=self.dimension_order.dimension_order)
-        return shape
+        array = array.reshape(shape, order=self.dimension_order.dimension_order)
 
-    @property
-    def numpy_array(self):
-        self._topvalid()
-        return self._array
+        return array
 
 ################################################# StatisticFilter
 
@@ -1666,7 +1670,23 @@ class Page(Portally):
 
     def _valid(self, seen, only, column, numentries):
         _valid(self.buffer, seen, None, column.numpy_dtype.itemsize * numentries)
-        buf = self.buffer._array
+        return numentries
+
+    @property
+    def numpy_array(self):
+        # self._topvalid()
+
+        if not hasattr(self, "_parent"):
+            raise ValueError("Page not attached to a hierarchy")
+        for pageid, page in enumerate(self._parent.pages):
+            if self is page:
+                break
+        else:
+            raise AssertionError("Page not in its own parent's pages list")
+
+        numentries = self._parent.numentries(pageid)
+        buf = self.buffer.numpy_array
+        column = self._parent.column
 
         if column.filters is not None:
             raise NotImplementedError("handle column.filters")
@@ -1680,14 +1700,7 @@ class Page(Portally):
         if len(buf) != column.numpy_dtype.itemsize * numentries:
             raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), numentries, column.numpy_dtype.itemsize))
 
-        self._array = buf.view(column.numpy_dtype).reshape((numentries,))
-
-        return numentries
-
-    @property
-    def numpy_array(self):
-        self._topvalid()
-        return self._array
+        return buf.view(column.numpy_dtype).reshape((numentries,))
 
 ################################################# ColumnChunk
 
@@ -1735,13 +1748,43 @@ class ColumnChunk(Portally):
 
         return self.page_offsets[-1]
 
+    def numentries(self, pageid=None):
+        if pageid is None:
+            return self.page_offsets[-1]
+        elif isinstance(pageid, (numbers.Integral, numpy.integer)):
+            original_pageid = pageid
+            if pageid < 0:
+                pageid += len(self.page_offsets) - 1
+            if not 0 <= pageid < len(self.page_offsets) - 1:
+                raise IndexError("pageid {0} out of range for {1} pages".format(original_pageid, len(self.page_offsets) - 1))
+            return self.page_offsets[pageid + 1] - self.page_offsets[pageid]
+        else:
+            raise TypeError("pageid must be None (for total number of entries) or an integer (for number of entries in a page)")
+
+    @property
+    def column(self):
+        if not hasattr(self, "_parent"):
+            raise ValueError("ColumnChunk not attached to a hierarchy")
+        if not hasattr(self._parent, "_parent"):
+            raise ValueError("{0} not attached to a hierarchy".format(type(self._parent)))
+        if not hasattr(self._parent._parent, "_parent"):
+            raise ValueError("{0} not attached to a hierarchy".format(type(self._parent._parent)))
+        
+        for columnid, columnchunk in enumerate(self._parent.columns):
+            if self is columnchunk:
+                break
+        else:
+            raise AssertionError("ColumnChunk not in its own parent's columns list")
+
+        return self._parent._parent._parent.columns[columnid]
+
     @property
     def numpy_array(self):
         out = [x.numpy_array for x in self.pages]
         if len(out) == 0:
-            self._topvalid()
-            column = self._parent._parent._parent.columns[self._parent.columns.index(self)]
-            return numpy.empty(0, column.numpy_dtype)
+            # self._topvalid()
+            # column = self._parent._parent._parent.columns[self._parent.columns.index(self)]
+            return numpy.empty(0, self.column.numpy_dtype)
 
         elif len(out) == 1:
             return out[0]
@@ -1868,6 +1911,19 @@ class NtupleInstance(Portally):
                 if only is None or id(x) in only:
                     x._validtypes()
                     x._valid(seen, only, self._parent.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+
+    def numentries(self, chunkid=None):
+        if chunkid is None:
+            return self.chunk_offsets[-1]
+        elif isinstance(chunkid, (numbers.Integral, numpy.integer)):
+            original_chunkid = chunkid
+            if chunkid < 0:
+                chunkid += len(self.chunk_offsets) - 1
+            if not 0 <= chunkid < len(self.chunk_offsets) - 1:
+                raise IndexError("chunkid {0} out of range for {1} chunks".format(original_chunkid, len(self.chunk_offsets) - 1))
+            return self.chunk_offsets[chunkid + 1] - self.chunk_offsets[chunkid]
+        else:
+            raise TypeError("chunkid must be None (for total number of entries) or an integer (for number of entries in a chunk)")
 
     @property
     def numpy_arrays(self):
