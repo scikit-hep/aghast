@@ -185,7 +185,7 @@ class Portally(object):
             x(getattr(self, n))
 
     def _valid(self, seen, only):
-        raise NotImplementedError("missing _valid implementation")
+        pass
 
 class Enum(object):
     def __init__(self, name, value):
@@ -228,9 +228,6 @@ class Metadata(Portally):
         self.data = data
         self.language = language
 
-    def _valid(self, seen, only):
-        pass
-
 ################################################# Decoration
 
 class DecorationLanguageEnum(Enum): pass
@@ -253,9 +250,6 @@ class Decoration(Portally):
     def __init__(self, data, language=unspecified):
         self.data = data
         self.language = language
-
-    def _valid(self, seen, only):
-        pass
 
 ################################################# Buffers
 
@@ -390,9 +384,6 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only):
-        pass
-
     @property
     def numbytes(self):
         return len(self.buffer)
@@ -418,9 +409,6 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.pointer = pointer
         self.numbytes = numbytes
         self.external_type = external_type
-
-    def _valid(self, seen, only):
-        pass
 
     @property
     def numpy_array(self):
@@ -452,9 +440,6 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dtype = dtype
         self.endianness = endianness
         self.dimension_order = dimension_order
-
-    def _valid(self, seen, only):
-        pass
 
     @classmethod
     def fromarray(cls, array):
@@ -528,9 +513,6 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.endianness = endianness
         self.dimension_order = dimension_order
         self.location = location
-
-    def _valid(self, seen, only):
-        pass
 
     @property
     def numpy_array(self):
@@ -606,9 +588,6 @@ class Moments(Portally):
         self.weighted = weighted
         self.filter = filter
 
-    def _valid(self, seen, only):
-        _valid(self.sumwxn, seen, only)
-
 ################################################# Extremes
 
 class Extremes(Portally):
@@ -623,9 +602,6 @@ class Extremes(Portally):
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
-
-    def _valid(self, seen, only):
-        _valid(self.values, seen, only)
 
 ################################################# Quantiles
 
@@ -648,9 +624,6 @@ class Quantiles(Portally):
         self.weighted = weighted
         self.filter = filter
 
-    def _valid(self, seen, only):
-        _valid(self.values, seen, only)
-
 ################################################# Modes
 
 class Modes(Portally):
@@ -665,9 +638,6 @@ class Modes(Portally):
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
-
-    def _valid(self, seen, only):
-        _valid(self.values, seen, only)
 
 ################################################# Statistics
 
@@ -733,9 +703,6 @@ class Correlations(Portally):
         self.sumwxy = sumwxy
         self.weighted = weighted
         self.filter = filter
-
-    def _valid(self, seen, only):
-        _valid(self.sumwxy, seen, only)
 
     @staticmethod
     def _validindexes(correlations, numvars):
@@ -915,9 +882,7 @@ class RegularBinning(Binning):
         if math.isinf(self.interval.high):
             raise ValueError("RegularBinning.interval.high must be finite")
 
-        if self.overflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
+        if self.overflow is not None:
             _valid(self.overflow, seen, None)
 
     def _binshape(self):
@@ -957,14 +922,8 @@ class TicTacToeOverflowBinning(Binning):
     def _valid(self, seen, only):
         _valid(self.xinterval, seen, None)
         _valid(self.yinterval, seen, None)
-        if self.xoverflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            _valid(self.xoverflow, seen, None)
-        if self.yoverflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            _valid(self.yoverflow, seen, None)
+        _valid(self.xoverflow, seen, None)
+        _valid(self.yoverflow, seen, None)
 
     def _binshape(self):
         if self.xoverflow is None:
@@ -1030,17 +989,8 @@ class HexagonalBinning(Binning):
             raise ValueError("HexagonalBinning.qmin ({0}) must be strictly less than HexagonalBinning.qmax ({1})".format(self.qmin, self.qmax))
         if self.rmin >= self.rmax:
             raise ValueError("HexagonalBinning.rmin ({0}) must be strictly less than HexagonalBinning.rmax ({1})".format(self.rmin, self.rmax))
-        qnum = self.qmax - self.qmin + 1
-        rnum = self.rmax - self.rmin + 1
-
-        if self.qoverflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            _valid(self.qoverflow, seen, None)
-        if self.roverflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            _valid(self.roverflow, seen, None)
+        _valid(self.qoverflow, seen, None)
+        _valid(self.roverflow, seen, None)
 
     def _binshape(self):
         qnum = self.qmax - self.qmin + 1
@@ -1075,10 +1025,7 @@ class EdgesBinning(Binning):
             raise ValueError("EdgesBinning.edges must all be finite")
         if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
             raise ValueError("EdgesBinning.edges must be strictly increasing")
-        if self.overflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            numoverflow, = _valid(self.overflow, seen, None)
+        _valid(self.overflow, seen, None)
 
     def _binshape(self):
         if self.overflow is None:
@@ -1115,10 +1062,7 @@ class IrregularBinning(Binning):
     def _valid(self, seen, only):
         for x in self.intervals:
             _valid(x, seen, only)
-        if self.overflow is None:
-            RealOverflow()._valid(set(), None)
-        else:
-            _valid(self.overflow, seen, None)
+        _valid(self.overflow, seen, None)
 
     def _binshape(self):
         if self.overflow is None:
@@ -1217,9 +1161,6 @@ class FractionBinning(Binning):
         self.layout_reversed = layout_reversed
         self.error_method = error_method
 
-    def _valid(self, seen, only):
-        pass
-
     @property
     def isnumerical(self):
         return False
@@ -1255,11 +1196,7 @@ class Axis(Portally):
         self.decoration = decoration
 
     def _valid(self, seen, only):
-        if self.binning is None:
-            (1,)
-        else:
-            _valid(self.binning, seen, None)
-
+        _valid(self.binning, seen, None)
         _valid(self.statistics, seen, only)
 
     def _binshape(self):
@@ -1596,7 +1533,6 @@ class Page(Portally):
 
     def _valid(self, seen, only):
         _valid(self.buffer, seen, only)
-
         numbytes = self.buffer.numbytes
         numentries = self.numentries()
         itemsize = self.column.numpy_dtype.itemsize
@@ -1747,7 +1683,6 @@ class Chunk(Portally):
 
     def _valid(self, seen, only):
         columns = self.columns
-
         if len(self.column_chunks) != len(columns):
             raise ValueError("Chunk.column_chunks has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(columns)))
 
@@ -1827,11 +1762,7 @@ class NtupleInstance(Portally):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
 
-        if self.chunk_offsets is None:
-            for x in self.chunks:
-                _valid(x, seen, only)
-
-        else:
+        if self.chunk_offsets is not None:
             if self.chunk_offsets[0] != 0:
                 raise ValueError("Ntuple.chunk_offsets must start with 0")
             if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
@@ -1840,8 +1771,8 @@ class NtupleInstance(Portally):
             if len(self.chunk_offsets) != len(self.chunks) + 1:
                 raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
 
-            for x in self.chunks:
-                _valid(x, seen, only)
+        for x in self.chunks:
+            _valid(x, seen, only)
 
     @property
     def columns(self):
