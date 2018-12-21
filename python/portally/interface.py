@@ -79,6 +79,9 @@ import portally.portally_generated.SparseRegularBinning
 import portally.portally_generated.FractionLayout
 import portally.portally_generated.FractionErrorMethod
 import portally.portally_generated.FractionBinning
+import portally.portally_generated.PredicateBinning
+import portally.portally_generated.Assignment
+import portally.portally_generated.VariationBinning
 import portally.portally_generated.Binning
 import portally.portally_generated.Axis
 import portally.portally_generated.Profile
@@ -102,10 +105,6 @@ import portally.portally_generated.NtupleInstance
 import portally.portally_generated.Ntuple
 import portally.portally_generated.ObjectData
 import portally.portally_generated.Object
-import portally.portally_generated.Region
-import portally.portally_generated.BinnedRegion
-import portally.portally_generated.Assignment
-import portally.portally_generated.Variation
 import portally.portally_generated.Collection
 
 import portally.checktype
@@ -1067,7 +1066,7 @@ class EdgesBinning(Binning):
             numoverflowbins = self.overflow._numbins()
         return (len(self.edges) - 1 + numoverflowbins,)
 
-################################################# EdgesBinning
+################################################# IrregularBinning
 
 class OverlappingFillStrategyEnum(Enum): pass
 
@@ -1200,6 +1199,58 @@ class FractionBinning(Binning):
 
     def _binshape(self):
         return (2,)
+
+################################################# PredicateBinning
+
+class PredicateBinning(Binning):
+    _params = {
+        "predicates": portally.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
+        }
+
+    predicates = typedproperty(_params["predicates"])
+
+    def __init__(self, predicates):
+        self.predicates = predicates
+
+    def _binshape(self):
+        return (len(self.predicates),)
+
+################################################# Assignment
+
+class Assignment(Portally):
+    _params = {
+        "identifier": portally.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
+        "expression": portally.checktype.CheckString("Assignment", "expression", required=True),
+        }
+
+    identifier = typedproperty(_params["identifier"])
+    expression = typedproperty(_params["expression"])
+
+    def __init__(self, identifier, expression):
+        self.identifier = identifier
+        self.expression  = expression 
+
+################################################# VariationBinning
+
+class VariationBinning(Binning):
+    _params = {
+        "assignments":         portally.checktype.CheckVector("VariationBinning", "assignments", required=True, type=Assignment),
+        "systematic":          portally.checktype.CheckVector("VariationBinning", "systematic", required=False, type=float),
+        "category_systematic": portally.checktype.CheckVector("VariationBinning", "category_systematic", required=False, type=str),
+        }
+
+    assignments         = typedproperty(_params["assignments"])
+    systematic          = typedproperty(_params["systematic"])
+    category_systematic = typedproperty(_params["category_systematic"])
+
+    def __init__(self, assignments, systematic=None, category_systematic=None):
+        self.assignments = assignments
+        self.systematic = systematic
+        self.category_systematic = category_systematic
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.assignments, seen, recursive)
 
 ################################################# Axis
 
@@ -1881,74 +1932,6 @@ class Ntuple(Object):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
-################################################# Region
-
-class Region(Portally):
-    _params = {
-        "expressions":  portally.checktype.CheckVector("Region", "expressions", required=True, type=str),
-        }
-
-    expressions = typedproperty(_params["expressions"])
-
-    def __init__(self, expressions):
-        self.expressions  = expressions 
-
-################################################# BinnedRegion
-
-class BinnedRegion(Portally):
-    _params = {
-        "expression": portally.checktype.CheckString("BinnedRegion", "expression", required=True),
-        "binning":    portally.checktype.CheckClass("BinnedRegion", "binning", required=True, type=Binning),
-        }
-
-    expression = typedproperty(_params["expression"])
-    binning    = typedproperty(_params["binning"])
-
-    def __init__(self, expression, binning):
-        self.expression = expression
-        self.binning  = binning 
-
-    def _valid(self, seen, recursive):
-        if recursive:
-            _valid(self.binning, seen, recursive)
-
-################################################# Assignment
-
-class Assignment(Portally):
-    _params = {
-        "identifier": portally.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
-        "expression": portally.checktype.CheckString("Assignment", "expression", required=True),
-        }
-
-    identifier = typedproperty(_params["identifier"])
-    expression = typedproperty(_params["expression"])
-
-    def __init__(self, identifier, expression):
-        self.identifier = identifier
-        self.expression  = expression 
-
-################################################# Variation
-
-class Variation(Portally):
-    _params = {
-        "assignments":         portally.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
-        "systematic":          portally.checktype.CheckVector("Variation", "systematic", required=False, type=float),
-        "category_systematic": portally.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
-        }
-
-    assignments         = typedproperty(_params["assignments"])
-    systematic          = typedproperty(_params["systematic"])
-    category_systematic = typedproperty(_params["category_systematic"])
-
-    def __init__(self, assignments, systematic=None, category_systematic=None):
-        self.assignments = assignments
-        self.systematic = systematic
-        self.category_systematic = category_systematic
-
-    def _valid(self, seen, recursive):
-        if recursive:
-            _valid(self.assignments, seen, recursive)
-
 ################################################# Collection
 
 class Collection(Portally):
@@ -1956,9 +1939,7 @@ class Collection(Portally):
         "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
         "objects":        portally.checktype.CheckVector("Collection", "objects", required=True, type=Object),
         "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
-        "regions":        portally.checktype.CheckVector("Collection", "regions", required=False, type=Region),
-        "binned_regions": portally.checktype.CheckVector("Collection", "binned_regions", required=False, type=BinnedRegion),
-        "variations":     portally.checktype.CheckVector("Collection", "variations", required=False, type=Variation),
+        "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis, minlen=1),
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
         "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
         "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
@@ -1968,21 +1949,17 @@ class Collection(Portally):
     identifier     = typedproperty(_params["identifier"])
     objects        = typedproperty(_params["objects"])
     collections    = typedproperty(_params["collections"])
-    regions        = typedproperty(_params["regions"])
-    binned_regions = typedproperty(_params["binned_regions"])
-    variations     = typedproperty(_params["variations"])
+    axis           = typedproperty(_params["axis"])
     title          = typedproperty(_params["title"])
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, identifier, objects, collections=None, axis=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.objects = objects
         self.collections = collections
-        self.regions = regions
-        self.binned_regions = binned_regions
-        self.variations = variations
+        self.axis = axis
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
@@ -1994,9 +1971,7 @@ class Collection(Portally):
         if recursive:
             _valid(self.objects, seen, recursive)
             _valid(self.collections, seen, recursive)
-            _valid(self.regions, seen, recursive)
-            _valid(self.binned_regions, seen, recursive)
-            _valid(self.variations, seen, recursive)
+            _valid(self.axis, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
@@ -2017,7 +1992,8 @@ class Collection(Portally):
         # if len(path) > 0 and isinstance(path[0], (HERE)):
         #     for x in self.axis:
         #         shape = shape + x._binshape()
-        print(path, shape)
+        
+        # print(path, shape)
 
         return super(Collection, self)._shape(path, shape)
 

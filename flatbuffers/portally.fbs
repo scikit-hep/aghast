@@ -299,6 +299,21 @@ table FractionBinning {
   error_method: FractionErrorMethod = frac_normal;
 }
 
+table PredicateBinning {
+  predicates: [string] (required);
+}
+
+table Assignment {
+  identifier: string (key);
+  expression: string (required);
+}
+
+table VariationBinning {
+  assignments: [Assignment] (required);
+  systematic: [double];
+  category_systematic: [string];
+}
+
 union Binning {
   IntegerBinning,
   RegularBinning,
@@ -308,7 +323,9 @@ union Binning {
   IrregularBinning,
   CategoryBinning,
   SparseRegularBinning,
-  FractionBinning
+  FractionBinning,
+  PredicateBinning,
+  VariationBinning
 }
 
 ///////////////////////////////////////////////// axis
@@ -469,33 +486,11 @@ table Object {
 
 ///////////////////////////////////////////////// collections
 
-table Region {
-  expressions: [string] (required);  // predicates to apply
-}
-
-table BinnedRegion {
-  expression: string (required);     // expression to slice
-  binning: Binning (required);
-}
-
-table Assignment {
-  identifier: string (key);
-  expression: string (required);
-}
-
-table Variation {
-  assignments: [Assignment] (required);
-  systematic: [double];
-  category_systematic: [string];
-}
-
 table Collection {
   identifier: string (key);
   objects: [Object] (required);
-  collections: [Collection];         // nested ANDs
-  regions: [Region];                 // list of ORs of (overlapping?) regions
-  binned_regions: [BinnedRegion];    // list of ORs of exclusive, binned regions
-  variations: [Variation];           // list of ORs with assignments
+  collections: [Collection];
+  axis: [Axis];
   title: string;
   metadata: Metadata;
   decoration: Decoration;

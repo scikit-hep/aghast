@@ -52,6 +52,9 @@ from portally.interface import IrregularBinning
 from portally.interface import CategoryBinning
 from portally.interface import SparseRegularBinning
 from portally.interface import FractionBinning
+from portally.interface import PredicateBinning
+from portally.interface import Assignment
+from portally.interface import VariationBinning
 from portally.interface import Axis
 from portally.interface import Profile
 from portally.interface import UnweightedCounts
@@ -67,8 +70,4 @@ from portally.interface import Chunk
 from portally.interface import Column
 from portally.interface import NtupleInstance
 from portally.interface import Ntuple
-from portally.interface import Region
-from portally.interface import BinnedRegion
-from portally.interface import Assignment
-from portally.interface import Variation
 from portally.interface import Collection
