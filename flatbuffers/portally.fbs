@@ -308,10 +308,14 @@ table Assignment {
   expression: string (required);
 }
 
-table VariationBinning {
+table Variation {
   assignments: [Assignment] (required);
   systematic: [double];
   category_systematic: [string];
+}
+
+table VariationBinning {
+  variations: [Variation] (required);
 }
 
 union Binning {

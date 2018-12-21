@@ -81,6 +81,7 @@ import portally.portally_generated.FractionErrorMethod
 import portally.portally_generated.FractionBinning
 import portally.portally_generated.PredicateBinning
 import portally.portally_generated.Assignment
+import portally.portally_generated.Variation
 import portally.portally_generated.VariationBinning
 import portally.portally_generated.Binning
 import portally.portally_generated.Axis
@@ -1230,13 +1231,13 @@ class Assignment(Portally):
         self.identifier = identifier
         self.expression  = expression 
 
-################################################# VariationBinning
+################################################# Variation
 
-class VariationBinning(Binning):
+class Variation(Portally):
     _params = {
-        "assignments":         portally.checktype.CheckVector("VariationBinning", "assignments", required=True, type=Assignment),
-        "systematic":          portally.checktype.CheckVector("VariationBinning", "systematic", required=False, type=float),
-        "category_systematic": portally.checktype.CheckVector("VariationBinning", "category_systematic", required=False, type=str),
+        "assignments":         portally.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
+        "systematic":          portally.checktype.CheckVector("Variation", "systematic", required=False, type=float),
+        "category_systematic": portally.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
     assignments         = typedproperty(_params["assignments"])
@@ -1251,6 +1252,25 @@ class VariationBinning(Binning):
     def _valid(self, seen, recursive):
         if recursive:
             _valid(self.assignments, seen, recursive)
+
+################################################# VariationBinning
+
+class VariationBinning(Binning):
+    _params = {
+        "variations": portally.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        }
+
+    variations = typedproperty(_params["variations"])
+
+    def __init__(self, variations):
+        self.variations = variations
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.variations, seen, recursive)
+
+    def _binshape(self):
+        return (len(self.variations),)
 
 ################################################# Axis
 

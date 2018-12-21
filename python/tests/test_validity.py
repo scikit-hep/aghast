@@ -207,6 +207,15 @@ class Test(unittest.TestCase):
     def test_PredicateBinning(self):
         pass
 
+    def test_Assignments(self):
+        pass
+
+    def test_Variation(self):
+        pass
+
+    def test_VariationBinning(self):
+        pass
+
     def test_Axis(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))])
         assert h.isvalid

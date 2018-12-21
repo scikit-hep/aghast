@@ -54,6 +54,7 @@ from portally.interface import SparseRegularBinning
 from portally.interface import FractionBinning
 from portally.interface import PredicateBinning
 from portally.interface import Assignment
+from portally.interface import Variation
 from portally.interface import VariationBinning
 from portally.interface import Axis
 from portally.interface import Profile
