@@ -113,7 +113,7 @@ def typedproperty(check):
     def setparent(self, value):
         if isinstance(value, Portally):
             if hasattr(value, "_parent"):
-                raise ValueError("object is already attached to another hierarchy: {0}".format(repr(value)))
+                raise ValueError("already attached to another hierarchy: {0}".format(repr(value)))
             else:
                 value._parent = self
 
@@ -133,6 +133,7 @@ def typedproperty(check):
     def prop(self):
         private = "_" + check.paramname
         if not hasattr(self, private):
+            assert hasattr(self, "_flatbuffers"), "not derived from a flatbuffer or not properly initialized"
             setattr(self, private, check.fromflatbuffers(getattr(self._flatbuffers, check.paramname.capitalize())()))
         return getattr(self, private)
 
@@ -168,6 +169,23 @@ def _getbykey(self, field, where):
 class Portally(object):
     def __repr__(self):
         return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
+
+    def _shapebit(self):
+        return ()
+
+    def _shape(self):
+        node = self
+        seen = set([id(node)])
+        shape = node._shapebit()
+        while hasattr(node, "_parent"):
+            node = node._parent
+            if id(node) in seen:
+                raise ValueError("hierarchy is recursively nested")
+            seen.add(id(node))
+            shape = node._shapebit() + shape
+        if shape == ():
+            shape = (1,)
+        return shape
 
     def _top(self):
         out = self
@@ -486,12 +504,6 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.endianness = endianness
         self.dimension_order = dimension_order
 
-    @classmethod
-    def fromarray(cls, array):
-        dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
-        order = InterpretedBuffer.fortran_order if numpy.isfortran(array) else InterpretedBuffer.c_order
-        return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
-
     def _valid(self, seen, only, shape):
         if self._buffer is None:
             self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
@@ -522,6 +534,12 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
         self._array = self._array.reshape(shape, order=self.dimension_order.dimension_order)
         return shape
+
+    @classmethod
+    def fromarray(cls, array):
+        dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
+        order = InterpretedBuffer.fortran_order if numpy.isfortran(array) else InterpretedBuffer.c_order
+        return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
 
     @property
     def numpy_array(self):
@@ -760,7 +778,7 @@ class Statistics(Portally):
         _valid(self.maxima, seen, only, statshape)
 
         return shape
-        
+
 ################################################# Correlations
 
 class Correlations(Portally):
@@ -864,6 +882,9 @@ class IntegerBinning(Binning, BinPosition):
 
         return (self.maximum - self.minimum + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
 
+    def _shapebit(self):
+        return (self.maximum - self.minimum + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
+
 ################################################# RealInterval
 
 class RealInterval(Portally):
@@ -941,6 +962,9 @@ class RealOverflow(Portally, BinPosition):
 
         return (int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent) + int(self.pos_nanflow != BinPosition.nonexistent),)
 
+    def _numbins(self):
+        return int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent) + int(self.pos_nanflow != BinPosition.nonexistent)
+
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
@@ -978,6 +1002,13 @@ class RegularBinning(Binning):
 
         return (self.num + overflowdims,)
 
+    def _shapebit(self):
+        if self.overflow is None:
+            numoverflowbins = 0
+        else:
+            numoverflowbins = self.overflow._numbins()
+        return (self.num + numoverflowbins,)
+
 ################################################# TicTacToeOverflowBinning
 
 class TicTacToeOverflowBinning(Binning):
@@ -1005,10 +1036,6 @@ class TicTacToeOverflowBinning(Binning):
         self.xoverflow = xoverflow
         self.yoverflow = yoverflow
 
-    @property
-    def dimensions(self):
-        return 2
-
     def _valid(self, seen, only, shape):
         _valid(self.xinterval, seen, None, shape)
         _valid(self.yinterval, seen, None, shape)
@@ -1022,6 +1049,23 @@ class TicTacToeOverflowBinning(Binning):
             yoverflowdims, = _valid(self.yoverflow, seen, None, shape)
 
         return (self.xnum + xoverflowdims, self.ynum + yoverflowdims)
+
+    def _shapebit(self):
+        if self.xoverflow is None:
+            numxoverflowbins = 0
+        else:
+            numxoverflowbins = self.xoverflow._numbins()
+
+        if self.yoverflow is None:
+            numyoverflowbins = 0
+        else:
+            numyoverflowbins = self.yoverflow._numbins()
+
+        return (self.xnum + numxoverflowdims, self.ynum + numyoverflowdims)
+
+    @property
+    def dimensions(self):
+        return 2
         
 ################################################# HexagonalBinning
 
@@ -1071,10 +1115,6 @@ class HexagonalBinning(Binning):
         self.qoverflow = qoverflow
         self.roverflow = roverflow
 
-    @property
-    def dimensions(self):
-        return 2
-
     def _valid(self, seen, only, shape):
         qnum = self.qmax - self.qmin + 1
         rnum = self.rmax - self.rmin + 1
@@ -1087,6 +1127,23 @@ class HexagonalBinning(Binning):
         else:
             roverflowdims, = _valid(self.roverflow, seen, None, shape)
         return (qnum + qoverflowdims, rnum + roverflowdims)
+
+    @property
+    def dimensions(self):
+        return 2
+
+    def _shapebit(self):
+        if self.qoverflow is None:
+            numqoverflowbins = 0
+        else:
+            numqoverflowbins = self.qoverflow._numbins()
+
+        if self.roverflow is None:
+            numroverflowbins = 0
+        else:
+            numroverflowbins = self.roverflow._numbins()
+
+        return (self.qnum + numqoverflowdims, self.rnum + numroverflowdims)
 
 ################################################# EdgesBinning
 
@@ -1113,6 +1170,13 @@ class EdgesBinning(Binning):
         else:
             numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.edges) - 1 + numoverflow,)
+
+    def _shapebit(self):
+        if self.overflow is None:
+            numoverflowbins = 0
+        else:
+            numoverflowbins = self.overflow._numbins()
+        return (len(self.edges) - 1 + numoverflowbins,)
 
 ################################################# EdgesBinning
 
@@ -1148,6 +1212,13 @@ class IrregularBinning(Binning):
             numoverflow, = _valid(self.overflow, seen, None, shape)
         return (len(self.intervals) + numoverflow,)
 
+    def _shapebit(self):
+        if self.overflow is None:
+            numoverflowbins = 0
+        else:
+            numoverflowbins = self.overflow._numbins()
+        return (len(self.intervals) + numoverflowbins,)
+
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning, BinPosition):
@@ -1163,14 +1234,17 @@ class CategoryBinning(Binning, BinPosition):
         self.categories = categories
         self.pos_overflow = pos_overflow
 
-    @property
-    def isnumerical(self):
-        return False
-
     def _valid(self, seen, only, shape):
         if len(self.categories) != len(set(self.categories)):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
+        return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
+
+    @property
+    def isnumerical(self):
+        return False
+
+    def _shapebit(self):
         return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
 
 ################################################# SparseRegularBinning
@@ -1198,6 +1272,9 @@ class SparseRegularBinning(Binning, BinPosition):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
+        return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
+
+    def _shapebit(self):
         return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
 
 ################################################# FractionBinning
@@ -1236,11 +1313,14 @@ class FractionBinning(Binning):
         self.layout_reversed = layout_reversed
         self.error_method = error_method
 
+    def _valid(self, seen, only, shape):
+        return (2,)
+
     @property
     def isnumerical(self):
         return False
 
-    def _valid(self, seen, only, shape):
+    def _shapebit(self):
         return (2,)
 
 ################################################# Axis
@@ -1279,6 +1359,12 @@ class Axis(Portally):
         _valid(self.statistics, seen, only, shape)
 
         return binshape
+
+    def _shapebit(self):
+        if self.binning is None:
+            return (1,)
+        else:
+            return ()
 
 ################################################# Profile
 
@@ -1522,6 +1608,12 @@ class BinnedEvaluatedFunction(FunctionObject):
 
         return shape
 
+    def _shapebit(self):
+        shape = ()
+        for x in self.axis:
+            shape = shape + x._shapebit()
+        return shape
+
 ################################################# Histogram
 
 class Histogram(Object):
@@ -1594,6 +1686,12 @@ class Histogram(Object):
             for x in self.functions:
                 _valid(x, seen, only, binshape)
 
+        return shape
+
+    def _shapebit(self):
+        shape = ()
+        for x in self.axis:
+            shape = shape + x._shapebit()
         return shape
 
 ################################################# Page
