@@ -379,6 +379,7 @@ table Function {
   title: string;
   metadata: Metadata;
   decoration: Decoration;
+  script: string;
 }
 
 table BinnedEvaluatedFunction {
@@ -462,6 +463,7 @@ table Object {
   title: string;
   metadata: Metadata;
   decoration: Decoration;
+  script: string;
 }
 
 ///////////////////////////////////////////////// collections
@@ -496,6 +498,7 @@ table Collection {
   title: string;
   metadata: Metadata;
   decoration: Decoration;
+  script: string;
 }
 
 file_extension "port";
