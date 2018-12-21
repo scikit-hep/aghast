@@ -1383,6 +1383,7 @@ class ParameterizedFunction(Function, FunctionObject):
         "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
         "metadata":   portally.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
         "decoration": portally.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        "script":     portally.checktype.CheckString("ParameterizedFunction", "script", required=False),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1391,14 +1392,16 @@ class ParameterizedFunction(Function, FunctionObject):
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
+    script     = typedproperty(_params["script"])
 
-    def __init__(self, identifier, expression, parameters=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, expression, parameters=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.expression = expression
         self.parameters = parameters
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         if self.parameters is not None:
@@ -1420,6 +1423,7 @@ class EvaluatedFunction(Function):
         "title":       portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
         "metadata":    portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
         "decoration":  portally.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      portally.checktype.CheckString("EvaluatedFunction", "script", required=False),
         }
 
     identifier  = typedproperty(_params["identifier"])
@@ -1429,8 +1433,9 @@ class EvaluatedFunction(Function):
     title       = typedproperty(_params["title"])
     metadata    = typedproperty(_params["metadata"])
     decoration  = typedproperty(_params["decoration"])
+    script      = typedproperty(_params["script"])
 
-    def __init__(self, identifier, values, derivatives=None, errors=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.values = values
         self.derivatives = derivatives
@@ -1438,6 +1443,7 @@ class EvaluatedFunction(Function):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         _valid(self.values, seen, only, shape)
@@ -1459,6 +1465,7 @@ class BinnedEvaluatedFunction(FunctionObject):
         "title":       portally.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
         "metadata":    portally.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
         "decoration":  portally.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      portally.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
         }
 
     identifier  = typedproperty(_params["identifier"])
@@ -1469,8 +1476,9 @@ class BinnedEvaluatedFunction(FunctionObject):
     title       = typedproperty(_params["title"])
     metadata    = typedproperty(_params["metadata"])
     decoration  = typedproperty(_params["decoration"])
+    script      = typedproperty(_params["script"])
 
-    def __init__(self, identifier, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.axis = axis
         self.values = values
@@ -1479,6 +1487,7 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         binshape = shape
@@ -1507,6 +1516,7 @@ class Histogram(Object):
         "title":                portally.checktype.CheckString("Histogram", "title", required=False),
         "metadata":             portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
         "decoration":           portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "script":               portally.checktype.CheckString("Histogram", "script", required=False),
         }
 
     identifier           = typedproperty(_params["identifier"])
@@ -1519,8 +1529,9 @@ class Histogram(Object):
     title                = typedproperty(_params["title"])
     metadata             = typedproperty(_params["metadata"])
     decoration           = typedproperty(_params["decoration"])
+    script               = typedproperty(_params["script"])
 
-    def __init__(self, identifier, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.axis = axis
         self.counts = counts
@@ -1531,6 +1542,7 @@ class Histogram(Object):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         binshape = shape
@@ -1800,6 +1812,7 @@ class Ntuple(Object):
         "title":               portally.checktype.CheckString("Ntuple", "title", required=False),
         "metadata":            portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
         "decoration":          portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "script":              portally.checktype.CheckString("Ntuple", "script", required=False),
         }
 
     identifier          = typedproperty(_params["identifier"])
@@ -1811,8 +1824,9 @@ class Ntuple(Object):
     title               = typedproperty(_params["title"])
     metadata            = typedproperty(_params["metadata"])
     decoration          = typedproperty(_params["decoration"])
+    script              = typedproperty(_params["script"])
 
-    def __init__(self, identifier, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.columns = columns
         self.instances = instances
@@ -1822,6 +1836,7 @@ class Ntuple(Object):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         if len(set(x.identifier for x in self.columns)) != len(self.columns):
@@ -1996,6 +2011,7 @@ class Collection(Portally):
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
         "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
         "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "script":         portally.checktype.CheckString("Collection", "script", required=False),
         }
 
     identifier     = typedproperty(_params["identifier"])
@@ -2007,8 +2023,9 @@ class Collection(Portally):
     title          = typedproperty(_params["title"])
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
+    script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, objects, collections=None, regions=None, binned_regions=None, variations=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.objects = objects
         self.collections = collections
@@ -2018,6 +2035,7 @@ class Collection(Portally):
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
+        self.script = script
 
     def _valid(self, seen, only, shape):
         if len(set(x.identifier for x in self.objects)) != len(self.objects):
