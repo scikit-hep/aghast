@@ -246,8 +246,8 @@ class Decoration(Portally):
     language = [unspecified, css, vega, root_json]
 
     _params = {
-        "data":     portally.checktype.CheckString("Metadata", "data", required=True),
-        "language": portally.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
+        "data":     portally.checktype.CheckString("Decoration", "data", required=True),
+        "language": portally.checktype.CheckEnum("Decoration", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -524,15 +524,15 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
-        "pointer":          portally.checktype.CheckInteger("ExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         portally.checktype.CheckInteger("ExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    portally.checktype.CheckEnum("ExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
-        "filters":          portally.checktype.CheckVector("ExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": portally.checktype.CheckSlice("ExternalBuffer", "postfilter_slice", required=False),
-        "dtype":            portally.checktype.CheckEnum("ExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       portally.checktype.CheckEnum("ExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  portally.checktype.CheckEnum("ExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
-        "location":         portally.checktype.CheckString("ExternalBuffer", "location", required=False),
+        "pointer":          portally.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         portally.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
+        "external_type":    portally.checktype.CheckEnum("InterpretedExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
+        "filters":          portally.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": portally.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
+        "dtype":            portally.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       portally.checktype.CheckEnum("InterpretedExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  portally.checktype.CheckEnum("InterpretedExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "location":         portally.checktype.CheckString("InterpretedExternalBuffer", "location", required=False),
         }
 
     pointer          = typedproperty(_params["pointer"])
@@ -625,18 +625,21 @@ class StatisticFilter(Portally):
 
 class Moments(Portally):
     _params = {
-        "sumwxn": portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
-        "n":      portally.checktype.CheckInteger("Moments", "n", required=True, min=1),
+        "sumwxn":   portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
+        "n":        portally.checktype.CheckInteger("Moments", "n", required=True, min=0),
+        "weighted": portally.checktype.CheckBool("Moments", "weighted", required=False),
         "filter": portally.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }
 
-    sumwxn = typedproperty(_params["sumwxn"])
-    n      = typedproperty(_params["n"])
-    filter = typedproperty(_params["filter"])
+    sumwxn   = typedproperty(_params["sumwxn"])
+    n        = typedproperty(_params["n"])
+    weighted = typedproperty(_params["weighted"])
+    filter   = typedproperty(_params["filter"])
 
-    def __init__(self, sumwxn, n, filter=None):
+    def __init__(self, sumwxn, n, weighted=True, filter=None):
         self.sumwxn = sumwxn
         self.n = n
+        self.weighted = weighted
         self.filter = filter
 
     def _valid(self, seen, only, shape):
@@ -666,16 +669,19 @@ class Quantiles(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
         "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "weighted": portally.checktype.CheckBool("Quantiles", "n", required=False),
         "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
-    values = typedproperty(_params["values"])
-    p      = typedproperty(_params["p"])
-    filter = typedproperty(_params["filter"])
+    values   = typedproperty(_params["values"])
+    p        = typedproperty(_params["p"])
+    weighted = typedproperty(_params["weighted"])
+    filter   = typedproperty(_params["filter"])
 
-    def __init__(self, values, p=0.5, filter=None):
+    def __init__(self, values, p=0.5, weighted=True, filter=None):
         self.values = values
         self.p = p
+        self.weighted = weighted
         self.filter = filter
 
     def _valid(self, seen, only, shape):
@@ -689,8 +695,8 @@ class Modes(Portally):
         "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
-    values = typedproperty(_params["values"])
-    filter = typedproperty(_params["filter"])
+    values   = typedproperty(_params["values"])
+    filter   = typedproperty(_params["filter"])
 
     def __init__(self, values, filter=None):
         self.values = values
@@ -725,21 +731,25 @@ class Statistics(Portally):
 
     def _valid(self, seen, only, shape):
         if shape == ():
-            momentshape = (1,)
+            statshape = (1,)
         else:
-            momentshape = shape
+            statshape = shape
 
         if self.moments is not None:
+            if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
+                raise ValueError("Statistics.moments must have unique (n, weighted)")
             for x in self.moments:
-                _valid(x, seen, only, momentshape)
+                _valid(x, seen, only, statshape)
 
         if self.quantiles is not None:
+            if len(set((x.p, x.weighted) for x in self.quantiles)) != len(self.quantiles):
+                raise ValueError("Statistics.quantiles must have unique (p, weighted)")
             for x in self.quantiles:
-                _valid(x, seen, only, momentshape)
+                _valid(x, seen, only, statshape)
 
-        _valid(self.modes, seen, only, momentshape)
-        _valid(self.minima, seen, only, momentshape)
-        _valid(self.maxima, seen, only, momentshape)
+        _valid(self.modes, seen, only, statshape)
+        _valid(self.minima, seen, only, statshape)
+        _valid(self.maxima, seen, only, statshape)
 
         return shape
         
@@ -750,18 +760,21 @@ class Correlations(Portally):
         "xindex": portally.checktype.CheckInteger("Correlations", "xindex", required=True, min=0),
         "yindex": portally.checktype.CheckInteger("Correlations", "yindex", required=True, min=0),
         "sumwxy": portally.checktype.CheckClass("Correlations", "sumwxy", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
+        "weighted": portally.checktype.CheckBool("Correlations", "n", required=False),
+        "filter": portally.checktype.CheckClass("Correlations", "filter", required=False, type=StatisticFilter),
         }
 
-    xindex = typedproperty(_params["xindex"])
-    yindex = typedproperty(_params["yindex"])
-    sumwxy = typedproperty(_params["sumwxy"])
-    filter = typedproperty(_params["filter"])
+    xindex   = typedproperty(_params["xindex"])
+    yindex   = typedproperty(_params["yindex"])
+    sumwxy   = typedproperty(_params["sumwxy"])
+    weighted = typedproperty(_params["weighted"])
+    filter   = typedproperty(_params["filter"])
 
-    def __init__(self, xindex, yindex, sumwxy, filter=None):
+    def __init__(self, xindex, yindex, sumwxy, weighted=True, filter=None):
         self.xindex = xindex
         self.yindex = yindex
         self.sumwxy = sumwxy
+        self.weighted = weighted
         self.filter = filter
 
     def _valid(self, seen, only, shape):
@@ -774,7 +787,7 @@ class Correlations(Portally):
 
     @staticmethod
     def _validindexes(correlations, numvars):
-        pairs = [(x.xindex, x.yindex) for x in correlations]
+        pairs = [(x.xindex, x.yindex, x.weighted) for x in correlations]
         if len(set(pairs)) != len(pairs):
             raise ValueError("Correlations.xindex, yindex pairs must be unique")
         if any(x.xindex >= numvars for x in correlations):
@@ -1733,8 +1746,8 @@ class Column(Portally, Interpretation):
 
 class NtupleInstance(Portally):
     _params = {
-        "chunks":              portally.checktype.CheckVector("Ntuple", "chunks", required=True, type=Chunk),
-        "chunk_offsets":       portally.checktype.CheckVector("Ntuple", "chunk_offsets", required=False, type=int, minlen=1),
+        "chunks":        portally.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
+        "chunk_offsets": portally.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int, minlen=1),
         }
 
     chunks              = typedproperty(_params["chunks"])
