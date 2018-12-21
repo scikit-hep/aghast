@@ -146,13 +146,18 @@ def typedproperty(check):
 
     return prop
 
-def _valid(obj, seen, *args):
-    if obj is not None:
+def _valid(obj, seen, recursive):
+    if obj is None:
+        pass
+    elif isinstance(obj, Portally):
         if id(obj) in seen:
             raise ValueError("hierarchy is recursively nested")
         seen.add(id(obj))
         obj._validtypes()
-        obj._valid(seen, *args)
+        obj._valid(seen, recursive)
+    else:
+        for x in obj:
+            _valid(x, seen, recursive)
 
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
@@ -183,7 +188,7 @@ class Portally(object):
         for n, x in self._params.items():
             x(getattr(self, n))
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         pass
 
 class Enum(object):
@@ -440,6 +445,11 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.endianness = endianness
         self.dimension_order = dimension_order
 
+    def _valid(self, seen, recursive):
+        if self.postfilter_slice is not None and self.postfilter_slice.has_step and self.postfilter_slice.step == 0:
+            raise ValueError("slice step cannot be zero")
+        self.numpy_array
+
     @classmethod
     def fromarray(cls, array):
         dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
@@ -474,8 +484,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         if len(array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
 
-        array = array.reshape(shape, order=self.dimension_order.dimension_order)
-        return array
+        return array.reshape(shape, order=self.dimension_order.dimension_order)
 
 ################################################# ExternalBuffer
 
@@ -513,6 +522,11 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.dimension_order = dimension_order
         self.location = location
 
+    def _valid(self, seen, recursive):
+        if self.postfilter_slice is not None and self.postfilter_slice.has_step and self.postfilter_slice.step == 0:
+            raise ValueError("slice step cannot be zero")
+        self.numpy_array
+
     @property
     def numpy_array(self):
         shape = self._shape((), ())
@@ -538,9 +552,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         if len(array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(array), functools.reduce(operator.mul, shape, 1)))
 
-        array = array.reshape(shape, order=self.dimension_order.dimension_order)
-
-        return array
+        return array.reshape(shape, order=self.dimension_order.dimension_order)
 
 ################################################# StatisticFilter
 
@@ -566,6 +578,10 @@ class StatisticFilter(Portally):
         self.excludes_pinf = excludes_pinf
         self.excludes_nan = excludes_nan
 
+    def _valid(self, seen, recursive):
+        if self.minimum is not None and self.maximum is not None and self.minimum >= self.maximum:
+            raise ValueError("StatisticFilter.minimum ({0}) must be strictly less than StatisticFilter.maximum ({1})".format(self.minimum, self.maximum))
+
 ################################################# Moments
 
 class Moments(Portally):
@@ -587,6 +603,11 @@ class Moments(Portally):
         self.weighted = weighted
         self.filter = filter
 
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.sumwxn, seen, recursive)
+            _valid(self.filter, seen, recursive)
+
 ################################################# Extremes
 
 class Extremes(Portally):
@@ -601,6 +622,11 @@ class Extremes(Portally):
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.values, seen, recursive)
+            _valid(self.filter, seen, recursive)
 
 ################################################# Quantiles
 
@@ -623,6 +649,11 @@ class Quantiles(Portally):
         self.weighted = weighted
         self.filter = filter
 
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.values, seen, recursive)
+            _valid(self.filter, seen, recursive)
+
 ################################################# Modes
 
 class Modes(Portally):
@@ -637,6 +668,11 @@ class Modes(Portally):
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.values, seen, recursive)
+            _valid(self.filter, seen, recursive)
 
 ################################################# Statistics
 
@@ -662,22 +698,19 @@ class Statistics(Portally):
         self.minima = minima
         self.maxima = maxima
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.moments is not None:
             if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
                 raise ValueError("Statistics.moments must have unique (n, weighted)")
-            for x in self.moments:
-                _valid(x, seen)
-
         if self.quantiles is not None:
             if len(set((x.p, x.weighted) for x in self.quantiles)) != len(self.quantiles):
                 raise ValueError("Statistics.quantiles must have unique (p, weighted)")
-            for x in self.quantiles:
-                _valid(x, seen)
-
-        _valid(self.modes, seen)
-        _valid(self.minima, seen)
-        _valid(self.maxima, seen)
+        if recursive:
+            _valid(self.moments, seen, recursive)
+            _valid(self.quantiles, seen, recursive)
+            _valid(self.modes, seen, recursive)
+            _valid(self.minima, seen, recursive)
+            _valid(self.maxima, seen, recursive)
 
 ################################################# Correlations
 
@@ -702,6 +735,11 @@ class Correlations(Portally):
         self.sumwxy = sumwxy
         self.weighted = weighted
         self.filter = filter
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.sumwxy, seen, recursive)
+            _valid(self.filter, seen, recursive)
 
     @staticmethod
     def _validindexes(correlations, numvars):
@@ -765,10 +803,9 @@ class IntegerBinning(Binning, BinPosition):
         self.pos_underflow = pos_underflow
         self.pos_overflow = pos_overflow
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.minimum >= self.maximum:
             raise ValueError("IntegerBinning.minimum ({0}) must be strictly less than IntegerBinning.maximum ({1})".format(self.minimum, self.maximum))
-
         if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
             raise ValueError("IntegerBinning.pos_underflow and IntegerBinning.pos_overflow must not be equal unless they are both nonexistent")
 
@@ -796,10 +833,9 @@ class RealInterval(Portally):
         self.low_inclusive = low_inclusive
         self.high_inclusive = high_inclusive
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.low > self.high:
             raise ValueError("RealInterval.low ({0}) must be less than or equal to RealInterval.high ({1})".format(self.low, self.high))
-
         if self.low == self.high and not self.low_inclusive and not self.high_inclusive:
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
 
@@ -838,13 +874,11 @@ class RealOverflow(Portally, BinPosition):
         self.pinf_mapping = pinf_mapping
         self.nan_mapping = nan_mapping
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
             raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_overflow must not be equal unless they are both nonexistent")
-
         if self.pos_underflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_underflow == self.pos_nanflow:
             raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
-
         if self.pos_overflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_overflow == self.pos_nanflow:
             raise ValueError("RealOverflow.pos_overflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
 
@@ -872,17 +906,14 @@ class RegularBinning(Binning):
         self.overflow = overflow
         self.circular = circular
 
-    def _valid(self, seen):
-        _valid(self.interval, seen)
-
+    def _valid(self, seen, recursive):
         if math.isinf(self.interval.low):
             raise ValueError("RegularBinning.interval.low must be finite")
-
         if math.isinf(self.interval.high):
             raise ValueError("RegularBinning.interval.high must be finite")
-
-        if self.overflow is not None:
-            _valid(self.overflow, seen)
+        if recursive:
+            _valid(self.interval, seen, recursive)
+            _valid(self.overflow, seen, recursive)
 
     def _binshape(self):
         if self.overflow is None:
@@ -918,11 +949,12 @@ class TicTacToeOverflowBinning(Binning):
         self.xoverflow = xoverflow
         self.yoverflow = yoverflow
 
-    def _valid(self, seen):
-        _valid(self.xinterval, seen)
-        _valid(self.yinterval, seen)
-        _valid(self.xoverflow, seen)
-        _valid(self.yoverflow, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.xinterval, seen, recursive)
+            _valid(self.yinterval, seen, recursive)
+            _valid(self.xoverflow, seen, recursive)
+            _valid(self.yoverflow, seen, recursive)
 
     def _binshape(self):
         if self.xoverflow is None:
@@ -983,13 +1015,14 @@ class HexagonalBinning(Binning):
         self.qoverflow = qoverflow
         self.roverflow = roverflow
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.qmin >= self.qmax:
             raise ValueError("HexagonalBinning.qmin ({0}) must be strictly less than HexagonalBinning.qmax ({1})".format(self.qmin, self.qmax))
         if self.rmin >= self.rmax:
             raise ValueError("HexagonalBinning.rmin ({0}) must be strictly less than HexagonalBinning.rmax ({1})".format(self.rmin, self.rmax))
-        _valid(self.qoverflow, seen)
-        _valid(self.roverflow, seen)
+        if recursive:
+            _valid(self.qoverflow, seen, recursive)
+            _valid(self.roverflow, seen, recursive)
 
     def _binshape(self):
         qnum = self.qmax - self.qmin + 1
@@ -1019,12 +1052,13 @@ class EdgesBinning(Binning):
         self.edges = edges
         self.overflow = overflow
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if numpy.isinf(self.edges).any():
             raise ValueError("EdgesBinning.edges must all be finite")
         if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
             raise ValueError("EdgesBinning.edges must be strictly increasing")
-        _valid(self.overflow, seen)
+        if recursive:
+            _valid(self.overflow, seen, recursive)
 
     def _binshape(self):
         if self.overflow is None:
@@ -1058,10 +1092,10 @@ class IrregularBinning(Binning):
         self.overflow = overflow
         self.overlapping_fill = overlapping_fill
 
-    def _valid(self, seen):
-        for x in self.intervals:
-            _valid(x, seen)
-        _valid(self.overflow, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.intervals, seen, recursive)
+            _valid(self.overflow, seen, recursive)
 
     def _binshape(self):
         if self.overflow is None:
@@ -1085,7 +1119,7 @@ class CategoryBinning(Binning, BinPosition):
         self.categories = categories
         self.pos_overflow = pos_overflow
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if len(self.categories) != len(set(self.categories)):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
@@ -1117,7 +1151,7 @@ class SparseRegularBinning(Binning, BinPosition):
         self.origin = origin
         self.pos_nanflow = pos_nanflow
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
@@ -1194,9 +1228,12 @@ class Axis(Portally):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, seen):
-        _valid(self.binning, seen)
-        _valid(self.statistics, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.binning, seen, recursive)
+            _valid(self.statistics, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
     def _binshape(self):
         if self.binning is None:
@@ -1228,8 +1265,11 @@ class Profile(Portally):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, seen):
-        _valid(self.statistics, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.statistics, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
 ################################################# Counts
 
@@ -1249,8 +1289,9 @@ class UnweightedCounts(Counts):
     def __init__(self, counts):
         self.counts = counts
 
-    def _valid(self, seen):
-        _valid(self.counts, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.counts, seen, recursive)
 
 ################################################# WeightedCounts
 
@@ -1270,10 +1311,11 @@ class WeightedCounts(Counts):
         self.sumw2 = sumw2
         self.unweighted = unweighted
 
-    def _valid(self, seen):
-        _valid(self.sumw, seen)
-        _valid(self.sumw2, seen)
-        _valid(self.unweighted, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.sumw, seen, recursive)
+            _valid(self.sumw2, seen, recursive)
+            _valid(self.unweighted, seen, recursive)
 
 ################################################# Parameter
 
@@ -1290,8 +1332,9 @@ class Parameter(Portally):
         self.identifier = identifier
         self.values = values
 
-    def _valid(self, seen):
-        _valid(self.values, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.values, seen, recursive)
 
 ################################################# Function
 
@@ -1341,12 +1384,14 @@ class ParameterizedFunction(Function, FunctionObject):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.parameters is not None:
             if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
                 raise ValueError("ParameterizedFunction.parameters keys must be unique")
-            for x in self.parameters:
-                _valid(x, seen)
+        if recursive:
+            _valid(self.parameters, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
 ################################################# EvaluatedFunction
 
@@ -1381,12 +1426,13 @@ class EvaluatedFunction(Function):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
-        _valid(self.values, seen)
-        _valid(self.derivatives, seen)
-        if self.errors is not None:
-            for x in self.errors:
-                _valid(x, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.values, seen, recursive)
+            _valid(self.derivatives, seen, recursive)
+            _valid(self.errors, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
 ################################################# BinnedEvaluatedFunction
 
@@ -1424,14 +1470,14 @@ class BinnedEvaluatedFunction(FunctionObject):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
-        for x in self.axis:
-            _valid(x, seen)
-        _valid(self.values, seen)
-        _valid(self.derivatives, seen)
-        if self.errors is not None:
-            for x in self.errors:
-                _valid(x, seen)
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.axis, seen, recursive)
+            _valid(self.values, seen, recursive)
+            _valid(self.derivatives, seen, recursive)
+            _valid(self.errors, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
     def _shape(self, path, shape):
         shape = ()
@@ -1482,34 +1528,23 @@ class Histogram(Object):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
-        for x in self.axis:
-            _valid(x, seen)
-
-        _valid(self.counts, seen)
-
+    def _valid(self, seen, recursive):
         if self.axis_correlations is not None:
             Correlations._validindexes(self.axis_correlations, len(self.axis))
-            for x in self.axis_correlations:
-                _valid(x, seen)
-
-        if self.profile is not None:
-            numprofile = len(self.profile)
-            for x in self.profile:
-                _valid(x, seen)
-        else:
-            numprofile = 0
-
         if self.profile_correlations is not None:
-            Correlations._validindexes(self.profile_correlations, numprofile)
-            for x in self.profile_correlations:
-                _valid(x, seen)
-
+            Correlations._validindexes(self.profile_correlations, 0 if self.profile is None else len(self.profile))
         if self.functions is not None:
             if len(set(x.identifier for x in self.functions)) != len(self.functions):
                 raise ValueError("Histogram.functions keys must be unique")
-            for x in self.functions:
-                _valid(x, seen)
+        if recursive:
+            _valid(self.axis, seen, recursive)
+            _valid(self.counts, seen, recursive)
+            _valid(self.profile, seen, recursive)
+            _valid(self.axis_correlations, seen, recursive)
+            _valid(self.profile_correlations, seen, recursive)
+            _valid(self.functions, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
     def _shape(self, path, shape):
         shape = ()
@@ -1530,13 +1565,8 @@ class Page(Portally):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen):
-        _valid(self.buffer, seen)
-        numbytes = self.buffer.numbytes
-        numentries = self.numentries()
-        itemsize = self.column.numpy_dtype.itemsize
-        if numbytes != numentries * itemsize:
-            raise ValueError("Page.buffer.numbytes is {0} but this page has {1} entries with {2} bytes each".format(numbytes, numentries, itemsize))
+    def _valid(self, seen, recursive):
+        self.numpy_array
 
     def numentries(self):
         if not hasattr(self, "_parent"):
@@ -1557,7 +1587,7 @@ class Page(Portally):
 
     @property
     def numpy_array(self):
-        buf = self.buffer.numpy_array
+        array = self.buffer.numpy_array
         column = self.column
 
         if column.filters is not None:
@@ -1567,14 +1597,16 @@ class Page(Portally):
             start = column.postfilter_slice.start if column.postfilter_slice.has_start else None
             stop = column.postfilter_slice.stop if column.postfilter_slice.has_stop else None
             step = column.postfilter_slice.step if column.postfilter_slice.has_step else None
-            buf = buf[start:stop:step]
+            if step == 0:
+                raise ValueError("slice step cannot be zero")
+            array = array[start:stop:step]
 
         numentries = self.numentries()
         itemsize = self.column.numpy_dtype.itemsize
-        if len(buf) != numentries * itemsize:
-            raise ValueError("Page.buffer.numbytes is {0} but this page has {1} entries with {2} bytes each".format(len(buf), numentries, itemsize))
+        if len(array) != numentries * itemsize:
+            raise ValueError("Page array has {0} bytes but this page has {1} entries with {2} bytes each".format(len(array), numentries, itemsize))
 
-        return buf.view(column.numpy_dtype).reshape((numentries,))
+        return array.view(column.numpy_dtype).reshape((numentries,))
 
 ################################################# ColumnChunk
 
@@ -1597,32 +1629,26 @@ class ColumnChunk(Portally):
         self.page_minima = page_minima
         self.page_maxima = page_maxima
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if self.page_offsets[0] != 0:
             raise ValueError("ColumnChunk.page_offsets must start with 0")
         if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
             raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
-
         if len(self.page_offsets) != len(self.pages) + 1:
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
-
-        for x in self.pages:
-            _valid(x, seen)
-
         if self.page_minima is not None:
             if len(self.page_minima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_minima), len(self.pages)))
-            for x in self.page_minima:
-                _valid(x, seen)
             raise NotImplementedError("check minima")
-
         if self.page_maxima is not None:
             if len(self.page_maxima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_maxima), len(self.pages)))
-            for x in self.page_maxima:
-                _valid(x, seen)
             raise NotImplementedError("check maxima")
-
+        if recursive:
+            _valid(self.pages, seen, recursive)
+            _valid(self.page_minima, seen, recursive)
+            _valid(self.page_maxima, seen, recursive)
+        
     def numentries(self, pageid=None):
         if pageid is None:
             return self.page_offsets[-1]
@@ -1658,10 +1684,8 @@ class ColumnChunk(Portally):
         out = [x.numpy_array for x in self.pages]
         if len(out) == 0:
             return numpy.empty(0, self.column.numpy_dtype)
-
         elif len(out) == 1:
             return out[0]
-
         else:
             return numpy.concatenate(out)
 
@@ -1680,13 +1704,12 @@ class Chunk(Portally):
         self.column_chunks = column_chunks
         self.metadata = metadata
 
-    def _valid(self, seen):
-        columns = self.columns
-        if len(self.column_chunks) != len(columns):
-            raise ValueError("Chunk.column_chunks has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(columns)))
-
-        for x in self.column_chunks:
-            _valid(x, seen)
+    def _valid(self, seen, recursive):
+        if len(self.column_chunks) != len(self.columns):
+            raise ValueError("Chunk.column_chunks has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(self.columns)))
+        if recursive:
+            _valid(self.column_chunks, seen, recursive)
+            _valid(self.metadata, seen, recursive)
 
     @property
     def columns(self):
@@ -1698,10 +1721,8 @@ class Chunk(Portally):
     def numpy_arrays(self):
         if not isinstance(getattr(self, "_parent", None), NtupleInstance) or not isinstance(getattr(self._parent, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-
         if len(self.column_chunks) != len(self._parent._parent.columns):
             raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(self._parent._parent.columns)))
-
         return {y.identifier: x.numpy_array for x, y in zip(self.column_chunks, self._parent._parent.columns)}
 
 ################################################# Column
@@ -1737,10 +1758,12 @@ class Column(Portally, Interpretation):
         self.metadata = metadata
         self.decoration = decoration
 
-    def _valid(self, seen):
-        if self.postfilter_slice is not None:
-            if self.postfilter_slice.step == 0:
-                raise ValueError("slice step cannot be zero")
+    def _valid(self, seen, recursive):
+        if self.postfilter_slice is not None and self.postfilter_slice.has_step and self.postfilter_slice.step == 0:
+            raise ValueError("slice step cannot be zero")
+        if recursive:
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
 ################################################# NtupleInstance
 
@@ -1757,10 +1780,9 @@ class NtupleInstance(Portally):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-
         if self.chunk_offsets is not None:
             if self.chunk_offsets[0] != 0:
                 raise ValueError("Ntuple.chunk_offsets must start with 0")
@@ -1769,9 +1791,8 @@ class NtupleInstance(Portally):
 
             if len(self.chunk_offsets) != len(self.chunks) + 1:
                 raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
-
-        for x in self.chunks:
-            _valid(x, seen)
+        if recursive:
+            _valid(self.chunks, seen, recursive)
 
     @property
     def columns(self):
@@ -1843,33 +1864,22 @@ class Ntuple(Object):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         shape = self._shape((), ())
-
         if len(set(x.identifier for x in self.columns)) != len(self.columns):
             raise ValueError("Ntuple.columns keys must be unique")
-
-        for x in self.columns:
-            _valid(x, seen)
-
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
-
-        for x in self.instances:
-            _valid(x, seen)
-
-        if self.column_statistics is not None:
-            for x in self.column_statistics:
-                _valid(x, seen)
-
         if self.column_correlations is not None:
             Correlations._validindexes(self.column_correlations, len(self.columns))
-            for x in self.column_correlations:
-                _valid(x, seen)
-
-        if self.functions is not None:
-            for x in self.functions:
-                _valid(x, seen)
+        if recursive:
+            _valid(self.columns, seen, recursive)
+            _valid(self.instances, seen, recursive)
+            _valid(self.column_statistics, seen, recursive)
+            _valid(self.column_correlations, seen, recursive)
+            _valid(self.functions, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
 
 ################################################# Region
 
@@ -1970,11 +1980,29 @@ class Collection(Portally):
         self.decoration = decoration
         self.script = script
 
-    def _valid(self, seen):
+    def _valid(self, seen, recursive):
         if len(set(x.identifier for x in self.objects)) != len(self.objects):
             raise ValueError("Collection.objects keys must be unique")
-        for x in self.objects:
-            _valid(x, seen)
+        if recursive:
+            _valid(self.objects, seen, recursive)
+            _valid(self.collections, seen, recursive)
+            _valid(self.regions, seen, recursive)
+            _valid(self.binned_regions, seen, recursive)
+            _valid(self.variations, seen, recursive)
+            _valid(self.metadata, seen, recursive)
+            _valid(self.decoration, seen, recursive)
+
+    def checkvalid(self, recursive=True):
+        self._valid(set(), recursive)
+
+    @property
+    def isvalid(self):
+        try:
+            self.checkvalid()
+        except ValueError:
+            return False
+        else:
+            return True
 
     def tobuffer(self):
         self.checkvalid()
@@ -2049,18 +2077,6 @@ class Collection(Portally):
 
     def __repr__(self):
         return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
-
-    @property
-    def isvalid(self):
-        try:
-            self.checkvalid()
-        except ValueError:
-            return False
-        else:
-            return True
-
-    def checkvalid(self):
-        self._valid(set())
 
     def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)
