@@ -432,7 +432,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
         "pointer":          portally.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         portally.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    portally.checktype.CheckEnum("RawExternalBuffer", "external_type", required=True, choices=ExternalBuffer.types),
+        "external_type":    portally.checktype.CheckEnum("RawExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
         }
 
     pointer       = typedproperty(_params["pointer"])
@@ -501,6 +501,8 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         self.dimension_order = dimension_order
 
     def _valid(self, seen, only, shape):
+        shape = self._shape((), ())
+
         if self._buffer is None:
             self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
 
@@ -523,10 +525,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         try:
             self._array = self._array.view(self.numpy_dtype)
         except ValueError:
-            raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
-
-        tmp = self._shape((), ())
-        assert shape == tmp, "{} != {}".format(shape, tmp)
+            raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy_dtype.itemsize))
 
         if len(self._array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(self._array), functools.reduce(operator.mul, shape, 1)))
@@ -588,6 +587,8 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.location = location
 
     def _valid(self, seen, only, shape):
+        shape = self._shape((), ())
+
         if self._pointer is None or self._numbytes is None:
             self._buffer = numpy.zeros(functools.reduce(operator.mul, shape, self.numpy_dtype.itemsize), dtype=InterpretedBuffer.none.dtype)
             self._pointer = self._buffer.ctypes.data
@@ -609,10 +610,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         try:
             self._array = self._array.view(self.numpy_dtype)
         except ValueError:
-            raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy._dtype.itemsize))
-
-        tmp = self._shape((), ())
-        assert shape == tmp, "{} != {}".format(shape, tmp)
+            raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(self._array), self.numpy_dtype.itemsize))
 
         if len(self._array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self._array), functools.reduce(operator.mul, shape, 1)))
@@ -1956,6 +1954,8 @@ class Ntuple(Object):
         self.script = script
 
     def _valid(self, seen, only, shape):
+        shape = self._shape((), ())
+
         if len(set(x.identifier for x in self.columns)) != len(self.columns):
             raise ValueError("Ntuple.columns keys must be unique")
 
@@ -1963,9 +1963,6 @@ class Ntuple(Object):
             if only is None or id(x) in only:
                 x._validtypes()
                 x._valid(seen, only)
-
-        tmp = self._shape((), ())
-        assert shape == tmp or (shape == () and tmp == (1,)), "{} != {}".format(shape, tmp)
 
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
