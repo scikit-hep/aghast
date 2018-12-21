@@ -184,22 +184,6 @@ class Portally(object):
         else:
             return shape
 
-    # def _top(self):
-    #     out = self
-    #     seen = set([id(out)])
-    #     while hasattr(out, "_parent"):
-    #         out = out._parent
-    #         if id(out) in seen:
-    #             raise ValueError("hierarchy is recursively nested")
-    #         seen.add(id(out))
-    #     if not isinstance(out, Collection):
-    #         raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-    #     return out, seen
-
-    # def _topvalid(self):
-    #     top, only = self._top()
-    #     top._valid(set(), only, ())
-
     def _validtypes(self):
         for n, x in self._params.items():
             x(getattr(self, n))
@@ -411,12 +395,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         self.buffer = buffer
 
     def _valid(self, seen, only, numbytes):
-        # self._array = numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
         pass
 
     @property
     def numpy_array(self):
-        # self._topvalid()
         return numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
 
 ################################################# RawExternalBuffer
@@ -438,16 +420,11 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.external_type = external_type
 
     def _valid(self, seen, only, numbytes):
-        # self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
-
         if self.numbytes != numbytes:
             raise ValueError("RawExternalBuffer.buffer length is {0} but it should be {1} bytes".format(len(self._buffer), numbytes))
 
-        # self._array = self._buffer
-
     @property
     def numpy_array(self):
-        # self._topvalid()
         return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
 ################################################# InlineBuffer
@@ -488,7 +465,6 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @property
     def numpy_array(self):
-        # self._topvalid()
         shape = self._shape((), ())
 
         if self.filters is None:
@@ -559,8 +535,6 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     @property
     def numpy_array(self):
-        # self._topvalid()
-
         shape = self._shape((), ())
 
         self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
@@ -1674,8 +1648,6 @@ class Page(Portally):
 
     @property
     def numpy_array(self):
-        # self._topvalid()
-
         if not hasattr(self, "_parent"):
             raise ValueError("Page not attached to a hierarchy")
         for pageid, page in enumerate(self._parent.pages):
@@ -1782,8 +1754,6 @@ class ColumnChunk(Portally):
     def numpy_array(self):
         out = [x.numpy_array for x in self.pages]
         if len(out) == 0:
-            # self._topvalid()
-            # column = self._parent._parent._parent.columns[self._parent.columns.index(self)]
             return numpy.empty(0, self.column.numpy_dtype)
 
         elif len(out) == 1:
