@@ -417,11 +417,12 @@ table Page {
 table ColumnChunk {
   pages: [Page] (required);
   page_offsets: [ulong] (required);
-  page_extremes: [Extremes];
+  page_minima: [Extremes];
+  page_maxima: [Extremes];
 }
 
 table Chunk {
-  columns: [ColumnChunk] (required);
+  column_chunks: [ColumnChunk] (required);
   metadata: Metadata;
 }
 

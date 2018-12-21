@@ -394,8 +394,12 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only, numbytes):
+    def _valid(self, seen, only):
         pass
+
+    @property
+    def numbytes(self):
+        return len(self.buffer)
 
     @property
     def numpy_array(self):
@@ -419,9 +423,8 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         self.numbytes = numbytes
         self.external_type = external_type
 
-    def _valid(self, seen, only, numbytes):
-        if self.numbytes != numbytes:
-            raise ValueError("RawExternalBuffer.buffer length is {0} but it should be {1} bytes".format(len(self._buffer), numbytes))
+    def _valid(self, seen, only):
+        pass
 
     @property
     def numpy_array(self):
@@ -1642,12 +1645,16 @@ class Page(Portally):
     def __init__(self, buffer):
         self.buffer = buffer
 
-    def _valid(self, seen, only, column, numentries):
-        _valid(self.buffer, seen, None, column.numpy_dtype.itemsize * numentries)
-        return numentries
+    def _valid(self, seen, only):
+        _valid(self.buffer, seen, only)
 
-    @property
-    def numpy_array(self):
+        numbytes = self.buffer.numbytes
+        numentries = self.numentries()
+        itemsize = self.column.numpy_dtype.itemsize
+        if numbytes != numentries * itemsize:
+            raise ValueError("Page.buffer.numbytes is {0} but this page has {1} entries with {2} bytes each".format(numbytes, numentries, itemsize))
+
+    def numentries(self):
         if not hasattr(self, "_parent"):
             raise ValueError("Page not attached to a hierarchy")
         for pageid, page in enumerate(self._parent.pages):
@@ -1656,9 +1663,18 @@ class Page(Portally):
         else:
             raise AssertionError("Page not in its own parent's pages list")
 
-        numentries = self._parent.numentries(pageid)
+        return self._parent.numentries(pageid)
+
+    @property
+    def column(self):
+        if not hasattr(self, "_parent"):
+            raise ValueError("Page not attached to a hierarchy")
+        return self._parent.column
+
+    @property
+    def numpy_array(self):
         buf = self.buffer.numpy_array
-        column = self._parent.column
+        column = self.column
 
         if column.filters is not None:
             raise NotImplementedError("handle column.filters")
@@ -1669,8 +1685,10 @@ class Page(Portally):
             step = column.postfilter_slice.step if column.postfilter_slice.has_step else None
             buf = buf[start:stop:step]
 
-        if len(buf) != column.numpy_dtype.itemsize * numentries:
-            raise ValueError("Page.buffer length is {0} bytes but ColumnChunk.page_offsets claims {1} entries of {2} bytes each".format(len(buf), numentries, column.numpy_dtype.itemsize))
+        numentries = self.numentries()
+        itemsize = self.column.numpy_dtype.itemsize
+        if len(buf) != numentries * itemsize:
+            raise ValueError("Page.buffer.numbytes is {0} but this page has {1} entries with {2} bytes each".format(len(buf), numentries, itemsize))
 
         return buf.view(column.numpy_dtype).reshape((numentries,))
 
@@ -1678,26 +1696,24 @@ class Page(Portally):
 
 class ColumnChunk(Portally):
     _params = {
-        "pages":         portally.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
-        "page_offsets":  portally.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_extremes": portally.checktype.CheckVector("ColumnChunk", "page_extremes", required=False, type=Extremes),
+        "pages":        portally.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
+        "page_offsets": portally.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
+        "page_minima":  portally.checktype.CheckVector("ColumnChunk", "page_minima", required=False, type=Extremes),
+        "page_maxima":  portally.checktype.CheckVector("ColumnChunk", "page_maxima", required=False, type=Extremes),
         }
 
-    pages         = typedproperty(_params["pages"])
-    page_offsets  = typedproperty(_params["page_offsets"])
-    page_extremes = typedproperty(_params["page_extremes"])
+    pages        = typedproperty(_params["pages"])
+    page_offsets = typedproperty(_params["page_offsets"])
+    page_minima  = typedproperty(_params["page_minima"])
+    page_maxima  = typedproperty(_params["page_maxima"])
 
-    def __init__(self, pages, page_offsets, page_extremes=None):
+    def __init__(self, pages, page_offsets, page_minima=None, page_maxima=None):
         self.pages = pages
         self.page_offsets = page_offsets
-        self.page_extremes = page_extremes
+        self.page_minima = page_minima
+        self.page_maxima = page_maxima
 
-    def _valid(self, seen, only, column):
-        # have to do recursive check because ColumnChunk._valid is called directly by Chunk._valid
-        if id(self) in seen:
-            raise ValueError("hierarchy is recursively nested")
-        seen.add(id(self))
-
+    def _valid(self, seen, only):
         if self.page_offsets[0] != 0:
             raise ValueError("ColumnChunk.page_offsets must start with 0")
         if not numpy.greater_equal(self.page_offsets[1:], self.page_offsets[:-1]).all():
@@ -1706,19 +1722,22 @@ class ColumnChunk(Portally):
         if len(self.page_offsets) != len(self.pages) + 1:
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
 
-        for i, x in enumerate(self.pages):
-            _valid(x, seen, only, column, self.page_offsets[i + 1] - self.page_offsets[i])
+        for x in self.pages:
+            _valid(x, seen, only)
 
-        if self.page_extremes is not None:
-            if len(self.page_extremes) != len(self.pages):
-                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_extremes), len(self.pages)))
-
-            for x in self.page_extremes:
+        if self.page_minima is not None:
+            if len(self.page_minima) != len(self.pages):
+                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_minima), len(self.pages)))
+            for x in self.page_minima:
                 _valid(x, seen, only, ())
+            raise NotImplementedError("check minima")
 
-            raise NotImplementedError("check extremes")
-
-        return self.page_offsets[-1]
+        if self.page_maxima is not None:
+            if len(self.page_maxima) != len(self.pages):
+                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_maxima), len(self.pages)))
+            for x in self.page_maxima:
+                _valid(x, seen, only, ())
+            raise NotImplementedError("check maxima")
 
     def numentries(self, pageid=None):
         if pageid is None:
@@ -1742,13 +1761,13 @@ class ColumnChunk(Portally):
         if not hasattr(self._parent._parent, "_parent"):
             raise ValueError("{0} not attached to a hierarchy".format(type(self._parent._parent)))
         
-        for columnid, columnchunk in enumerate(self._parent.columns):
+        for columnid, columnchunk in enumerate(self._parent.column_chunks):
             if self is columnchunk:
                 break
         else:
             raise AssertionError("ColumnChunk not in its own parent's columns list")
 
-        return self._parent._parent._parent.columns[columnid]
+        return self._parent._parent._parent.columns[columnid]   # FIXME: go through intermediate columns properties
 
     @property
     def numpy_array(self):
@@ -1766,44 +1785,43 @@ class ColumnChunk(Portally):
 
 class Chunk(Portally):
     _params = {
-        "columns":  portally.checktype.CheckVector("Chunk", "columns", required=True, type=ColumnChunk),
-        "metadata": portally.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
+        "column_chunks": portally.checktype.CheckVector("Chunk", "column_chunks", required=True, type=ColumnChunk),
+        "metadata":      portally.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
-    columns  = typedproperty(_params["columns"])
-    metadata = typedproperty(_params["metadata"])
+    column_chunks = typedproperty(_params["column_chunks"])
+    metadata      = typedproperty(_params["metadata"])
 
-    def __init__(self, columns, metadata=None):
-        self.columns = columns
+    def __init__(self, column_chunks, metadata=None):
+        self.column_chunks = column_chunks
         self.metadata = metadata
 
-    def _valid(self, seen, only, columns, numentries):
-        # have to do recursive check because Chunk._valid is called directly by Ntuple._valid
-        if id(self) in seen:
-            raise ValueError("hierarchy is recursively nested")
-        seen.add(id(self))
+    def _valid(self, seen, only):
+        columns = self.columns
 
-        if len(self.columns) != len(columns):
-            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(columns)))
+        if len(self.column_chunks) != len(columns):
+            raise ValueError("Chunk.column_chunks has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(columns)))
 
-        for x, y in zip(self.columns, columns):
+        for x in self.column_chunks:
             if only is None or id(x) in only:
                 x._validtypes()
-                num = x._valid(seen, only, y)
-                if numentries is not None and num != numentries:
-                    raise ValueError("Chunk.column {0} has {1} entries but Chunk has {2} entries".format(repr(y.identifier), num, numentries))
+                x._valid(seen, only)
 
-        return numentries
+    @property
+    def columns(self):
+        if not hasattr(self, "_parent"):
+            raise ValueError("Chunk not attached to a hierarchy")
+        return self._parent.columns
 
     @property
     def numpy_arrays(self):
         if not isinstance(getattr(self, "_parent", None), NtupleInstance) or not isinstance(getattr(self._parent, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
 
-        if len(self.columns) != len(self._parent._parent.columns):
-            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.columns), len(self._parent._parent.columns)))
+        if len(self.column_chunks) != len(self._parent._parent.columns):
+            raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(self._parent._parent.columns)))
 
-        return {y.identifier: x.numpy_array for x, y in zip(self.columns, self._parent._parent.columns)}
+        return {y.identifier: x.numpy_array for x, y in zip(self.column_chunks, self._parent._parent.columns)}
 
 ################################################# Column
 
@@ -1866,7 +1884,7 @@ class NtupleInstance(Portally):
             for x in self.chunks:
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, self._parent.columns, None)
+                    x._valid(seen, only)
 
         else:
             if self.chunk_offsets[0] != 0:
@@ -1880,20 +1898,33 @@ class NtupleInstance(Portally):
             for i, x in enumerate(self.chunks):
                 if only is None or id(x) in only:
                     x._validtypes()
-                    x._valid(seen, only, self._parent.columns, self.chunk_offsets[i + 1] - self.chunk_offsets[i])
+                    x._valid(seen, only)
+
+    @property
+    def columns(self):
+        if not hasattr(self, "_parent"):
+            raise ValueError("NtupleInstance not attached to a hierarchy")
+        return self._parent.columns
 
     def numentries(self, chunkid=None):
-        if chunkid is None:
-            return self.chunk_offsets[-1]
-        elif isinstance(chunkid, (numbers.Integral, numpy.integer)):
-            original_chunkid = chunkid
-            if chunkid < 0:
-                chunkid += len(self.chunk_offsets) - 1
-            if not 0 <= chunkid < len(self.chunk_offsets) - 1:
-                raise IndexError("chunkid {0} out of range for {1} chunks".format(original_chunkid, len(self.chunk_offsets) - 1))
-            return self.chunk_offsets[chunkid + 1] - self.chunk_offsets[chunkid]
+        if self.chunk_offsets is None:
+            if chunkid is None:
+                return sum(x.numentries() for x in self.chunks)
+            else:
+                return self.chunks[chunkid].numentries()
+
         else:
-            raise TypeError("chunkid must be None (for total number of entries) or an integer (for number of entries in a chunk)")
+            if chunkid is None:
+                return self.chunk_offsets[-1]
+            elif isinstance(chunkid, (numbers.Integral, numpy.integer)):
+                original_chunkid = chunkid
+                if chunkid < 0:
+                    chunkid += len(self.chunk_offsets) - 1
+                if not 0 <= chunkid < len(self.chunk_offsets) - 1:
+                    raise IndexError("chunkid {0} out of range for {1} chunks".format(original_chunkid, len(self.chunk_offsets) - 1))
+                return self.chunk_offsets[chunkid + 1] - self.chunk_offsets[chunkid]
+            else:
+                raise TypeError("chunkid must be None (for total number of entries) or an integer (for number of entries in a chunk)")
 
     @property
     def numpy_arrays(self):
@@ -1947,17 +1978,13 @@ class Ntuple(Object):
             raise ValueError("Ntuple.columns keys must be unique")
 
         for x in self.columns:
-            if only is None or id(x) in only:
-                x._validtypes()
-                x._valid(seen, only)
+            _valid(x, seen, only)
 
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
 
         for x in self.instances:
-            if only is None or id(x) in only:
-                x._validtypes()
-                x._valid(seen, only)
+            _valid(x, seen, only)
 
         if self.column_statistics is not None:
             for x in self.column_statistics:
