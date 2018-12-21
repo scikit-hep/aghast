@@ -1908,6 +1908,10 @@ class BinnedRegion(Portally):
         self.expression = expression
         self.binning  = binning 
 
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.binning, seen, recursive)
+
 ################################################# Assignment
 
 class Assignment(Portally):
@@ -1940,6 +1944,10 @@ class Variation(Portally):
         self.assignments = assignments
         self.systematic = systematic
         self.category_systematic = category_systematic
+
+    def _valid(self, seen, recursive):
+        if recursive:
+            _valid(self.assignments, seen, recursive)
 
 ################################################# Collection
 
@@ -2003,6 +2011,15 @@ class Collection(Portally):
             return False
         else:
             return True
+
+    def _shape(self, path, shape):
+        # shape = ()
+        # if len(path) > 0 and isinstance(path[0], (HERE)):
+        #     for x in self.axis:
+        #         shape = shape + x._binshape()
+        print(path, shape)
+
+        return super(Collection, self)._shape(path, shape)
 
     def tobuffer(self):
         self.checkvalid()
