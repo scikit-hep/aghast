@@ -1957,7 +1957,7 @@ class Ntuple(Object):
 class Collection(Portally):
     _params = {
         "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
-        "objects":        portally.checktype.CheckVector("Collection", "objects", required=True, type=Object),
+        "objects":        portally.checktype.CheckVector("Collection", "objects", required=False, type=Object),
         "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
         "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis, minlen=1),
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
@@ -1975,7 +1975,7 @@ class Collection(Portally):
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects, collections=None, axis=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, identifier, objects=None, collections=None, axis=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.objects = objects
         self.collections = collections
@@ -1986,8 +1986,9 @@ class Collection(Portally):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if len(set(x.identifier for x in self.objects)) != len(self.objects):
-            raise ValueError("Collection.objects keys must be unique")
+        if self.objects is not None:
+            if len(set(x.identifier for x in self.objects)) != len(self.objects):
+                raise ValueError("Collection.objects keys must be unique")
         if recursive:
             _valid(self.objects, seen, recursive)
             _valid(self.collections, seen, recursive)
@@ -2008,13 +2009,12 @@ class Collection(Portally):
             return True
 
     def _shape(self, path, shape):
-        # shape = ()
-        # if len(path) > 0 and isinstance(path[0], (HERE)):
-        #     for x in self.axis:
-        #         shape = shape + x._binshape()
-        
-        # print(path, shape)
-
+        if self.axis is not None:
+            axisshape = ()
+            if len(path) > 0 and isinstance(path[0], (Object, Collection)):
+                for x in self.axis:
+                    axisshape = axisshape + x._binshape()
+            shape = axisshape + shape
         return super(Collection, self)._shape(path, shape)
 
     def tobuffer(self):

@@ -492,7 +492,7 @@ table Object {
 
 table Collection {
   identifier: string (key);
-  objects: [Object] (required);
+  objects: [Object];
   collections: [Collection];
   axis: [Axis];
   title: string;
