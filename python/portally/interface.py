@@ -1250,6 +1250,8 @@ class Variation(Portally):
         self.category_systematic = category_systematic
 
     def _valid(self, seen, recursive):
+        if len(set(x.identifier for x in self.assignments)) != len(self.assignments):
+            raise ValueError("Variation.assignments keys must be unique")
         if recursive:
             _valid(self.assignments, seen, recursive)
 

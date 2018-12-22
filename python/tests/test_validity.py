@@ -205,16 +205,20 @@ class Test(unittest.TestCase):
         assert h["id"].values.array.tolist() == [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
 
     def test_PredicateBinning(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(PredicateBinning(["p", "q"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))])
+        h.checkvalid()
 
     def test_Assignments(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))])
+        h.checkvalid()
 
     def test_Variation(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))])
+        h.checkvalid()
 
     def test_VariationBinning(self):
-        pass
+        h = Collection("id", [Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")]), Variation([Assignment("x", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0, 0.0]))))])
+        h.checkvalid()
 
     def test_Axis(self):
         h = Collection("id", [BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))])
@@ -371,18 +375,6 @@ class Test(unittest.TestCase):
     def test_Ntuple(self):
         h = Collection("id", [Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([])])])
         h.checkvalid()
-
-    def test_Region(self):
-        pass
-
-    def test_BinnedRegion(self):
-        pass
-
-    def test_Assignment(self):
-        pass
-
-    def test_Variation(self):
-        pass
 
     def test_collection(self):
         h = Collection("id")
