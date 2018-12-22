@@ -344,7 +344,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
 
     def test_BinnedEvaluatedFunction(self):
-        # h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
+        # h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
         # assert h == frombuffer(h.tobuffer())
         pass
 

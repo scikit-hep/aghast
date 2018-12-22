@@ -668,7 +668,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=""):
+    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=None):
         self.pointer = pointer
         self.numbytes = numbytes
         self.external_type = external_type
@@ -1467,7 +1467,7 @@ class Axis(Portally):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, binning=None, expression="", statistics=None, title="", metadata=None, decoration=None):
+    def __init__(self, binning=None, expression=None, statistics=None, title=None, metadata=None, decoration=None):
         self.binning = binning
         self.expression = expression
         self.statistics = statistics
@@ -1505,7 +1505,7 @@ class Profile(Portally):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    def __init__(self, expression, statistics, title="", metadata=None, decoration=None):
+    def __init__(self, expression, statistics, title=None, metadata=None, decoration=None):
         self.expression = expression
         self.statistics = statistics
         self.title = title
@@ -1614,7 +1614,7 @@ class ParameterizedFunction(Function, FunctionObject):
     decoration = typedproperty(_params["decoration"])
     script     = typedproperty(_params["script"])
 
-    def __init__(self, expression, parameters=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, expression, parameters=None, title=None, metadata=None, decoration=None, script=None):
         self.expression = expression
         self.parameters = parameters
         self.title = title
@@ -1664,7 +1664,7 @@ class EvaluatedFunction(Function):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    def __init__(self, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
         self.values = values
         self.derivatives = derivatives
         self.errors = errors
@@ -1704,7 +1704,7 @@ class BinnedEvaluatedFunction(FunctionObject):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    def __init__(self, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, axis, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
         self.values = values
         self.derivatives = derivatives
@@ -1757,7 +1757,7 @@ class Histogram(Object):
     decoration           = typedproperty(_params["decoration"])
     script               = typedproperty(_params["script"])
 
-    def __init__(self, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
         self.counts = counts
         self.profile = profile
@@ -1999,7 +1999,7 @@ class Column(Portally, Interpretation):
     metadata         = typedproperty(_params["metadata"])
     decoration       = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, postfilter_slice=None, title="", metadata=None, decoration=None):
+    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, postfilter_slice=None, title=None, metadata=None, decoration=None):
         self.identifier = identifier
         self.dtype = dtype
         self.endianness = endianness
@@ -2101,7 +2101,7 @@ class Ntuple(Object):
     decoration          = typedproperty(_params["decoration"])
     script              = typedproperty(_params["script"])
 
-    def __init__(self, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, columns, instances, column_statistics=None, column_correlations=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.columns = columns
         self.instances = instances
         self.column_statistics = column_statistics
