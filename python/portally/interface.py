@@ -216,6 +216,12 @@ class Portally(object):
         else:
             return True
 
+    @classmethod
+    def _fromflatbuffers(cls, flatbuffers):
+        out = cls.__new__(cls)
+        out._flatbuffers = flatbuffers
+        return out
+
     def _toflatbuffers(self, builder):
         raise NotImplementedError("missing _toflatbuffers implementation")
 
@@ -251,10 +257,10 @@ class Enum(object):
         self.value = value
 
     def __repr__(self):
-        return repr(self.name)
+        return self.base + "." + self.name
 
     def __str__(self):
-        return str(self.name)
+        return self.base + "." + self.name
 
     def __hash__(self):
         return hash(self.name)
@@ -338,7 +344,8 @@ def fromfile(file, mode="r+"):
 
 ################################################# Metadata
 
-class MetadataLanguageEnum(Enum): pass
+class MetadataLanguageEnum(Enum):
+    base = "Metadata"
 
 class Metadata(Portally):
     unspecified = MetadataLanguageEnum("unspecified", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
@@ -357,9 +364,27 @@ class Metadata(Portally):
         self.data = data
         self.language = language
 
+    def _toflatbuffers(self, builder):
+        # enum MetadataLanguage: uint {
+        #   meta_unspecified = 0,
+        #   meta_json = 1,
+        # }
+
+        # table Metadata {
+        #   data: string (required);
+        #   language: MetadataLanguage = meta_unspecified;
+        # }
+
+        data = builder.CreateString(self.data.encode("utf-8"))
+        portally.portally_generated.Metadata.MetadataStart(builder)
+        portally.portally_generated.Metadata.MetadataAddData(builder, data)
+        portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
+        return portally.portally_generated.Metadata.MetadataEnd(builder)
+
 ################################################# Decoration
 
-class DecorationLanguageEnum(Enum): pass
+class DecorationLanguageEnum(Enum):
+    base = "Decoration"
 
 class Decoration(Portally):
     unspecified = DecorationLanguageEnum("unspecified", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
@@ -382,7 +407,8 @@ class Decoration(Portally):
 
 ################################################# Buffers
 
-class BufferFilterEnum(Enum): pass
+class BufferFilterEnum(Enum):
+    base = "Buffer"
 
 class Buffer(Portally):
     none = BufferFilterEnum("none", portally.portally_generated.Filter.Filter.filter_none)
@@ -398,7 +424,8 @@ class InlineBuffer(object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-class ExternalTypeEnum(Enum): pass
+class ExternalTypeEnum(Enum):
+    base = "ExternalBuffer"
 
 class ExternalBuffer(object):
     memory   = ExternalTypeEnum("memory", portally.portally_generated.ExternalType.ExternalType.external_memory)
@@ -415,11 +442,15 @@ class RawBuffer(object):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 class DTypeEnum(Enum):
+    base = "Interpretation"
+
     def __init__(self, name, value, dtype):
         super(DTypeEnum, self).__init__(name, value)
         self.dtype = dtype
 
 class EndiannessEnum(Enum):
+    base = "Interpretation"
+
     def __init__(self, name, value, endianness):
         super(EndiannessEnum, self).__init__(name, value)
         self.endianness = endianness
@@ -489,6 +520,8 @@ class Interpretation(object):
         raise ValueError("numpy dtype {0} does not correspond to any Interpretation dtype, endianness pair".format(str(dtype)))
 
 class DimensionOrderEnum(Enum):
+    base = "InterpretedBuffer"
+
     def __init__(self, name, value, dimension_order):
         super(DimensionOrderEnum, self).__init__(name, value)
         self.dimension_order = dimension_order
@@ -890,7 +923,8 @@ class Binning(Portally):
 
 ################################################# BinPosition
 
-class BinPositionEnum(Enum): pass
+class BinPositionEnum(Enum):
+    base = "BinPosition"
 
 class BinPosition(object):
     below3      = BinPositionEnum("below3", portally.portally_generated.BinPosition.BinPosition.pos_below3)
@@ -964,7 +998,8 @@ class RealInterval(Portally):
 
 ################################################# RealOverflow
 
-class NonRealMappingEnum(Enum): pass
+class NonRealMappingEnum(Enum):
+    base = "RealOverflow"
 
 class RealOverflow(Portally, BinPosition):
     missing      = NonRealMappingEnum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
@@ -1092,7 +1127,8 @@ class TicTacToeOverflowBinning(Binning):
         
 ################################################# HexagonalBinning
 
-class HexagonalCoordinatesEnum(Enum): pass
+class HexagonalCoordinatesEnum(Enum):
+    base = "HexagonalBinning"
 
 class HexagonalBinning(Binning):
     offset         = HexagonalCoordinatesEnum("offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
@@ -1192,7 +1228,8 @@ class EdgesBinning(Binning):
 
 ################################################# IrregularBinning
 
-class OverlappingFillStrategyEnum(Enum): pass
+class OverlappingFillStrategyEnum(Enum):
+    base = "IrregularBinning"
 
 class IrregularBinning(Binning):
     all   = OverlappingFillStrategyEnum("all", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
@@ -1283,9 +1320,11 @@ class SparseRegularBinning(Binning, BinPosition):
 
 ################################################# FractionBinning
 
-class FractionLayoutEnum(Enum): pass
+class FractionLayoutEnum(Enum):
+    base = "FractionBinning"
 
-class FractionErrorMethodEnum(Enum): pass
+class FractionErrorMethodEnum(Enum):
+    base = "FractionBinning"
 
 class FractionBinning(Binning):
     passall  = FractionLayoutEnum("passall", portally.portally_generated.FractionLayout.FractionLayout.frac_passall)
@@ -2142,7 +2181,7 @@ class Collection(Object):
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects=None, axis=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, identifier, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):
         self.identifier = identifier
         self.objects = objects
         self.axis = axis
@@ -2236,10 +2275,10 @@ class Collection(Object):
         # }
 
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
-        title = None if len(self.title) == 0 else builder.CreateString(self.title.encode("utf-8"))
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
-        script = None if len(self.script) == 0 else builder.CreateString(self.script.encode("utf-8"))
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
 
         portally.portally_generated.Object.ObjectStart(builder)
         portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)

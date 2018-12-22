@@ -34,6 +34,10 @@ from portally.interface import fromfile
 
 from portally.interface import Metadata
 from portally.interface import Decoration
+from portally.interface import Buffer
+from portally.interface import ExternalBuffer
+from portally.interface import Interpretation
+from portally.interface import InterpretedBuffer
 from portally.interface import RawInlineBuffer
 from portally.interface import RawExternalBuffer
 from portally.interface import InterpretedInlineBuffer
@@ -45,6 +49,7 @@ from portally.interface import Quantiles
 from portally.interface import Modes
 from portally.interface import Statistics
 from portally.interface import Correlations
+from portally.interface import BinPosition
 from portally.interface import IntegerBinning
 from portally.interface import RealInterval
 from portally.interface import RealOverflow
@@ -76,3 +81,5 @@ from portally.interface import Column
 from portally.interface import NtupleInstance
 from portally.interface import Ntuple
 from portally.interface import Collection
+
+

@@ -102,7 +102,10 @@ class CheckString(Check):
             return obj
 
     def fromflatbuffers(self, obj):
-        return obj.decode("utf-8")
+        if obj is None:
+            return obj
+        else:
+            return obj.decode("utf-8")
 
 class CheckNumber(Check):
     def __init__(self, classname, paramname, required, min=float("-inf"), max=float("inf"), min_inclusive=True, max_inclusive=True):
@@ -163,7 +166,10 @@ class CheckEnum(Check):
             return self.choices[self.choices.index(obj)]
 
     def fromflatbuffers(self, obj):
-        return self.choices[obj]
+        if obj is None:
+            return obj
+        else:
+            return self.choices[obj]
 
 class CheckClass(Check):
     def __init__(self, classname, paramname, required, type):
@@ -179,7 +185,10 @@ class CheckClass(Check):
         return obj
 
     def fromflatbuffers(self, obj):
-        return self.type._fromflatbuffers(obj)
+        if obj is None:
+            return obj
+        else:
+            return self.type._fromflatbuffers(obj)
 
 class CheckKey(Check):
     def __init__(self, classname, paramname, required, type):
@@ -208,7 +217,7 @@ class CheckKey(Check):
             return obj
 
     def fromflatbuffers(self, obj):
-        if self.type is float or self.type is int:
+        if obj is None or self.type is float or self.type is int:
             return obj
         elif self.type is str:
             return obj.decode("utf-8")
@@ -273,4 +282,7 @@ class CheckSlice(Check):
         return out
 
     def fromflatbuffers(self, obj):
-        return slice(obj.Start() if obj.HasStart() else None, obj.Stop() if obj.HasStop() else None, obj.Step() if obj.HasStep() else None)
+        if obj is None:
+            return obj
+        else:
+            return slice(obj.Start() if obj.HasStart() else None, obj.Stop() if obj.HasStop() else None, obj.Step() if obj.HasStep() else None)

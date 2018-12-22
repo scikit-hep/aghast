@@ -37,11 +37,8 @@ class Test(unittest.TestCase):
         pass
 
     def test_Metadata(self):
-        pass
-    #     h = Collection("id", [], metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
-    #     h.checkvalid()
-    #     assert h.metadata.data == """{"one": 1, "two": 2}"""
-    #     assert h.metadata.language == Metadata.json
+        h = Collection("id", [], metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
+        assert h == frombuffer(h.tobuffer())
 
     def test_Decoration(self):
         pass
