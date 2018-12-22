@@ -167,6 +167,8 @@ def _getbykey(self, field, where):
             raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
     return getattr(self, lookup)[where]
 
+################################################# Portally
+
 class Portally(object):
     def __repr__(self):
         if "identifier" in self._params:
@@ -206,6 +208,8 @@ class Portally(object):
         else:
             return True
 
+################################################# Enum
+
 class Enum(object):
     def __init__(self, name, value):
         self.name = name
@@ -226,6 +230,90 @@ class Enum(object):
     def __ne__(self, other):
         return not self.__eq__(other)
     
+################################################# Object
+
+class Object(Portally):
+    def __init__(self):
+        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+    def tobuffer(self):
+        self.checkvalid()
+        builder = flatbuffers.Builder(1024)
+        builder.Finish(self._toflatbuffers(builder, None))
+        return builder.Output()
+
+    @classmethod
+    def frombuffer(cls, buffer, offset=0):
+        out = cls.__new__(cls)
+        out._flatbuffers = portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset)
+        return out
+
+    def toarray(self):
+        return numpy.frombuffer(self.tobuffer(), dtype=numpy.uint8)
+
+    @classmethod
+    def fromarray(cls, array):
+        return cls.frombuffer(array)
+
+    def tofile(self, file):
+        self.checkvalid()
+
+        opened = False
+        if not hasattr(file, "write"):
+            file = open(file, "wb")
+            opened = True
+
+        if not hasattr(file, "tell"):
+            class FileLike(object):
+                def __init__(self, file):
+                    self.file = file
+                    self.offset = 0
+                def write(self, data):
+                    self.file.write(data)
+                    self.offset += len(data)
+                def close(self):
+                    try:
+                        self.file.close()
+                    except:
+                        pass
+                def tell(self):
+                    return self.offset
+            file = FileLike(file)
+
+        try:
+            file.write(b"port")
+            builder = flatbuffers.Builder(1024)
+            builder.Finish(self._toflatbuffers(builder, False, file))
+            offset = file.tell()
+            file.write(builder.Output())
+            file.write(struct.pack("<Q", offset))
+            file.write(b"port")
+
+        finally:
+            if opened:
+                file.close()
+
+    @classmethod
+    def fromfile(cls, file, mode="r+"):
+        if isinstance(file, str):
+            file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
+        if file[:4].tostring() != b"port":
+            raise OSError("file does not begin with magic 'port'")
+        if file[-4:].tostring() != b"port":
+            raise OSError("file does not end with magic 'port'")
+        offset, = struct.unpack("<Q", file[-12:-4])
+        return cls.frombuffer(file[offset:-12])
+
+    def _toflatbuffers(self, builder, file):
+        identifier = builder.CreateString(self._identifier)
+        if len(self._title) > 0:
+            title = builder.CreateString(self._title)
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)
+        if len(self._title) > 0:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        return portally.portally_generated.Object.ObjectEnd(builder)
+
 ################################################# Metadata
 
 class MetadataLanguageEnum(Enum): pass
@@ -1430,12 +1518,6 @@ class Function(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-################################################# Object
-
-class Object(Portally):
-    def __init__(self):
-        raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
-
 ################################################# FunctionObject
 
 class FunctionObject(Object):
@@ -2020,81 +2102,3 @@ class Collection(Object):
 
     def __getitem__(self, where):
         return _getbykey(self, "objects", where)
-
-    # def tobuffer(self):
-    #     self.checkvalid()
-    #     builder = flatbuffers.Builder(1024)
-    #     builder.Finish(self._toflatbuffers(builder, None))
-    #     return builder.Output()
-
-    # @classmethod
-    # def frombuffer(cls, buffer, offset=0):
-    #     out = cls.__new__(cls)
-    #     out._flatbuffers = portally.portally_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
-    #     return out
-
-    # def toarray(self):
-    #     return numpy.frombuffer(self.tobuffer(), dtype=numpy.uint8)
-
-    # @classmethod
-    # def fromarray(cls, array):
-    #     return cls.frombuffer(array)
-
-    # def tofile(self, file):
-    #     self.checkvalid()
-
-    #     opened = False
-    #     if not hasattr(file, "write"):
-    #         file = open(file, "wb")
-    #         opened = True
-
-    #     if not hasattr(file, "tell"):
-    #         class FileLike(object):
-    #             def __init__(self, file):
-    #                 self.file = file
-    #                 self.offset = 0
-    #             def write(self, data):
-    #                 self.file.write(data)
-    #                 self.offset += len(data)
-    #             def close(self):
-    #                 try:
-    #                     self.file.close()
-    #                 except:
-    #                     pass
-    #             def tell(self):
-    #                 return self.offset
-    #         file = FileLike(file)
-
-    #     try:
-    #         file.write(b"port")
-    #         builder = flatbuffers.Builder(1024)
-    #         builder.Finish(self._toflatbuffers(builder, False, file))
-    #         offset = file.tell()
-    #         file.write(builder.Output())
-    #         file.write(struct.pack("<Q", offset))
-    #         file.write(b"port")
-
-    #     finally:
-    #         if opened:
-    #             file.close()
-
-    # @classmethod
-    # def fromfile(cls, file, mode="r+"):
-    #     if isinstance(file, str):
-    #         file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
-    #     if file[:4].tostring() != b"port":
-    #         raise OSError("file does not begin with magic 'port'")
-    #     if file[-4:].tostring() != b"port":
-    #         raise OSError("file does not end with magic 'port'")
-    #     offset, = struct.unpack("<Q", file[-12:-4])
-    #     return cls.frombuffer(file[offset:-12])
-
-    # def _toflatbuffers(self, builder, file):
-    #     identifier = builder.CreateString(self._identifier)
-    #     if len(self._title) > 0:
-    #         title = builder.CreateString(self._title)
-    #     portally.portally_generated.Collection.CollectionStart(builder)
-    #     portally.portally_generated.Collection.CollectionAddIdentifier(builder, identifier)
-    #     if len(self._title) > 0:
-    #         portally.portally_generated.Collection.CollectionAddTitle(builder, title)
-    #     return portally.portally_generated.Collection.CollectionEnd(builder)
