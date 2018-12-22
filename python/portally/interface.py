@@ -111,25 +111,6 @@ import portally.portally_generated.Collection
 import portally.checktype
 
 def typedproperty(check):
-    def setparent(self, value):
-        if isinstance(value, Portally):
-            if hasattr(value, "_parent"):
-                raise ValueError("already attached to another hierarchy: {0}".format(repr(value)))
-            else:
-                value._parent = self
-
-        elif ((sys.version_info[0] >= 3 and isinstance(value, (str, bytes))) or (sys.version_info[0] < 3 and isinstance(value, basestring))):
-            pass
-
-        else:
-            try:
-                value = list(value)
-            except TypeError:
-                pass
-            else:
-                for x in value:
-                    setparent(self, x)
-
     @property
     def prop(self):
         private = "_" + check.paramname
@@ -138,15 +119,16 @@ def typedproperty(check):
             fbname = check.paramname.capitalize()
             fbnamelen = fbname + "Length"
             if hasattr(self._flatbuffers, fbnamelen):
-                value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check)
+                value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
             else:
                 value = check.fromflatbuffers(getattr(self._flatbuffers, fbname)())
+                portally.checktype.setparent(self, value)
             setattr(self, private, value)
         return getattr(self, private)
 
     @prop.setter
     def prop(self, value):
-        setparent(self, value)
+        portally.checktype.setparent(self, value)
         private = "_" + check.paramname
         setattr(self, private, check(value))
 

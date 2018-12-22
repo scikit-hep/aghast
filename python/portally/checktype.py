@@ -39,6 +39,27 @@ except ImportError:
 
 import numpy
 
+def setparent(parent, value):
+    import portally.interface
+
+    if isinstance(value, portally.interface.Portally):
+        if hasattr(value, "_parent"):
+            raise ValueError("already attached to another hierarchy: {0}".format(repr(value)))
+        else:
+            value._parent = parent
+
+    elif ((sys.version_info[0] >= 3 and isinstance(value, (str, bytes))) or (sys.version_info[0] < 3 and isinstance(value, basestring))):
+        pass
+
+    else:
+        try:
+            value = iter(value)
+        except TypeError:
+            pass
+        else:
+            for x in value:
+                setparent(parent, x)
+
 class Vector(Sequence):
     def __init__(self, data):
         if data is None:
@@ -56,7 +77,7 @@ class Vector(Sequence):
         return "[" + ", ".join(repr(x) for x in self) + "]"
 
 class FBVector(Vector):
-    def __init__(self, length, get, check):
+    def __init__(self, length, get, check, parent):
         self._got = [None] * length
         self._get = get
         assert isinstance(check, CheckVector)
@@ -70,6 +91,7 @@ class FBVector(Vector):
             self._check = CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
         else:
             self._check = CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+        self._parent = parent
 
     def __len__(self):
         return len(self._got)
@@ -77,6 +99,7 @@ class FBVector(Vector):
     def __getitem__(self, where):
         if self._got[where] is None:
             self._got[where] = self._check.fromflatbuffers(self._get(where))
+            setparent(self._parent, self._got[where])
         return self._got[where]
 
 class Check(object):
