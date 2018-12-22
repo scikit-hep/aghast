@@ -160,10 +160,14 @@ class FBLookup(Lookup):
         return iter(self._lookup)
 
     def __getitem__(self, where):
+        import portally.interface
+
         item = self._got.get(where, None)
         if item is None:
             item = self._check.fromflatbuffers(self._get(self._lookup[where]))
             self._got[where] = item
+            if isinstance(item, portally.interface.Portally):
+                item._identifier = where
             setparent(self._parent, item)
         return item
 
