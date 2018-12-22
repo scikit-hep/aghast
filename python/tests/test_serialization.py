@@ -237,11 +237,8 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
 
     def test_Axis(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.axis[0].expression == "x"
-    #     assert h.values.array.tolist() == [0.0]
+        h = BinnedEvaluatedFunction([Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer())        
 
     def test_UnweightedCounts(self):
         pass
@@ -346,13 +343,10 @@ class Test(unittest.TestCase):
     def test_BinnedEvaluatedFunction(self):
         h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer())
-
-    #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0]
-    #     h = BinnedEvaluatedFunction("id", [Axis(), Axis()], InterpretedInlineBuffer(numpy.array([[0.0]]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0]]
+        assert frombuffer(h.tobuffer()).values.array.tolist() == [0.0]
+        h = BinnedEvaluatedFunction([Axis(), Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer())
+        assert frombuffer(h.tobuffer()).values.array.tolist() == [[0.0]]
 
     def test_Page(self):
         pass
