@@ -41,11 +41,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer())
 
     def test_Decoration(self):
-        pass
-    #     h = Collection("id", [], decoration=Decoration("""points { color: red }""", language=Decoration.css))
-    #     h.checkvalid()
-    #     assert h.decoration.data == """points { color: red }"""
-    #     assert h.decoration.css == Decoration.css
+        h = Collection("id", [], decoration=Decoration("""points { color: red }""", language=Decoration.css))
+        assert h == frombuffer(h.tobuffer())
 
     def test_RawInlineBuffer(self):
         pass

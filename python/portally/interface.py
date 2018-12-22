@@ -365,16 +365,6 @@ class Metadata(Portally):
         self.language = language
 
     def _toflatbuffers(self, builder):
-        # enum MetadataLanguage: uint {
-        #   meta_unspecified = 0,
-        #   meta_json = 1,
-        # }
-
-        # table Metadata {
-        #   data: string (required);
-        #   language: MetadataLanguage = meta_unspecified;
-        # }
-
         data = builder.CreateString(self.data.encode("utf-8"))
         portally.portally_generated.Metadata.MetadataStart(builder)
         portally.portally_generated.Metadata.MetadataAddData(builder, data)
@@ -404,6 +394,13 @@ class Decoration(Portally):
     def __init__(self, data, language=unspecified):
         self.data = data
         self.language = language
+
+    def _toflatbuffers(self, builder):
+        data = builder.CreateString(self.data.encode("utf-8"))
+        portally.portally_generated.Decoration.DecorationStart(builder)
+        portally.portally_generated.Decoration.DecorationAddData(builder, data)
+        portally.portally_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
+        return portally.portally_generated.Decoration.DecorationEnd(builder)
 
 ################################################# Buffers
 
@@ -2239,11 +2236,6 @@ class Collection(Object):
         return out
 
     def _toflatbuffers(self, builder):
-        # table Collection {
-        #   objects: [Object];
-        #   axis: [Axis];
-        # }
-
         objects = None if len(self.objects) == 0 else [x._toflatbuffers(builder) for x in self.objects]
         axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
 
@@ -2264,15 +2256,6 @@ class Collection(Object):
         if axis is not None:
             portally.portally_generated.Collection.CollectionAddAxis(builder, axis)
         data = portally.portally_generated.Collection.CollectionEnd(builder)
-
-        # table Object {
-        #   identifier: string (key);
-        #   data: ObjectData (required);
-        #   title: string;
-        #   metadata: Metadata;
-        #   decoration: Decoration;
-        #   script: string;
-        # }
 
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
