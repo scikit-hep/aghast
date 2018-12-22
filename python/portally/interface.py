@@ -39,7 +39,6 @@ import sys
 import numpy
 import flatbuffers
 
-import portally.portally_generated.LookupPair
 import portally.portally_generated.MetadataLanguage
 import portally.portally_generated.Metadata
 import portally.portally_generated.DecorationLanguage
@@ -119,7 +118,10 @@ def typedproperty(check):
             assert hasattr(self, "_flatbuffers"), "not derived from a flatbuffer or not properly initialized"
             fbname = check.paramname.capitalize()
             fbnamelen = fbname + "Length"
-            if hasattr(self._flatbuffers, fbnamelen):
+            fbnamelookup = fbname + "Lookup"
+            if hasattr(self._flatbuffers, fbnamelookup):
+                value = portally.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
+            elif hasattr(self._flatbuffers, fbnamelen):
                 value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
             else:
                 value = check.fromflatbuffers(getattr(self._flatbuffers, fbname)())
@@ -316,7 +318,7 @@ class Object(Portally):
         try:
             file.write(b"port")
             builder = flatbuffers.Builder(1024)
-            builder.Finish(self._toflatbuffers(builder, False, file))
+            builder.Finish(self._toflatbuffers(builder))
             offset = file.tell()
             file.write(builder.Output())
             file.write(struct.pack("<Q", offset))
@@ -2204,6 +2206,7 @@ class Collection(Object):
         out._flatbuffers = Merged()
         out._flatbuffers.Objects = collection.Objects
         out._flatbuffers.ObjectsLength = collection.ObjectsLength
+        out._flatbuffers.ObjectsLookup = collection.Lookup
         out._flatbuffers.Axis = collection.Axis
         out._flatbuffers.AxisLength = collection.AxisLength
         out._flatbuffers.Title = flatbuffers.Title
@@ -2213,31 +2216,39 @@ class Collection(Object):
         return out
 
     def _toflatbuffers(self, builder):
-        objects = None if len(self.objects) == 0 else [x._toflatbuffers(builder) for x in self.objects]
+        objects = None if len(self.objects) == 0 else [x._toflatbuffers(builder) for x in self.objects.values()]
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
 
-        if objects is not None:
-            portally.portally_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
-            for x in objects[::-1]:
-                builder.PrependUOffsetTRelative(x)
-            objects = builder.EndVector(len(objects))
         if axis is not None:
             portally.portally_generated.Collection.CollectionStartAxisVector(builder, len(axis))
             for x in axis[::-1]:
                 builder.PrependUOffsetTRelative(x)
             axis = builder.EndVector(len(axis))
 
+        if objects is not None:
+            portally.portally_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
+            for x in objects[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            objects = builder.EndVector(len(objects))
+
+        lookup = None if len(self.objects) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.objects.keys()]
+        if lookup is not None:
+            portally.portally_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
+            for x in lookup[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            lookup = builder.EndVector(len(lookup))
+
         portally.portally_generated.Collection.CollectionStart(builder)
         if objects is not None:
+            portally.portally_generated.Collection.CollectionAddLookup(builder, lookup)
             portally.portally_generated.Collection.CollectionAddObjects(builder, objects)
         if axis is not None:
             portally.portally_generated.Collection.CollectionAddAxis(builder, axis)
         data = portally.portally_generated.Collection.CollectionEnd(builder)
-
-        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
-        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
-        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
-        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
 
         portally.portally_generated.Object.ObjectStart(builder)
         portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Collection)

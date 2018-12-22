@@ -1,12 +1,5 @@
 namespace portally_generated;
 
-///////////////////////////////////////////////// looking up by identifier
-
-table LookupPair {
-  identifier: string (required);
-  index: long;
-}
-
 ///////////////////////////////////////////////// metadata
 
 enum MetadataLanguage: uint {
@@ -432,7 +425,7 @@ table Histogram {
   profile: [Profile];
   axis_correlations: [Correlations];
   profile_correlations: [Correlations];
-  lookup_functions: [LookupPair];
+  lookup_functions: [string];
   functions: [Function];
 }
 
@@ -475,14 +468,14 @@ table Ntuple {
   instances: [NtupleInstance] (required);
   column_statistics: [Statistics];
   column_correlations: [Correlations];
-  lookup_functions: [LookupPair];
+  lookup_functions: [string];
   functions: [FunctionObject];
 }
 
 ///////////////////////////////////////////////// objects and collections
 
 table Collection {
-  lookup: [LookupPair];
+  lookup: [string];
   objects: [Object];
   axis: [Axis];
 }

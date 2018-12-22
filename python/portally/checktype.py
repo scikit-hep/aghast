@@ -84,6 +84,16 @@ class Vector(Sequence):
         else:
             return "[" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "]"
 
+def _checkitem(check):
+    if check.type is str:
+        return CheckString(check.classname, check.paramname, required=check.required)
+    elif check.type is float:
+        return CheckNumber(check.classname, check.paramname, required=check.required)
+    elif isinstance(check.type, list):
+        return CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
+    else:
+        return CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+
 class FBVector(Vector):
     def __init__(self, length, get, check, parent):
         self._got = [None] * length
@@ -91,14 +101,7 @@ class FBVector(Vector):
         assert isinstance(check, CheckVector)
         if not check.minlen <= length <= check.maxlen:
             raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive)".format(check.classname, check.paramname, check.minlen, check.maxlen))
-        if check.type is str:
-            self._check = CheckString(check.classname, check.paramname, required=check.required)
-        elif check.type is float:
-            self._check = CheckNumber(check.classname, check.paramname, required=check.required)
-        elif isinstance(check.type, list):
-            self._check = CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
-        else:
-            self._check = CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+        self._check = _checkitem(check)
         self._parent = parent
 
     def __len__(self):
@@ -140,8 +143,29 @@ class Lookup(Mapping):
             return "{" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "}"
 
 class FBLookup(Lookup):
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, length, lookup, get, check, parent):
+        self._lookup = {lookup(i).decode("utf-8"): i for i in range(length)}
+        self._got = {}
+        self._get = get
+        assert isinstance(check, CheckLookup)
+        if not check.minlen <= length <= check.maxlen:
+            raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive)".format(check.classname, check.paramname, check.minlen, check.maxlen))
+        self._check = _checkitem(check)
+        self._parent = parent
+
+    def __len__(self):
+        return len(self._lookup)
+
+    def __iter__(self):
+        return iter(self._lookup)
+
+    def __getitem__(self, where):
+        item = self._got.get(where, None)
+        if item is None:
+            item = self._check.fromflatbuffers(self._get(self._lookup[where]))
+            self._got[where] = item
+            setparent(self._parent, item)
+        return item
 
 class Check(object):
     def __init__(self, classname, paramname, required):
