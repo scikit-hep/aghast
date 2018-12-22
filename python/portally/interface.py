@@ -242,18 +242,8 @@ class Object(Portally):
         builder.Finish(self._toflatbuffers(builder, None))
         return builder.Output()
 
-    @classmethod
-    def frombuffer(cls, buffer, offset=0):
-        out = cls.__new__(cls)
-        out._flatbuffers = portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset)
-        return out
-
     def toarray(self):
         return numpy.frombuffer(self.tobuffer(), dtype=numpy.uint8)
-
-    @classmethod
-    def fromarray(cls, array):
-        return cls.frombuffer(array)
 
     def tofile(self, file):
         self.checkvalid()
@@ -293,17 +283,6 @@ class Object(Portally):
             if opened:
                 file.close()
 
-    @classmethod
-    def fromfile(cls, file, mode="r+"):
-        if isinstance(file, str):
-            file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
-        if file[:4].tostring() != b"port":
-            raise OSError("file does not begin with magic 'port'")
-        if file[-4:].tostring() != b"port":
-            raise OSError("file does not end with magic 'port'")
-        offset, = struct.unpack("<Q", file[-12:-4])
-        return cls.frombuffer(file[offset:-12])
-
     def _toflatbuffers(self, builder, file):
         identifier = builder.CreateString(self._identifier)
         if len(self._title) > 0:
@@ -313,6 +292,26 @@ class Object(Portally):
         if len(self._title) > 0:
             portally.portally_generated.Object.ObjectAddTitle(builder, title)
         return portally.portally_generated.Object.ObjectEnd(builder)
+
+def frombuffer(buffer, offset=0):
+    flatbuffers = portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset)
+    # FIXME: pick a class based on the flatbuffers.data type
+    out = cls.__new__(cls)
+    out._flatbuffers = flatbuffers
+    return out
+
+def fromarray(array):
+    return frombuffer(array)
+
+def fromfile(file, mode="r+"):
+    if isinstance(file, str):
+        file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
+    if file[:4].tostring() != b"port":
+        raise OSError("file does not begin with magic 'port'")
+    if file[-4:].tostring() != b"port":
+        raise OSError("file does not end with magic 'port'")
+    offset, = struct.unpack("<Q", file[-12:-4])
+    return frombuffer(file[offset:-12])
 
 ################################################# Metadata
 
@@ -1358,6 +1357,19 @@ class Variation(Portally):
         if recursive:
             _valid(self.assignments, seen, recursive)
 
+    def __getitem__(self, where):
+        if where == ():
+            return self
+        elif isinstance(where, tuple):
+            head, tail = where[0], where[1:]
+        else:
+            head, tail = where, ()
+        out = _getbykey(self, "assignments", head)
+        if tail == ():
+            return out
+        else:
+            return out[tail]
+
 ################################################# VariationBinning
 
 class VariationBinning(Binning):
@@ -1563,6 +1575,19 @@ class ParameterizedFunction(Function, FunctionObject):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
+    def __getitem__(self, where):
+        if where == ():
+            return self
+        elif isinstance(where, tuple):
+            head, tail = where[0], where[1:]
+        else:
+            head, tail = where, ()
+        out = _getbykey(self, "parameters", head)
+        if tail == ():
+            return out
+        else:
+            return out[tail]
+
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
@@ -1715,6 +1740,19 @@ class Histogram(Object):
             _valid(self.functions, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
+
+    def __getitem__(self, where):
+        if where == ():
+            return self
+        elif isinstance(where, tuple):
+            head, tail = where[0], where[1:]
+        else:
+            head, tail = where, ()
+        out = _getbykey(self, "functions", head)
+        if tail == ():
+            return out
+        else:
+            return out[tail]
 
     def _shape(self, path, shape):
         shape = ()
@@ -2051,11 +2089,24 @@ class Ntuple(Object):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
+    def __getitem__(self, where):
+        if where == ():
+            return self
+        elif isinstance(where, tuple):
+            head, tail = where[0], where[1:]
+        else:
+            head, tail = where, ()
+        out = _getbykey(self, "columns", head)
+        if tail == ():
+            return out
+        else:
+            return out[tail]
+
 ################################################# Collection
 
 class Collection(Object):
     _params = {
-        "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
+        "identifier":     portally.checktype.CheckKey("Collection", "identifier", required=True, type=str),
         "objects":        portally.checktype.CheckVector("Collection", "objects", required=False, type=Object),
         "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis, minlen=1),
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
@@ -2091,6 +2142,19 @@ class Collection(Object):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
+    def __getitem__(self, where):
+        if where == ():
+            return self
+        elif isinstance(where, tuple):
+            head, tail = where[0], where[1:]
+        else:
+            head, tail = where, ()
+        out = _getbykey(self, "objects", head)
+        if tail == ():
+            return out
+        else:
+            return out[tail]
+
     def _shape(self, path, shape):
         if self.axis is not None:
             axisshape = ()
@@ -2099,6 +2163,3 @@ class Collection(Object):
                     axisshape = axisshape + x._binshape()
             shape = axisshape + shape
         return super(Collection, self)._shape(path, shape)
-
-    def __getitem__(self, where):
-        return _getbykey(self, "objects", where)

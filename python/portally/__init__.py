@@ -28,6 +28,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from portally.interface import frombuffer
+from portally.interface import fromarray
+from portally.interface import fromfile
+
 from portally.interface import Metadata
 from portally.interface import Decoration
 from portally.interface import RawInlineBuffer

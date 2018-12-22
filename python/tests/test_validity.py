@@ -211,6 +211,7 @@ class Test(unittest.TestCase):
     def test_Assignments(self):
         h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))
         h.checkvalid()
+        assert h.axis[0].binning.variations[0]["y"].expression == "2"
 
     def test_Variation(self):
         h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
@@ -295,6 +296,7 @@ class Test(unittest.TestCase):
     def test_Parameter(self):
         h = ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])
         h.checkvalid()
+        assert h["y"].values.array.tolist() == [6]
 
     def test_ParameterizedFunction(self):
         h = ParameterizedFunction("id", "x**2")
@@ -303,8 +305,9 @@ class Test(unittest.TestCase):
         h.checkvalid()
 
     def test_EvaluatedFunction(self):
-        h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])
+        h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("f", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])
         h.checkvalid()
+        assert h["f"].values.array.tolist() == numpy.arange(100).reshape((10, 10)).tolist()
         h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)))])
         h.checkvalid()
         h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)), [Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.75)])])
@@ -382,5 +385,6 @@ class Test(unittest.TestCase):
         assert h.identifier == "id"
         h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(30)))), Histogram("id2", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(300))))], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
         h.checkvalid()
-        h = Collection("id", [Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(60)))), Histogram("id2", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(600))))], axis=[Axis(FractionBinning())])], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
+        h = Collection("a", [Collection("b", [Histogram("c", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(60)))), Histogram("d", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(600))))], axis=[Axis(FractionBinning())])], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
         h.checkvalid()
+        assert h["b", "c"].counts.counts.array.tolist() == numpy.arange(60).reshape((3, 2, 10)).tolist()
