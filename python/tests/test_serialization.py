@@ -413,8 +413,10 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
 
     def test_collection(self):
-        pass
-    #     h = Collection("id")
+        h = Collection("id")
+        assert h == frombuffer(h.tobuffer())
+        h = Collection("a", [Collection("b"), Collection("c")])
+        assert h == frombuffer(h.tobuffer())
     #     h.checkvalid()
     #     assert h.identifier == "id"
     #     h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(30)))), Histogram("id2", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(300))))], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])

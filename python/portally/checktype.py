@@ -45,10 +45,13 @@ class Vector(Sequence):
             self._data = ()
         else:
             self._data = tuple(data)
+
     def __len__(self):
         return len(self._data)
+
     def __getitem__(self, where):
         return self._data[where]
+
     def __repr__(self):
         return "[" + ", ".join(repr(x) for x in self) + "]"
 
@@ -56,9 +59,21 @@ class FBVector(Vector):
     def __init__(self, length, get, check):
         self._got = [None] * length
         self._get = get
-        self._check = check
+        assert isinstance(check, CheckVector)
+        if not check.minlen <= length <= check.maxlen:
+            raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive)".format(check.classname, check.paramname, check.minlen, check.maxlen))
+        if check.type is str:
+            self._check = CheckString(check.classname, check.paramname, required=check.required)
+        elif check.type is float:
+            self._check = CheckNumber(check.classname, check.paramname, required=check.required)
+        elif isinstance(check.type, list):
+            self._check = CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
+        else:
+            self._check = CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+
     def __len__(self):
         return len(self._got)
+
     def __getitem__(self, where):
         if self._got[where] is None:
             self._got[where] = self._check.fromflatbuffers(self._get(where))

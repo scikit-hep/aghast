@@ -277,6 +277,11 @@ class Object(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+    @classmethod
+    def _fromflatbuffers(cls, flatbuffers):
+        cls = _ObjectData_lookup[flatbuffers.DataType()]
+        return cls._fromflatbuffers(flatbuffers)
+
     def tobuffer(self):
         self.checkvalid()
         builder = flatbuffers.Builder(1024)
@@ -325,9 +330,7 @@ class Object(Portally):
                 file.close()
 
 def frombuffer(buffer, offset=0):
-    flatbuffers = portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset)
-    cls = _ObjectData_lookup[flatbuffers.DataType()]
-    return cls._fromflatbuffers(flatbuffers)
+    return Object._fromflatbuffers(portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset))
 
 def fromarray(array):
     return frombuffer(array)
@@ -2163,7 +2166,7 @@ class Collection(Object):
     _params = {
         "identifier":     portally.checktype.CheckKey("Collection", "identifier", required=True, type=str),
         "objects":        portally.checktype.CheckVector("Collection", "objects", required=False, type=Object),
-        "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis, minlen=1),
+        "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
         "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
         "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
