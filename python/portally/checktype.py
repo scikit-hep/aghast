@@ -32,10 +32,37 @@ import sys
 import numbers
 try:
     from collections.abc import Iterable
+    from collections.abc import Sequence
 except ImportError:
     from collections import Iterable
+    from collections import Sequence
 
 import numpy
+
+class Vector(Sequence):
+    def __init__(self, data):
+        if data is None:
+            self._data = ()
+        else:
+            self._data = tuple(data)
+    def __len__(self):
+        return len(self._data)
+    def __getitem__(self, where):
+        return self._data[where]
+    def __repr__(self):
+        return "[" + ", ".join(repr(x) for x in self) + "]"
+
+class FBVector(Vector):
+    def __init__(self, length, get, check):
+        self._got = [None] * length
+        self._get = get
+        self._check = check
+    def __len__(self):
+        return len(self._got)
+    def __getitem__(self, where):
+        if self._got[where] is None:
+            self._got[where] = self._check.fromflatbuffers(self._get(where))
+        return self._got[where]
 
 class Check(object):
     def __init__(self, classname, paramname, required):
@@ -48,7 +75,7 @@ class Check(object):
 
     def __call__(self, obj):
         if obj is None and self.required:
-            raise TypeError("{0}.{1} is required, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} is required, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         else:
             return obj
 
@@ -61,7 +88,7 @@ class CheckBool(Check):
         if obj is None:
             return obj
         elif not isinstance(obj, (bool, numpy.bool_, numpy.bool)):
-            raise TypeError("{0}.{1} must be boolean, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be boolean, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         return bool(obj)
 
 class CheckString(Check):
@@ -70,7 +97,7 @@ class CheckString(Check):
         if obj is None:
             return obj
         elif not ((sys.version_info[0] >= 3 and isinstance(obj, str)) or (sys.version_info[0] < 3 and isinstance(obj, basestring))):
-            raise TypeError("{0}.{1} must be a string, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be a string, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         else:
             return obj
 
@@ -87,15 +114,15 @@ class CheckNumber(Check):
         if obj is None:
             return obj
         elif not isinstance(obj, (numbers.Real, numpy.floating, numpy.integer)) or numpy.isnan(obj):
-            raise TypeError("{0}.{1} must be a number, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be a number, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         elif self.min_inclusive and not self.min <= obj:
-            raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.min, repr(obj)))
+            raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.min, repr(obj), type(obj)))
         elif not self.min_inclusive and not self.min < obj:
-            raise TypeError("{0}.{1} must not be below {2} (exclusive), cannot pass {3}".format(self.classname, self.paramname, self.min, repr(obj)))
+            raise TypeError("{0}.{1} must not be below {2} (exclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.min, repr(obj), type(obj)))
         elif self.max_inclusive and not obj <= self.max:
-            raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.max, repr(obj)))
+            raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.max, repr(obj), type(obj)))
         elif not self.max_inclusive and not obj < self.max:
-            raise TypeError("{0}.{1} must not be above {2} (exclusive), cannot pass {3}".format(self.classname, self.paramname, self.max, repr(obj)))
+            raise TypeError("{0}.{1} must not be above {2} (exclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.max, repr(obj), type(obj)))
         else:
             return float(obj)
 
@@ -110,11 +137,11 @@ class CheckInteger(Check):
         if obj is None:
             return obj
         elif not isinstance(obj, (numbers.Integral, numpy.integer)):
-            raise TypeError("{0}.{1} must be an integer, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be an integer, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         elif not self.min <= obj:
-            raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.min, repr(obj)))
+            raise TypeError("{0}.{1} must not be below {2} (inclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.min, repr(obj), type(obj)))
         elif not obj <= self.max:
-            raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3}".format(self.classname, self.paramname, self.max, repr(obj)))
+            raise TypeError("{0}.{1} must not be above {2} (inclusive), cannot pass {3} (type {4})".format(self.classname, self.paramname, self.max, repr(obj), type(obj)))
         else:
             return int(obj)
 
@@ -128,7 +155,7 @@ class CheckEnum(Check):
         if obj is None:
             return obj
         elif obj not in self.choices:
-            raise TypeError("{0}.{1} must be one of {2}, cannot pass {3}".format(self.classname, self.paramname, self.choices, repr(obj)))
+            raise TypeError("{0}.{1} must be one of {2}, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.choices, repr(obj), type(obj)))
         else:
             return self.choices[self.choices.index(obj)]
 
@@ -145,7 +172,7 @@ class CheckClass(Check):
         if obj is None:
             return obj
         elif not isinstance(obj, self.type):
-            raise TypeError("{0}.{1} must be a {2} object, cannot pass {3}".format(self.classname, self.paramname, self.type, repr(obj)))
+            raise TypeError("{0}.{1} must be a {2} object, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(obj), type(obj)))
         return obj
 
     def fromflatbuffers(self, obj):
@@ -162,19 +189,19 @@ class CheckKey(Check):
             return obj
         elif self.type is str:
             if not ((sys.version_info[0] >= 3 and isinstance(obj, str)) or (sys.version_info[0] < 3 and isinstance(obj, basestring))):
-                raise TypeError("{0}.{1} must be a string, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+                raise TypeError("{0}.{1} must be a string, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
             return obj
         elif self.type is float:
             if not isinstance(obj, (numbers.Real, numpy.floating, numpy.integer)):
-                raise TypeError("{0}.{1} must be a number, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+                raise TypeError("{0}.{1} must be a number, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
             return float(obj)
         elif self.type is int:
             if not isinstance(obj, (numbers.Integral, numpy.integer)):
-                raise TypeError("{0}.{1} must be an integer, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+                raise TypeError("{0}.{1} must be an integer, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
             return int(obj)
         else:
             if not isinstance(obj, self.type):
-                raise TypeError("{0}.{1} must be a {2} object, cannot pass {3}".format(self.classname, self.paramname, self.type, repr(obj)))
+                raise TypeError("{0}.{1} must be a {2} object, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(obj), type(obj)))
             return obj
 
     def fromflatbuffers(self, obj):
@@ -193,28 +220,33 @@ class CheckVector(Check):
     def __call__(self, obj):
         super(CheckVector, self).__call__(obj)
         if obj is None:
-            return obj
+            return Vector(obj)
         elif not isinstance(obj, Iterable):
-            raise TypeError("{0}.{1} must be iterable, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be iterable, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
 
         if not self.minlen <= len(obj) <= self.maxlen:
-            raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive), cannot pass {4}".format(self.classname, self.paramname, self.minlen, self.maxlen, repr(obj)))
+            raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive), cannot pass {4} (type ({5}))".format(self.classname, self.paramname, self.minlen, self.maxlen, repr(obj), type(obj)))
 
         if self.type is str:
             for x in obj:
                 if not ((sys.version_info[0] >= 3 and isinstance(x, str)) or (sys.version_info[0] < 3 and isinstance(x, basestring))):
-                    raise TypeError("{0}.{1} elements must be strings, cannot pass {2}".format(self.classname, self.paramname, repr(x)))
-            return list(obj)
+                    raise TypeError("{0}.{1} elements must be strings, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
+            return Vector(obj)
+        elif self.type is float:
+            for x in obj:
+                if not isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
+                    raise TypeError("{0}.{1} elements must be numbers, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
+            return Vector(float(x) for x in obj)
         elif isinstance(self.type, list):
             for x in obj:
                 if not x in self.type:
-                    raise TypeError("{0}.{1} elements must be one of {2}, cannot pass {3}".format(self.classname, self.paramname, self.type, repr(x)))
-            return [self.type[self.type.index(x)] for x in obj]
+                    raise TypeError("{0}.{1} elements must be one of {2}, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
+            return Vector(self.type[self.type.index(x)] for x in obj)
         else:
             for x in obj:
                 if not isinstance(x, self.type):
-                    raise TypeError("{0}.{1} elements must be {2} objects, cannot pass {3}".format(self.classname, self.paramname, self.type, repr(x)))
-            return list(obj)
+                    raise TypeError("{0}.{1} elements must be {2} objects, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
+            return Vector(obj)
 
     def fromflatbuffers(self, obj):
         if self.type is str or self.type is float or self.type is int:
@@ -230,7 +262,7 @@ class CheckBuffer(Check):
         try:
             return numpy.frombuffer(obj, dtype=numpy.uint8)
         except AttributeError:
-            raise TypeError("{0}.{1} must be a buffer, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be a buffer, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
 
 class CheckSlice(Check):
     def __call__(self, obj):
@@ -238,7 +270,7 @@ class CheckSlice(Check):
         if obj is None:
             return obj
         elif not isinstance(obj, slice):
-            raise TypeError("{0}.{1} must be a slice, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+            raise TypeError("{0}.{1} must be a slice, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
         return out
 
     def fromflatbuffers(self, obj):

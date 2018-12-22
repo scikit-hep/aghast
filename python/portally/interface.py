@@ -129,13 +129,19 @@ def typedproperty(check):
             else:
                 for x in value:
                     setparent(self, x)
-        
+
     @property
     def prop(self):
         private = "_" + check.paramname
         if not hasattr(self, private):
             assert hasattr(self, "_flatbuffers"), "not derived from a flatbuffer or not properly initialized"
-            setattr(self, private, check.fromflatbuffers(getattr(self._flatbuffers, check.paramname.capitalize())()))
+            fbname = check.paramname.capitalize()
+            fbnamelen = fbname + "Length"
+            if hasattr(self._flatbuffers, fbnamelen):
+                value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check)
+            else:
+                value = check.fromflatbuffers(getattr(self._flatbuffers, fbname)())
+            setattr(self, private, value)
         return getattr(self, private)
 
     @prop.setter
@@ -166,6 +172,8 @@ def _getbykey(self, field, where):
         if len(getattr(self, lookup)) != len(getattr(self, field)):
             raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
     return getattr(self, lookup)[where]
+
+class Merged(object): pass
 
 ################################################# Portally
 
@@ -208,6 +216,33 @@ class Portally(object):
         else:
             return True
 
+    def _toflatbuffers(self, builder):
+        raise NotImplementedError("missing _toflatbuffers implementation")
+
+    def __eq__(self, other):
+        if type(self) is not type(other):
+            return False
+        for n in self._params:
+            selfn = getattr(self, n)
+            othern = getattr(other, n)
+            if selfn is None or isinstance(selfn, (Portally, Enum)):
+                if selfn != othern:
+                    return False
+            else:
+                try:
+                    if len(selfn) != len(othern):
+                        return False
+                except TypeError:
+                    return False
+                for x, y in zip(selfn, othern):
+                    if x != y:
+                        return False
+        else:
+            return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 ################################################# Enum
 
 class Enum(object):
@@ -239,7 +274,7 @@ class Object(Portally):
     def tobuffer(self):
         self.checkvalid()
         builder = flatbuffers.Builder(1024)
-        builder.Finish(self._toflatbuffers(builder, None))
+        builder.Finish(self._toflatbuffers(builder))
         return builder.Output()
 
     def toarray(self):
@@ -283,22 +318,10 @@ class Object(Portally):
             if opened:
                 file.close()
 
-    def _toflatbuffers(self, builder, file):
-        identifier = builder.CreateString(self._identifier)
-        if len(self._title) > 0:
-            title = builder.CreateString(self._title)
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)
-        if len(self._title) > 0:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
-        return portally.portally_generated.Object.ObjectEnd(builder)
-
 def frombuffer(buffer, offset=0):
     flatbuffers = portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset)
-    # FIXME: pick a class based on the flatbuffers.data type
-    out = cls.__new__(cls)
-    out._flatbuffers = flatbuffers
-    return out
+    cls = _ObjectData_lookup[flatbuffers.DataType()]
+    return cls._fromflatbuffers(flatbuffers)
 
 def fromarray(array):
     return frombuffer(array)
@@ -562,7 +585,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     def array(self):
         shape = self._shape((), ())
 
-        if self.filters is None:
+        if len(self.filters) == 0:
             array = self._buffer
         else:
             raise NotImplementedError(self.filters)
@@ -635,7 +658,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
         self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
-        if self.filters is None:
+        if len(self.filters) == 0:
             array = self._buffer
         else:
             raise NotImplementedError(self.filters)
@@ -801,12 +824,10 @@ class Statistics(Portally):
         self.maxima = maxima
 
     def _valid(self, seen, recursive):
-        if self.moments is not None:
-            if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
-                raise ValueError("Statistics.moments must have unique (n, weighted)")
-        if self.quantiles is not None:
-            if len(set((x.p, x.weighted) for x in self.quantiles)) != len(self.quantiles):
-                raise ValueError("Statistics.quantiles must have unique (p, weighted)")
+        if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
+            raise ValueError("Statistics.moments must have unique (n, weighted)")
+        if len(set((x.p, x.weighted) for x in self.quantiles)) != len(self.quantiles):
+            raise ValueError("Statistics.quantiles must have unique (p, weighted)")
         if recursive:
             _valid(self.moments, seen, recursive)
             _valid(self.quantiles, seen, recursive)
@@ -1567,9 +1588,8 @@ class ParameterizedFunction(Function, FunctionObject):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if self.parameters is not None:
-            if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
-                raise ValueError("ParameterizedFunction.parameters keys must be unique")
+        if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
+            raise ValueError("ParameterizedFunction.parameters keys must be unique")
         if recursive:
             _valid(self.parameters, seen, recursive)
             _valid(self.metadata, seen, recursive)
@@ -1724,13 +1744,12 @@ class Histogram(Object):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if self.axis_correlations is not None:
+        if len(self.axis_correlations) != 0:
             Correlations._validindexes(self.axis_correlations, len(self.axis))
-        if self.profile_correlations is not None:
-            Correlations._validindexes(self.profile_correlations, 0 if self.profile is None else len(self.profile))
-        if self.functions is not None:
-            if len(set(x.identifier for x in self.functions)) != len(self.functions):
-                raise ValueError("Histogram.functions keys must be unique")
+        if len(self.profile_correlations) != 0:
+            Correlations._validindexes(self.profile_correlations, len(self.profile))
+        if len(set(x.identifier for x in self.functions)) != len(self.functions):
+            raise ValueError("Histogram.functions keys must be unique")
         if recursive:
             _valid(self.axis, seen, recursive)
             _valid(self.counts, seen, recursive)
@@ -1798,7 +1817,7 @@ class Page(Portally):
         array = self.buffer.array
         column = self.column
 
-        if column.filters is not None:
+        if len(column.filters) != 0:
             raise NotImplementedError("handle column.filters")
 
         if column.postfilter_slice is not None:
@@ -1844,11 +1863,11 @@ class ColumnChunk(Portally):
             raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
         if len(self.page_offsets) != len(self.pages) + 1:
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
-        if self.page_minima is not None:
+        if len(self.page_minima) != 0:
             if len(self.page_minima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_minima), len(self.pages)))
             raise NotImplementedError("check minima")
-        if self.page_maxima is not None:
+        if len(self.page_maxima) != 0:
             if len(self.page_maxima) != len(self.pages):
                 raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_maxima), len(self.pages)))
             raise NotImplementedError("check maxima")
@@ -1951,7 +1970,7 @@ class Column(Portally, Interpretation):
     dtype            = typedproperty(_params["dtype"])
     endianness       = typedproperty(_params["endianness"])
     filters          = typedproperty(_params["filters"])
-    postfilter_slice = typedproperty(_params["filters"])
+    postfilter_slice = typedproperty(_params["postfilter_slice"])
     title            = typedproperty(_params["title"])
     metadata         = typedproperty(_params["metadata"])
     decoration       = typedproperty(_params["decoration"])
@@ -1978,7 +1997,7 @@ class Column(Portally, Interpretation):
 class NtupleInstance(Portally):
     _params = {
         "chunks":        portally.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
-        "chunk_offsets": portally.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int, minlen=1),
+        "chunk_offsets": portally.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
         }
 
     chunks              = typedproperty(_params["chunks"])
@@ -1991,7 +2010,7 @@ class NtupleInstance(Portally):
     def _valid(self, seen, recursive):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
             raise ValueError("{0} object is not nested in a hierarchy".format(type(self).__name__))
-        if self.chunk_offsets is not None:
+        if len(self.chunk_offsets) != 0:
             if self.chunk_offsets[0] != 0:
                 raise ValueError("Ntuple.chunk_offsets must start with 0")
             if not numpy.greater_equal(self.chunk_offsets[1:], self.chunk_offsets[:-1]).all():
@@ -2009,7 +2028,7 @@ class NtupleInstance(Portally):
         return self._parent.columns
 
     def numentries(self, chunkid=None):
-        if self.chunk_offsets is None:
+        if len(self.chunk_offsets) == 0:
             if chunkid is None:
                 return sum(x.numentries() for x in self.chunks)
             else:
@@ -2078,7 +2097,7 @@ class Ntuple(Object):
             raise ValueError("Ntuple.columns keys must be unique")
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
-        if self.column_correlations is not None:
+        if len(self.column_correlations) != 0:
             Correlations._validindexes(self.column_correlations, len(self.columns))
         if recursive:
             _valid(self.columns, seen, recursive)
@@ -2133,9 +2152,8 @@ class Collection(Object):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if self.objects is not None:
-            if len(set(x.identifier for x in self.objects)) != len(self.objects):
-                raise ValueError("Collection.objects keys must be unique")
+        if len(set(x.identifier for x in self.objects)) != len(self.objects):
+            raise ValueError("Collection.objects keys must be unique")
         if recursive:
             _valid(self.objects, seen, recursive)
             _valid(self.axis, seen, recursive)
@@ -2156,10 +2174,90 @@ class Collection(Object):
             return out[tail]
 
     def _shape(self, path, shape):
-        if self.axis is not None:
-            axisshape = ()
-            if len(path) > 0 and isinstance(path[0], Object):
-                for x in self.axis:
-                    axisshape = axisshape + x._binshape()
-            shape = axisshape + shape
+        axisshape = ()
+        if len(path) > 0 and isinstance(path[0], Object):
+            for x in self.axis:
+                axisshape = axisshape + x._binshape()
+        shape = axisshape + shape
         return super(Collection, self)._shape(path, shape)
+
+    @classmethod
+    def _fromflatbuffers(cls, flatbuffers):
+        data = flatbuffers.Data()
+        collection = portally.portally_generated.Collection.Collection()
+        collection.Init(data.Bytes, data.Pos)
+        out = cls.__new__(cls)
+        out._flatbuffers = Merged()
+        out._flatbuffers.Objects = collection.Objects
+        out._flatbuffers.ObjectsLength = collection.ObjectsLength
+        out._flatbuffers.Axis = collection.Axis
+        out._flatbuffers.AxisLength = collection.AxisLength
+        out._flatbuffers.Identifier = flatbuffers.Identifier
+        out._flatbuffers.Title = flatbuffers.Title
+        out._flatbuffers.Metadata = flatbuffers.Metadata
+        out._flatbuffers.Decoration = flatbuffers.Decoration
+        out._flatbuffers.Script = flatbuffers.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        # table Collection {
+        #   objects: [Object];
+        #   axis: [Axis];
+        # }
+
+        objects = None if len(self.objects) == 0 else [x._toflatbuffers(builder) for x in self.objects]
+        axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
+
+        if objects is not None:
+            portally.portally_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
+            for x in objects[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            objects = builder.EndVector(len(objects))
+        if axis is not None:
+            portally.portally_generated.Collection.CollectionStartAxisVector(builder, len(axis))
+            for x in axis[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            axis = builder.EndVector(len(axis))
+
+        portally.portally_generated.Collection.CollectionStart(builder)
+        if objects is not None:
+            portally.portally_generated.Collection.CollectionAddObjects(builder, objects)
+        if axis is not None:
+            portally.portally_generated.Collection.CollectionAddAxis(builder, axis)
+        data = portally.portally_generated.Collection.CollectionEnd(builder)
+
+        # table Object {
+        #   identifier: string (key);
+        #   data: ObjectData (required);
+        #   title: string;
+        #   metadata: Metadata;
+        #   decoration: Decoration;
+        #   script: string;
+        # }
+
+        identifier = builder.CreateString(self.identifier)
+        title = None if len(self.title) == 0 else builder.CreateString(self.title)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        script = None if len(self.script) == 0 else builder.CreateString(self.script)
+
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)
+        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Collection)
+        portally.portally_generated.Object.ObjectAddData(builder, data)
+        if title is not None:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Object.ObjectAddScript(builder, script)
+        return portally.portally_generated.Object.ObjectEnd(builder)
+
+_ObjectData_lookup = {
+    portally.portally_generated.ObjectData.ObjectData.Histogram: Histogram,
+    portally.portally_generated.ObjectData.ObjectData.Ntuple: Ntuple,
+    portally.portally_generated.ObjectData.ObjectData.FunctionObject: FunctionObject,
+    portally.portally_generated.ObjectData.ObjectData.Collection: Collection,
+    }
