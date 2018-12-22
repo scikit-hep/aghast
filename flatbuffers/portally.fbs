@@ -52,7 +52,7 @@ enum DimensionOrder: byte {
   fortran_order = 1
 }
 
-enum Filter: int {
+enum Filter: uint {
   filter_none = 0,
   filter_gzip = 1,
   filter_lzma = 2,
@@ -69,7 +69,7 @@ struct Slice {
   has_step: bool;
 }
 
-enum ExternalType: int {
+enum ExternalType: uint {
   external_memory = 0,
   external_samefile = 1,
   external_file = 2,

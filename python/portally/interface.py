@@ -116,10 +116,14 @@ def typedproperty(check):
         private = "_" + check.paramname
         if not hasattr(self, private):
             assert hasattr(self, "_flatbuffers"), "not derived from a flatbuffer or not properly initialized"
-            fbname = check.paramname.capitalize()
+            fbname = portally.checktype.name2fb(check.paramname)
             fbnamelen = fbname + "Length"
             fbnamelookup = fbname + "Lookup"
-            if hasattr(self._flatbuffers, fbnamelookup):
+            fbnametag = fbname + "ByTag"
+            if hasattr(self._flatbuffers, fbnametag):
+                value = getattr(self._flatbuffers, fbnametag)()
+                portally.checktype.setparent(self, value)
+            elif hasattr(self._flatbuffers, fbnamelookup):
                 value = portally.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
             elif hasattr(self._flatbuffers, fbnamelen):
                 value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
@@ -278,8 +282,11 @@ class Object(Portally):
 
     @classmethod
     def _fromflatbuffers(cls, flatbuffers):
-        cls = _ObjectData_lookup[flatbuffers.DataType()]
-        return cls._fromflatbuffers(flatbuffers)
+        interface, deserializer = _ObjectData_lookup[flatbuffers.DataType()]
+        data = flatbuffers.Data()
+        flatbuffers2 = deserializer()
+        flatbuffers2.Init(data.Bytes, data.Pos)
+        return interface._fromflatbuffers(flatbuffers, flatbuffers2)
 
     def tobuffer(self):
         self.checkvalid()
@@ -477,7 +484,7 @@ class Interpretation(object):
 
     @property
     def numpy_dtype(self):
-        return self.dtype.dtype.newbyteorder(self._endianness.endianness)
+        return self.dtype.dtype.newbyteorder(self.endianness.endianness)
 
     @classmethod
     def from_numpy_dtype(cls, dtype):
@@ -551,7 +558,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
     @property
     def array(self):
-        return numpy.frombuffer(self._buffer, dtype=InterpretedBuffer.none.dtype)
+        return numpy.frombuffer(self.buffer, dtype=InterpretedBuffer.none.dtype)
 
 ################################################# RawExternalBuffer
 
@@ -618,7 +625,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         shape = self._shape((), ())
 
         if len(self.filters) == 0:
-            array = self._buffer
+            array = self.buffer
         else:
             raise NotImplementedError(self.filters)
 
@@ -642,6 +649,44 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
 
         return array.reshape(shape, order=self.dimension_order.dimension_order)
+
+    @classmethod
+    def _fromflatbuffers(cls, flatbuffers):
+        out = cls.__new__(cls)
+        out._flatbuffers = Merged()
+        out._flatbuffers.Buffer = flatbuffers.BufferAsNumpy
+        out._flatbuffers.Filters = flatbuffers.Filters
+        out._flatbuffers.FiltersLength = flatbuffers.FiltersLength
+        out._flatbuffers.PostfilterSlice = flatbuffers.PostfilterSlice
+        out._flatbuffers.Dtype = flatbuffers.Dtype
+        out._flatbuffers.Endianness = flatbuffers.Endianness
+        out._flatbuffers.DimensionOrder = flatbuffers.DimensionOrder
+        return out
+
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, len(self.buffer))
+        builder.head = builder.head - len(self.buffer)
+        builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
+        buffer = builder.EndVector(len(self.buffer))
+
+        if len(self.filters) == 0:
+            filters = None
+        else:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
+            for x in self.filters[::-1]:
+                builder.PrependUInt32(x.value)
+            filters = builder.EndVector(len(self.filters))
+
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddBuffer(builder, buffer)
+        if filters is not None:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
+        if self.postfilter_slice is not None:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
+        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
+        return portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
 ################################################# ExternalBuffer
 
@@ -1488,6 +1533,29 @@ class Axis(Portally):
         else:
             return self.binning._binshape()
 
+    def _toflatbuffers(self, builder):
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        statistics = None if self.statistics is None else self.statistics._toflatbuffers(builder)
+        expression = None if self.expression is None else builder.CreateString(self.expression.encode("utf-8"))
+        binning = None if self.binning is None else self.binning._toflatbuffers(builder)
+
+        portally.portally_generated.Axis.AxisStart(builder)
+        if binning is not None:
+            portally.portally_generated.Axis.AxisAddBinning(builder, binning)
+        if expression is not None:
+            portally.portally_generated.Axis.AxisAddExpression(builder, expression)
+        if statistics is not None:
+            portally.portally_generated.Axis.AxisAddStatistics(builder, statistics)
+        if title is not None:
+            portally.portally_generated.Axis.AxisAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Axis.AxisAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Axis.AxisAddDecoration(builder, decoration)
+        return portally.portally_generated.Axis.AxisEnd(builder)
+
 ################################################# Profile
 
 class Profile(Portally):
@@ -1594,6 +1662,14 @@ class Function(Portally):
 class FunctionObject(Object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+    @classmethod
+    def _fromflatbuffers(cls, flatbuffers, flatbuffers2):
+        interface, deserializer = _FunctionObjectData_lookup[flatbuffers2.DataType()]
+        data = flatbuffers2.Data()
+        flatbuffers3 = deserializer()
+        flatbuffers3.Init(data.Bytes, data.Pos)
+        return interface._fromflatbuffers(flatbuffers, flatbuffers2, flatbuffers3)
 
 ################################################# ParameterizedFunction
 
@@ -1729,6 +1805,96 @@ class BinnedEvaluatedFunction(FunctionObject):
             for x in self.axis:
                 shape = shape + x._binshape()
         return super(BinnedEvaluatedFunction, self)._shape(path, shape)
+
+    @classmethod
+    def _fromflatbuffers(cls, fbobject, fbfunction, fbbinned):
+        fbevaluated = fbbinned.Data()
+
+        def ValuesByTag():
+            data = fbevaluated.Values()
+            interface, deserializer = _InterpretedBuffer_lookup[fbevaluated.ValuesType()]
+            flatbuffers = deserializer()
+            flatbuffers.Init(data.Bytes, data.Pos)
+            return interface._fromflatbuffers(flatbuffers)
+
+        out = cls.__new__(cls)
+        out._flatbuffers = Merged()
+        out._flatbuffers.Axis = fbbinned.Axis
+        out._flatbuffers.AxisLength = fbbinned.AxisLength
+        out._flatbuffers.ValuesByTag = ValuesByTag
+        out._flatbuffers.Derivatives = fbevaluated.Derivatives
+        out._flatbuffers.Errors = fbevaluated.Errors
+        out._flatbuffers.ErrorsLength = fbevaluated.ErrorsLength
+        out._flatbuffers.Title = fbobject.Title
+        out._flatbuffers.Metadata = fbobject.Metadata
+        out._flatbuffers.Decoration = fbobject.Decoration
+        out._flatbuffers.Script = fbobject.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        errors = None if len(self.errors) == 0 else [x._toflatbuffers(builder) for x in self.errors]
+        derivatives = None if self.derivatives is None else self.derivatives._toflatbuffers(builder)
+        values = self.values._toflatbuffers(builder)
+        axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
+        
+        if errors is not None:
+            portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartErrorsVector(builder, len(errors))
+            for x in errors[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            errors = builder.EndVector(len(errors))
+
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        if isinstance(self.values, InterpretedInlineBuffer):
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
+        elif isinstance(self.values, InterpretedExternalBuffer):
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
+        else:
+            raise AssertionError(type(self.values))
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        if derivatives is not None:
+            if isinstance(self.derivatives, InterpretedInlineBuffer):
+                portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
+            elif isinstance(self.derivatives, InterpretedExternalBuffer):
+                portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
+            else:
+                raise AssertionError(type(self.derivatives))
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+        if errors is not None:
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = portally.portally_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+
+        if axis is not None:
+            portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
+            for x in axis[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            axis = builder.EndVector(len(axis))
+
+        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
+        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)
+        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddData(builder, evaluated)
+        binned_evaluated = portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionEnd(builder)
+
+        portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
+        portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction)
+        portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, binned_evaluated)
+        function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
+
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
+        portally.portally_generated.Object.ObjectAddData(builder, function_object)
+        if title is not None:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Object.ObjectAddScript(builder, script)
+        return portally.portally_generated.Object.ObjectEnd(builder)
 
 ################################################# Histogram
 
@@ -2198,21 +2364,18 @@ class Collection(Object):
         return super(Collection, self)._shape(path, shape)
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers):
-        data = flatbuffers.Data()
-        collection = portally.portally_generated.Collection.Collection()
-        collection.Init(data.Bytes, data.Pos)
+    def _fromflatbuffers(cls, fbobject, fbcollection):
         out = cls.__new__(cls)
         out._flatbuffers = Merged()
-        out._flatbuffers.Objects = collection.Objects
-        out._flatbuffers.ObjectsLength = collection.ObjectsLength
-        out._flatbuffers.ObjectsLookup = collection.Lookup
-        out._flatbuffers.Axis = collection.Axis
-        out._flatbuffers.AxisLength = collection.AxisLength
-        out._flatbuffers.Title = flatbuffers.Title
-        out._flatbuffers.Metadata = flatbuffers.Metadata
-        out._flatbuffers.Decoration = flatbuffers.Decoration
-        out._flatbuffers.Script = flatbuffers.Script
+        out._flatbuffers.Objects = fbcollection.Objects
+        out._flatbuffers.ObjectsLength = fbcollection.ObjectsLength
+        out._flatbuffers.ObjectsLookup = fbcollection.Lookup
+        out._flatbuffers.Axis = fbcollection.Axis
+        out._flatbuffers.AxisLength = fbcollection.AxisLength
+        out._flatbuffers.Title = fbobject.Title
+        out._flatbuffers.Metadata = fbobject.Metadata
+        out._flatbuffers.Decoration = fbobject.Decoration
+        out._flatbuffers.Script = fbobject.Script
         return out
 
     def _toflatbuffers(self, builder):
@@ -2264,8 +2427,18 @@ class Collection(Object):
         return portally.portally_generated.Object.ObjectEnd(builder)
 
 _ObjectData_lookup = {
-    portally.portally_generated.ObjectData.ObjectData.Histogram: Histogram,
-    portally.portally_generated.ObjectData.ObjectData.Ntuple: Ntuple,
-    portally.portally_generated.ObjectData.ObjectData.FunctionObject: FunctionObject,
-    portally.portally_generated.ObjectData.ObjectData.Collection: Collection,
+    portally.portally_generated.ObjectData.ObjectData.Histogram: (Histogram, portally.portally_generated.Histogram.Histogram),
+    portally.portally_generated.ObjectData.ObjectData.Ntuple: (Ntuple, portally.portally_generated.Ntuple.Ntuple),
+    portally.portally_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, portally.portally_generated.FunctionObject.FunctionObject),
+    portally.portally_generated.ObjectData.ObjectData.Collection: (Collection, portally.portally_generated.Collection.Collection),
+    }
+
+_FunctionObjectData_lookup = {
+    portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
+    portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
+    }
+
+_InterpretedBuffer_lookup = {
+    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
+    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
     }

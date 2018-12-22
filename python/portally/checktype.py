@@ -42,6 +42,9 @@ except ImportError:
 
 import numpy
 
+def name2fb(name):
+    return "".join(x.capitalize() for x in name.split("_"))
+
 def setparent(parent, value):
     import portally.interface
 
@@ -98,7 +101,7 @@ class FBVector(Vector):
     def __init__(self, length, get, check, parent):
         self._got = [None] * length
         self._get = get
-        assert isinstance(check, CheckVector)
+        assert isinstance(check, CheckVector), repr(type(check))
         if not check.minlen <= length <= check.maxlen:
             raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive)".format(check.classname, check.paramname, check.minlen, check.maxlen))
         self._check = _checkitem(check)
@@ -147,7 +150,7 @@ class FBLookup(Lookup):
         self._lookup = {lookup(i).decode("utf-8"): i for i in range(length)}
         self._got = {}
         self._get = get
-        assert isinstance(check, CheckLookup)
+        assert isinstance(check, CheckLookup), repr(type(check))
         if not check.minlen <= length <= check.maxlen:
             raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive)".format(check.classname, check.paramname, check.minlen, check.maxlen))
         self._check = _checkitem(check)
@@ -164,7 +167,7 @@ class FBLookup(Lookup):
 
         item = self._got.get(where, None)
         if item is None:
-            item = self._check.fromflatbuffers(self._get(self._lookup[where]))
+            item = self._check.fromflatbuffers(name2fb(where), self._get(self._lookup[where]))
             self._got[where] = item
             if isinstance(item, portally.interface.Portally):
                 item._identifier = where
