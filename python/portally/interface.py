@@ -39,6 +39,7 @@ import sys
 import numpy
 import flatbuffers
 
+import portally.portally_generated.LookupPair
 import portally.portally_generated.MetadataLanguage
 import portally.portally_generated.Metadata
 import portally.portally_generated.DecorationLanguage
@@ -128,9 +129,9 @@ def typedproperty(check):
 
     @prop.setter
     def prop(self, value):
+        value = check(value)
         portally.checktype.setparent(self, value)
-        private = "_" + check.paramname
-        setattr(self, private, check(value))
+        setattr(self, "_" + check.paramname, value)
 
     return prop
 
@@ -143,16 +144,27 @@ def _valid(obj, seen, recursive):
         seen.add(id(obj))
         obj._validtypes()
         obj._valid(seen, recursive)
-    else:
+    elif isinstance(obj, portally.checktype.Vector):
         for x in obj:
             _valid(x, seen, recursive)
+    elif isinstance(obj, portally.checktype.Lookup):
+        for x in obj.values():
+            _valid(x, seen, recursive)
+    else:
+        raise AssertionError(type(obj))
 
 def _getbykey(self, field, where):
     lookup = "_lookup_" + field
     if not hasattr(self, lookup):
-        setattr(self, lookup, {x.identifier: x for x in getattr(self, field)})
-        if len(getattr(self, lookup)) != len(getattr(self, field)):
-            raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
+        values = getattr(self, field)
+        if isinstance(values, portally.checktype.Vector):
+            setattr(self, lookup, {x.identifier: x for x in values})
+            if len(getattr(self, lookup)) != len(values):
+                raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
+        elif isinstance(values, portally.checktype.Lookup):
+            setattr(self, lookup, values)
+        else:
+            raise AssertionError(type(values))
     return getattr(self, lookup)[where]
 
 class Merged(object): pass
@@ -162,9 +174,12 @@ class Merged(object): pass
 class Portally(object):
     def __repr__(self):
         if "identifier" in self._params:
-            return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
+            identifier = " " + repr(self.identifier)
+        elif hasattr(self, "_identifier"):
+            identifier = " " + repr(self._identifier)
         else:
-            return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
+            identifier = ""
+        return "<{0}{1} at 0x{2:012x}>".format(type(self).__name__, identifier, id(self))
         
     def _shape(self, path, shape):
         for x in path:
@@ -1582,7 +1597,6 @@ class FunctionObject(Object):
 
 class ParameterizedFunction(Function, FunctionObject):
     _params = {
-        "identifier": portally.checktype.CheckKey("ParameterizedFunction", "identifier", required=True, type=str),
         "expression": portally.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
         "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
@@ -1591,7 +1605,6 @@ class ParameterizedFunction(Function, FunctionObject):
         "script":     portally.checktype.CheckString("ParameterizedFunction", "script", required=False),
         }
 
-    identifier = typedproperty(_params["identifier"])
     expression = typedproperty(_params["expression"])
     parameters = typedproperty(_params["parameters"])
     title      = typedproperty(_params["title"])
@@ -1599,8 +1612,7 @@ class ParameterizedFunction(Function, FunctionObject):
     decoration = typedproperty(_params["decoration"])
     script     = typedproperty(_params["script"])
 
-    def __init__(self, identifier, expression, parameters=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
+    def __init__(self, expression, parameters=None, title="", metadata=None, decoration=None, script=""):
         self.expression = expression
         self.parameters = parameters
         self.title = title
@@ -1633,7 +1645,6 @@ class ParameterizedFunction(Function, FunctionObject):
 
 class EvaluatedFunction(Function):
     _params = {
-        "identifier":  portally.checktype.CheckKey("EvaluatedFunction", "identifier", required=True, type=str),
         "values":      portally.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
         "derivatives": portally.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
         "errors":      portally.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
@@ -1643,7 +1654,6 @@ class EvaluatedFunction(Function):
         "script":      portally.checktype.CheckString("EvaluatedFunction", "script", required=False),
         }
 
-    identifier  = typedproperty(_params["identifier"])
     values      = typedproperty(_params["values"])
     derivatives = typedproperty(_params["derivatives"])
     errors      = typedproperty(_params["errors"])
@@ -1652,8 +1662,7 @@ class EvaluatedFunction(Function):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    def __init__(self, identifier, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
+    def __init__(self, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
         self.values = values
         self.derivatives = derivatives
         self.errors = errors
@@ -1674,7 +1683,6 @@ class EvaluatedFunction(Function):
 
 class BinnedEvaluatedFunction(FunctionObject):
     _params = {
-        "identifier":  portally.checktype.CheckKey("BinnedEvaluatedFunction", "identifier", required=True, type=str),
         "axis":        portally.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
         "values":      portally.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
         "derivatives": portally.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
@@ -1685,7 +1693,6 @@ class BinnedEvaluatedFunction(FunctionObject):
         "script":      portally.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
         }
 
-    identifier  = typedproperty(_params["identifier"])
     axis        = typedproperty(_params["axis"])
     values      = typedproperty(_params["values"])
     derivatives = typedproperty(_params["derivatives"])
@@ -1695,8 +1702,7 @@ class BinnedEvaluatedFunction(FunctionObject):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    def __init__(self, identifier, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
+    def __init__(self, axis, values, derivatives=None, errors=None, title="", metadata=None, decoration=None, script=""):
         self.axis = axis
         self.values = values
         self.derivatives = derivatives
@@ -1726,20 +1732,18 @@ class BinnedEvaluatedFunction(FunctionObject):
 
 class Histogram(Object):
     _params = {
-        "identifier":           portally.checktype.CheckKey("Histogram", "identifier", required=True, type=str),
         "axis":                 portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
         "counts":               portally.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
         "profile":              portally.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
         "axis_correlations":    portally.checktype.CheckVector("Histogram", "axis_correlations", required=False, type=Correlations),
         "profile_correlations": portally.checktype.CheckVector("Histogram", "profile_correlations", required=False, type=Correlations),
-        "functions":            portally.checktype.CheckVector("Histogram", "functions", required=False, type=Function),
+        "functions":            portally.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
         "title":                portally.checktype.CheckString("Histogram", "title", required=False),
         "metadata":             portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
         "decoration":           portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
         "script":               portally.checktype.CheckString("Histogram", "script", required=False),
         }
 
-    identifier           = typedproperty(_params["identifier"])
     axis                 = typedproperty(_params["axis"])
     counts               = typedproperty(_params["counts"])
     profile              = typedproperty(_params["profile"])
@@ -1751,8 +1755,7 @@ class Histogram(Object):
     decoration           = typedproperty(_params["decoration"])
     script               = typedproperty(_params["script"])
 
-    def __init__(self, identifier, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
+    def __init__(self, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
         self.axis = axis
         self.counts = counts
         self.profile = profile
@@ -1769,8 +1772,6 @@ class Histogram(Object):
             Correlations._validindexes(self.axis_correlations, len(self.axis))
         if len(self.profile_correlations) != 0:
             Correlations._validindexes(self.profile_correlations, len(self.profile))
-        if len(set(x.identifier for x in self.functions)) != len(self.functions):
-            raise ValueError("Histogram.functions keys must be unique")
         if recursive:
             _valid(self.axis, seen, recursive)
             _valid(self.counts, seen, recursive)
@@ -2077,19 +2078,17 @@ class NtupleInstance(Portally):
 
 class Ntuple(Object):
     _params = {
-        "identifier":          portally.checktype.CheckKey("Ntuple", "identifier", required=True, type=str),
         "columns":             portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
         "instances":           portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
         "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
         "column_correlations": portally.checktype.CheckVector("Ntuple", "column_correlations", required=False, type=Correlations),
-        "functions":           portally.checktype.CheckVector("Ntuple", "functions", required=False, type=FunctionObject),
+        "functions":           portally.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
         "title":               portally.checktype.CheckString("Ntuple", "title", required=False),
         "metadata":            portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
         "decoration":          portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
         "script":              portally.checktype.CheckString("Ntuple", "script", required=False),
         }
 
-    identifier          = typedproperty(_params["identifier"])
     columns             = typedproperty(_params["columns"])
     instances           = typedproperty(_params["instances"])
     column_statistics   = typedproperty(_params["column_statistics"])
@@ -2100,8 +2099,7 @@ class Ntuple(Object):
     decoration          = typedproperty(_params["decoration"])
     script              = typedproperty(_params["script"])
 
-    def __init__(self, identifier, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
-        self.identifier = identifier
+    def __init__(self, columns, instances, column_statistics=None, column_correlations=None, functions=None, title="", metadata=None, decoration=None, script=""):
         self.columns = columns
         self.instances = instances
         self.column_statistics = column_statistics
@@ -2146,16 +2144,14 @@ class Ntuple(Object):
 
 class Collection(Object):
     _params = {
-        "identifier":     portally.checktype.CheckKey("Collection", "identifier", required=True, type=str),
-        "objects":        portally.checktype.CheckVector("Collection", "objects", required=False, type=Object),
-        "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
-        "title":          portally.checktype.CheckString("Collection", "title", required=False),
-        "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
-        "decoration":     portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
-        "script":         portally.checktype.CheckString("Collection", "script", required=False),
+        "objects":    portally.checktype.CheckLookup("Collection", "objects", required=False, type=Object),
+        "axis":       portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
+        "title":      portally.checktype.CheckString("Collection", "title", required=False),
+        "metadata":   portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration": portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "script":     portally.checktype.CheckString("Collection", "script", required=False),
         }
 
-    identifier     = typedproperty(_params["identifier"])
     objects        = typedproperty(_params["objects"])
     axis           = typedproperty(_params["axis"])
     title          = typedproperty(_params["title"])
@@ -2163,8 +2159,7 @@ class Collection(Object):
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):
-        self.identifier = identifier
+    def __init__(self, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):
         self.objects = objects
         self.axis = axis
         self.title = title
@@ -2173,8 +2168,6 @@ class Collection(Object):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if len(set(x.identifier for x in self.objects)) != len(self.objects):
-            raise ValueError("Collection.objects keys must be unique")
         if recursive:
             _valid(self.objects, seen, recursive)
             _valid(self.axis, seen, recursive)
@@ -2213,7 +2206,6 @@ class Collection(Object):
         out._flatbuffers.ObjectsLength = collection.ObjectsLength
         out._flatbuffers.Axis = collection.Axis
         out._flatbuffers.AxisLength = collection.AxisLength
-        out._flatbuffers.Identifier = flatbuffers.Identifier
         out._flatbuffers.Title = flatbuffers.Title
         out._flatbuffers.Metadata = flatbuffers.Metadata
         out._flatbuffers.Decoration = flatbuffers.Decoration
@@ -2242,14 +2234,12 @@ class Collection(Object):
             portally.portally_generated.Collection.CollectionAddAxis(builder, axis)
         data = portally.portally_generated.Collection.CollectionEnd(builder)
 
-        identifier = builder.CreateString(self.identifier.encode("utf-8"))
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
         script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
 
         portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)
         portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Collection)
         portally.portally_generated.Object.ObjectAddData(builder, data)
         if title is not None:

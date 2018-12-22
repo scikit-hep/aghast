@@ -30,6 +30,8 @@
 
 import unittest
 
+import numpy
+
 from portally import *
 
 class Test(unittest.TestCase):
@@ -37,11 +39,11 @@ class Test(unittest.TestCase):
         pass
 
     def test_Metadata(self):
-        h = Collection("id", [], metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
+        h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
         assert h == frombuffer(h.tobuffer())
 
     def test_Decoration(self):
-        h = Collection("id", [], decoration=Decoration("""points { color: red }""", language=Decoration.css))
+        h = Collection({}, decoration=Decoration("""points { color: red }""", language=Decoration.css))
         assert h == frombuffer(h.tobuffer())
 
     def test_RawInlineBuffer(self):
@@ -342,7 +344,10 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
 
     def test_BinnedEvaluatedFunction(self):
+        # h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
+        # assert h == frombuffer(h.tobuffer())
         pass
+
     #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0]
@@ -413,9 +418,9 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
 
     def test_collection(self):
-        h = Collection("id")
+        h = Collection()
         assert h == frombuffer(h.tobuffer())
-        h = Collection("a", [Collection("b"), Collection("c")])
+        h = Collection({"b": Collection(), "c": Collection()})
         assert h == frombuffer(h.tobuffer())
     #     h.checkvalid()
     #     assert h.identifier == "id"

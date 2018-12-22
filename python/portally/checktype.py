@@ -30,12 +30,15 @@
 
 import sys
 import numbers
+import collections
 try:
     from collections.abc import Iterable
     from collections.abc import Sequence
+    from collections.abc import Mapping
 except ImportError:
     from collections import Iterable
     from collections import Sequence
+    from collections import Mapping
 
 import numpy
 
@@ -51,14 +54,13 @@ def setparent(parent, value):
     elif ((sys.version_info[0] >= 3 and isinstance(value, (str, bytes))) or (sys.version_info[0] < 3 and isinstance(value, basestring))):
         pass
 
-    else:
-        try:
-            value = iter(value)
-        except TypeError:
-            pass
-        else:
-            for x in value:
-                setparent(parent, x)
+    elif isinstance(value, Vector):
+        for x in value:
+            setparent(parent, x)
+
+    elif isinstance(value, Lookup):
+        for x in value.values():
+            setparent(parent, x)
 
 class Vector(Sequence):
     def __init__(self, data):
@@ -74,7 +76,13 @@ class Vector(Sequence):
         return self._data[where]
 
     def __repr__(self):
-        return "[" + ", ".join(repr(x) for x in self) + "]"
+        tmp = [repr(x) for x in self]
+        if sum(len(x) for x in tmp) < 100:
+            return "[" + ", ".join(tmp) + "]"
+        elif len(tmp) < 100:
+            return "[" + ",\n ".join(tmp) + "]"
+        else:
+            return "[" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "]"
 
 class FBVector(Vector):
     def __init__(self, length, get, check, parent):
@@ -101,6 +109,39 @@ class FBVector(Vector):
             self._got[where] = self._check.fromflatbuffers(self._get(where))
             setparent(self._parent, self._got[where])
         return self._got[where]
+
+class Lookup(Mapping):
+    def __init__(self, data):
+        import portally.interface
+        if data is None:
+            self._data = {}
+        else:
+            self._data = collections.OrderedDict(data)
+        for n, x in self._data.items():
+            if isinstance(x, portally.interface.Portally) and not hasattr(x, "_parent"):
+                x._identifier = n
+
+    def __len__(self):
+        return len(self._data)
+
+    def __getitem__(self, where):
+        return self._data[where]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __repr__(self):
+        tmp = [repr(n) + ": " + repr(x) for n, x in self.items()]
+        if sum(len(x) for x in tmp) < 100:
+            return "{" + ", ".join(tmp) + "}"
+        elif len(tmp) < 100:
+            return "{" + ",\n ".join(tmp) + "}"
+        else:
+            return "{" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "}"
+
+class FBLookup(Lookup):
+    def __init__(self):
+        raise NotImplementedError
 
 class Check(object):
     def __init__(self, classname, paramname, required):
@@ -299,6 +340,44 @@ class CheckVector(Check):
                 if not isinstance(x, self.type):
                     raise TypeError("{0}.{1} elements must be {2} objects, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
             return Vector(obj)
+
+class CheckLookup(Check):
+    def __init__(self, classname, paramname, required, type, minlen=0, maxlen=float("inf")):
+        super(CheckLookup, self).__init__(classname, paramname, required)
+        self.type = type
+        self.minlen = minlen
+        self.maxlen = maxlen
+
+    def __call__(self, obj):
+        super(CheckLookup, self).__call__(obj)
+        if obj is None:
+            return Lookup(obj)
+        elif not isinstance(obj, (dict, Mapping)):
+            raise TypeError("{0}.{1} must be a dict or Mapping, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
+
+        if not self.minlen <= len(obj) <= self.maxlen:
+            raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive), cannot pass {4} (type ({5}))".format(self.classname, self.paramname, self.minlen, self.maxlen, repr(obj), type(obj)))
+
+        if self.type is str:
+            for x in obj.values():
+                if not ((sys.version_info[0] >= 3 and isinstance(x, str)) or (sys.version_info[0] < 3 and isinstance(x, basestring))):
+                    raise TypeError("{0}.{1} elements must be strings, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
+            return Lookup(obj)
+        elif self.type is float:
+            for x in obj.values():
+                if not isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
+                    raise TypeError("{0}.{1} elements must be numbers, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
+            return Lookup(float(x) for x in obj)
+        elif isinstance(self.type, list):
+            for x in obj.values():
+                if not x in self.type:
+                    raise TypeError("{0}.{1} elements must be one of {2}, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
+            return Lookup(self.type[self.type.index(x)] for x in obj)
+        else:
+            for x in obj.values():
+                if not isinstance(x, self.type):
+                    raise TypeError("{0}.{1} elements must be {2} objects, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
+            return Lookup(obj)
 
 class CheckBuffer(Check):
     def __call__(self, obj):
