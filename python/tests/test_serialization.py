@@ -38,15 +38,15 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def test_Metadata(self):
+    def test_serialization_Metadata(self):
         h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
         assert h == frombuffer(h.tobuffer())
 
-    def test_Decoration(self):
+    def test_serialization_Decoration(self):
         h = Collection({}, decoration=Decoration("""points { color: red }""", language=Decoration.css))
         assert h == frombuffer(h.tobuffer())
 
-    def test_RawInlineBuffer(self):
+    def test_serialization_RawInlineBuffer(self):
         pass
     #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(numpy.zeros(1, dtype=numpy.int32)))], [0, 1])])])])
     #     h.checkvalid()
@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [5]
 
-    def test_RawExternalBuffer(self):
+    def test_serialization_RawExternalBuffer(self):
         pass
     #     buf = numpy.zeros(1, dtype=numpy.int32)
     #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [3.14]
 
-    def test_InterpretedInlineBuffer(self):
+    def test_serialization_InterpretedInlineBuffer(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.zeros(1, dtype=numpy.int32), dtype=InterpretedInlineBuffer.int32))
     #     h.checkvalid()
@@ -78,7 +78,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [7]
 
-    def test_InterpretedExternalBuffer(self):
+    def test_serialization_InterpretedExternalBuffer(self):
         pass
     #     buf = numpy.zeros(1, dtype=numpy.float64)
     #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))
@@ -90,7 +90,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [3.14]
 
-    def test_IntegerBinning(self):
+    def test_serialization_IntegerBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -109,14 +109,14 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0] * 13
 
-    def test_RealInterval(self):
+    def test_serialization_RealInterval(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
     #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(5, -5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
     #     assert not h.isvalid
 
-    def test_RealOverflow(self):
+    def test_serialization_RealOverflow(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -137,12 +137,12 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0] * 13
 
-    def test_RegularBinning(self):
+    def test_serialization_RegularBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
 
-    def test_TicTacToeOverflowBinning(self):
+    def test_serialization_TicTacToeOverflowBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3)))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0, 0.0, 0.0, 0.0]] * 5), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -151,7 +151,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [[0.0, 0.0], [0.0, 0.0]]
 
-    def test_HexagonalBinning(self):
+    def test_serialization_HexagonalBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(3, 5, -5, -4))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 3), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -166,7 +166,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [[0.0] * 3] * 4
 
-    def test_EdgesBinning(self):
+    def test_serialization_EdgesBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(EdgesBinning([3.3]))], InterpretedInlineBuffer(numpy.array([]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -175,7 +175,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0, 0.0]
 
-    def test_IrregularBinning(self):
+    def test_serialization_IrregularBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5)]))], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -184,7 +184,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0, 0.0, 0.0]
 
-    def test_CategoryBinning(self):
+    def test_serialization_CategoryBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(CategoryBinning(["one", "two", "three"]))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -193,7 +193,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0]
 
-    def test_SparseRegularBinning(self):
+    def test_serialization_SparseRegularBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -202,7 +202,7 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
-    def test_FractionBinning(self):
+    def test_serialization_FractionBinning(self):
         pass
     #     h = BinnedEvaluatedFunction("id", [Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
@@ -215,37 +215,37 @@ class Test(unittest.TestCase):
     #     h.checkvalid()
     #     assert h.values.array.tolist() == [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
 
-    def test_PredicateBinning(self):
+    def test_serialization_PredicateBinning(self):
         pass
     #     h = Histogram("id", [Axis(PredicateBinning(["p", "q"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
     #     h.checkvalid()
 
-    def test_Assignments(self):
+    def test_serialization_Assignments(self):
         pass
     #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))
     #     h.checkvalid()
     #     assert h.axis[0].binning.variations[0]["y"].expression == "2"
 
-    def test_Variation(self):
+    def test_serialization_Variation(self):
         pass
     #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
     #     h.checkvalid()
 
-    def test_VariationBinning(self):
+    def test_serialization_VariationBinning(self):
         pass
     #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")]), Variation([Assignment("x", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0, 0.0]))))
     #     h.checkvalid()
 
-    def test_Axis(self):
+    def test_serialization_Axis(self):
         h = BinnedEvaluatedFunction([Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer())        
 
-    def test_UnweightedCounts(self):
+    def test_serialization_UnweightedCounts(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
-    def test_WeightedCounts(self):
+    def test_serialization_WeightedCounts(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
@@ -254,45 +254,45 @@ class Test(unittest.TestCase):
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))
     #     h.checkvalid()
 
-    def test_StatisticFilter(self):
+    def test_serialization_StatisticFilter(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1, filter=StatisticFilter(excludes_nan=False))]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
-    def test_Moments(self):
+    def test_serialization_Moments(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=False), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
-    def test_Extremes(self):
+    def test_serialization_Extremes(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), maxima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
-    def test_Quantiles(self):
+    def test_serialization_Quantiles(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=False), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
         
-    def test_Modes(self):
+    def test_serialization_Modes(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(modes=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
-    def test_Statistics(self):
+    def test_serialization_Statistics(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
     #     h.checkvalid()
     #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
     #     h.checkvalid()
 
-    def test_Correlations(self):
+    def test_serialization_Correlations(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), axis_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
     #     h.checkvalid()
@@ -305,32 +305,34 @@ class Test(unittest.TestCase):
     #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_correlations=[Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=True), Correlations(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=False)])
     #     h.checkvalid()
 
-    def test_Profile(self):
+    def test_serialization_Profile(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))])
     #     h.checkvalid()
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 2)]))])
     #     h.checkvalid()
         
-    def test_Histogram(self):
-        pass
+    def test_serialization_Histogram(self):
+        h = Histogram([Axis()], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1))))
+        assert h == frombuffer(h.tobuffer())
+
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
     #     h.checkvalid()
 
-    def test_Parameter(self):
+    def test_serialization_Parameter(self):
         pass
     #     h = ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])
     #     h.checkvalid()
     #     assert h["y"].values.array.tolist() == [6]
 
-    def test_ParameterizedFunction(self):
+    def test_serialization_ParameterizedFunction(self):
         pass
     #     h = ParameterizedFunction("id", "x**2")
     #     h.checkvalid()
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])])
     #     h.checkvalid()
 
-    def test_EvaluatedFunction(self):
+    def test_serialization_EvaluatedFunction(self):
         pass
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("f", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])
     #     h.checkvalid()
@@ -340,7 +342,7 @@ class Test(unittest.TestCase):
     #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[EvaluatedFunction("id", InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)), [Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.75)])])
     #     h.checkvalid()
 
-    def test_BinnedEvaluatedFunction(self):
+    def test_serialization_BinnedEvaluatedFunction(self):
         h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer())
         assert frombuffer(h.tobuffer()).values.array.tolist() == [0.0]
@@ -348,7 +350,7 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer())
         assert frombuffer(h.tobuffer()).values.array.tolist() == [[0.0]]
 
-    def test_Page(self):
+    def test_serialization_Page(self):
         pass
     #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
     #     h.checkvalid()
@@ -375,7 +377,7 @@ class Test(unittest.TestCase):
     #     for arrays in h.instances[0].arrays: pass
     #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5, 4, 3]}
 
-    def test_Chunk(self):
+    def test_serialization_Chunk(self):
         pass
     #     h = Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
     #     h.checkvalid()
@@ -395,7 +397,7 @@ class Test(unittest.TestCase):
     #     for arrays in h.instances[0].arrays:
     #         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
 
-    def test_Column(self):
+    def test_serialization_Column(self):
         pass
     #     h = Ntuple("id", [Column("one", Column.float64), Column("two", Column.int32)], [NtupleInstance([])])
     #     h.checkvalid()
@@ -405,12 +407,12 @@ class Test(unittest.TestCase):
     #     for arrays in h.instances[0].arrays: pass
     #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5], "two": [3]}
 
-    def test_Ntuple(self):
+    def test_serialization_Ntuple(self):
         pass
     #     h = Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([])])
     #     h.checkvalid()
 
-    def test_collection(self):
+    def test_serialization_collection(self):
         h = Collection()
         assert h == frombuffer(h.tobuffer())
         h = Collection({"b": Collection(), "c": Collection()})

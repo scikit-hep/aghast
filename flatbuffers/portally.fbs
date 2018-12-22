@@ -425,7 +425,7 @@ table Histogram {
   profile: [Profile];
   axis_correlations: [Correlations];
   profile_correlations: [Correlations];
-  lookup_functions: [string];
+  functions_lookup: [string];
   functions: [Function];
 }
 

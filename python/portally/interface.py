@@ -173,7 +173,7 @@ def _getbykey(self, field, where):
             raise AssertionError(type(values))
     return getattr(self, lookup)[where]
 
-class Merged(object): pass
+class MockFlatbuffers(object): pass
 
 ################################################# Portally
 
@@ -653,7 +653,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     @classmethod
     def _fromflatbuffers(cls, flatbuffers):
         out = cls.__new__(cls)
-        out._flatbuffers = Merged()
+        out._flatbuffers = MockFlatbuffers()
         out._flatbuffers.Buffer = flatbuffers.BufferAsNumpy
         out._flatbuffers.Filters = flatbuffers.Filters
         out._flatbuffers.FiltersLength = flatbuffers.FiltersLength
@@ -1608,6 +1608,32 @@ class UnweightedCounts(Counts):
         if recursive:
             _valid(self.counts, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fbcounts):
+        def CountsByTag():
+            data = fbcounts.Counts()
+            interface, deserializer = _InterpretedBuffer_lookup[fbcounts.CountsType()]
+            flatbuffers = deserializer()
+            flatbuffers.Init(data.Bytes, data.Pos)
+            return interface._fromflatbuffers(flatbuffers)
+        out = cls.__new__(cls)
+        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers.CountsByTag = CountsByTag
+        return out
+
+    def _toflatbuffers(self, builder):
+        counts = self.counts._toflatbuffers(builder)
+
+        portally.portally_generated.UnweightedCounts.UnweightedCountsStart(builder)
+        if isinstance(self.counts, InterpretedInlineBuffer):
+            portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
+        elif isinstance(self.counts, InterpretedExternalBuffer):
+            portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
+        else:
+            raise AssertionError(type(self.counts))
+        portally.portally_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
+        return portally.portally_generated.UnweightedCounts.UnweightedCountsEnd(builder)
+
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
@@ -1818,7 +1844,7 @@ class BinnedEvaluatedFunction(FunctionObject):
             return interface._fromflatbuffers(flatbuffers)
 
         out = cls.__new__(cls)
-        out._flatbuffers = Merged()
+        out._flatbuffers = MockFlatbuffers()
         out._flatbuffers.Axis = fbbinned.Axis
         out._flatbuffers.AxisLength = fbbinned.AxisLength
         out._flatbuffers.ValuesByTag = ValuesByTag
@@ -1969,6 +1995,116 @@ class Histogram(Object):
             for x in self.axis:
                 shape = shape + x._binshape()
         return super(Histogram, self)._shape(path, shape)
+
+    @classmethod
+    def _fromflatbuffers(cls, fbobject, fbhistogram):
+        def CountsByTag():
+            data = fbhistogram.Counts()
+            interface, deserializer = _Counts_lookup[fbhistogram.CountsType()]
+            flatbuffers = deserializer()
+            flatbuffers.Init(data.Bytes, data.Pos)
+            return interface._fromflatbuffers(flatbuffers)
+
+        out = cls.__new__(cls)
+        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers.Axis = fbhistogram.Axis
+        out._flatbuffers.AxisLength = fbhistogram.AxisLength
+        out._flatbuffers.CountsByTag = CountsByTag
+        out._flatbuffers.Profile = fbhistogram.Profile
+        out._flatbuffers.ProfileLength = fbhistogram.ProfileLength
+        out._flatbuffers.AxisCorrelations = fbhistogram.AxisCorrelations
+        out._flatbuffers.AxisCorrelationsLength = fbhistogram.AxisCorrelationsLength
+        out._flatbuffers.ProfileCorrelations = fbhistogram.ProfileCorrelations
+        out._flatbuffers.ProfileCorrelationsLength = fbhistogram.ProfileCorrelationsLength
+        out._flatbuffers.Functions = fbhistogram.Functions
+        out._flatbuffers.FunctionsLength = fbhistogram.FunctionsLength
+        out._flatbuffers.FunctionsLookup = fbhistogram.FunctionsLookup
+        out._flatbuffers.Title = fbobject.Title
+        out._flatbuffers.Metadata = fbobject.Metadata
+        out._flatbuffers.Decoration = fbobject.Decoration
+        out._flatbuffers.Script = fbobject.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        counts = self.counts._toflatbuffers(builder)
+        functions = None if len(self.functions) == 0 else [x._toflatbuffers(builder) for x in self.functions.values()]
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        profile_correlations = None if len(self.profile_correlations) == 0 else [x._toflatbuffers(builder) for x in self.profile_correlations]
+        axis_correlations = None if len(self.axis_correlations) == 0 else [x._toflatbuffers(builder) for x in self.axis_correlations]
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        profile = None if len(self.profile) == 0 else [x._toflatbuffers(builder) for x in self.profile]
+        axis = [x._toflatbuffers(builder) for x in self.axis]
+
+        portally.portally_generated.Histogram.HistogramStartAxisVector(builder, len(axis))
+        for x in axis[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        axis = builder.EndVector(len(axis))
+
+        if profile is not None:
+            portally.portally_generated.Histogram.HistogramStartProfileVector(builder, len(profile))
+            for x in profile[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            profile = builder.EndVector(len(profile))
+
+        if axis_correlations is not None:
+            portally.portally_generated.Histogram.HistogramStartAxisCorrelationsVector(builder, len(axis_correlations))
+            for x in axis_correlations[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            axis_correlations = builder.EndVector(len(axis_correlations))
+
+        if profile_correlations is not None:
+            portally.portally_generated.Histogram.HistogramStartProfileCorrelationsVector(builder, len(profile_correlations))
+            for x in profile_correlations[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            profile_correlations = builder.EndVector(len(profile_correlations))
+
+        if functions is not None:
+            portally.portally_generated.Collection.CollectionStartFunctionsVector(builder, len(functions))
+            for x in functions[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            functions = builder.EndVector(len(functions))
+
+        lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
+        if lookup is not None:
+            portally.portally_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
+            for x in lookup[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            lookup = builder.EndVector(len(lookup))
+
+        portally.portally_generated.Histogram.HistogramStart(builder)
+        portally.portally_generated.Histogram.HistogramAddAxis(builder, axis)
+        if isinstance(self.counts, UnweightedCounts):
+            portally.portally_generated.Histogram.HistogramAddCountsType(builder, portally.portally_generated.Counts.Counts.UnweightedCounts)
+        elif isinstance(self.counts, WeightedCounts):
+            portally.portally_generated.Histogram.HistogramAddCountsType(builder, portally.portally_generated.Counts.Counts.UnweightedCounts)
+        else:
+            raise AssertionError(type(self.counts))
+        portally.portally_generated.Histogram.HistogramAddCounts(builder, counts)
+        if profile is not None:
+            portally.portally_generated.Histogram.HistogramAddProfile(builder, profile)
+        if axis_correlations is not None:
+            portally.portally_generated.Histogram.HistogramAddAxisCorrelations(builder, axis_correlations)
+        if profile_correlations is not None:
+            portally.portally_generated.Histogram.HistogramAddProfileCorrelations(builder, profile_correlations)
+        if functions is not None:
+            portally.portally_generated.Histogram.HistogramAddLookup(builder, lookup)
+            portally.portally_generated.Histogram.HistogramAddFunctions(builder, functions)
+        data = portally.portally_generated.Histogram.HistogramEnd(builder)
+
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Histogram)
+        portally.portally_generated.Object.ObjectAddData(builder, data)
+        if title is not None:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Object.ObjectAddScript(builder, script)
+        return portally.portally_generated.Object.ObjectEnd(builder)
 
 ################################################# Page
 
@@ -2366,7 +2502,7 @@ class Collection(Object):
     @classmethod
     def _fromflatbuffers(cls, fbobject, fbcollection):
         out = cls.__new__(cls)
-        out._flatbuffers = Merged()
+        out._flatbuffers = MockFlatbuffers()
         out._flatbuffers.Objects = fbcollection.Objects
         out._flatbuffers.ObjectsLength = fbcollection.ObjectsLength
         out._flatbuffers.ObjectsLookup = fbcollection.Lookup
@@ -2436,6 +2572,16 @@ _ObjectData_lookup = {
 _FunctionObjectData_lookup = {
     portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
     portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
+    }
+
+_Counts_lookup = {
+    portally.portally_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, portally.portally_generated.UnweightedCounts.UnweightedCounts),
+    portally.portally_generated.Counts.Counts.WeightedCounts: (WeightedCounts, portally.portally_generated.WeightedCounts.WeightedCounts),
+    }
+
+_RawBuffer_lookup = {
+    portally.portally_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, portally.portally_generated.RawInlineBuffer.RawInlineBuffer),
+    portally.portally_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, portally.portally_generated.RawExternalBuffer.RawExternalBuffer),
     }
 
 _InterpretedBuffer_lookup = {

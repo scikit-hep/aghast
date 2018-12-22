@@ -65,6 +65,16 @@ def setparent(parent, value):
         for x in value.values():
             setparent(parent, x)
 
+def _checkitem(check):
+    if check.type is str:
+        return CheckString(check.classname, check.paramname, required=check.required)
+    elif check.type is float:
+        return CheckNumber(check.classname, check.paramname, required=check.required)
+    elif isinstance(check.type, list):
+        return CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
+    else:
+        return CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+
 class Vector(Sequence):
     def __init__(self, data):
         if data is None:
@@ -87,15 +97,19 @@ class Vector(Sequence):
         else:
             return "[" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "]"
 
-def _checkitem(check):
-    if check.type is str:
-        return CheckString(check.classname, check.paramname, required=check.required)
-    elif check.type is float:
-        return CheckNumber(check.classname, check.paramname, required=check.required)
-    elif isinstance(check.type, list):
-        return CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
-    else:
-        return CheckClass(check.classname, check.paramname, required=check.required, type=check.type)
+    def __eq__(self, other):
+        if not isinstance(other, Vector):
+            return False
+        if len(self) != len(other):
+            return False
+        for i in range(len(self)):
+            if self[i] != other[i]:
+                return False
+        else:
+            return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 class FBVector(Vector):
     def __init__(self, length, get, check, parent):
@@ -144,6 +158,20 @@ class Lookup(Mapping):
             return "{" + ",\n ".join(tmp) + "}"
         else:
             return "{" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "}"
+
+    def __eq__(self, other):
+        if not isinstance(other, Lookup):
+            return False
+        if set(self) != set(other):
+            return False
+        for n in self:
+            if self[n] != other[n]:
+                return False
+        else:
+            return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 class FBLookup(Lookup):
     def __init__(self, length, lookup, get, check, parent):
