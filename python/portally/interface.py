@@ -169,8 +169,11 @@ def _getbykey(self, field, where):
 
 class Portally(object):
     def __repr__(self):
-        return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
-
+        if "identifier" in self._params:
+            return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
+        else:
+            return "<{0} at 0x{1:012x}>".format(type(self).__name__, id(self))
+        
     def _shape(self, path, shape):
         for x in path:
             if self is x:
@@ -190,6 +193,18 @@ class Portally(object):
 
     def _valid(self, seen, recursive):
         pass
+
+    def checkvalid(self, recursive=True):
+        self._valid(set(), recursive)
+
+    @property
+    def isvalid(self):
+        try:
+            self.checkvalid()
+        except ValueError:
+            return False
+        else:
+            return True
 
 class Enum(object):
     def __init__(self, name, value):
@@ -1956,11 +1971,10 @@ class Ntuple(Object):
 
 ################################################# Collection
 
-class Collection(Portally):
+class Collection(Object):
     _params = {
         "identifier":     portally.checktype.CheckString("Collection", "identifier", required=True),
         "objects":        portally.checktype.CheckVector("Collection", "objects", required=False, type=Object),
-        "collections":    portally.checktype.CheckVector("Collection", "collections", required=False, type=None),
         "axis":           portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis, minlen=1),
         "title":          portally.checktype.CheckString("Collection", "title", required=False),
         "metadata":       portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
@@ -1970,17 +1984,15 @@ class Collection(Portally):
 
     identifier     = typedproperty(_params["identifier"])
     objects        = typedproperty(_params["objects"])
-    collections    = typedproperty(_params["collections"])
     axis           = typedproperty(_params["axis"])
     title          = typedproperty(_params["title"])
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
 
-    def __init__(self, identifier, objects=None, collections=None, axis=None, title="", metadata=None, decoration=None, script=""):
+    def __init__(self, identifier, objects=None, axis=None, title="", metadata=None, decoration=None, script=""):
         self.identifier = identifier
         self.objects = objects
-        self.collections = collections
         self.axis = axis
         self.title = title
         self.metadata = metadata
@@ -1993,114 +2005,96 @@ class Collection(Portally):
                 raise ValueError("Collection.objects keys must be unique")
         if recursive:
             _valid(self.objects, seen, recursive)
-            _valid(self.collections, seen, recursive)
             _valid(self.axis, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
-    def checkvalid(self, recursive=True):
-        self._valid(set(), recursive)
-
-    @property
-    def isvalid(self):
-        try:
-            self.checkvalid()
-        except ValueError:
-            return False
-        else:
-            return True
-
     def _shape(self, path, shape):
         if self.axis is not None:
             axisshape = ()
-            if len(path) > 0 and isinstance(path[0], (Object, Collection)):
+            if len(path) > 0 and isinstance(path[0], Object):
                 for x in self.axis:
                     axisshape = axisshape + x._binshape()
             shape = axisshape + shape
         return super(Collection, self)._shape(path, shape)
 
-    def tobuffer(self):
-        self.checkvalid()
-        builder = flatbuffers.Builder(1024)
-        builder.Finish(self._toflatbuffers(builder, None))
-        return builder.Output()
-
-    @classmethod
-    def frombuffer(cls, buffer, offset=0):
-        out = cls.__new__(cls)
-        out._flatbuffers = portally.portally_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
-        return out
-
-    def toarray(self):
-        return numpy.frombuffer(self.tobuffer(), dtype=numpy.uint8)
-
-    @classmethod
-    def fromarray(cls, array):
-        return cls.frombuffer(array)
-
-    def tofile(self, file):
-        self.checkvalid()
-
-        opened = False
-        if not hasattr(file, "write"):
-            file = open(file, "wb")
-            opened = True
-
-        if not hasattr(file, "tell"):
-            class FileLike(object):
-                def __init__(self, file):
-                    self.file = file
-                    self.offset = 0
-                def write(self, data):
-                    self.file.write(data)
-                    self.offset += len(data)
-                def close(self):
-                    try:
-                        self.file.close()
-                    except:
-                        pass
-                def tell(self):
-                    return self.offset
-            file = FileLike(file)
-
-        try:
-            file.write(b"hist")
-            builder = flatbuffers.Builder(1024)
-            builder.Finish(self._toflatbuffers(builder, False, file))
-            offset = file.tell()
-            file.write(builder.Output())
-            file.write(struct.pack("<Q", offset))
-            file.write(b"hist")
-
-        finally:
-            if opened:
-                file.close()
-
-    @classmethod
-    def fromfile(cls, file, mode="r+"):
-        if isinstance(file, str):
-            file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
-        if file[:4].tostring() != b"hist":
-            raise OSError("file does not begin with magic 'hist'")
-        if file[-4:].tostring() != b"hist":
-            raise OSError("file does not end with magic 'hist'")
-        offset, = struct.unpack("<Q", file[-12:-4])
-        return cls.frombuffer(file[offset:-12])
-
     def __getitem__(self, where):
         return _getbykey(self, "objects", where)
 
-    def __repr__(self):
-        return "<{0} {1} at 0x{2:012x}>".format(type(self).__name__, repr(self.identifier), id(self))
+    # def tobuffer(self):
+    #     self.checkvalid()
+    #     builder = flatbuffers.Builder(1024)
+    #     builder.Finish(self._toflatbuffers(builder, None))
+    #     return builder.Output()
 
-    def _toflatbuffers(self, builder, file):
-        identifier = builder.CreateString(self._identifier)
-        if len(self._title) > 0:
-            title = builder.CreateString(self._title)
-        portally.portally_generated.Collection.CollectionStart(builder)
-        portally.portally_generated.Collection.CollectionAddIdentifier(builder, identifier)
-        if len(self._title) > 0:
-            portally.portally_generated.Collection.CollectionAddTitle(builder, title)
-        return portally.portally_generated.Collection.CollectionEnd(builder)
+    # @classmethod
+    # def frombuffer(cls, buffer, offset=0):
+    #     out = cls.__new__(cls)
+    #     out._flatbuffers = portally.portally_generated.Collection.Collection.GetRootAsCollection(buffer, offset)
+    #     return out
 
-Collection._params["collections"].type = Collection
+    # def toarray(self):
+    #     return numpy.frombuffer(self.tobuffer(), dtype=numpy.uint8)
+
+    # @classmethod
+    # def fromarray(cls, array):
+    #     return cls.frombuffer(array)
+
+    # def tofile(self, file):
+    #     self.checkvalid()
+
+    #     opened = False
+    #     if not hasattr(file, "write"):
+    #         file = open(file, "wb")
+    #         opened = True
+
+    #     if not hasattr(file, "tell"):
+    #         class FileLike(object):
+    #             def __init__(self, file):
+    #                 self.file = file
+    #                 self.offset = 0
+    #             def write(self, data):
+    #                 self.file.write(data)
+    #                 self.offset += len(data)
+    #             def close(self):
+    #                 try:
+    #                     self.file.close()
+    #                 except:
+    #                     pass
+    #             def tell(self):
+    #                 return self.offset
+    #         file = FileLike(file)
+
+    #     try:
+    #         file.write(b"port")
+    #         builder = flatbuffers.Builder(1024)
+    #         builder.Finish(self._toflatbuffers(builder, False, file))
+    #         offset = file.tell()
+    #         file.write(builder.Output())
+    #         file.write(struct.pack("<Q", offset))
+    #         file.write(b"port")
+
+    #     finally:
+    #         if opened:
+    #             file.close()
+
+    # @classmethod
+    # def fromfile(cls, file, mode="r+"):
+    #     if isinstance(file, str):
+    #         file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
+    #     if file[:4].tostring() != b"port":
+    #         raise OSError("file does not begin with magic 'port'")
+    #     if file[-4:].tostring() != b"port":
+    #         raise OSError("file does not end with magic 'port'")
+    #     offset, = struct.unpack("<Q", file[-12:-4])
+    #     return cls.frombuffer(file[offset:-12])
+
+    # def _toflatbuffers(self, builder, file):
+    #     identifier = builder.CreateString(self._identifier)
+    #     if len(self._title) > 0:
+    #         title = builder.CreateString(self._title)
+    #     portally.portally_generated.Collection.CollectionStart(builder)
+    #     portally.portally_generated.Collection.CollectionAddIdentifier(builder, identifier)
+    #     if len(self._title) > 0:
+    #         portally.portally_generated.Collection.CollectionAddTitle(builder, title)
+    #     return portally.portally_generated.Collection.CollectionEnd(builder)

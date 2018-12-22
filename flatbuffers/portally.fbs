@@ -471,12 +471,18 @@ table Ntuple {
   functions: [FunctionObject];
 }
 
-///////////////////////////////////////////////// objects
+///////////////////////////////////////////////// objects and collections
+
+table Collection {
+  objects: [Object];
+  axis: [Axis];
+}
 
 union ObjectData {
   Histogram,
   Ntuple,
   FunctionObject,
+  Collection
 }
 
 table Object {
@@ -488,19 +494,6 @@ table Object {
   script: string;
 }
 
-///////////////////////////////////////////////// collections
-
-table Collection {
-  identifier: string (key);
-  objects: [Object];
-  collections: [Collection];
-  axis: [Axis];
-  title: string;
-  metadata: Metadata;
-  decoration: Decoration;
-  script: string;
-}
-
 file_extension "port";
 file_identifier "port";
-root_type Collection;
+root_type Object;
