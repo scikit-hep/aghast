@@ -101,6 +101,9 @@ class CheckString(Check):
         else:
             return obj
 
+    def fromflatbuffers(self, obj):
+        return obj.decode("utf-8")
+
 class CheckNumber(Check):
     def __init__(self, classname, paramname, required, min=float("-inf"), max=float("inf"), min_inclusive=True, max_inclusive=True):
         super(CheckNumber, self).__init__(classname, paramname, required)
@@ -205,8 +208,10 @@ class CheckKey(Check):
             return obj
 
     def fromflatbuffers(self, obj):
-        if self.type is str or self.type is float or self.type is int:
+        if self.type is float or self.type is int:
             return obj
+        elif self.type is str:
+            return obj.decode("utf-8")
         else:
             return self.type._fromflatbuffers(obj)
 
@@ -247,12 +252,6 @@ class CheckVector(Check):
                 if not isinstance(x, self.type):
                     raise TypeError("{0}.{1} elements must be {2} objects, cannot pass {3} (type {4})".format(self.classname, self.paramname, self.type, repr(x), type(x)))
             return Vector(obj)
-
-    def fromflatbuffers(self, obj):
-        if self.type is str or self.type is float or self.type is int:
-            return list(obj)
-        else:
-            return [self.type._fromflatbuffers(x) for x in obj]
 
 class CheckBuffer(Check):
     def __call__(self, obj):

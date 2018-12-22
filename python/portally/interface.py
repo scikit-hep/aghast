@@ -2235,11 +2235,11 @@ class Collection(Object):
         #   script: string;
         # }
 
-        identifier = builder.CreateString(self.identifier)
-        title = None if len(self.title) == 0 else builder.CreateString(self.title)
+        identifier = builder.CreateString(self.identifier.encode("utf-8"))
+        title = None if len(self.title) == 0 else builder.CreateString(self.title.encode("utf-8"))
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
-        script = None if len(self.script) == 0 else builder.CreateString(self.script)
+        script = None if len(self.script) == 0 else builder.CreateString(self.script.encode("utf-8"))
 
         portally.portally_generated.Object.ObjectStart(builder)
         portally.portally_generated.Object.ObjectAddIdentifier(builder, identifier)
