@@ -177,22 +177,6 @@ def _getbykey(self, field, where):
     return getattr(self, lookup)[where]
 
 class _MockFlatbuffers(object):
-    @staticmethod
-    def _writetype(builder, writer, data, pairs):
-        for interface, tag in pairs:
-            if isinstance(data, interface):
-                writer(builder, tag)
-                return
-        else:
-            raise AssertionError(type(data))
-
-    @staticmethod
-    def _writeibuffertype(builder, writer, data):
-        _MockFlatbuffers._writetype(builder, writer, data, (
-            (InterpretedInlineBuffer, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer),
-            (InterpretedExternalBuffer, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer)
-            ))
-
     class _ByTag(object):
         __slots__ = ["getdata", "gettype", "lookup"]
 
@@ -203,10 +187,13 @@ class _MockFlatbuffers(object):
 
         def __call__(self):
             data = self.getdata()
-            interface, deserializer = self.lookup[self.gettype()]
-            flatbuffers = deserializer()
-            flatbuffers.Init(data.Bytes, data.Pos)
-            return interface._fromflatbuffers(flatbuffers)
+            try:
+                interface, deserializer = self.lookup[self.gettype()]
+            except KeyError:
+                return None
+            fb = deserializer()
+            fb.Init(data.Bytes, data.Pos)
+            return interface._fromflatbuffers(fb)
 
 ################################################# Portally
 
@@ -253,9 +240,9 @@ class Portally(object):
             return True
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers):
+    def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
-        out._flatbuffers = flatbuffers
+        out._flatbuffers = fb
         return out
 
     def _toflatbuffers(self, builder):
@@ -275,7 +262,7 @@ class Portally(object):
                     if len(selfn) != len(othern):
                         return False
                 except TypeError:
-                    return False
+                    return selfn == othern
                 for x, y in zip(selfn, othern):
                     if x != y:
                         return False
@@ -302,7 +289,7 @@ class Enum(object):
         return hash(self.name)
 
     def __eq__(self, other):
-        return self is other or (isinstance(other, Enum) and self.name == other.name)
+        return self is other or (isinstance(other, type(self)) and self.value == other.value)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -314,12 +301,12 @@ class Object(Portally):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers):
-        interface, deserializer = _ObjectData_lookup[flatbuffers.DataType()]
-        data = flatbuffers.Data()
-        flatbuffers2 = deserializer()
-        flatbuffers2.Init(data.Bytes, data.Pos)
-        return interface._fromflatbuffers(flatbuffers, flatbuffers2)
+    def _fromflatbuffers(cls, fb):
+        interface, deserializer = _ObjectData_lookup[fb.DataType()]
+        data = fb.Data()
+        fb2 = deserializer()
+        fb2.Init(data.Bytes, data.Pos)
+        return interface._fromflatbuffers(fb, fb2)
 
     def tobuffer(self):
         self.checkvalid()
@@ -687,16 +674,16 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return array.reshape(shape, order=self.dimension_order.dimension_order)
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers):
+    def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
         out._flatbuffers = _MockFlatbuffers()
-        out._flatbuffers.Buffer = flatbuffers.BufferAsNumpy
-        out._flatbuffers.Filters = flatbuffers.Filters
-        out._flatbuffers.FiltersLength = flatbuffers.FiltersLength
-        out._flatbuffers.PostfilterSlice = flatbuffers.PostfilterSlice
-        out._flatbuffers.Dtype = flatbuffers.Dtype
-        out._flatbuffers.Endianness = flatbuffers.Endianness
-        out._flatbuffers.DimensionOrder = flatbuffers.DimensionOrder
+        out._flatbuffers.Buffer = fb.BufferAsNumpy
+        out._flatbuffers.Filters = fb.Filters
+        out._flatbuffers.FiltersLength = fb.FiltersLength
+        out._flatbuffers.PostfilterSlice = fb.PostfilterSlice
+        out._flatbuffers.Dtype = fb.Dtype
+        out._flatbuffers.Endianness = fb.Endianness
+        out._flatbuffers.DimensionOrder = fb.DimensionOrder
         return out
 
     def _toflatbuffers(self, builder):
@@ -1049,14 +1036,13 @@ class IntegerBinning(Binning, BinPosition):
     def _binshape(self):
         return (self.max - self.min + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
 
-    # def _toflatbuffers(self, builder):
-    #     portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
-    #     portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
-    #     portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
-
-
-    #     portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
-    #     return portally.portally_generated.Metadata.MetadataEnd(builder)
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddPosUnderflow(builder, self.pos_underflow.value)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddPosOverflow(builder, self.pos_overflow.value)
+        return portally.portally_generated.IntegerBinning.IntegerBinningEnd(builder)
 
 ################################################# RealInterval
 
@@ -1578,6 +1564,18 @@ class Axis(Portally):
         else:
             return self.binning._binshape()
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.BinningByTag = _MockFlatbuffers._ByTag(fb.Binning, fb.BinningType, _Binning_lookup)
+        out._flatbuffers.Expression = fb.Expression
+        out._flatbuffers.Statistics = fb.Statistics
+        out._flatbuffers.Title = fb.Title
+        out._flatbuffers.Metadata = fb.Metadata
+        out._flatbuffers.Decoration = fb.Decoration
+        return out
+
     def _toflatbuffers(self, builder):
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
@@ -1588,6 +1586,7 @@ class Axis(Portally):
 
         portally.portally_generated.Axis.AxisStart(builder)
         if binning is not None:
+            portally.portally_generated.Axis.AxisAddBinningType(builder, _Binning_invlookup[type(self.binning)])
             portally.portally_generated.Axis.AxisAddBinning(builder, binning)
         if expression is not None:
             portally.portally_generated.Axis.AxisAddExpression(builder, expression)
@@ -1654,16 +1653,16 @@ class UnweightedCounts(Counts):
             _valid(self.counts, seen, recursive)
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers):
+    def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
         out._flatbuffers = _MockFlatbuffers()
-        out._flatbuffers.CountsByTag = _MockFlatbuffers._ByTag(flatbuffers.Counts, flatbuffers.CountsType, _InterpretedBuffer_lookup)
+        out._flatbuffers.CountsByTag = _MockFlatbuffers._ByTag(fb.Counts, fb.CountsType, _InterpretedBuffer_lookup)
         return out
 
     def _toflatbuffers(self, builder):
         counts = self.counts._toflatbuffers(builder)
         portally.portally_generated.UnweightedCounts.UnweightedCountsStart(builder)
-        _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType, self.counts)
+        portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
         portally.portally_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
         return portally.portally_generated.UnweightedCounts.UnweightedCountsEnd(builder)
     
@@ -1723,12 +1722,12 @@ class FunctionObject(Object):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     @classmethod
-    def _fromflatbuffers(cls, flatbuffers, flatbuffers2):
-        interface, deserializer = _FunctionObjectData_lookup[flatbuffers2.DataType()]
-        data = flatbuffers2.Data()
-        flatbuffers3 = deserializer()
-        flatbuffers3.Init(data.Bytes, data.Pos)
-        return interface._fromflatbuffers(flatbuffers, flatbuffers2, flatbuffers3)
+    def _fromflatbuffers(cls, fb, fb2):
+        interface, deserializer = _FunctionObjectData_lookup[fb2.DataType()]
+        data = fb2.Data()
+        fb3 = deserializer()
+        fb3.Init(data.Bytes, data.Pos)
+        return interface._fromflatbuffers(fb, fb2, fb3)
 
 ################################################# ParameterizedFunction
 
@@ -1899,10 +1898,10 @@ class BinnedEvaluatedFunction(FunctionObject):
             errors = builder.EndVector(len(errors))
 
         portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType, self.values)
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType, self.derivatives)
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
             portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
             portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
@@ -2083,10 +2082,7 @@ class Histogram(Object):
 
         portally.portally_generated.Histogram.HistogramStart(builder)
         portally.portally_generated.Histogram.HistogramAddAxis(builder, axis)
-        _MockFlatbuffers._writetype(builder, portally.portally_generated.Histogram.HistogramAddCountsType, self.counts, (
-            (UnweightedCounts, portally.portally_generated.Counts.Counts.UnweightedCounts),
-            (WeightedCounts, portally.portally_generated.Counts.Counts.WeightedCounts),
-            ))
+        portally.portally_generated.Histogram.HistogramAddCountsType(builder, _Counts_invlookup[type(self.counts)])
         portally.portally_generated.Histogram.HistogramAddCounts(builder, counts)
         if profile is not None:
             portally.portally_generated.Histogram.HistogramAddProfile(builder, profile)
@@ -2568,29 +2564,49 @@ class Collection(Object):
             portally.portally_generated.Object.ObjectAddScript(builder, script)
         return portally.portally_generated.Object.ObjectEnd(builder)
 
+_RawBuffer_lookup = {
+    portally.portally_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, portally.portally_generated.RawInlineBuffer.RawInlineBuffer),
+    portally.portally_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, portally.portally_generated.RawExternalBuffer.RawExternalBuffer),
+    }
+_RawBuffer_invlookup = {x[0]: n for n, x in _RawBuffer_lookup.items()}
+
+_InterpretedBuffer_lookup = {
+    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
+    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
+    }
+_InterpretedBuffer_invlookup = {x[0]: n for n, x in _InterpretedBuffer_lookup.items()}
+
 _ObjectData_lookup = {
     portally.portally_generated.ObjectData.ObjectData.Histogram: (Histogram, portally.portally_generated.Histogram.Histogram),
     portally.portally_generated.ObjectData.ObjectData.Ntuple: (Ntuple, portally.portally_generated.Ntuple.Ntuple),
     portally.portally_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, portally.portally_generated.FunctionObject.FunctionObject),
     portally.portally_generated.ObjectData.ObjectData.Collection: (Collection, portally.portally_generated.Collection.Collection),
     }
+_ObjectData_invlookup = {x[0]: n for n, x in _ObjectData_lookup.items()}
 
 _FunctionObjectData_lookup = {
     portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
     portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
     }
+_FunctionObjectData_invlookup = {x[0]: n for n, x in _FunctionObjectData_lookup.items()}
 
+_Binning_lookup = {
+    portally.portally_generated.Binning.Binning.IntegerBinning: (IntegerBinning, portally.portally_generated.IntegerBinning.IntegerBinning),
+    portally.portally_generated.Binning.Binning.RegularBinning: (RegularBinning, portally.portally_generated.RegularBinning.RegularBinning),
+    portally.portally_generated.Binning.Binning.TicTacToeOverflowBinning: (TicTacToeOverflowBinning, portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinning),
+    portally.portally_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, portally.portally_generated.HexagonalBinning.HexagonalBinning),
+    portally.portally_generated.Binning.Binning.EdgesBinning: (EdgesBinning, portally.portally_generated.EdgesBinning.EdgesBinning),
+    portally.portally_generated.Binning.Binning.IrregularBinning: (IrregularBinning, portally.portally_generated.IrregularBinning.IrregularBinning),
+    portally.portally_generated.Binning.Binning.CategoryBinning: (CategoryBinning, portally.portally_generated.CategoryBinning.CategoryBinning),
+    portally.portally_generated.Binning.Binning.SparseRegularBinning: (SparseRegularBinning, portally.portally_generated.SparseRegularBinning.SparseRegularBinning),
+    portally.portally_generated.Binning.Binning.FractionBinning: (FractionBinning, portally.portally_generated.FractionBinning.FractionBinning),
+    portally.portally_generated.Binning.Binning.PredicateBinning: (PredicateBinning, portally.portally_generated.PredicateBinning.PredicateBinning),
+    portally.portally_generated.Binning.Binning.VariationBinning: (VariationBinning, portally.portally_generated.VariationBinning.VariationBinning),
+    }
+_Binning_invlookup = {x[0]: n for n, x in _Binning_lookup.items()}
+    
 _Counts_lookup = {
     portally.portally_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, portally.portally_generated.UnweightedCounts.UnweightedCounts),
     portally.portally_generated.Counts.Counts.WeightedCounts: (WeightedCounts, portally.portally_generated.WeightedCounts.WeightedCounts),
     }
-
-_RawBuffer_lookup = {
-    portally.portally_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, portally.portally_generated.RawInlineBuffer.RawInlineBuffer),
-    portally.portally_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, portally.portally_generated.RawExternalBuffer.RawExternalBuffer),
-    }
-
-_InterpretedBuffer_lookup = {
-    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
-    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
-    }
+_Counts_invlookup = {x[0]: n for n, x in _Counts_lookup.items()}

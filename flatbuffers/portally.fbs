@@ -170,14 +170,14 @@ table Correlations {
 
 ///////////////////////////////////////////////// binning
 
-enum BinPosition: int8 {
-  pos_below3 = -3,
-  pos_below2 = -2,
-  pos_below1 = -1,
-  pos_nonexistent = 0,
-  pos_above1 = 1,
-  pos_above2 = 2,
-  pos_above3 = 3
+enum BinPosition: byte {
+  pos_below3 = 0,
+  pos_below2 = 1,
+  pos_below1 = 2,
+  pos_nonexistent = 3,
+  pos_above1 = 4,
+  pos_above2 = 5,
+  pos_above3 = 6
 }
 
 table IntegerBinning {

@@ -91,9 +91,8 @@ class Test(unittest.TestCase):
     #     assert h.values.array.tolist() == [3.14]
 
     def test_serialization_IntegerBinning(self):
-        # h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
-        # assert h == frombuffer(h.tobuffer(), checkvalid=True)
-        pass
+        h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
