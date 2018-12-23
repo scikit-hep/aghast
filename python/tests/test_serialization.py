@@ -40,11 +40,11 @@ class Test(unittest.TestCase):
 
     def test_serialization_Metadata(self):
         h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Decoration(self):
         h = Collection({}, decoration=Decoration("""points { color: red }""", language=Decoration.css))
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RawInlineBuffer(self):
         pass
@@ -238,7 +238,7 @@ class Test(unittest.TestCase):
 
     def test_serialization_Axis(self):
         h = BinnedEvaluatedFunction([Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-        assert h == frombuffer(h.tobuffer())        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_UnweightedCounts(self):
         pass
@@ -314,10 +314,7 @@ class Test(unittest.TestCase):
         
     def test_serialization_Histogram(self):
         h = Histogram([Axis()], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1))))
-        assert h == frombuffer(h.tobuffer())
-
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
-    #     h.checkvalid()
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Parameter(self):
         pass
@@ -344,10 +341,10 @@ class Test(unittest.TestCase):
 
     def test_serialization_BinnedEvaluatedFunction(self):
         h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         assert frombuffer(h.tobuffer()).values.array.tolist() == [0.0]
         h = BinnedEvaluatedFunction([Axis(), Axis()], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         assert frombuffer(h.tobuffer()).values.array.tolist() == [[0.0]]
 
     def test_serialization_Page(self):
@@ -414,9 +411,9 @@ class Test(unittest.TestCase):
 
     def test_serialization_collection(self):
         h = Collection()
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Collection({"b": Collection(), "c": Collection()})
-        assert h == frombuffer(h.tobuffer())
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
     #     h.checkvalid()
     #     assert h.identifier == "id"
     #     h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(30)))), Histogram("id2", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(300))))], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])

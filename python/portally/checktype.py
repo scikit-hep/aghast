@@ -42,9 +42,6 @@ except ImportError:
 
 import numpy
 
-def name2fb(name):
-    return "".join(x.capitalize() for x in name.split("_"))
-
 def setparent(parent, value):
     import portally.interface
 
@@ -195,7 +192,7 @@ class FBLookup(Lookup):
 
         item = self._got.get(where, None)
         if item is None:
-            item = self._check.fromflatbuffers(name2fb(where), self._get(self._lookup[where]))
+            item = self._check.fromflatbuffers(self._get(self._lookup[where]))
             self._got[where] = item
             if isinstance(item, portally.interface.Portally):
                 item._identifier = where

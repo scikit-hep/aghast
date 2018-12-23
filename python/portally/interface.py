@@ -110,13 +110,16 @@ import portally.portally_generated.Collection
 
 import portally.checktype
 
+def _name2fb(name):
+    return "".join(x.capitalize() for x in name.split("_"))
+
 def typedproperty(check):
     @property
     def prop(self):
         private = "_" + check.paramname
         if not hasattr(self, private):
             assert hasattr(self, "_flatbuffers"), "not derived from a flatbuffer or not properly initialized"
-            fbname = portally.checktype.name2fb(check.paramname)
+            fbname = _name2fb(check.paramname)
             fbnamelen = fbname + "Length"
             fbnamelookup = fbname + "Lookup"
             fbnametag = fbname + "ByTag"
@@ -365,13 +368,16 @@ class Object(Portally):
             if opened:
                 file.close()
 
-def frombuffer(buffer, offset=0):
-    return Object._fromflatbuffers(portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset))
+def frombuffer(buffer, checkvalid=False, offset=0):
+    out = Object._fromflatbuffers(portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset))
+    if checkvalid:
+        out.checkvalid()
+    return out
 
-def fromarray(array):
-    return frombuffer(array)
+def fromarray(array, checkvalid=False):
+    return frombuffer(array, checkvalid=checkvalid)
 
-def fromfile(file, mode="r+"):
+def fromfile(file, mode="r+", checkvalid=False):
     if isinstance(file, str):
         file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
     if file[:4].tostring() != b"port":
@@ -379,7 +385,7 @@ def fromfile(file, mode="r+"):
     if file[-4:].tostring() != b"port":
         raise OSError("file does not end with magic 'port'")
     offset, = struct.unpack("<Q", file[-12:-4])
-    return frombuffer(file[offset:-12])
+    return frombuffer(file[offset:-12], checkvalid=checkvalid)
 
 ################################################# Metadata
 
