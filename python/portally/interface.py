@@ -62,7 +62,7 @@ import portally.portally_generated.Quantiles
 import portally.portally_generated.Modes
 import portally.portally_generated.Statistics
 import portally.portally_generated.Correlations
-import portally.portally_generated.BinPosition
+import portally.portally_generated.BinLocation
 import portally.portally_generated.IntegerBinning
 import portally.portally_generated.RealInterval
 import portally.portally_generated.NonRealMapping
@@ -988,60 +988,60 @@ class Binning(Portally):
     def dimensions(self):
         return len(self._binshape())
 
-################################################# BinPosition
+################################################# BinLocation
 
-class BinPositionEnum(Enum):
-    base = "BinPosition"
+class BinLocationEnum(Enum):
+    base = "BinLocation"
 
-class BinPosition(object):
-    below3      = BinPositionEnum("below3", portally.portally_generated.BinPosition.BinPosition.pos_below3)
-    below2      = BinPositionEnum("below2", portally.portally_generated.BinPosition.BinPosition.pos_below2)
-    below1      = BinPositionEnum("below1", portally.portally_generated.BinPosition.BinPosition.pos_below1)
-    nonexistent = BinPositionEnum("nonexistent", portally.portally_generated.BinPosition.BinPosition.pos_nonexistent)
-    above1      = BinPositionEnum("above1", portally.portally_generated.BinPosition.BinPosition.pos_above1)
-    above2      = BinPositionEnum("above2", portally.portally_generated.BinPosition.BinPosition.pos_above2)
-    above3      = BinPositionEnum("above3", portally.portally_generated.BinPosition.BinPosition.pos_above3)
-    positions = [below3, below2, below1, nonexistent, above1, above2, above3]
+class BinLocation(object):
+    below3      = BinLocationEnum("below3", portally.portally_generated.BinLocation.BinLocation.loc_below3)
+    below2      = BinLocationEnum("below2", portally.portally_generated.BinLocation.BinLocation.loc_below2)
+    below1      = BinLocationEnum("below1", portally.portally_generated.BinLocation.BinLocation.loc_below1)
+    nonexistent = BinLocationEnum("nonexistent", portally.portally_generated.BinLocation.BinLocation.loc_nonexistent)
+    above1      = BinLocationEnum("above1", portally.portally_generated.BinLocation.BinLocation.loc_above1)
+    above2      = BinLocationEnum("above2", portally.portally_generated.BinLocation.BinLocation.loc_above2)
+    above3      = BinLocationEnum("above3", portally.portally_generated.BinLocation.BinLocation.loc_above3)
+    locations = [below3, below2, below1, nonexistent, above1, above2, above3]
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
 ################################################# IntegerBinning
 
-class IntegerBinning(Binning, BinPosition):
+class IntegerBinning(Binning, BinLocation):
     _params = {
         "min":       portally.checktype.CheckInteger("IntegerBinning", "min", required=True),
         "max":       portally.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "pos_underflow": portally.checktype.CheckEnum("IntegerBinning", "pos_underflow", required=False, choices=BinPosition.positions),
-        "pos_overflow":  portally.checktype.CheckEnum("IntegerBinning", "pos_overflow", required=False, choices=BinPosition.positions),
+        "loc_underflow": portally.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations),
+        "loc_overflow":  portally.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations),
         }
 
     min       = typedproperty(_params["min"])
     max       = typedproperty(_params["max"])
-    pos_underflow = typedproperty(_params["pos_underflow"])
-    pos_overflow  = typedproperty(_params["pos_overflow"])
+    loc_underflow = typedproperty(_params["loc_underflow"])
+    loc_overflow  = typedproperty(_params["loc_overflow"])
 
-    def __init__(self, min, max, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent):
+    def __init__(self, min, max, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent):
         self.min = min
         self.max = max
-        self.pos_underflow = pos_underflow
-        self.pos_overflow = pos_overflow
+        self.loc_underflow = loc_underflow
+        self.loc_overflow = loc_overflow
 
     def _valid(self, seen, recursive):
         if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
-        if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
-            raise ValueError("IntegerBinning.pos_underflow and IntegerBinning.pos_overflow must not be equal unless they are both nonexistent")
+        if self.loc_underflow != BinLocation.nonexistent and self.loc_overflow != BinLocation.nonexistent and self.loc_underflow == self.loc_overflow:
+            raise ValueError("IntegerBinning.loc_underflow and IntegerBinning.loc_overflow must not be equal unless they are both nonexistent")
 
     def _binshape(self):
-        return (self.max - self.min + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
+        return (self.max - self.min + 1 + int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent),)
 
     def _toflatbuffers(self, builder):
         portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
         portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
         portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddPosUnderflow(builder, self.pos_underflow.value)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddPosOverflow(builder, self.pos_overflow.value)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
+        portally.portally_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
         return portally.portally_generated.IntegerBinning.IntegerBinningEnd(builder)
 
 ################################################# RealInterval
@@ -1076,7 +1076,7 @@ class RealInterval(Portally):
 class NonRealMappingEnum(Enum):
     base = "RealOverflow"
 
-class RealOverflow(Portally, BinPosition):
+class RealOverflow(Portally, BinLocation):
     missing      = NonRealMappingEnum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
     in_underflow = NonRealMappingEnum("in_underflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_underflow)
     in_overflow  = NonRealMappingEnum("in_overflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_overflow)
@@ -1084,39 +1084,39 @@ class RealOverflow(Portally, BinPosition):
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "pos_underflow": portally.checktype.CheckEnum("RealOverflow", "pos_underflow", required=False, choices=BinPosition.positions),
-        "pos_overflow":  portally.checktype.CheckEnum("RealOverflow", "pos_overflow", required=False, choices=BinPosition.positions),
-        "pos_nanflow":   portally.checktype.CheckEnum("RealOverflow", "pos_nanflow", required=False, choices=BinPosition.positions),
+        "loc_underflow": portally.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations),
+        "loc_overflow":  portally.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations),
+        "loc_nanflow":   portally.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations),
         "minf_mapping":  portally.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
         "pinf_mapping":  portally.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
         "nan_mapping":   portally.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
-    pos_underflow = typedproperty(_params["pos_underflow"])
-    pos_overflow  = typedproperty(_params["pos_overflow"])
-    pos_nanflow   = typedproperty(_params["pos_nanflow"])
+    loc_underflow = typedproperty(_params["loc_underflow"])
+    loc_overflow  = typedproperty(_params["loc_overflow"])
+    loc_nanflow   = typedproperty(_params["loc_nanflow"])
     minf_mapping  = typedproperty(_params["minf_mapping"])
     pinf_mapping  = typedproperty(_params["pinf_mapping"])
     nan_mapping   = typedproperty(_params["nan_mapping"])
 
-    def __init__(self, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent, pos_nanflow=BinPosition.nonexistent, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
-        self.pos_underflow = pos_underflow
-        self.pos_overflow = pos_overflow
-        self.pos_nanflow = pos_nanflow
+    def __init__(self, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent, loc_nanflow=BinLocation.nonexistent, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
+        self.loc_underflow = loc_underflow
+        self.loc_overflow = loc_overflow
+        self.loc_nanflow = loc_nanflow
         self.minf_mapping = minf_mapping
         self.pinf_mapping = pinf_mapping
         self.nan_mapping = nan_mapping
 
     def _valid(self, seen, recursive):
-        if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
-            raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_overflow must not be equal unless they are both nonexistent")
-        if self.pos_underflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_underflow == self.pos_nanflow:
-            raise ValueError("RealOverflow.pos_underflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
-        if self.pos_overflow != BinPosition.nonexistent and self.pos_nanflow != BinPosition.nonexistent and self.pos_overflow == self.pos_nanflow:
-            raise ValueError("RealOverflow.pos_overflow and RealOverflow.pos_nanflow must not be equal unless they are both nonexistent")
+        if self.loc_underflow != BinLocation.nonexistent and self.loc_overflow != BinLocation.nonexistent and self.loc_underflow == self.loc_overflow:
+            raise ValueError("RealOverflow.loc_underflow and RealOverflow.loc_overflow must not be equal unless they are both nonexistent")
+        if self.loc_underflow != BinLocation.nonexistent and self.loc_nanflow != BinLocation.nonexistent and self.loc_underflow == self.loc_nanflow:
+            raise ValueError("RealOverflow.loc_underflow and RealOverflow.loc_nanflow must not be equal unless they are both nonexistent")
+        if self.loc_overflow != BinLocation.nonexistent and self.loc_nanflow != BinLocation.nonexistent and self.loc_overflow == self.loc_nanflow:
+            raise ValueError("RealOverflow.loc_overflow and RealOverflow.loc_nanflow must not be equal unless they are both nonexistent")
 
     def _numbins(self):
-        return int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent) + int(self.pos_nanflow != BinPosition.nonexistent)
+        return int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent) + int(self.loc_nanflow != BinLocation.nonexistent)
 
 ################################################# RegularBinning
 
@@ -1341,18 +1341,18 @@ class IrregularBinning(Binning):
 
 ################################################# CategoryBinning
 
-class CategoryBinning(Binning, BinPosition):
+class CategoryBinning(Binning, BinLocation):
     _params = {
         "categories": portally.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
-        "pos_overflow":  portally.checktype.CheckEnum("CategoryBinning", "pos_overflow", required=False, choices=BinPosition.positions),
+        "loc_overflow":  portally.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations),
         }
 
     categories = typedproperty(_params["categories"])
-    pos_overflow = typedproperty(_params["pos_overflow"])
+    loc_overflow = typedproperty(_params["loc_overflow"])
 
-    def __init__(self, categories, pos_overflow=BinPosition.nonexistent):
+    def __init__(self, categories, loc_overflow=BinLocation.nonexistent):
         self.categories = categories
-        self.pos_overflow = pos_overflow
+        self.loc_overflow = loc_overflow
 
     def _valid(self, seen, recursive):
         if len(self.categories) != len(set(self.categories)):
@@ -1363,35 +1363,35 @@ class CategoryBinning(Binning, BinPosition):
         return False
 
     def _binshape(self):
-        return (len(self.categories) + (self.pos_overflow != BinPosition.nonexistent),)
+        return (len(self.categories) + (self.loc_overflow != BinLocation.nonexistent),)
 
 ################################################# SparseRegularBinning
 
-class SparseRegularBinning(Binning, BinPosition):
+class SparseRegularBinning(Binning, BinLocation):
     _params = {
         "bins":        portally.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
         "bin_width":   portally.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
         "origin":      portally.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "pos_nanflow": portally.checktype.CheckEnum("SparseRegularBinning", "pos_nanflow", required=False, choices=BinPosition.positions),
+        "loc_nanflow": portally.checktype.CheckEnum("SparseRegularBinning", "loc_nanflow", required=False, choices=BinLocation.locations),
         }
 
     bins        = typedproperty(_params["bins"])
     bin_width   = typedproperty(_params["bin_width"])
     origin      = typedproperty(_params["origin"])
-    pos_nanflow = typedproperty(_params["pos_nanflow"])
+    loc_nanflow = typedproperty(_params["loc_nanflow"])
 
-    def __init__(self, bins, bin_width, origin=0.0, pos_nanflow=BinPosition.nonexistent):
+    def __init__(self, bins, bin_width, origin=0.0, loc_nanflow=BinLocation.nonexistent):
         self.bins = bins
         self.bin_width = bin_width
         self.origin = origin
-        self.pos_nanflow = pos_nanflow
+        self.loc_nanflow = loc_nanflow
 
     def _valid(self, seen, recursive):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
     def _binshape(self):
-        return (len(self.bins) + (self.pos_nanflow != BinPosition.nonexistent),)
+        return (len(self.bins) + (self.loc_nanflow != BinLocation.nonexistent),)
 
 ################################################# FractionBinning
 
@@ -2421,7 +2421,7 @@ class Ntuple(Object):
         if len(set(x.identifier for x in self.columns)) != len(self.columns):
             raise ValueError("Ntuple.columns keys must be unique")
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
-            raise ValueError("Ntuple.instances length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
+            raise ValueError("Ntuple.instances length is {0} but multiplicity at this location in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
         if len(self.column_correlations) != 0:
             Correlations._validindexes(self.column_correlations, len(self.columns))
         if recursive:

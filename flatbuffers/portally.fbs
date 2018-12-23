@@ -170,21 +170,21 @@ table Correlations {
 
 ///////////////////////////////////////////////// binning
 
-enum BinPosition: byte {
-  pos_below3 = 0,
-  pos_below2 = 1,
-  pos_below1 = 2,
-  pos_nonexistent = 3,
-  pos_above1 = 4,
-  pos_above2 = 5,
-  pos_above3 = 6
+enum BinLocation: byte {
+  loc_below3 = 0,
+  loc_below2 = 1,
+  loc_below1 = 2,
+  loc_nonexistent = 3,
+  loc_above1 = 4,
+  loc_above2 = 5,
+  loc_above3 = 6
 }
 
 table IntegerBinning {
   min: long;   // assumed to be inclusive (if not, change its value!)
   max: long;
-  pos_underflow: BinPosition = pos_nonexistent;
-  pos_overflow: BinPosition = pos_nonexistent;
+  loc_underflow: BinLocation = loc_nonexistent;
+  loc_overflow: BinLocation = loc_nonexistent;
 }
 
 table RealInterval {
@@ -202,9 +202,9 @@ enum NonRealMapping: byte {
 }
 
 table RealOverflow {
-  pos_underflow: BinPosition = pos_nonexistent;
-  pos_overflow: BinPosition = pos_nonexistent;
-  pos_nanflow: BinPosition = pos_nonexistent;
+  loc_underflow: BinLocation = loc_nonexistent;
+  loc_overflow: BinLocation = loc_nonexistent;
+  loc_nanflow: BinLocation = loc_nonexistent;
   minf_mapping: NonRealMapping = in_underflow;
   pinf_mapping: NonRealMapping = in_overflow;
   nan_mapping: NonRealMapping = in_nanflow;
@@ -267,14 +267,14 @@ table IrregularBinning {
 
 table CategoryBinning {
   categories: [string] (required);
-  pos_overflow: BinPosition = pos_nonexistent;
+  loc_overflow: BinLocation = loc_nonexistent;
 }
 
 table SparseRegularBinning {
   bins: [long] (required);
   bin_width: double;
   origin: double = 0.0;
-  pos_nanflow: BinPosition = pos_nonexistent;
+  loc_nanflow: BinLocation = loc_nonexistent;
 }
 
 enum FractionLayout: byte {
@@ -386,7 +386,7 @@ table EvaluatedFunction {
   errors: [Quantiles];
 }
 
-// FIXME: ContourFunction? Has to specify its own number of points because it can't be determined by position
+// FIXME: ContourFunction? Has to specify its own number of points because it can't be determined by its place in the hierarchy
 
 union FunctionData {
   ParameterizedFunction,

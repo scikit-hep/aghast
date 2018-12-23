@@ -95,16 +95,16 @@ class Test(unittest.TestCase):
         h.checkvalid()
         h = BinnedEvaluatedFunction([Axis(IntegerBinning(20, 10))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
         assert not h.isvalid
-        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.nonexistent, pos_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.nonexistent, loc_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 11
-        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.below1, pos_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.below1, loc_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 12
-        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.nonexistent, pos_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.nonexistent, loc_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 12
-        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, pos_underflow=IntegerBinning.below1, pos_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(13), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.below1, loc_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(13), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 13
 
@@ -115,22 +115,22 @@ class Test(unittest.TestCase):
         assert not h.isvalid
 
     def test_validity_RealOverflow(self):
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.nonexistent, loc_overflow=RealOverflow.nonexistent, loc_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 10
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.nonexistent, loc_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 11
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.above1, pos_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.nonexistent, loc_overflow=RealOverflow.above1, loc_nanflow=RealOverflow.nonexistent)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 11
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.nonexistent, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.nonexistent, loc_overflow=RealOverflow.nonexistent, loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 11
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.nonexistent, pos_nanflow=RealOverflow.above2)))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.nonexistent, loc_nanflow=RealOverflow.above2)))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 12
-        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(pos_underflow=RealOverflow.above1, pos_overflow=RealOverflow.above2, pos_nanflow=RealOverflow.above3)))], InterpretedInlineBuffer(numpy.zeros(13), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5), RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.above2, loc_nanflow=RealOverflow.above3)))], InterpretedInlineBuffer(numpy.zeros(13), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0] * 13
 
@@ -150,13 +150,13 @@ class Test(unittest.TestCase):
         h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 3), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [[0.0] * 2] * 3
-        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(pos_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 4), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 4), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [[0.0] * 2] * 4
-        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, roverflow=RealOverflow(pos_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 3), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 3), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [[0.0] * 3] * 3
-        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(pos_nanflow=RealOverflow.above1), roverflow=RealOverflow(pos_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 4), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1), roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 4), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [[0.0] * 3] * 4
 
@@ -180,7 +180,7 @@ class Test(unittest.TestCase):
         h = BinnedEvaluatedFunction([Axis(CategoryBinning(["one", "two", "three"]))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0, 0.0, 0.0]
-        h = BinnedEvaluatedFunction([Axis(CategoryBinning(["one", "two", "three"], pos_overflow=CategoryBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(CategoryBinning(["one", "two", "three"], loc_overflow=CategoryBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0]
 
@@ -188,7 +188,7 @@ class Test(unittest.TestCase):
         h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0]
-        h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, pos_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, loc_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
