@@ -91,7 +91,10 @@ class Test(unittest.TestCase):
     #     assert h.values.array.tolist() == [3.14]
 
     def test_serialization_IntegerBinning(self):
+        # h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
+        # assert h == frombuffer(h.tobuffer(), checkvalid=True)
         pass
+
     #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
     #     h.checkvalid()
     #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(20, 10))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
@@ -268,9 +271,9 @@ class Test(unittest.TestCase):
 
     def test_serialization_Extremes(self):
         pass
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(minima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), maxima=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
     #     h.checkvalid()
 
     def test_serialization_Quantiles(self):

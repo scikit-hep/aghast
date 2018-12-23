@@ -121,8 +121,8 @@ union InterpretedBuffer {
 ///////////////////////////////////////////////// descriptive statistics
 
 table StatisticFilter {
-  minimum: double;
-  maximum: double;
+  min: double;
+  max: double;
   excludes_minf: bool;
   excludes_pinf: bool;
   excludes_nan: bool;
@@ -155,9 +155,9 @@ table Modes {
 table Statistics {
   moments: [Moments];
   quantiles: [Quantiles];
-  modes: Modes;
-  minima: Extremes;
-  maxima: Extremes;
+  mode: Modes;
+  min: Extremes;
+  max: Extremes;
 }
 
 table Correlations {
@@ -181,8 +181,8 @@ enum BinPosition: int8 {
 }
 
 table IntegerBinning {
-  minimum: long;   // assumed to be inclusive (if not, change its value!)
-  maximum: long;
+  min: long;   // assumed to be inclusive (if not, change its value!)
+  max: long;
   pos_underflow: BinPosition = pos_nonexistent;
   pos_overflow: BinPosition = pos_nonexistent;
 }
@@ -438,8 +438,8 @@ table Page {
 table ColumnChunk {
   pages: [Page] (required);
   page_offsets: [ulong] (required);
-  page_minima: [Extremes];
-  page_maxima: [Extremes];
+  page_min: [Extremes];
+  page_max: [Extremes];
 }
 
 table Chunk {

@@ -796,29 +796,29 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
 class StatisticFilter(Portally):
     _params = {
-        "minimum": portally.checktype.CheckNumber("StatisticFilter", "minimum", required=False),
-        "maximum": portally.checktype.CheckNumber("StatisticFilter", "maximum", required=False),
+        "min": portally.checktype.CheckNumber("StatisticFilter", "min", required=False),
+        "max": portally.checktype.CheckNumber("StatisticFilter", "max", required=False),
         "excludes_minf": portally.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
         "excludes_pinf": portally.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
         "excludes_nan":  portally.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
         }
 
-    minimum       = typedproperty(_params["minimum"])
-    maximum       = typedproperty(_params["maximum"])
+    min       = typedproperty(_params["min"])
+    max       = typedproperty(_params["max"])
     excludes_minf = typedproperty(_params["excludes_minf"])
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
-    def __init__(self, minimum=None, maximum=None, excludes_minf=None, excludes_pinf=None, excludes_nan=None):
-        self.minimum = minimum
-        self.maximum = maximum
+    def __init__(self, min=None, max=None, excludes_minf=None, excludes_pinf=None, excludes_nan=None):
+        self.min = min
+        self.max = max
         self.excludes_minf = excludes_minf
         self.excludes_pinf = excludes_pinf
         self.excludes_nan = excludes_nan
 
     def _valid(self, seen, recursive):
-        if self.minimum is not None and self.maximum is not None and self.minimum >= self.maximum:
-            raise ValueError("StatisticFilter.minimum ({0}) must be strictly less than StatisticFilter.maximum ({1})".format(self.minimum, self.maximum))
+        if self.min is not None and self.max is not None and self.min >= self.max:
+            raise ValueError("StatisticFilter.min ({0}) must be strictly less than StatisticFilter.max ({1})".format(self.min, self.max))
 
 ################################################# Moments
 
@@ -918,23 +918,23 @@ class Statistics(Portally):
     _params = {
         "moments":   portally.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
         "quantiles": portally.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
-        "modes":     portally.checktype.CheckClass("Statistics", "modes", required=False, type=Modes),
-        "minima":    portally.checktype.CheckClass("Statistics", "minima", required=False, type=Extremes),
-        "maxima":    portally.checktype.CheckClass("Statistics", "maxima", required=False, type=Extremes),
+        "mode":     portally.checktype.CheckClass("Statistics", "mode", required=False, type=Modes),
+        "min":    portally.checktype.CheckClass("Statistics", "min", required=False, type=Extremes),
+        "max":    portally.checktype.CheckClass("Statistics", "max", required=False, type=Extremes),
         }
 
     moments   = typedproperty(_params["moments"])
     quantiles = typedproperty(_params["quantiles"])
-    modes     = typedproperty(_params["modes"])
-    minima    = typedproperty(_params["minima"])
-    maxima    = typedproperty(_params["maxima"])
+    mode     = typedproperty(_params["mode"])
+    min    = typedproperty(_params["min"])
+    max    = typedproperty(_params["max"])
 
-    def __init__(self, moments=None, quantiles=None, modes=None, minima=None, maxima=None):
+    def __init__(self, moments=None, quantiles=None, mode=None, min=None, max=None):
         self.moments = moments
         self.quantiles = quantiles
-        self.modes = modes
-        self.minima = minima
-        self.maxima = maxima
+        self.mode = mode
+        self.min = min
+        self.max = max
 
     def _valid(self, seen, recursive):
         if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
@@ -944,9 +944,9 @@ class Statistics(Portally):
         if recursive:
             _valid(self.moments, seen, recursive)
             _valid(self.quantiles, seen, recursive)
-            _valid(self.modes, seen, recursive)
-            _valid(self.minima, seen, recursive)
-            _valid(self.maxima, seen, recursive)
+            _valid(self.mode, seen, recursive)
+            _valid(self.min, seen, recursive)
+            _valid(self.max, seen, recursive)
 
 ################################################# Correlations
 
@@ -1023,31 +1023,40 @@ class BinPosition(object):
 
 class IntegerBinning(Binning, BinPosition):
     _params = {
-        "minimum":       portally.checktype.CheckInteger("IntegerBinning", "minimum", required=True),
-        "maximum":       portally.checktype.CheckInteger("IntegerBinning", "maximum", required=True),
+        "min":       portally.checktype.CheckInteger("IntegerBinning", "min", required=True),
+        "max":       portally.checktype.CheckInteger("IntegerBinning", "max", required=True),
         "pos_underflow": portally.checktype.CheckEnum("IntegerBinning", "pos_underflow", required=False, choices=BinPosition.positions),
         "pos_overflow":  portally.checktype.CheckEnum("IntegerBinning", "pos_overflow", required=False, choices=BinPosition.positions),
         }
 
-    minimum       = typedproperty(_params["minimum"])
-    maximum       = typedproperty(_params["maximum"])
+    min       = typedproperty(_params["min"])
+    max       = typedproperty(_params["max"])
     pos_underflow = typedproperty(_params["pos_underflow"])
     pos_overflow  = typedproperty(_params["pos_overflow"])
 
-    def __init__(self, minimum, maximum, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent):
-        self.minimum = minimum
-        self.maximum = maximum
+    def __init__(self, min, max, pos_underflow=BinPosition.nonexistent, pos_overflow=BinPosition.nonexistent):
+        self.min = min
+        self.max = max
         self.pos_underflow = pos_underflow
         self.pos_overflow = pos_overflow
 
     def _valid(self, seen, recursive):
-        if self.minimum >= self.maximum:
-            raise ValueError("IntegerBinning.minimum ({0}) must be strictly less than IntegerBinning.maximum ({1})".format(self.minimum, self.maximum))
+        if self.min >= self.max:
+            raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
         if self.pos_underflow != BinPosition.nonexistent and self.pos_overflow != BinPosition.nonexistent and self.pos_underflow == self.pos_overflow:
             raise ValueError("IntegerBinning.pos_underflow and IntegerBinning.pos_overflow must not be equal unless they are both nonexistent")
 
     def _binshape(self):
-        return (self.maximum - self.minimum + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
+        return (self.max - self.min + 1 + int(self.pos_underflow != BinPosition.nonexistent) + int(self.pos_overflow != BinPosition.nonexistent),)
+
+    # def _toflatbuffers(self, builder):
+    #     portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
+    #     portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
+    #     portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
+
+
+    #     portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
+    #     return portally.portally_generated.Metadata.MetadataEnd(builder)
 
 ################################################# RealInterval
 
@@ -2164,20 +2173,20 @@ class ColumnChunk(Portally):
     _params = {
         "pages":        portally.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
         "page_offsets": portally.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_minima":  portally.checktype.CheckVector("ColumnChunk", "page_minima", required=False, type=Extremes),
-        "page_maxima":  portally.checktype.CheckVector("ColumnChunk", "page_maxima", required=False, type=Extremes),
+        "page_min":  portally.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
+        "page_max":  portally.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
         }
 
     pages        = typedproperty(_params["pages"])
     page_offsets = typedproperty(_params["page_offsets"])
-    page_minima  = typedproperty(_params["page_minima"])
-    page_maxima  = typedproperty(_params["page_maxima"])
+    page_min  = typedproperty(_params["page_min"])
+    page_max  = typedproperty(_params["page_max"])
 
-    def __init__(self, pages, page_offsets, page_minima=None, page_maxima=None):
+    def __init__(self, pages, page_offsets, page_min=None, page_max=None):
         self.pages = pages
         self.page_offsets = page_offsets
-        self.page_minima = page_minima
-        self.page_maxima = page_maxima
+        self.page_min = page_min
+        self.page_max = page_max
 
     def _valid(self, seen, recursive):
         if self.page_offsets[0] != 0:
@@ -2186,18 +2195,18 @@ class ColumnChunk(Portally):
             raise ValueError("ColumnChunk.page_offsets must be monotonically increasing")
         if len(self.page_offsets) != len(self.pages) + 1:
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
-        if len(self.page_minima) != 0:
-            if len(self.page_minima) != len(self.pages):
-                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_minima), len(self.pages)))
-            raise NotImplementedError("check minima")
-        if len(self.page_maxima) != 0:
-            if len(self.page_maxima) != len(self.pages):
-                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_maxima), len(self.pages)))
-            raise NotImplementedError("check maxima")
+        if len(self.page_min) != 0:
+            if len(self.page_min) != len(self.pages):
+                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_min), len(self.pages)))
+            raise NotImplementedError("check min")
+        if len(self.page_max) != 0:
+            if len(self.page_max) != len(self.pages):
+                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_max), len(self.pages)))
+            raise NotImplementedError("check max")
         if recursive:
             _valid(self.pages, seen, recursive)
-            _valid(self.page_minima, seen, recursive)
-            _valid(self.page_maxima, seen, recursive)
+            _valid(self.page_min, seen, recursive)
+            _valid(self.page_max, seen, recursive)
         
     def numentries(self, pageid=None):
         if pageid is None:
