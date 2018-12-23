@@ -93,23 +93,10 @@ class Test(unittest.TestCase):
     def test_serialization_IntegerBinning(self):
         h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(20, 10))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
-    #     assert not h.isvalid
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.nonexistent, loc_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(11), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0] * 11
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.below1, loc_overflow=IntegerBinning.nonexistent))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0] * 12
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.nonexistent, loc_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(12), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0] * 12
-    #     h = BinnedEvaluatedFunction("id", [Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.below1, loc_overflow=IntegerBinning.above1))], InterpretedInlineBuffer(numpy.zeros(13), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0] * 13
+        h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(12))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1, loc_overflow=IntegerBinning.above2))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RealInterval(self):
         pass
