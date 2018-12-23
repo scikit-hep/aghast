@@ -173,7 +173,37 @@ def _getbykey(self, field, where):
             raise AssertionError(type(values))
     return getattr(self, lookup)[where]
 
-class MockFlatbuffers(object): pass
+class _MockFlatbuffers(object):
+    @staticmethod
+    def _writetype(builder, writer, data, pairs):
+        for interface, tag in pairs:
+            if isinstance(data, interface):
+                writer(builder, tag)
+                return
+        else:
+            raise AssertionError(type(data))
+
+    @staticmethod
+    def _writeibuffertype(builder, writer, data):
+        _MockFlatbuffers._writetype(builder, writer, data, (
+            (InterpretedInlineBuffer, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer),
+            (InterpretedExternalBuffer, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer)
+            ))
+
+    class _ByTag(object):
+        __slots__ = ["getdata", "gettype", "lookup"]
+
+        def __init__(self, getdata, gettype, lookup):
+            self.getdata = getdata
+            self.gettype = gettype
+            self.lookup = lookup
+
+        def __call__(self):
+            data = self.getdata()
+            interface, deserializer = self.lookup[self.gettype()]
+            flatbuffers = deserializer()
+            flatbuffers.Init(data.Bytes, data.Pos)
+            return interface._fromflatbuffers(flatbuffers)
 
 ################################################# Portally
 
@@ -653,7 +683,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     @classmethod
     def _fromflatbuffers(cls, flatbuffers):
         out = cls.__new__(cls)
-        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Buffer = flatbuffers.BufferAsNumpy
         out._flatbuffers.Filters = flatbuffers.Filters
         out._flatbuffers.FiltersLength = flatbuffers.FiltersLength
@@ -1609,31 +1639,19 @@ class UnweightedCounts(Counts):
             _valid(self.counts, seen, recursive)
 
     @classmethod
-    def _fromflatbuffers(cls, fbcounts):
-        def CountsByTag():
-            data = fbcounts.Counts()
-            interface, deserializer = _InterpretedBuffer_lookup[fbcounts.CountsType()]
-            flatbuffers = deserializer()
-            flatbuffers.Init(data.Bytes, data.Pos)
-            return interface._fromflatbuffers(flatbuffers)
+    def _fromflatbuffers(cls, flatbuffers):
         out = cls.__new__(cls)
-        out._flatbuffers = MockFlatbuffers()
-        out._flatbuffers.CountsByTag = CountsByTag
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.CountsByTag = _MockFlatbuffers._ByTag(flatbuffers.Counts, flatbuffers.CountsType, _InterpretedBuffer_lookup)
         return out
 
     def _toflatbuffers(self, builder):
         counts = self.counts._toflatbuffers(builder)
-
         portally.portally_generated.UnweightedCounts.UnweightedCountsStart(builder)
-        if isinstance(self.counts, InterpretedInlineBuffer):
-            portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
-        elif isinstance(self.counts, InterpretedExternalBuffer):
-            portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
-        else:
-            raise AssertionError(type(self.counts))
+        _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType, self.counts)
         portally.portally_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
         return portally.portally_generated.UnweightedCounts.UnweightedCountsEnd(builder)
-
+    
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
@@ -1835,19 +1853,11 @@ class BinnedEvaluatedFunction(FunctionObject):
     @classmethod
     def _fromflatbuffers(cls, fbobject, fbfunction, fbbinned):
         fbevaluated = fbbinned.Data()
-
-        def ValuesByTag():
-            data = fbevaluated.Values()
-            interface, deserializer = _InterpretedBuffer_lookup[fbevaluated.ValuesType()]
-            flatbuffers = deserializer()
-            flatbuffers.Init(data.Bytes, data.Pos)
-            return interface._fromflatbuffers(flatbuffers)
-
         out = cls.__new__(cls)
-        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Axis = fbbinned.Axis
         out._flatbuffers.AxisLength = fbbinned.AxisLength
-        out._flatbuffers.ValuesByTag = ValuesByTag
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fbevaluated.Values, fbevaluated.ValuesType, _InterpretedBuffer_lookup)
         out._flatbuffers.Derivatives = fbevaluated.Derivatives
         out._flatbuffers.Errors = fbevaluated.Errors
         out._flatbuffers.ErrorsLength = fbevaluated.ErrorsLength
@@ -1874,20 +1884,10 @@ class BinnedEvaluatedFunction(FunctionObject):
             errors = builder.EndVector(len(errors))
 
         portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        if isinstance(self.values, InterpretedInlineBuffer):
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
-        elif isinstance(self.values, InterpretedExternalBuffer):
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
-        else:
-            raise AssertionError(type(self.values))
+        _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType, self.values)
         portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            if isinstance(self.derivatives, InterpretedInlineBuffer):
-                portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer)
-            elif isinstance(self.derivatives, InterpretedExternalBuffer):
-                portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, portally.portally_generated.InterpretedBuffer.InterpretedExternalBuffer.InterpretedExternalBuffer)
-            else:
-                raise AssertionError(type(self.derivatives))
+            _MockFlatbuffers._writeibuffertype(builder, portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType, self.derivatives)
             portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
             portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
@@ -1998,18 +1998,11 @@ class Histogram(Object):
 
     @classmethod
     def _fromflatbuffers(cls, fbobject, fbhistogram):
-        def CountsByTag():
-            data = fbhistogram.Counts()
-            interface, deserializer = _Counts_lookup[fbhistogram.CountsType()]
-            flatbuffers = deserializer()
-            flatbuffers.Init(data.Bytes, data.Pos)
-            return interface._fromflatbuffers(flatbuffers)
-
         out = cls.__new__(cls)
-        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Axis = fbhistogram.Axis
         out._flatbuffers.AxisLength = fbhistogram.AxisLength
-        out._flatbuffers.CountsByTag = CountsByTag
+        out._flatbuffers.CountsByTag = _MockFlatbuffers._ByTag(fbhistogram.Counts, fbhistogram.CountsType, _Counts_lookup)
         out._flatbuffers.Profile = fbhistogram.Profile
         out._flatbuffers.ProfileLength = fbhistogram.ProfileLength
         out._flatbuffers.AxisCorrelations = fbhistogram.AxisCorrelations
@@ -2075,12 +2068,10 @@ class Histogram(Object):
 
         portally.portally_generated.Histogram.HistogramStart(builder)
         portally.portally_generated.Histogram.HistogramAddAxis(builder, axis)
-        if isinstance(self.counts, UnweightedCounts):
-            portally.portally_generated.Histogram.HistogramAddCountsType(builder, portally.portally_generated.Counts.Counts.UnweightedCounts)
-        elif isinstance(self.counts, WeightedCounts):
-            portally.portally_generated.Histogram.HistogramAddCountsType(builder, portally.portally_generated.Counts.Counts.UnweightedCounts)
-        else:
-            raise AssertionError(type(self.counts))
+        _MockFlatbuffers._writetype(builder, portally.portally_generated.Histogram.HistogramAddCountsType, self.counts, (
+            (UnweightedCounts, portally.portally_generated.Counts.Counts.UnweightedCounts),
+            (WeightedCounts, portally.portally_generated.Counts.Counts.WeightedCounts),
+            ))
         portally.portally_generated.Histogram.HistogramAddCounts(builder, counts)
         if profile is not None:
             portally.portally_generated.Histogram.HistogramAddProfile(builder, profile)
@@ -2502,7 +2493,7 @@ class Collection(Object):
     @classmethod
     def _fromflatbuffers(cls, fbobject, fbcollection):
         out = cls.__new__(cls)
-        out._flatbuffers = MockFlatbuffers()
+        out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Objects = fbcollection.Objects
         out._flatbuffers.ObjectsLength = fbcollection.ObjectsLength
         out._flatbuffers.ObjectsLookup = fbcollection.Lookup
