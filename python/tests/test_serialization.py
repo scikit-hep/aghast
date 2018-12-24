@@ -231,9 +231,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
         
     def test_serialization_Modes(self):
-        pass
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(modes=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-    #     h.checkvalid()
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(mode=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_Statistics(self):
         pass

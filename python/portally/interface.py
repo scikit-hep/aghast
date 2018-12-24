@@ -985,6 +985,25 @@ class Modes(Portally):
             _valid(self.values, seen, recursive)
             _valid(self.filter, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.Filter = fb.Filter
+        return out
+
+    def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
+
+        portally.portally_generated.Modes.ModesStart(builder)
+        portally.portally_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        portally.portally_generated.Modes.ModesAddValues(builder, values)
+        if filter is not None:
+            portally.portally_generated.Modes.ModesAddFilter(builder, filter)
+        return portally.portally_generated.Modes.ModesEnd(builder)
+
 ################################################# Statistics
 
 class Statistics(Portally):
