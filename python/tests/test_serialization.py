@@ -199,13 +199,12 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_WeightedCounts(self):
-        pass
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-    #     h.checkvalid()
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2)))
-    #     h.checkvalid()
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))
-    #     h.checkvalid()
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2)))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_StatisticFilter(self):
         pass

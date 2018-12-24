@@ -1909,6 +1909,30 @@ class WeightedCounts(Counts):
             _valid(self.sumw2, seen, recursive)
             _valid(self.unweighted, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.SumwByTag = _MockFlatbuffers._ByTag(fb.Sumw, fb.SumwType, _InterpretedBuffer_lookup)
+        out._flatbuffers.Sumw2ByTag = _MockFlatbuffers._ByTag(fb.Sumw2, fb.Sumw2Type, _InterpretedBuffer_lookup)
+        out._flatbuffers.Unweighted = fb.Unweighted
+        return out
+
+    def _toflatbuffers(self, builder):
+        sumw = self.sumw._toflatbuffers(builder)
+        sumw2 = None if self.sumw2 is None else self.sumw2._toflatbuffers(builder)
+        unweighted = None if self.unweighted is None else self.unweighted._toflatbuffers(builder)
+
+        portally.portally_generated.WeightedCounts.WeightedCountsStart(builder)
+        portally.portally_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
+        portally.portally_generated.WeightedCounts.WeightedCountsAddSumw(builder, sumw)
+        if sumw2 is not None:
+            portally.portally_generated.WeightedCounts.WeightedCountsAddSumw2Type(builder, _InterpretedBuffer_invlookup[type(self.sumw2)])
+            portally.portally_generated.WeightedCounts.WeightedCountsAddSumw2(builder, sumw2)
+        if unweighted is not None:
+            portally.portally_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
+        return portally.portally_generated.WeightedCounts.WeightedCountsEnd(builder)
+
 ################################################# Parameter
 
 class Parameter(Portally):
