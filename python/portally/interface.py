@@ -1609,6 +1609,18 @@ class PredicateBinning(Binning):
     def _binshape(self):
         return (len(self.predicates),)
 
+    def _toflatbuffers(self, builder):
+        predicates = [builder.CreateString(x.encode("utf-8")) for x in self.predicates]
+
+        portally.portally_generated.PredicateBinning.PredicateBinningStartPredicatesVector(builder, len(predicates))
+        for x in predicates[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        predicates = builder.EndVector(len(predicates))
+
+        portally.portally_generated.PredicateBinning.PredicateBinningStart(builder)
+        portally.portally_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
+        return portally.portally_generated.PredicateBinning.PredicateBinningEnd(builder)
+
 ################################################# Assignment
 
 class Assignment(Portally):

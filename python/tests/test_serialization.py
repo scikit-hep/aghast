@@ -175,9 +175,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_PredicateBinning(self):
-        pass
-    #     h = Histogram("id", [Axis(PredicateBinning(["p", "q"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
-    #     h.checkvalid()
+        h = Histogram([Axis(PredicateBinning(["p", "q"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Assignments(self):
         pass
