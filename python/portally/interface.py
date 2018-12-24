@@ -801,7 +801,7 @@ class StatisticFilter(Portally):
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
-    def __init__(self, min=None, max=None, excludes_minf=None, excludes_pinf=None, excludes_nan=None):
+    def __init__(self, min=float("-inf"), max=float("inf"), excludes_minf=False, excludes_pinf=False, excludes_nan=False):
         self.min = min
         self.max = max
         self.excludes_minf = excludes_minf
@@ -811,6 +811,20 @@ class StatisticFilter(Portally):
     def _valid(self, seen, recursive):
         if self.min is not None and self.max is not None and self.min >= self.max:
             raise ValueError("StatisticFilter.min ({0}) must be strictly less than StatisticFilter.max ({1})".format(self.min, self.max))
+
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.StatisticFilter.StatisticFilterStart(builder)
+        if self.min != float("-inf"):
+            portally.portally_generated.StatisticFilter.StatisticFilterAddMin(builder, self.min)
+        if self.max != float("inf"):
+            portally.portally_generated.StatisticFilter.StatisticFilterAddMax(builder, self.max)
+        if self.excludes_minf is not False:
+            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesMinf(builder, self.excludes_minf)
+        if self.excludes_pinf is not False:
+            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesPinf(builder, self.excludes_pinf)
+        if self.excludes_nan is not False:
+            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesNan(builder, self.excludes_nan)
+        return portally.portally_generated.StatisticFilter.StatisticFilterEnd(builder)
 
 ################################################# Moments
 
@@ -837,6 +851,30 @@ class Moments(Portally):
         if recursive:
             _valid(self.sumwxn, seen, recursive)
             _valid(self.filter, seen, recursive)
+
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.SumwxnByTag = _MockFlatbuffers._ByTag(fb.Sumwxn, fb.SumwxnType, _InterpretedBuffer_lookup)
+        out._flatbuffers.N = fb.N
+        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Filter = fb.Filter
+        return out
+
+    def _toflatbuffers(self, builder):
+        sumwxn = self.sumwxn._toflatbuffers(builder)
+        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
+
+        portally.portally_generated.Moments.MomentsStart(builder)
+        portally.portally_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
+        portally.portally_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
+        portally.portally_generated.Moments.MomentsAddN(builder, self.n)
+        if self.weighted is not True:
+            portally.portally_generated.Moments.MomentsAddWeighted(builder, self.weighted)
+        if filter is not None:
+            portally.portally_generated.Moments.MomentsAddFilter(builder, filter)
+        return portally.portally_generated.Moments.MomentsEnd(builder)
 
 ################################################# Extremes
 
@@ -939,6 +977,38 @@ class Statistics(Portally):
             _valid(self.mode, seen, recursive)
             _valid(self.min, seen, recursive)
             _valid(self.max, seen, recursive)
+
+    def _toflatbuffers(self, builder):
+        moments = None if len(self.moments) == 0 else [x._toflatbuffers(builder) for x in self.moments]
+        quantiles = None if len(self.quantiles) == 0 else [x._toflatbuffers(builder) for x in self.quantiles]
+        mode = None if self.mode is None else self.mode._toflatbuffers(builder)
+        min = None if self.min is None else self.min._toflatbuffers(builder)
+        max = None if self.max is None else self.max._toflatbuffers(builder)
+
+        if moments is not None:
+            portally.portally_generated.Statistics.StatisticsStartMomentsVector(builder, len(moments))
+            for x in moments[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            moments = builder.EndVector(len(moments))
+
+        if quantiles is not None:
+            portally.portally_generated.Statistics.StatisticsStartQuantilesVector(builder, len(quantiles))
+            for x in quantiles[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            quantiles = builder.EndVector(len(quantiles))
+
+        portally.portally_generated.Statistics.StatisticsStart(builder)
+        if moments is not None:
+            portally.portally_generated.Statistics.StatisticsAddMoments(builder, moments)
+        if quantiles is not None:
+            portally.portally_generated.Statistics.StatisticsAddQuantiles(builder, quantiles)
+        if mode is not None:
+            portally.portally_generated.Statistics.StatisticsAddMode(builder, mode)
+        if min is not None:
+            portally.portally_generated.Statistics.StatisticsAddMin(builder, min)
+        if max is not None:
+            portally.portally_generated.Statistics.StatisticsAddMax(builder, max)
+        return portally.portally_generated.Statistics.StatisticsEnd(builder)
 
 ################################################# Correlations
 

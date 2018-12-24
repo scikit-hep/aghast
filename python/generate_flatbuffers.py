@@ -37,3 +37,8 @@ if __name__ == "__main__":
 
     os.chdir("portally")
     os.system("flatc --python ../../flatbuffers/portally.fbs")
+
+    with open("portally_generated/StatisticFilter.py") as f:
+        tmp = f.read().replace("inf.0", "float('inf')")
+    with open("portally_generated/StatisticFilter.py", "w") as f:
+        f.write(tmp)

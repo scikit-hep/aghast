@@ -121,11 +121,11 @@ union InterpretedBuffer {
 ///////////////////////////////////////////////// descriptive statistics
 
 table StatisticFilter {
-  min: double;
-  max: double;
-  excludes_minf: bool;
-  excludes_pinf: bool;
-  excludes_nan: bool;
+  min: double = "-Inf";
+  max: double = "+Inf";
+  excludes_minf: bool = false;
+  excludes_pinf: bool = false;
+  excludes_nan: bool = false;
 }
 
 table Moments {
