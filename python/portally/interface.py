@@ -921,7 +921,7 @@ class Quantiles(Portally):
     _params = {
         "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
         "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
-        "weighted": portally.checktype.CheckBool("Quantiles", "n", required=False),
+        "weighted": portally.checktype.CheckBool("Quantiles", "weighted", required=False),
         "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
@@ -940,6 +940,30 @@ class Quantiles(Portally):
         if recursive:
             _valid(self.values, seen, recursive)
             _valid(self.filter, seen, recursive)
+
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.P = fb.P
+        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Filter = fb.Filter
+        return out
+
+    def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
+
+        portally.portally_generated.Quantiles.QuantilesStart(builder)
+        portally.portally_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        portally.portally_generated.Quantiles.QuantilesAddValues(builder, values)
+        portally.portally_generated.Quantiles.QuantilesAddP(builder, self.p)
+        if self.weighted is not True:
+            portally.portally_generated.Quantiles.QuantilesAddWeighted(builder, self.weighted)
+        if filter is not None:
+            portally.portally_generated.Quantiles.QuantilesAddFilter(builder, filter)
+        return portally.portally_generated.Quantiles.QuantilesEnd(builder)
 
 ################################################# Modes
 
