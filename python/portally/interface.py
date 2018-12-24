@@ -1954,12 +1954,12 @@ class Axis(Portally):
         return out
 
     def _toflatbuffers(self, builder):
-        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
-        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
-        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
-        statistics = None if self.statistics is None else self.statistics._toflatbuffers(builder)
-        expression = None if self.expression is None else builder.CreateString(self.expression.encode("utf-8"))
         binning = None if self.binning is None else self.binning._toflatbuffers(builder)
+        expression = None if self.expression is None else builder.CreateString(self.expression.encode("utf-8"))
+        statistics = None if self.statistics is None else self.statistics._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
 
         portally.portally_generated.Axis.AxisStart(builder)
         if binning is not None:
@@ -2006,6 +2006,24 @@ class Profile(Portally):
             _valid(self.statistics, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
+
+    def _toflatbuffers(self, builder):
+        expression = builder.CreateString(self.expression.encode("utf-8"))
+        statistics = self.statistics._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+
+        portally.portally_generated.Profile.ProfileStart(builder)
+        portally.portally_generated.Profile.ProfileAddExpression(builder, expression)
+        portally.portally_generated.Profile.ProfileAddStatistics(builder, statistics)
+        if title is not None:
+            portally.portally_generated.Profile.ProfileAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Profile.ProfileAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Profile.ProfileAddDecoration(builder, decoration)
+        return portally.portally_generated.Profile.ProfileEnd(builder)
 
 ################################################# Counts
 
