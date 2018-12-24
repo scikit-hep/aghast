@@ -1386,6 +1386,20 @@ class EdgesBinning(Binning):
             numoverflowbins = self.overflow._numbins()
         return (len(self.edges) - 1 + numoverflowbins,)
 
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
+        for x in self.edges[::-1]:
+            builder.PrependFloat64(x)
+        edges = builder.EndVector(len(self.edges))
+
+        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
+
+        portally.portally_generated.EdgesBinning.EdgesBinningStart(builder)
+        portally.portally_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
+        if overflow is not None:
+            portally.portally_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        return portally.portally_generated.EdgesBinning.EdgesBinningEnd(builder)
+
 ################################################# IrregularBinning
 
 class OverlappingFillStrategyEnum(Enum):
