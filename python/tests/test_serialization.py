@@ -167,17 +167,12 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_FractionBinning(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0, 0.0]
-    #     assert h.axis[0].binning.error_method == FractionBinning.normal
-    #     h = BinnedEvaluatedFunction("id", [Axis(FractionBinning()), Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
-    #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([[[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+        h = BinnedEvaluatedFunction([Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(FractionBinning()), Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([[[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_PredicateBinning(self):
         pass

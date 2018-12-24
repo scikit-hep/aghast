@@ -1584,6 +1584,16 @@ class FractionBinning(Binning):
     def _binshape(self):
         return (2,)
 
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.FractionBinning.FractionBinningStart(builder)
+        if self.layout != self.passall:
+            portally.portally_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
+        if self.layout_reversed is not False:
+            portally.portally_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
+        if self.error_method != self.normal:
+            portally.portally_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
+        return portally.portally_generated.FractionBinning.FractionBinningEnd(builder)
+
 ################################################# PredicateBinning
 
 class PredicateBinning(Binning):
