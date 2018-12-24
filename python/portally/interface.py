@@ -400,7 +400,8 @@ class Metadata(Portally):
         data = builder.CreateString(self.data.encode("utf-8"))
         portally.portally_generated.Metadata.MetadataStart(builder)
         portally.portally_generated.Metadata.MetadataAddData(builder, data)
-        portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
+        if self.language != self.unspecified:
+            portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
         return portally.portally_generated.Metadata.MetadataEnd(builder)
 
 ################################################# Decoration
@@ -431,7 +432,8 @@ class Decoration(Portally):
         data = builder.CreateString(self.data.encode("utf-8"))
         portally.portally_generated.Decoration.DecorationStart(builder)
         portally.portally_generated.Decoration.DecorationAddData(builder, data)
-        portally.portally_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
+        if self.language != self.unspecified:
+            portally.portally_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
         return portally.portally_generated.Decoration.DecorationEnd(builder)
 
 ################################################# Buffers
@@ -706,9 +708,12 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
         if self.postfilter_slice is not None:
             portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
+        if self.dtype != self.none:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
+        if self.endianness != self.little_endian:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
+        if self.dimension_order != self.c_order:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
         return portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
 ################################################# ExternalBuffer
@@ -1040,8 +1045,10 @@ class IntegerBinning(Binning, BinLocation):
         portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
         portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
         portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
+        if self.loc_underflow != self.nonexistent:
+            portally.portally_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
+        if self.loc_overflow != self.nonexistent:
+            portally.portally_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
         return portally.portally_generated.IntegerBinning.IntegerBinningEnd(builder)
 
 ################################################# RealInterval
@@ -1070,6 +1077,16 @@ class RealInterval(Portally):
             raise ValueError("RealInterval.low ({0}) must be less than or equal to RealInterval.high ({1})".format(self.low, self.high))
         if self.low == self.high and not self.low_inclusive and not self.high_inclusive:
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
+
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.RealInterval.RealIntervalStart(builder)
+        portally.portally_generated.RealInterval.RealIntervalAddLow(builder, self.low)
+        portally.portally_generated.RealInterval.RealIntervalAddHigh(builder, self.high)
+        if self.low_inclusive is not True:
+            portally.portally_generated.RealInterval.RealIntervalAddLowInclusive(builder, self.low_inclusive)
+        if self.high_inclusive is not False:
+            portally.portally_generated.RealInterval.RealIntervalAddHighInclusive(builder, self.high_inclusive)
+        return portally.portally_generated.RealInterval.RealIntervalEnd(builder)
 
 ################################################# RealOverflow
 
@@ -1154,6 +1171,18 @@ class RegularBinning(Binning):
         else:
             numoverflowbins = self.overflow._numbins()
         return (self.num + numoverflowbins,)
+
+    def _toflatbuffers(self, builder):
+        interval = self.interval._toflatbuffers(builder)
+        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
+        portally.portally_generated.RegularBinning.RegularBinningStart(builder)
+        portally.portally_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
+        portally.portally_generated.RegularBinning.RegularBinningAddInterval(builder, interval)
+        if overflow is not None:
+            portally.portally_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
+        if self.circular is not False:
+            portally.portally_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
+        return portally.portally_generated.RegularBinning.RegularBinningEnd(builder)
 
 ################################################# TicTacToeOverflowBinning
 
@@ -1889,7 +1918,7 @@ class BinnedEvaluatedFunction(FunctionObject):
         errors = None if len(self.errors) == 0 else [x._toflatbuffers(builder) for x in self.errors]
         derivatives = None if self.derivatives is None else self.derivatives._toflatbuffers(builder)
         values = self.values._toflatbuffers(builder)
-        axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
+        axis = [x._toflatbuffers(builder) for x in self.axis]
         
         if errors is not None:
             portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartErrorsVector(builder, len(errors))
@@ -1907,11 +1936,10 @@ class BinnedEvaluatedFunction(FunctionObject):
             portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
         evaluated = portally.portally_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
 
-        if axis is not None:
-            portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
-            for x in axis[::-1]:
-                builder.PrependUOffsetTRelative(x)
-            axis = builder.EndVector(len(axis))
+        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
+        for x in axis[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        axis = builder.EndVector(len(axis))
 
         portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
         portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)

@@ -373,6 +373,9 @@ class CheckVector(Check):
         elif not isinstance(obj, Iterable):
             raise TypeError("{0}.{1} must be iterable, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(obj), type(obj)))
 
+        if ((sys.version_info[0] >= 3 and isinstance(obj, (str, bytes))) or (sys.version_info[0] < 3 and isinstance(obj, basestring))):
+            raise TypeError("{0}.{1} must be iterable but not a string, cannot pass {2}".format(self.classname, self.paramname, repr(obj)))
+
         if not self.minlen <= len(obj) <= self.maxlen:
             raise TypeError("{0}.{1} length must be between {2} and {3} (inclusive), cannot pass {4} (type ({5}))".format(self.classname, self.paramname, self.minlen, self.maxlen, repr(obj), type(obj)))
 

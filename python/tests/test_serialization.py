@@ -41,9 +41,13 @@ class Test(unittest.TestCase):
     def test_serialization_Metadata(self):
         h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}"""))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Decoration(self):
         h = Collection({}, decoration=Decoration("""points { color: red }""", language=Decoration.css))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Collection({}, decoration=Decoration("""points { color: red }"""))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RawInlineBuffer(self):
@@ -99,8 +103,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RealInterval(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
     #     h.checkvalid()
     #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(5, -5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
     #     assert not h.isvalid
