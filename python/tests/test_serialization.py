@@ -105,9 +105,6 @@ class Test(unittest.TestCase):
     def test_serialization_RealInterval(self):
         h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-    #     h.checkvalid()
-    #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(5, -5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
-    #     assert not h.isvalid
 
     def test_serialization_RealOverflow(self):
         pass
@@ -131,9 +128,8 @@ class Test(unittest.TestCase):
     #     assert h.values.array.tolist() == [0.0] * 13
 
     def test_serialization_RegularBinning(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
+        h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_TicTacToeOverflowBinning(self):
         pass
