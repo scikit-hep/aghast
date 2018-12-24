@@ -246,7 +246,7 @@ class Portally(object):
         return out
 
     def _toflatbuffers(self, builder):
-        raise NotImplementedError("missing _toflatbuffers implementation")
+        raise NotImplementedError("missing _toflatbuffers implementation in {0}".format(type(self)))
 
     def __eq__(self, other):
         if type(self) is not type(other):
@@ -1134,6 +1134,22 @@ class RealOverflow(Portally, BinLocation):
 
     def _numbins(self):
         return int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent) + int(self.loc_nanflow != BinLocation.nonexistent)
+
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.RealOverflow.RealOverflowStart(builder)
+        if self.loc_underflow is not self.nonexistent:
+            portally.portally_generated.RealOverflow.RealOverflowAddLocUnderflow(builder, self.loc_underflow.value)
+        if self.loc_overflow is not self.nonexistent:
+            portally.portally_generated.RealOverflow.RealOverflowAddLocOverflow(builder, self.loc_overflow.value)
+        if self.loc_nanflow is not self.nonexistent:
+            portally.portally_generated.RealOverflow.RealOverflowAddLocNanflow(builder, self.loc_nanflow.value)
+        if self.minf_mapping is not self.in_underflow:
+            portally.portally_generated.RealOverflow.RealOverflowAddMinfMapping(builder, self.minf_mapping.value)
+        if self.pinf_mapping is not self.in_overflow:
+            portally.portally_generated.RealOverflow.RealOverflowAddPinfMapping(builder, self.pinf_mapping.value)
+        if self.nan_mapping is not self.in_nanflow:
+            portally.portally_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
+        return portally.portally_generated.RealOverflow.RealOverflowEnd(builder)
 
 ################################################# RegularBinning
 
