@@ -2128,6 +2128,24 @@ class Parameter(Portally):
         if recursive:
             _valid(self.values, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Identifier = fb.Identifier
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
+        return out
+
+    def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        identifier = builder.CreateString(self.identifier.encode("utf-8"))
+        
+        portally.portally_generated.Parameter.ParameterStart(builder)
+        portally.portally_generated.Parameter.ParameterAddIdentifier(builder, identifier)
+        portally.portally_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        portally.portally_generated.Parameter.ParameterAddValues(builder, values)
+        return portally.portally_generated.Parameter.ParameterEnd(builder)
+
 ################################################# Function
 
 class Function(Portally):
@@ -2195,6 +2213,57 @@ class ParameterizedFunction(Function, FunctionObject):
             return out
         else:
             return out[tail]
+
+    @classmethod
+    def _fromflatbuffers(cls, fbobject, fbfunction, fbparameterized):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Expression = fbparameterized.Expression
+        out._flatbuffers.Parameters = fbparameterized.Parameters
+        out._flatbuffers.ParametersLength = fbparameterized.ParametersLength
+        out._flatbuffers.Title = fbobject.Title
+        out._flatbuffers.Metadata = fbobject.Metadata
+        out._flatbuffers.Decoration = fbobject.Decoration
+        out._flatbuffers.Script = fbobject.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        parameters = None if len(self.parameters) == 0 else [x._toflatbuffers(builder) for x in self.parameters]
+        expression = builder.CreateString(self.expression.encode("utf-8"))
+
+        if parameters is not None:
+            portally.portally_generated.ParameterizedFunction.ParameterizedFunctionStartParametersVector(builder, len(parameters))
+            for x in parameters[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            parameters = builder.EndVector(len(parameters))
+
+        portally.portally_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
+        portally.portally_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
+        if parameters is not None:
+            portally.portally_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
+        parameterized = portally.portally_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
+
+        portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
+        portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
+        portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
+        function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
+
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
+        portally.portally_generated.Object.ObjectAddData(builder, function_object)
+        if title is not None:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Object.ObjectAddScript(builder, script)
+        return portally.portally_generated.Object.ObjectEnd(builder)
 
 ################################################# EvaluatedFunction
 

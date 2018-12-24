@@ -265,10 +265,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Parameter(self):
-        pass
-    #     h = ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])
-    #     h.checkvalid()
-    #     assert h["y"].values.array.tolist() == [6]
+        h = ParameterizedFunction("x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_ParameterizedFunction(self):
         pass
