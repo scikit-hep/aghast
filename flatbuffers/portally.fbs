@@ -160,7 +160,7 @@ table Statistics {
   max: Extremes;
 }
 
-table Correlations {
+table Covariance {
   xindex: int;
   yindex: int;
   sumwxy: InterpretedBuffer (required);   // one of the N*(N-1) elements
@@ -423,8 +423,8 @@ table Histogram {
   axis: [Axis] (required);
   counts: Counts (required);
   profile: [Profile];
-  axis_correlations: [Correlations];
-  profile_correlations: [Correlations];
+  axis_covariances: [Covariance];
+  profile_covariances: [Covariance];
   functions_lookup: [string];
   functions: [Function];
 }
@@ -467,7 +467,7 @@ table Ntuple {
   columns: [Column] (required);
   instances: [NtupleInstance] (required);
   column_statistics: [Statistics];
-  column_correlations: [Correlations];
+  column_covariances: [Covariance];
   lookup_functions: [string];
   functions: [FunctionObject];
 }

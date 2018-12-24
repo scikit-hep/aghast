@@ -61,7 +61,7 @@ import portally.portally_generated.Extremes
 import portally.portally_generated.Quantiles
 import portally.portally_generated.Modes
 import portally.portally_generated.Statistics
-import portally.portally_generated.Correlations
+import portally.portally_generated.Covariance
 import portally.portally_generated.BinLocation
 import portally.portally_generated.IntegerBinning
 import portally.portally_generated.RealInterval
@@ -1072,15 +1072,15 @@ class Statistics(Portally):
             portally.portally_generated.Statistics.StatisticsAddMax(builder, max)
         return portally.portally_generated.Statistics.StatisticsEnd(builder)
 
-################################################# Correlations
+################################################# Covariance
 
-class Correlations(Portally):
+class Covariance(Portally):
     _params = {
-        "xindex": portally.checktype.CheckInteger("Correlations", "xindex", required=True, min=0),
-        "yindex": portally.checktype.CheckInteger("Correlations", "yindex", required=True, min=0),
-        "sumwxy": portally.checktype.CheckClass("Correlations", "sumwxy", required=True, type=InterpretedBuffer),
-        "weighted": portally.checktype.CheckBool("Correlations", "n", required=False),
-        "filter": portally.checktype.CheckClass("Correlations", "filter", required=False, type=StatisticFilter),
+        "xindex": portally.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
+        "yindex": portally.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
+        "sumwxy": portally.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
+        "weighted": portally.checktype.CheckBool("Covariance", "weighted", required=False),
+        "filter": portally.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
         }
 
     xindex   = typedproperty(_params["xindex"])
@@ -1102,14 +1102,40 @@ class Correlations(Portally):
             _valid(self.filter, seen, recursive)
 
     @staticmethod
-    def _validindexes(correlations, numvars):
-        pairs = [(x.xindex, x.yindex, x.weighted) for x in correlations]
+    def _validindexes(covariances, numvars):
+        pairs = [(x.xindex, x.yindex, x.weighted) for x in covariances]
         if len(set(pairs)) != len(pairs):
-            raise ValueError("Correlations.xindex, yindex pairs must be unique")
-        if any(x.xindex >= numvars for x in correlations):
-            raise ValueError("Correlations.xindex must all be less than the number of axis or column variables {}".format(numvars))
-        if any(x.yindex >= numvars for x in correlations):
-            raise ValueError("Correlations.yindex must all be less than the number of axis or column variables {}".format(numvars))
+            raise ValueError("Covariance.xindex, yindex pairs must be unique")
+        if any(x.xindex >= numvars for x in covariances):
+            raise ValueError("Covariance.xindex must all be less than the number of axis or column variables {}".format(numvars))
+        if any(x.yindex >= numvars for x in covariances):
+            raise ValueError("Covariance.yindex must all be less than the number of axis or column variables {}".format(numvars))
+
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Xindex = fb.Xindex
+        out._flatbuffers.Yindex = fb.Yindex
+        out._flatbuffers.SumwxyByTag = _MockFlatbuffers._ByTag(fb.Sumwxy, fb.SumwxyType, _InterpretedBuffer_lookup)
+        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Filter = fb.Filter
+        return out
+
+    def _toflatbuffers(self, builder):
+        sumwxy = self.sumwxy._toflatbuffers(builder)
+        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
+
+        portally.portally_generated.Covariance.CovarianceStart(builder)
+        portally.portally_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
+        portally.portally_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
+        portally.portally_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
+        portally.portally_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
+        if self.weighted is not True:
+            portally.portally_generated.Covariance.CovarianceAddWeighted(builder, self.weighted)
+        if filter is not None:
+            portally.portally_generated.Covariance.CovarianceAddFilter(builder, filter)
+        return portally.portally_generated.Covariance.CovarianceEnd(builder)
 
 ################################################# Binning
 
@@ -2317,8 +2343,8 @@ class Histogram(Object):
         "axis":                 portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
         "counts":               portally.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
         "profile":              portally.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
-        "axis_correlations":    portally.checktype.CheckVector("Histogram", "axis_correlations", required=False, type=Correlations),
-        "profile_correlations": portally.checktype.CheckVector("Histogram", "profile_correlations", required=False, type=Correlations),
+        "axis_covariances":    portally.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
+        "profile_covariances": portally.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
         "functions":            portally.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
         "title":                portally.checktype.CheckString("Histogram", "title", required=False),
         "metadata":             portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
@@ -2329,20 +2355,20 @@ class Histogram(Object):
     axis                 = typedproperty(_params["axis"])
     counts               = typedproperty(_params["counts"])
     profile              = typedproperty(_params["profile"])
-    axis_correlations    = typedproperty(_params["axis_correlations"])
-    profile_correlations = typedproperty(_params["profile_correlations"])
+    axis_covariances    = typedproperty(_params["axis_covariances"])
+    profile_covariances = typedproperty(_params["profile_covariances"])
     functions            = typedproperty(_params["functions"])
     title                = typedproperty(_params["title"])
     metadata             = typedproperty(_params["metadata"])
     decoration           = typedproperty(_params["decoration"])
     script               = typedproperty(_params["script"])
 
-    def __init__(self, axis, counts, profile=None, axis_correlations=None, profile_correlations=None, functions=None, title=None, metadata=None, decoration=None, script=None):
+    def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
         self.counts = counts
         self.profile = profile
-        self.axis_correlations = axis_correlations
-        self.profile_correlations = profile_correlations
+        self.axis_covariances = axis_covariances
+        self.profile_covariances = profile_covariances
         self.functions = functions
         self.title = title
         self.metadata = metadata
@@ -2350,16 +2376,16 @@ class Histogram(Object):
         self.script = script
 
     def _valid(self, seen, recursive):
-        if len(self.axis_correlations) != 0:
-            Correlations._validindexes(self.axis_correlations, len(self.axis))
-        if len(self.profile_correlations) != 0:
-            Correlations._validindexes(self.profile_correlations, len(self.profile))
+        if len(self.axis_covariances) != 0:
+            Covariance._validindexes(self.axis_covariances, len(self.axis))
+        if len(self.profile_covariances) != 0:
+            Covariance._validindexes(self.profile_covariances, len(self.profile))
         if recursive:
             _valid(self.axis, seen, recursive)
             _valid(self.counts, seen, recursive)
             _valid(self.profile, seen, recursive)
-            _valid(self.axis_correlations, seen, recursive)
-            _valid(self.profile_correlations, seen, recursive)
+            _valid(self.axis_covariances, seen, recursive)
+            _valid(self.profile_covariances, seen, recursive)
             _valid(self.functions, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
@@ -2393,10 +2419,10 @@ class Histogram(Object):
         out._flatbuffers.CountsByTag = _MockFlatbuffers._ByTag(fbhistogram.Counts, fbhistogram.CountsType, _Counts_lookup)
         out._flatbuffers.Profile = fbhistogram.Profile
         out._flatbuffers.ProfileLength = fbhistogram.ProfileLength
-        out._flatbuffers.AxisCorrelations = fbhistogram.AxisCorrelations
-        out._flatbuffers.AxisCorrelationsLength = fbhistogram.AxisCorrelationsLength
-        out._flatbuffers.ProfileCorrelations = fbhistogram.ProfileCorrelations
-        out._flatbuffers.ProfileCorrelationsLength = fbhistogram.ProfileCorrelationsLength
+        out._flatbuffers.AxisCovariances = fbhistogram.AxisCovariances
+        out._flatbuffers.AxisCovariancesLength = fbhistogram.AxisCovariancesLength
+        out._flatbuffers.ProfileCovariances = fbhistogram.ProfileCovariances
+        out._flatbuffers.ProfileCovariancesLength = fbhistogram.ProfileCovariancesLength
         out._flatbuffers.Functions = fbhistogram.Functions
         out._flatbuffers.FunctionsLength = fbhistogram.FunctionsLength
         out._flatbuffers.FunctionsLookup = fbhistogram.FunctionsLookup
@@ -2412,8 +2438,8 @@ class Histogram(Object):
         script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
-        profile_correlations = None if len(self.profile_correlations) == 0 else [x._toflatbuffers(builder) for x in self.profile_correlations]
-        axis_correlations = None if len(self.axis_correlations) == 0 else [x._toflatbuffers(builder) for x in self.axis_correlations]
+        profile_covariances = None if len(self.profile_covariances) == 0 else [x._toflatbuffers(builder) for x in self.profile_covariances]
+        axis_covariances = None if len(self.axis_covariances) == 0 else [x._toflatbuffers(builder) for x in self.axis_covariances]
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         profile = None if len(self.profile) == 0 else [x._toflatbuffers(builder) for x in self.profile]
         axis = [x._toflatbuffers(builder) for x in self.axis]
@@ -2429,17 +2455,17 @@ class Histogram(Object):
                 builder.PrependUOffsetTRelative(x)
             profile = builder.EndVector(len(profile))
 
-        if axis_correlations is not None:
-            portally.portally_generated.Histogram.HistogramStartAxisCorrelationsVector(builder, len(axis_correlations))
-            for x in axis_correlations[::-1]:
+        if axis_covariances is not None:
+            portally.portally_generated.Histogram.HistogramStartAxisCovariancesVector(builder, len(axis_covariances))
+            for x in axis_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
-            axis_correlations = builder.EndVector(len(axis_correlations))
+            axis_covariances = builder.EndVector(len(axis_covariances))
 
-        if profile_correlations is not None:
-            portally.portally_generated.Histogram.HistogramStartProfileCorrelationsVector(builder, len(profile_correlations))
-            for x in profile_correlations[::-1]:
+        if profile_covariances is not None:
+            portally.portally_generated.Histogram.HistogramStartProfileCovariancesVector(builder, len(profile_covariances))
+            for x in profile_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
-            profile_correlations = builder.EndVector(len(profile_correlations))
+            profile_covariances = builder.EndVector(len(profile_covariances))
 
         if functions is not None:
             portally.portally_generated.Collection.CollectionStartFunctionsVector(builder, len(functions))
@@ -2460,10 +2486,10 @@ class Histogram(Object):
         portally.portally_generated.Histogram.HistogramAddCounts(builder, counts)
         if profile is not None:
             portally.portally_generated.Histogram.HistogramAddProfile(builder, profile)
-        if axis_correlations is not None:
-            portally.portally_generated.Histogram.HistogramAddAxisCorrelations(builder, axis_correlations)
-        if profile_correlations is not None:
-            portally.portally_generated.Histogram.HistogramAddProfileCorrelations(builder, profile_correlations)
+        if axis_covariances is not None:
+            portally.portally_generated.Histogram.HistogramAddAxisCovariances(builder, axis_covariances)
+        if profile_covariances is not None:
+            portally.portally_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
         if functions is not None:
             portally.portally_generated.Histogram.HistogramAddLookup(builder, lookup)
             portally.portally_generated.Histogram.HistogramAddFunctions(builder, functions)
@@ -2761,7 +2787,7 @@ class Ntuple(Object):
         "columns":             portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
         "instances":           portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
         "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
-        "column_correlations": portally.checktype.CheckVector("Ntuple", "column_correlations", required=False, type=Correlations),
+        "column_covariances": portally.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
         "functions":           portally.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
         "title":               portally.checktype.CheckString("Ntuple", "title", required=False),
         "metadata":            portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
@@ -2772,18 +2798,18 @@ class Ntuple(Object):
     columns             = typedproperty(_params["columns"])
     instances           = typedproperty(_params["instances"])
     column_statistics   = typedproperty(_params["column_statistics"])
-    column_correlations = typedproperty(_params["column_correlations"])
+    column_covariances = typedproperty(_params["column_covariances"])
     functions           = typedproperty(_params["functions"])
     title               = typedproperty(_params["title"])
     metadata            = typedproperty(_params["metadata"])
     decoration          = typedproperty(_params["decoration"])
     script              = typedproperty(_params["script"])
 
-    def __init__(self, columns, instances, column_statistics=None, column_correlations=None, functions=None, title=None, metadata=None, decoration=None, script=None):
+    def __init__(self, columns, instances, column_statistics=None, column_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.columns = columns
         self.instances = instances
         self.column_statistics = column_statistics
-        self.column_correlations = column_correlations
+        self.column_covariances = column_covariances
         self.functions = functions
         self.title = title
         self.metadata = metadata
@@ -2796,13 +2822,13 @@ class Ntuple(Object):
             raise ValueError("Ntuple.columns keys must be unique")
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this location in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
-        if len(self.column_correlations) != 0:
-            Correlations._validindexes(self.column_correlations, len(self.columns))
+        if len(self.column_covariances) != 0:
+            Covariance._validindexes(self.column_covariances, len(self.columns))
         if recursive:
             _valid(self.columns, seen, recursive)
             _valid(self.instances, seen, recursive)
             _valid(self.column_statistics, seen, recursive)
-            _valid(self.column_correlations, seen, recursive)
+            _valid(self.column_covariances, seen, recursive)
             _valid(self.functions, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
