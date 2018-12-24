@@ -129,13 +129,8 @@ class Test(unittest.TestCase):
     def test_serialization_TicTacToeOverflowBinning(self):
         h = BinnedEvaluatedFunction([Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3), RealOverflow(RealOverflow.above1, RealOverflow.above2, RealOverflow.above3)))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0, 0.0, 0.0, 0.0]] * 5), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-
-    #     
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0, 0.0, 0.0, 0.0, 0.0]] * 5
-    #     h = BinnedEvaluatedFunction("id", [Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10)))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0], [0.0, 0.0]]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0, 0.0], [0.0, 0.0]]
+        h = BinnedEvaluatedFunction([Axis(TicTacToeOverflowBinning(2, 2, RealInterval(-10, 10), RealInterval(-10, 10), RealOverflow(), RealOverflow()))], InterpretedInlineBuffer(numpy.array([[0.0, 0.0]] * 2), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_HexagonalBinning(self):
         pass
