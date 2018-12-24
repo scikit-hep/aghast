@@ -1524,6 +1524,21 @@ class SparseRegularBinning(Binning, BinLocation):
     def _binshape(self):
         return (len(self.bins) + (self.loc_nanflow != BinLocation.nonexistent),)
 
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
+        for x in self.bins[::-1]:
+            builder.PrependInt64(x)
+        bins = builder.EndVector(len(self.bins))
+
+        portally.portally_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
+        portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
+        portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
+        if self.origin != 0.0:
+            portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
+        if self.loc_nanflow != self.nonexistent:
+            portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddLocNanflow(builder, self.loc_nanflow.value)
+        return portally.portally_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
+
 ################################################# FractionBinning
 
 class FractionLayoutEnum(Enum):

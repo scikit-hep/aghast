@@ -67,6 +67,8 @@ def _checkitem(check):
         return CheckString(check.classname, check.paramname, required=check.required)
     elif check.type is float:
         return CheckNumber(check.classname, check.paramname, required=check.required)
+    elif check.type is int:
+        return CheckInteger(check.classname, check.paramname, required=check.required)
     elif isinstance(check.type, list):
         return CheckEnum(check.classname, check.paramname, required=check.required, choices=check.type)
     else:
