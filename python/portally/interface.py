@@ -1636,6 +1636,14 @@ class Assignment(Portally):
         self.identifier = identifier
         self.expression  = expression 
 
+    def _toflatbuffers(self, builder):
+        identifier = builder.CreateString(self.identifier.encode("utf-8"))
+        expression = builder.CreateString(self.expression.encode("utf-8"))
+        portally.portally_generated.Assignment.AssignmentStart(builder)
+        portally.portally_generated.Assignment.AssignmentAddIdentifier(builder, identifier)
+        portally.portally_generated.Assignment.AssignmentAddExpression(builder, expression)
+        return portally.portally_generated.Assignment.AssignmentEnd(builder)
+
 ################################################# Variation
 
 class Variation(Portally):
@@ -1673,6 +1681,37 @@ class Variation(Portally):
         else:
             return out[tail]
 
+    def _toflatbuffers(self, builder):
+        assignments = [x._toflatbuffers(builder) for x in self.assignments]
+        category_systematic = None if len(self.category_systematic) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic]
+
+        portally.portally_generated.Variation.VariationStartAssignmentsVector(builder, len(assignments))
+        for x in assignments[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        assignments = builder.EndVector(len(assignments))
+
+        if len(self.systematic) == 0:
+            systematic = None
+        else:
+            portally.portally_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
+            for x in self.systematic[::-1]:
+                builder.PrependFloat64(x)
+            systematic = builder.EndVector(len(self.systematic))
+
+        if category_systematic is not None:
+            portally.portally_generated.Variation.VariationStartCategorySystematicVector(builder, len(category_systematic))
+            for x in category_systematic[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            category_systematic = builder.EndVector(len(category_systematic))
+
+        portally.portally_generated.Variation.VariationStart(builder)
+        portally.portally_generated.Variation.VariationAddAssignments(builder, assignments)
+        if systematic is not None:
+            portally.portally_generated.Variation.VariationAddSystematic(builder, systematic)
+        if category_systematic is not None:
+            portally.portally_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
+        return portally.portally_generated.Variation.VariationEnd(builder)
+
 ################################################# VariationBinning
 
 class VariationBinning(Binning):
@@ -1691,6 +1730,18 @@ class VariationBinning(Binning):
 
     def _binshape(self):
         return (len(self.variations),)
+
+    def _toflatbuffers(self, builder):
+        variations = [x._toflatbuffers(builder) for x in self.variations]
+
+        portally.portally_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
+        for x in variations[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        variations = builder.EndVector(len(variations))
+
+        portally.portally_generated.VariationBinning.VariationBinningStart(builder)
+        portally.portally_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
+        return portally.portally_generated.VariationBinning.VariationBinningEnd(builder)
 
 ################################################# Axis
 

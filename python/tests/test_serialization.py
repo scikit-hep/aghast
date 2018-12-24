@@ -179,20 +179,16 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Assignments(self):
-        pass
-    #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))
-    #     h.checkvalid()
-    #     assert h.axis[0].binning.variations[0]["y"].expression == "2"
+        h = Histogram([Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Variation(self):
-        pass
-    #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
-    #     h.checkvalid()
+        h = Histogram([Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_VariationBinning(self):
-        pass
-    #     h = Histogram("id", [Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")]), Variation([Assignment("x", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0, 0.0]))))
-    #     h.checkvalid()
+        h = Histogram([Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")]), Variation([Assignment("x", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0, 0.0]))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Axis(self):
         h = BinnedEvaluatedFunction([Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
