@@ -1482,6 +1482,20 @@ class CategoryBinning(Binning, BinLocation):
     def _binshape(self):
         return (len(self.categories) + (self.loc_overflow != BinLocation.nonexistent),)
 
+    def _toflatbuffers(self, builder):
+        categories = [builder.CreateString(x.encode("utf-8")) for x in self.categories]
+
+        portally.portally_generated.CategoryBinning.CategoryBinningStartCategoriesVector(builder, len(categories))
+        for x in categories[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        categories = builder.EndVector(len(categories))
+
+        portally.portally_generated.CategoryBinning.CategoryBinningStart(builder)
+        portally.portally_generated.CategoryBinning.CategoryBinningAddCategories(builder, categories)
+        if self.loc_overflow != self.nonexistent:
+            portally.portally_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
+        return portally.portally_generated.CategoryBinning.CategoryBinningEnd(builder)
+
 ################################################# SparseRegularBinning
 
 class SparseRegularBinning(Binning, BinLocation):
