@@ -896,6 +896,25 @@ class Extremes(Portally):
             _valid(self.values, seen, recursive)
             _valid(self.filter, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.Filter = fb.Filter
+        return out
+
+    def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
+
+        portally.portally_generated.Extremes.ExtremesStart(builder)
+        portally.portally_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        portally.portally_generated.Extremes.ExtremesAddValues(builder, values)
+        if filter is not None:
+            portally.portally_generated.Extremes.ExtremesAddFilter(builder, filter)
+        return portally.portally_generated.Extremes.ExtremesEnd(builder)
+
 ################################################# Quantiles
 
 class Quantiles(Portally):
