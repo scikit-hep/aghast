@@ -48,7 +48,7 @@ import portally.portally_generated.Endianness
 import portally.portally_generated.DimensionOrder
 import portally.portally_generated.Filter
 import portally.portally_generated.Slice
-import portally.portally_generated.ExternalType
+import portally.portally_generated.ExternalSource
 import portally.portally_generated.RawInlineBuffer
 import portally.portally_generated.RawExternalBuffer
 import portally.portally_generated.InterpretedInlineBuffer
@@ -455,14 +455,14 @@ class InlineBuffer(object):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
-class ExternalTypeEnum(Enum):
+class ExternalSourceEnum(Enum):
     base = "ExternalBuffer"
 
 class ExternalBuffer(object):
-    memory   = ExternalTypeEnum("memory", portally.portally_generated.ExternalType.ExternalType.external_memory)
-    samefile = ExternalTypeEnum("samefile", portally.portally_generated.ExternalType.ExternalType.external_samefile)
-    file     = ExternalTypeEnum("file", portally.portally_generated.ExternalType.ExternalType.external_file)
-    url      = ExternalTypeEnum("url", portally.portally_generated.ExternalType.ExternalType.external_url)
+    memory   = ExternalSourceEnum("memory", portally.portally_generated.ExternalSource.ExternalSource.external_memory)
+    samefile = ExternalSourceEnum("samefile", portally.portally_generated.ExternalSource.ExternalSource.external_samefile)
+    file     = ExternalSourceEnum("file", portally.portally_generated.ExternalSource.ExternalSource.external_file)
+    url      = ExternalSourceEnum("url", portally.portally_generated.ExternalSource.ExternalSource.external_url)
     types = [memory, samefile, file, url]
 
     def __init__(self):
@@ -589,19 +589,19 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
-        "pointer":          portally.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         portally.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    portally.checktype.CheckEnum("RawExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
+        "pointer":         portally.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":        portally.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
+        "external_source": portally.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
         }
 
     pointer       = typedproperty(_params["pointer"])
     numbytes      = typedproperty(_params["numbytes"])
-    external_type = typedproperty(_params["external_type"])
+    external_source = typedproperty(_params["external_source"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory):
+    def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory):
         self.pointer = pointer
         self.numbytes = numbytes
-        self.external_type = external_type
+        self.external_source = external_source
 
     @property
     def array(self):
@@ -722,7 +722,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
         "pointer":          portally.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         portally.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
-        "external_type":    portally.checktype.CheckEnum("InterpretedExternalBuffer", "external_type", required=False, choices=ExternalBuffer.types),
+        "external_source":  portally.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
         "filters":          portally.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": portally.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
         "dtype":            portally.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
@@ -733,7 +733,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     pointer          = typedproperty(_params["pointer"])
     numbytes         = typedproperty(_params["numbytes"])
-    external_type    = typedproperty(_params["external_type"])
+    external_source  = typedproperty(_params["external_source"])
     filters          = typedproperty(_params["filters"])
     postfilter_slice = typedproperty(_params["postfilter_slice"])
     dtype            = typedproperty(_params["dtype"])
@@ -741,10 +741,10 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
 
-    def __init__(self, pointer, numbytes, external_type=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=None):
+    def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=None):
         self.pointer = pointer
         self.numbytes = numbytes
-        self.external_type = external_type
+        self.external_source = external_source
         self.filters = filters
         self.postfilter_slice = postfilter_slice
         self.dtype = dtype
