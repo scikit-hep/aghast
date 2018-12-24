@@ -269,11 +269,10 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_ParameterizedFunction(self):
-        pass
-    #     h = ParameterizedFunction("id", "x**2")
-    #     h.checkvalid()
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions=[ParameterizedFunction("id", "x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])])
-    #     h.checkvalid()
+        h = ParameterizedFunction("x**2")
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions={"f": ParameterizedFunction("x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.arange(100)))])})
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_EvaluatedFunction(self):
         pass

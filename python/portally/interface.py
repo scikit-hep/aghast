@@ -2152,6 +2152,14 @@ class Function(Portally):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        interface, deserializer = _FunctionData_lookup[fb.DataType()]
+        data = fb.Data()
+        fb2 = deserializer()
+        fb2.Init(data.Bytes, data.Pos)
+        return interface._fromflatbuffers(fb, fb2)
+
 ################################################# FunctionObject
 
 class FunctionObject(Object):
@@ -2215,16 +2223,16 @@ class ParameterizedFunction(Function, FunctionObject):
             return out[tail]
 
     @classmethod
-    def _fromflatbuffers(cls, fbobject, fbfunction, fbparameterized):
+    def _fromflatbuffers(cls, *args):
         out = cls.__new__(cls)
         out._flatbuffers = _MockFlatbuffers()
-        out._flatbuffers.Expression = fbparameterized.Expression
-        out._flatbuffers.Parameters = fbparameterized.Parameters
-        out._flatbuffers.ParametersLength = fbparameterized.ParametersLength
-        out._flatbuffers.Title = fbobject.Title
-        out._flatbuffers.Metadata = fbobject.Metadata
-        out._flatbuffers.Decoration = fbobject.Decoration
-        out._flatbuffers.Script = fbobject.Script
+        out._flatbuffers.Expression = args[-1].Expression
+        out._flatbuffers.Parameters = args[-1].Parameters
+        out._flatbuffers.ParametersLength = args[-1].ParametersLength
+        out._flatbuffers.Title = args[0].Title
+        out._flatbuffers.Metadata = args[0].Metadata
+        out._flatbuffers.Decoration = args[0].Decoration
+        out._flatbuffers.Script = args[0].Script
         return out
 
     def _toflatbuffers(self, builder):
@@ -2247,24 +2255,39 @@ class ParameterizedFunction(Function, FunctionObject):
             portally.portally_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
         parameterized = portally.portally_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
 
-        portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
-        portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
-        portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
-        function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
+        if isinstance(getattr(self, "_parent", None), Histogram):
+            portally.portally_generated.Function.FunctionStart(builder)
+            portally.portally_generated.Function.FunctionAddDataType(builder, portally.portally_generated.FunctionData.FunctionData.ParameterizedFunction)
+            portally.portally_generated.Function.FunctionAddData(builder, parameterized)
+            if title is not None:
+                portally.portally_generated.Function.FunctionAddTitle(builder, title)
+            if metadata is not None:
+                portally.portally_generated.Function.FunctionAddMetadata(builder, metadata)
+            if decoration is not None:
+                portally.portally_generated.Function.FunctionAddDecoration(builder, decoration)
+            if script is not None:
+                portally.portally_generated.Function.FunctionAddScript(builder, script)
+            return portally.portally_generated.Function.FunctionEnd(builder)
 
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
-        portally.portally_generated.Object.ObjectAddData(builder, function_object)
-        if title is not None:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
-        if metadata is not None:
-            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
-        if decoration is not None:
-            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
-        if script is not None:
-            portally.portally_generated.Object.ObjectAddScript(builder, script)
-        return portally.portally_generated.Object.ObjectEnd(builder)
+        else:
+            portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
+            portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
+            portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
+            function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
 
+            portally.portally_generated.Object.ObjectStart(builder)
+            portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
+            portally.portally_generated.Object.ObjectAddData(builder, function_object)
+            if title is not None:
+                portally.portally_generated.Object.ObjectAddTitle(builder, title)
+            if metadata is not None:
+                portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+            if decoration is not None:
+                portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+            if script is not None:
+                portally.portally_generated.Object.ObjectAddScript(builder, script)
+            return portally.portally_generated.Object.ObjectEnd(builder)
+       
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
@@ -2555,17 +2578,17 @@ class Histogram(Object):
             profile_covariances = builder.EndVector(len(profile_covariances))
 
         if functions is not None:
-            portally.portally_generated.Collection.CollectionStartFunctionsVector(builder, len(functions))
+            portally.portally_generated.Histogram.HistogramStartFunctionsVector(builder, len(functions))
             for x in functions[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions = builder.EndVector(len(functions))
 
-        lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
-        if lookup is not None:
-            portally.portally_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
-            for x in lookup[::-1]:
+        functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
+        if functions_lookup is not None:
+            portally.portally_generated.Histogram.HistogramStartFunctionsLookupVector(builder, len(functions_lookup))
+            for x in functions_lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
-            lookup = builder.EndVector(len(lookup))
+            functions_lookup = builder.EndVector(len(functions_lookup))
 
         portally.portally_generated.Histogram.HistogramStart(builder)
         portally.portally_generated.Histogram.HistogramAddAxis(builder, axis)
@@ -2578,7 +2601,7 @@ class Histogram(Object):
         if profile_covariances is not None:
             portally.portally_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
         if functions is not None:
-            portally.portally_generated.Histogram.HistogramAddLookup(builder, lookup)
+            portally.portally_generated.Histogram.HistogramAddFunctionsLookup(builder, functions_lookup)
             portally.portally_generated.Histogram.HistogramAddFunctions(builder, functions)
         data = portally.portally_generated.Histogram.HistogramEnd(builder)
 
@@ -3076,6 +3099,12 @@ _FunctionObjectData_lookup = {
     portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
     }
 _FunctionObjectData_invlookup = {x[0]: n for n, x in _FunctionObjectData_lookup.items()}
+
+_FunctionData_lookup = {
+    portally.portally_generated.FunctionData.FunctionData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
+    portally.portally_generated.FunctionData.FunctionData.EvaluatedFunction: (EvaluatedFunction, portally.portally_generated.EvaluatedFunction.EvaluatedFunction),
+    }
+_FunctionData_invlookup = {x[0]: n for n, x in _FunctionData_lookup.items()}
 
 _Binning_lookup = {
     portally.portally_generated.Binning.Binning.IntegerBinning: (IntegerBinning, portally.portally_generated.IntegerBinning.IntegerBinning),
