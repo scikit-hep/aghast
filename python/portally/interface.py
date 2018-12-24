@@ -1244,6 +1244,23 @@ class TicTacToeOverflowBinning(Binning):
         else:
             numyoverflowbins = self.yoverflow._numbins()
         return (self.xnum + numxoverflowbins, self.ynum + numyoverflowbins)
+
+    def _toflatbuffers(self, builder):
+        xinterval = self.xinterval._toflatbuffers(builder)
+        yinterval = self.yinterval._toflatbuffers(builder)
+        xoverflow = None if self.xoverflow is None else self.xoverflow._toflatbuffers(builder)
+        yoverflow = None if self.yoverflow is None else self.yoverflow._toflatbuffers(builder)
+
+        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningStart(builder)
+        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXnum(builder, self.xnum)
+        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYnum(builder, self.ynum)
+        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXinterval(builder, xinterval)
+        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYinterval(builder, yinterval)
+        if xoverflow is not None:
+            portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXoverflow(builder, xoverflow)
+        if yoverflow is not None:
+            portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYoverflow(builder, yoverflow)
+        return portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningEnd(builder)
         
 ################################################# HexagonalBinning
 
