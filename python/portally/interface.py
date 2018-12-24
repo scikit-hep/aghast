@@ -1333,6 +1333,29 @@ class HexagonalBinning(Binning):
             numroverflowbins = self.roverflow._numbins()
         return (qnum + numqoverflowbins, rnum + numroverflowbins)
 
+    def _toflatbuffers(self, builder):
+        qoverflow = None if self.qoverflow is None else self.qoverflow._toflatbuffers(builder)
+        roverflow = None if self.roverflow is None else self.roverflow._toflatbuffers(builder)
+
+        portally.portally_generated.HexagonalBinning.HexagonalBinningStart(builder)
+        portally.portally_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
+        portally.portally_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
+        portally.portally_generated.HexagonalBinning.HexagonalBinningAddRmin(builder, self.rmin)
+        portally.portally_generated.HexagonalBinning.HexagonalBinningAddRmax(builder, self.rmax)
+        if self.coordinates != self.offset:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddOffset(builder, self.coordinates)
+        if self.xorigin != 0.0:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddXorigin(builder, self.xorigin)
+        if self.yorigin != 0.0:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
+        if self.qangle != 0.0:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
+        if qoverflow is not None:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, qoverflow)
+        if roverflow is not None:
+            portally.portally_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
+        return portally.portally_generated.HexagonalBinning.HexagonalBinningEnd(builder)
+
 ################################################# EdgesBinning
 
 class EdgesBinning(Binning):

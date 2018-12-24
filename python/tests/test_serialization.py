@@ -133,19 +133,14 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_HexagonalBinning(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(3, 5, -5, -4))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 3), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0] * 2] * 3
-    #     h = BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 4), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0] * 2] * 4
-    #     h = BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(3, 5, -5, -4, roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 3), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0] * 3] * 3
-    #     h = BinnedEvaluatedFunction("id", [Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1), roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 4), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [[0.0] * 3] * 4
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 3), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 2] * 4), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 3), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(HexagonalBinning(3, 5, -5, -4, qoverflow=RealOverflow(loc_nanflow=RealOverflow.above1), roverflow=RealOverflow(loc_nanflow=RealOverflow.above1)))], InterpretedInlineBuffer(numpy.array([[0.0] * 3] * 4), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_EdgesBinning(self):
         pass
