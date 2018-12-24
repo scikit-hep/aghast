@@ -195,9 +195,8 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_UnweightedCounts(self):
-        pass
-    #     h = Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-    #     h.checkvalid()
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_WeightedCounts(self):
         pass
