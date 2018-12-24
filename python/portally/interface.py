@@ -1376,6 +1376,8 @@ class EdgesBinning(Binning):
             raise ValueError("EdgesBinning.edges must all be finite")
         if not numpy.greater(self.edges[1:], self.edges[:-1]).all():
             raise ValueError("EdgesBinning.edges must be strictly increasing")
+        if len(self.edges) == 1 and (self.overflow is None or self.overflow._numbins() == 0):
+            raise ValueError("EdgesBinning.edges must have more than one edge if EdgesBinning.overflow is missing or has zero bins")
         if recursive:
             _valid(self.overflow, seen, recursive)
 
@@ -1391,7 +1393,6 @@ class EdgesBinning(Binning):
         for x in self.edges[::-1]:
             builder.PrependFloat64(x)
         edges = builder.EndVector(len(self.edges))
-
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
         portally.portally_generated.EdgesBinning.EdgesBinningStart(builder)
@@ -1412,7 +1413,7 @@ class IrregularBinning(Binning):
     overlapping_fill_strategies = [all, first, last]
 
     _params = {
-        "intervals":        portally.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval),
+        "intervals":        portally.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
         "overflow":         portally.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
         "overlapping_fill": portally.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
         }
@@ -1437,6 +1438,23 @@ class IrregularBinning(Binning):
         else:
             numoverflowbins = self.overflow._numbins()
         return (len(self.intervals) + numoverflowbins,)
+
+    def _toflatbuffers(self, builder):
+        intervals = [x._toflatbuffers(builder) for x in self.intervals]
+        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
+
+        portally.portally_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(intervals))
+        for x in intervals[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        intervals = builder.EndVector(len(intervals))
+
+        portally.portally_generated.IrregularBinning.IrregularBinningStart(builder)
+        portally.portally_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
+        if overflow is not None:
+            portally.portally_generated.IrregularBinning.IrregularBinningAddOverflow(builder, overflow)
+        if self.overlapping_fill != self.all:
+            portally.portally_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
+        return portally.portally_generated.IrregularBinning.IrregularBinningEnd(builder)
 
 ################################################# CategoryBinning
 

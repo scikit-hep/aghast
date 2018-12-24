@@ -143,19 +143,16 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_EdgesBinning(self):
-        h = BinnedEvaluatedFunction([Axis(EdgesBinning([3.3]))], InterpretedInlineBuffer(numpy.array([]), dtype=InterpretedInlineBuffer.float64))
+        h = BinnedEvaluatedFunction([Axis(EdgesBinning([3.3], overflow=RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.above2)))], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = BinnedEvaluatedFunction([Axis(EdgesBinning([1.1, 2.2, 3.3]))], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_IrregularBinning(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5)]))], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0]
-    #     h = BinnedEvaluatedFunction("id", [Axis(IrregularBinning([RealInterval(0.5, 1.5), RealInterval(1.5, 1.5), RealInterval(0.0, 10.0)]))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0, 0.0, 0.0]
+        h = BinnedEvaluatedFunction([Axis(IrregularBinning([RealInterval(0.5, 1.5)]))], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis(IrregularBinning([RealInterval(0.5, 1.5), RealInterval(1.5, 1.5), RealInterval(0.0, 10.0)]))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_CategoryBinning(self):
         pass
