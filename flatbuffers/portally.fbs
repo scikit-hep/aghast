@@ -69,7 +69,7 @@ struct Slice {
   has_step: bool;
 }
 
-enum ExternalType: uint {
+enum ExternalSource: uint {
   external_memory = 0,
   external_samefile = 1,
   external_file = 2,
@@ -83,7 +83,7 @@ table RawInlineBuffer {
 table RawExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
-  external_type: ExternalType = external_memory;
+  external_source: ExternalSource = external_memory;
   location: string;
 }
 
@@ -99,7 +99,7 @@ table InterpretedInlineBuffer {
 table InterpretedExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
-  external_type: ExternalType = external_memory;
+  external_source: ExternalSource = external_memory;
   filters: [Filter];
   postfilter_slice: Slice;
   dtype: DType = dtype_none;
