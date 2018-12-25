@@ -357,10 +357,5 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Collection({"b": Collection(), "c": Collection()})
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-    #     h.checkvalid()
-    #     assert h.identifier == "id"
-    #     h = Collection("id", [Histogram("id", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(30)))), Histogram("id2", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(300))))], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
-    #     h.checkvalid()
-    #     h = Collection("a", [Collection("b", [Histogram("c", [Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(60)))), Histogram("d", [Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(600))))], axis=[Axis(FractionBinning())])], axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
-    #     h.checkvalid()
-    #     assert h["b", "c"].counts.counts.array.tolist() == numpy.arange(60).reshape((3, 2, 10)).tolist()
+        h = Collection({"id": Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(30)))), "id2": Histogram([Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(300))))}, axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
+        h = Collection({"b": Collection({"c": Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(60)))), "d": Histogram([Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(600))))}, axis=[Axis(FractionBinning())])}, axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
