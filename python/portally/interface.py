@@ -2951,7 +2951,7 @@ class Chunk(Portally):
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
 
         portally.portally_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
-        for x in column_chunks:
+        for x in column_chunks[::-1]:
             builder.PrependUOffsetTRelative(x)
         column_chunks = builder.EndVector(len(column_chunks))
 

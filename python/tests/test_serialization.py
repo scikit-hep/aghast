@@ -221,9 +221,8 @@ class Test(unittest.TestCase):
     def test_serialization_Statistics(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
-
-    #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
-    #     h.checkvalid()
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_Covariance(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), axis_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
@@ -232,11 +231,10 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)])), Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))], profile_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
         assert h == frombuffer(h.tobuffer(), checkvalid=True)        
-
-    #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
-    #     h.checkvalid()
-    #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=True), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=False)])
-    #     h.checkvalid()
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=True), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=False)])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
 
     def test_serialization_Profile(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))])
@@ -277,61 +275,28 @@ class Test(unittest.TestCase):
     def test_serialization_Page(self):
         h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-    #     
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [5]
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].array.tolist() == []
-    #     assert {n: x.tolist() for n, x in h.instances[0].chunks[0].arrays.items()} == {"one": []}
-    #     for arrays in h.instances[0].arrays: pass
-    #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": []}
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].array.tolist() == [5]
-    #     assert {n: x.tolist() for n, x in h.instances[0].chunks[0].arrays.items()} == {"one": [5]}
-    #     for arrays in h.instances[0].arrays: pass
-    #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00")), Page(RawInlineBuffer(b"\x04\x00\x00\x00\x03\x00\x00\x00"))], [0, 1, 3])])])])
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].array.tolist() == [5, 4, 3]
-    #     assert {n: x.tolist() for n, x in h.instances[0].chunks[0].arrays.items()} == {"one": [5, 4, 3]}
-    #     for arrays in h.instances[0].arrays: pass
-    #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5, 4, 3]}
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00")), Page(RawInlineBuffer(b"\x04\x00\x00\x00\x03\x00\x00\x00"))], [0, 1, 3])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Chunk(self):
         h = Ntuple([Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-
-    #     h.checkvalid()
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([])])
-    #     h.checkvalid()
-    #     for arrays in h.instances[0].arrays:
-    #         assert False
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-    #     h.checkvalid()
-    #     for arrays in h.instances[0].arrays: pass
-    #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])]), Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-    #     h.checkvalid()
-    #     for arrays in h.instances[0].arrays:
-    #         assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5]}
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])]), Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Column(self):
-        pass
-    #     h = Ntuple("id", [Column("one", Column.float64), Column("two", Column.int32)], [NtupleInstance([])])
-    #     h.checkvalid()
-
-    #     h = Ntuple("id", [Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])])
-    #     h.checkvalid()
-    #     for arrays in h.instances[0].arrays: pass
-    #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5], "two": [3]}
+        h = Ntuple([Column("one", Column.float64), Column("two", Column.int32)], [NtupleInstance([])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Ntuple(self):
         h = Ntuple([Column("one", Column.float64)], [NtupleInstance([])])
