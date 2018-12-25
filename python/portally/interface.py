@@ -784,6 +784,52 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
         return array.reshape(shape, order=self.dimension_order.dimension_order)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Pointer = fb.Pointer
+        out._flatbuffers.Numbytes = fb.Numbytes
+        out._flatbuffers.ExternalSource = fb.ExternalSource
+        out._flatbuffers.Filters = fb.Filters
+        out._flatbuffers.FiltersLength = fb.FiltersLength
+        out._flatbuffers.PostfilterSlice = fb.PostfilterSlice
+        out._flatbuffers.Dtype = fb.Dtype
+        out._flatbuffers.Endianness = fb.Endianness
+        out._flatbuffers.DimensionOrder = fb.DimensionOrder
+        out._flatbuffers.Location = fb.Location
+        return out
+
+    def _toflatbuffers(self, builder):
+        location = None if self.location is None else builder.CreateString(location.encode("utf-8"))
+
+        if len(self.filters) == 0:
+            filters = None
+        else:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
+            for x in self.filters[::-1]:
+                builder.PrependUInt32(x.value)
+            filters = builder.EndVector(len(self.filters))
+
+        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
+        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPointer(builder, self.pointer)
+        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddNumbytes(builder, self.numbytes)
+        if self.external_source != ExternalBuffer.memory:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddExternalSource(builder, self.external_source.values)
+        if filters is not None:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddFilters(builder, filters)
+        if self.postfilter_slice is not None:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+        if self.dtype != self.none:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDtype(builder, self.dtype.value)
+        if self.endianness != self.little_endian:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddEndianness(builder, self.endianness.value)
+        if self.dimension_order != self.c_order:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDimensionOrder(builder, self.dimension_order.value)
+        if location is not None:
+            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
+        return portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
+
 ################################################# StatisticFilter
 
 class StatisticFilter(Portally):

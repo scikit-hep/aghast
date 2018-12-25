@@ -73,26 +73,18 @@ class Test(unittest.TestCase):
     #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [3.14]
 
     def test_serialization_InterpretedInlineBuffer(self):
-        pass
-    #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(numpy.zeros(1, dtype=numpy.int32), dtype=InterpretedInlineBuffer.int32))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0]
-
-    #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedInlineBuffer(b"\x07\x00\x00\x00", dtype=InterpretedInlineBuffer.int32))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [7]
+        h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.zeros(1, dtype=numpy.int32), dtype=InterpretedInlineBuffer.int32))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(b"\x07\x00\x00\x00", dtype=InterpretedInlineBuffer.int32))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_InterpretedExternalBuffer(self):
-        pass
-    #     buf = numpy.zeros(1, dtype=numpy.float64)
-    #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [0.0]
-
-    #     buf = numpy.array([3.14], dtype=numpy.float64)
-    #     h = BinnedEvaluatedFunction("id", [Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))
-    #     h.checkvalid()
-    #     assert h.values.array.tolist() == [3.14]
+        buf = numpy.zeros(1, dtype=numpy.float64)
+        h = BinnedEvaluatedFunction([Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        buf = numpy.array([3.14], dtype=numpy.float64)
+        h = BinnedEvaluatedFunction([Axis()], InterpretedExternalBuffer(buf.ctypes.data, buf.nbytes, dtype=InterpretedInlineBuffer.float64))
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_IntegerBinning(self):
         h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
