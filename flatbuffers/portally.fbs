@@ -437,7 +437,7 @@ table Page {
 
 table ColumnChunk {
   pages: [Page] (required);
-  page_offsets: [ulong] (required);
+  page_offsets: [long] (required);
   page_min: [Extremes];
   page_max: [Extremes];
 }

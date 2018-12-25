@@ -310,8 +310,9 @@ class Test(unittest.TestCase):
     #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5, 4, 3]}
 
     def test_serialization_Chunk(self):
-        pass
-    #     h = Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
+        h = Ntuple([Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([], [0])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+
     #     h.checkvalid()
 
     #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([])])

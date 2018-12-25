@@ -2852,6 +2852,41 @@ class ColumnChunk(Portally):
         else:
             return numpy.concatenate(out)
 
+    def _toflatbuffers(self, builder):
+        pages = [x._toflatbuffers(builder) for x in self.pages]
+        page_min = None if len(self.page_min) == 0 else [x._toflatbuffers(builder) for x in self.page_min]
+        page_max = None if len(self.page_max) == 0 else [x._toflatbuffers(builder) for x in self.page_max]
+
+        portally.portally_generated.ColumnChunk.ColumnChunkStartPagesVector(builder, len(pages))
+        for x in pages[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        pages = builder.EndVector(len(pages))
+
+        portally.portally_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
+        for x in self.page_offsets[::-1]:
+            builder.PrependInt64(x)
+        page_offsets = builder.EndVector(len(self.page_offsets))
+
+        if page_min is not None:
+            portally.portally_generated.ColumnChunk.ColumnChunkStartPageMinVector(builder, len(page_min))
+            for x in page_min[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            page_min = builder.EndVector(len(page_min))
+
+        if page_max is not None:
+            portally.portally_generated.ColumnChunk.ColumnChunkStartPageMaxVector(builder, len(page_max))
+            for x in page_max[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            page_max = builder.EndVector(len(page_max))
+
+        portally.portally_generated.ColumnChunk.ColumnChunkStart(builder)
+        portally.portally_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
+        if page_min is not None:
+            portally.portally_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
+        if page_max is not None:
+            portally.portally_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
+        return portally.portally_generated.ColumnChunk.ColumnChunkEnd(builder)
+        
 ################################################# Chunk
 
 class Chunk(Portally):
@@ -2887,6 +2922,21 @@ class Chunk(Portally):
         if len(self.column_chunks) != len(self._parent._parent.columns):
             raise ValueError("Chunk.columns has length {0}, but Ntuple.columns has length {1}".format(len(self.column_chunks), len(self._parent._parent.columns)))
         return {y.identifier: x.array for x, y in zip(self.column_chunks, self._parent._parent.columns)}
+
+    def _toflatbuffers(self, builder):
+        column_chunks = [x._toflatbuffers(builder) for x in self.column_chunks]
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+
+        portally.portally_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
+        for x in column_chunks:
+            builder.PrependUOffsetTRelative(x)
+        column_chunks = builder.EndVector(len(column_chunks))
+
+        portally.portally_generated.Chunk.ChunkStart(builder)
+        portally.portally_generated.Chunk.ChunkAddColumnChunks(builder, column_chunks)
+        if metadata is not None:
+            portally.portally_generated.Chunk.ChunkAddMetadata(builder, metadata)
+        return portally.portally_generated.Chunk.ChunkEnd(builder)
 
 ################################################# Column
 
@@ -2937,7 +2987,7 @@ class Column(Portally, Interpretation):
         if len(self.filters) == 0:
             filters = None
         else:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
+            portally.portally_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUInt32(x.value)
             filters = builder.EndVector(len(self.filters))
