@@ -51,26 +51,18 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RawInlineBuffer(self):
-        pass
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(numpy.zeros(1, dtype=numpy.int32)))], [0, 1])])])])
-    #     h.checkvalid()
-    #     assert len(h.instances[0].chunks[0].column_chunks[0].pages[0].array) == 1
-
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [5]
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(numpy.zeros(1, dtype=numpy.int32)))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_RawExternalBuffer(self):
-        pass
-    #     buf = numpy.zeros(1, dtype=numpy.int32)
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
-    #     h.checkvalid()
-    #     assert len(h.instances[0].chunks[0].column_chunks[0].pages[0].array) == 1
-
-    #     buf = numpy.array([3.14], dtype=numpy.float64)
-    #     h = Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
-    #     h.checkvalid()
-    #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [3.14]
+        buf = numpy.zeros(1, dtype=numpy.int32)
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+        buf = numpy.array([3.14], dtype=numpy.float64)
+        h = Ntuple([Column("one", Column.float64)], [NtupleInstance([Chunk([ColumnChunk([Page(RawExternalBuffer(buf.ctypes.data, buf.nbytes))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_InterpretedInlineBuffer(self):
         h = BinnedEvaluatedFunction([Axis()], InterpretedInlineBuffer(numpy.zeros(1, dtype=numpy.int32), dtype=InterpretedInlineBuffer.int32))

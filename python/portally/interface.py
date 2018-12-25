@@ -624,6 +624,13 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     def array(self):
         return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.RawExternalBuffer.RawExternalBufferStart(builder)
+        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
+        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
+        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
+        return portally.portally_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
+
 ################################################# InlineBuffer
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
@@ -800,22 +807,6 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(array), functools.reduce(operator.mul, shape, 1)))
 
         return array.reshape(shape, order=self.dimension_order.dimension_order)
-
-    @classmethod
-    def _fromflatbuffers(cls, fb):
-        out = cls.__new__(cls)
-        out._flatbuffers = _MockFlatbuffers()
-        out._flatbuffers.Pointer = fb.Pointer
-        out._flatbuffers.Numbytes = fb.Numbytes
-        out._flatbuffers.ExternalSource = fb.ExternalSource
-        out._flatbuffers.Filters = fb.Filters
-        out._flatbuffers.FiltersLength = fb.FiltersLength
-        out._flatbuffers.PostfilterSlice = fb.PostfilterSlice
-        out._flatbuffers.Dtype = fb.Dtype
-        out._flatbuffers.Endianness = fb.Endianness
-        out._flatbuffers.DimensionOrder = fb.DimensionOrder
-        out._flatbuffers.Location = fb.Location
-        return out
 
     def _toflatbuffers(self, builder):
         location = None if self.location is None else builder.CreateString(location.encode("utf-8"))
