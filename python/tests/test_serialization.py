@@ -283,8 +283,9 @@ class Test(unittest.TestCase):
         assert frombuffer(h.tobuffer()).values.array.tolist() == [[0.0]]
 
     def test_serialization_Page(self):
-        pass
-    #     h = Ntuple("id", [Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        h = Ntuple([Column("one", Column.int32)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1])])])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+    #     
     #     h.checkvalid()
     #     assert h.instances[0].chunks[0].column_chunks[0].pages[0].array.tolist() == [5]
 

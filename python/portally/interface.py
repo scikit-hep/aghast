@@ -585,6 +585,23 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     def array(self):
         return numpy.frombuffer(self.buffer, dtype=InterpretedBuffer.none.dtype)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Buffer = fb.BufferAsNumpy
+        return out
+
+    def _toflatbuffers(self, builder):
+        portally.portally_generated.RawInlineBuffer.RawInlineBufferStartBufferVector(builder, len(self.buffer))
+        builder.head = builder.head - len(self.buffer)
+        builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
+        buffer = builder.EndVector(len(self.buffer))
+
+        portally.portally_generated.RawInlineBuffer.RawInlineBufferStart(builder)
+        portally.portally_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
+        return portally.portally_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
+
 ################################################# RawExternalBuffer
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
@@ -2771,6 +2788,20 @@ class Page(Portally):
 
         return array.view(column.numpy_dtype).reshape((numentries,))
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.BufferByTag = _MockFlatbuffers._ByTag(fb.Buffer, fb.BufferType, _RawBuffer_lookup)
+        return out
+
+    def _toflatbuffers(self, builder):
+        buffer = self.buffer._toflatbuffers(builder)
+        portally.portally_generated.Page.PageStart(builder)
+        portally.portally_generated.Page.PageAddBufferType(builder, _RawBuffer_invlookup[type(self.buffer)])
+        portally.portally_generated.Page.PageAddBuffer(builder, buffer)
+        return portally.portally_generated.Page.PageEnd(builder)
+
 ################################################# ColumnChunk
 
 class ColumnChunk(Portally):
@@ -2880,6 +2911,7 @@ class ColumnChunk(Portally):
             page_max = builder.EndVector(len(page_max))
 
         portally.portally_generated.ColumnChunk.ColumnChunkStart(builder)
+        portally.portally_generated.ColumnChunk.ColumnChunkAddPages(builder, pages)
         portally.portally_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
         if page_min is not None:
             portally.portally_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
