@@ -340,9 +340,8 @@ class Test(unittest.TestCase):
     #     assert {n: x.tolist() for n, x in arrays.items()} == {"one": [5], "two": [3]}
 
     def test_serialization_Ntuple(self):
-        pass
-    #     h = Ntuple("id", [Column("one", Column.float64)], [NtupleInstance([])])
-    #     h.checkvalid()
+        h = Ntuple([Column("one", Column.float64)], [NtupleInstance([])])
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_collection(self):
         h = Collection()

@@ -2928,6 +2928,37 @@ class Column(Portally, Interpretation):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
+    def _toflatbuffers(self, builder):
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        identifier = builder.CreateString(self.identifier.encode("utf-8"))
+
+        if len(self.filters) == 0:
+            filters = None
+        else:
+            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
+            for x in self.filters[::-1]:
+                builder.PrependUInt32(x.value)
+            filters = builder.EndVector(len(self.filters))
+
+        portally.portally_generated.Column.ColumnStart(builder)
+        portally.portally_generated.Column.ColumnAddIdentifier(builder, identifier)
+        portally.portally_generated.Column.ColumnAddDtype(builder, self.dtype.value)
+        if self.endianness != InterpretedBuffer.little_endian:
+            portally.portally_generated.Column.ColumnAddEndianness(builder, self.endianness.value)
+        if filters is not None:
+            portally.portally_generated.Column.ColumnAddFilters(builder, self.filters)
+        if self.postfilter_slice is not None:
+            portally.portally_generated.Column.ColumnAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+        if title is not None:
+            portally.portally_generated.Column.ColumnAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Column.ColumnAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Column.ColumnAddDecoration(builder, decoration)
+        return portally.portally_generated.Column.ColumnEnd(builder)
+
 ################################################# NtupleInstance
 
 class NtupleInstance(Portally):
@@ -2988,19 +3019,41 @@ class NtupleInstance(Portally):
         for x in self.chunks:
             yield x.arrays
 
+    def _toflatbuffers(self, builder):
+        chunks = [x._toflatbuffers(builder) for x in self.chunks]
+
+        portally.portally_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
+        for x in chunks[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        chunks = builder.EndVector(len(chunks))
+
+        if len(self.chunk_offsets) == 0:
+            chunk_offsets = None
+        else:
+            portally.portally_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
+            for x in self.chunk_offsets[::-1]:
+                builder.PrependInt64(x)
+            chunk_offsets = builder.EndVector(len(self.chunk_offsets))
+
+        portally.portally_generated.NtupleInstance.NtupleInstanceStart(builder)
+        portally.portally_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
+        if chunk_offsets is not None:
+            portally.portally_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
+        return portally.portally_generated.NtupleInstance.NtupleInstanceEnd(builder)
+
 ################################################# Ntuple
 
 class Ntuple(Object):
     _params = {
-        "columns":             portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":           portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "column_statistics":   portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "columns":            portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":          portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "column_statistics":  portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
         "column_covariances": portally.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
-        "functions":           portally.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
-        "title":               portally.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":            portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration":          portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
-        "script":              portally.checktype.CheckString("Ntuple", "script", required=False),
+        "functions":          portally.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":              portally.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":           portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":         portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "script":             portally.checktype.CheckString("Ntuple", "script", required=False),
         }
 
     columns             = typedproperty(_params["columns"])
@@ -3053,6 +3106,98 @@ class Ntuple(Object):
             return out
         else:
             return out[tail]
+
+    @classmethod
+    def _fromflatbuffers(cls, fbobject, fbntuple):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Columns = fbntuple.Columns
+        out._flatbuffers.ColumnsLength = fbntuple.ColumnsLength
+        out._flatbuffers.Instances = fbntuple.Instances
+        out._flatbuffers.InstancesLength = fbntuple.InstancesLength
+        out._flatbuffers.ColumnStatistics = fbntuple.ColumnStatistics
+        out._flatbuffers.ColumnStatisticsLength = fbntuple.ColumnStatisticsLength
+        out._flatbuffers.ColumnCovariances = fbntuple.ColumnCovariances
+        out._flatbuffers.ColumnCovariancesLength = fbntuple.ColumnCovariancesLength
+        out._flatbuffers.Functions = fbntuple.Functions
+        out._flatbuffers.FunctionsLength = fbntuple.FunctionsLength
+        out._flatbuffers.FunctionsLookup = fbntuple.FunctionsLookup
+        out._flatbuffers.Title = fbobject.Title
+        out._flatbuffers.Metadata = fbobject.Metadata
+        out._flatbuffers.Decoration = fbobject.Decoration
+        out._flatbuffers.Script = fbobject.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        instances = [x._toflatbuffers(builder) for x in self.instances]
+        functions = None if len(self.functions) == 0 else [x._toflatbuffers(builder) for x in self.functions.values()]
+        column_statistics = None if len(self.column_statistics) == 0 else [x._toflatbuffers(builder) for x in self.column_statistics]
+        column_covariances = None if len(self.column_covariances) == 0 else [x._toflatbuffers(builder) for x in self.column_covariances]
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+        columns = [x._toflatbuffers(builder) for x in self.columns]
+
+        portally.portally_generated.Ntuple.NtupleStartColumnsVector(builder, len(columns))
+        for x in columns[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        columns = builder.EndVector(len(columns))
+
+        portally.portally_generated.Ntuple.NtupleStartInstancesVector(builder, len(instances))
+        for x in instances[::-1]:
+            builder.PrependUOffsetTRelative(x)
+        instances = builder.EndVector(len(instances))
+
+        if column_statistics is not None:
+            portally.portally_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
+            for x in column_statistics[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            column_statistics = builder.EndVector(len(column_statistics))
+
+        if column_covariances is not None:
+            portally.portally_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
+            for x in column_covariances[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            column_covariances = builder.EndVector(len(column_covariances))
+
+        if functions is not None:
+            portally.portally_generated.Ntuple.NtupleStartFunctionsVector(builder, len(functions))
+            for x in functions[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            functions = builder.EndVector(len(functions))
+
+        functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
+        if functions_lookup is not None:
+            portally.portally_generated.Ntuple.NtupleStartFunctionsLookupVector(builder, len(functions_lookup))
+            for x in functions_lookup[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            functions_lookup = builder.EndVector(len(functions_lookup))
+
+        portally.portally_generated.Ntuple.NtupleStart(builder)
+        portally.portally_generated.Ntuple.NtupleAddColumns(builder, columns)
+        portally.portally_generated.Ntuple.NtupleAddInstances(builder, instances)
+        if column_statistics is not None:
+            portally.portally_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
+        if column_covariances is not None:
+            portally.portally_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
+        if functions is not None:
+            portally.portally_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
+            portally.portally_generated.Ntuple.NtupleAddFunctions(builder, functions)
+        data = portally.portally_generated.Ntuple.NtupleEnd(builder)
+
+        portally.portally_generated.Object.ObjectStart(builder)
+        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Ntuple)
+        portally.portally_generated.Object.ObjectAddData(builder, data)
+        if title is not None:
+            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Object.ObjectAddScript(builder, script)
+        return portally.portally_generated.Object.ObjectEnd(builder)
 
 ################################################# Collection
 

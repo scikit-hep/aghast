@@ -468,7 +468,7 @@ table Ntuple {
   instances: [NtupleInstance] (required);
   column_statistics: [Statistics];
   column_covariances: [Covariance];
-  lookup_functions: [string];
+  functions_lookup: [string];
   functions: [FunctionObject];
 }
 
