@@ -2326,6 +2326,58 @@ class EvaluatedFunction(Function):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
+    @classmethod
+    def _fromflatbuffers(cls, fbfunction, fbevaluated):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fbevaluated.Values, fbevaluated.ValuesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.DerivativesByTag = _MockFlatbuffers._ByTag(fbevaluated.Derivatives, fbevaluated.DerivativesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.Errors = fbevaluated.Errors
+        out._flatbuffers.ErrorsLength = fbevaluated.ErrorsLength
+        out._flatbuffers.Title = fbfunction.Title
+        out._flatbuffers.Metadata = fbfunction.Metadata
+        out._flatbuffers.Decoration = fbfunction.Decoration
+        out._flatbuffers.Script = fbfunction.Script
+        return out
+
+    def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        derivatives = None if self.derivatives is None else self.derivatives._toflatbuffers(builder)
+        errors = None if len(self.errors) == 0 else [x._toflatbuffers(builder) for x in self.errors]
+        script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
+        decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
+        metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
+        title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
+
+        if errors is not None:
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
+            for x in errors[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            errors = builder.EndVector(len(errors))
+
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        if derivatives is not None:
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+        if errors is not None:
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = portally.portally_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+
+        portally.portally_generated.Function.FunctionStart(builder)
+        portally.portally_generated.Function.FunctionAddDataType(builder, portally.portally_generated.FunctionData.FunctionData.EvaluatedFunction)
+        portally.portally_generated.Function.FunctionAddData(builder, evaluated)
+        if title is not None:
+            portally.portally_generated.Function.FunctionAddTitle(builder, title)
+        if metadata is not None:
+            portally.portally_generated.Function.FunctionAddMetadata(builder, metadata)
+        if decoration is not None:
+            portally.portally_generated.Function.FunctionAddDecoration(builder, decoration)
+        if script is not None:
+            portally.portally_generated.Function.FunctionAddScript(builder, script)
+        return portally.portally_generated.Function.FunctionEnd(builder)
+
 ################################################# BinnedEvaluatedFunction
 
 class BinnedEvaluatedFunction(FunctionObject):
@@ -2383,7 +2435,7 @@ class BinnedEvaluatedFunction(FunctionObject):
         out._flatbuffers.Axis = fbbinned.Axis
         out._flatbuffers.AxisLength = fbbinned.AxisLength
         out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fbevaluated.Values, fbevaluated.ValuesType, _InterpretedBuffer_lookup)
-        out._flatbuffers.Derivatives = fbevaluated.Derivatives
+        out._flatbuffers.DerivativesByTag = _MockFlatbuffers._ByTag(fbevaluated.Derivatives, fbevaluated.DerivativesType, _InterpretedBuffer_lookup)
         out._flatbuffers.Errors = fbevaluated.Errors
         out._flatbuffers.ErrorsLength = fbevaluated.ErrorsLength
         out._flatbuffers.Title = fbobject.Title
@@ -2393,17 +2445,17 @@ class BinnedEvaluatedFunction(FunctionObject):
         return out
 
     def _toflatbuffers(self, builder):
+        values = self.values._toflatbuffers(builder)
+        derivatives = None if self.derivatives is None else self.derivatives._toflatbuffers(builder)
+        errors = None if len(self.errors) == 0 else [x._toflatbuffers(builder) for x in self.errors]
         script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
-        errors = None if len(self.errors) == 0 else [x._toflatbuffers(builder) for x in self.errors]
-        derivatives = None if self.derivatives is None else self.derivatives._toflatbuffers(builder)
-        values = self.values._toflatbuffers(builder)
         axis = [x._toflatbuffers(builder) for x in self.axis]
         
         if errors is not None:
-            portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartErrorsVector(builder, len(errors))
+            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
             for x in errors[::-1]:
                 builder.PrependUOffsetTRelative(x)
             errors = builder.EndVector(len(errors))
