@@ -343,13 +343,13 @@ class Object(Stagg):
             file = FileLike(file)
 
         try:
-            file.write(b"port")
+            file.write(b"StAg")
             builder = flatbuffers.Builder(1024)
             builder.Finish(self._toflatbuffers(builder))
             offset = file.tell()
             file.write(builder.Output())
             file.write(struct.pack("<Q", offset))
-            file.write(b"port")
+            file.write(b"StAg")
 
         finally:
             if opened:
@@ -367,10 +367,10 @@ def fromarray(array, checkvalid=False):
 def fromfile(file, mode="r+", checkvalid=False):
     if isinstance(file, str):
         file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
-    if file[:4].tostring() != b"port":
-        raise OSError("file does not begin with magic 'port'")
-    if file[-4:].tostring() != b"port":
-        raise OSError("file does not end with magic 'port'")
+    if file[:4].tostring() != b"StAg":
+        raise OSError("file does not begin with magic 'StAg'")
+    if file[-4:].tostring() != b"StAg":
+        raise OSError("file does not end with magic 'StAg'")
     offset, = struct.unpack("<Q", file[-12:-4])
     return frombuffer(file[offset:-12], checkvalid=checkvalid)
 

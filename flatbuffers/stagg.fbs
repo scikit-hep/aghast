@@ -495,6 +495,6 @@ table Object {
   script: string;
 }
 
-file_extension "port";
-file_identifier "port";
+file_extension "stagg";
+file_identifier "StAg";
 root_type Object;
