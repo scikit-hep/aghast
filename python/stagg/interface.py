@@ -256,6 +256,27 @@ class Stagg(object):
             setattr(out, "_" + n, x)
         return out
 
+    def _add(self, other, noclobber):
+        if (isinstance(self, Stagg) and type(self) is not type(other)) or \
+           (isinstance(self, stagg.checktype.Vector) and not isinstance(self, stagg.checktype.Vector)) or \
+           (isinstance(self, stagg.checktype.Lookup) and not isinstance(self, stagg.checktype.Lookup)):
+            raise ValueError("incompatible objects in add: {0} and {1}".format(self, other))
+        for n in self._params:
+            selfn = getattr(self, n)
+            othern = getattr(other, n)
+            if isinstance(selfn, Stagg):
+                selfn._add(othern, noclobber)
+            elif isinstance(selfn, stagg.checktype.Vector):
+                if len(selfn) != len(othern):
+                    raise ValueError("incompatible lists in add: length {0} vs length {1}".format(len(selfn), len(othern)))
+                for x, y in zip(selfn, othern):
+                    x._add(y, noclobber)
+            elif isinstance(selfn, stagg.checktype.Lookup):
+                if set(selfn.keys()) != set(othern.keys()):
+                    raise ValueError("incompatible dicts in add:\n\n    keys {0}\n    keys {1}".format(sorted(selfn), sorted(othern)))
+                for n in selfn:
+                    selfn[n]._add(othern[n], noclobber)
+
     @classmethod
     def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
@@ -318,12 +339,12 @@ class Object(Stagg):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     def __add__(self, other):
-        out = self._copy(1)
-        out._add(other)
+        out = self._copy()
+        out._add(other, noclobber=True)
         return out
 
     def __iadd__(self, other):
-        self._add(other)
+        self._add(other, noclobber=False)
         return self
 
     def __radd__(self, other):
