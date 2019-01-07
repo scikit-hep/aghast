@@ -1,3 +1,3 @@
-# portally
+# stagg
 
-Portable "tallies," nested collections of counts, sums, histograms, profiles, and ntuples.
+Statistical Aggregates: collections of histograms, profiles, and ntuples as [Flatbuffers](http://google.github.io/flatbuffers/).
