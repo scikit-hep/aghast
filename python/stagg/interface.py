@@ -28,6 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import copy
 import ctypes
 import functools
 import math
@@ -239,6 +240,22 @@ class Stagg(object):
         else:
             return True
 
+    def copy(self, checkvalid=False):
+        out = self._copy()
+        if checkvalid:
+            out.checkvalid()
+        return out
+
+    def _copy(self):
+        out = type(self).__new__(type(self))
+        for n in self._params:
+            x = getattr(self, n)
+            if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
+                x = x._copy()
+            stagg.checktype.setparent(out, x)
+            setattr(out, "_" + n, x)
+        return out
+
     @classmethod
     def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
@@ -271,7 +288,7 @@ class Stagg(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
+        
 ################################################# Enum
 
 class Enum(object):
@@ -299,6 +316,18 @@ class Enum(object):
 class Object(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+    def __add__(self, other):
+        out = self._copy(1)
+        out._add(other)
+        return out
+
+    def __iadd__(self, other):
+        self._add(other)
+        return self
+
+    def __radd__(self, other):
+        return self.__add__(other)
 
     @classmethod
     def _fromflatbuffers(cls, fb):

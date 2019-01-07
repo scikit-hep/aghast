@@ -87,6 +87,10 @@ class Vector(Sequence):
     def __getitem__(self, where):
         return self._data[where]
 
+    def _copy(self):
+        import stagg.interface
+        return Vector([x if not isinstance(x, stagg.interface.Stagg) else x._copy() for x in self])
+
     def __repr__(self):
         tmp = [repr(x) for x in self]
         if sum(len(x) for x in tmp) < 100:
@@ -148,6 +152,10 @@ class Lookup(Mapping):
 
     def __iter__(self):
         return iter(self._data)
+
+    def _copy(self):
+        import stagg.interface
+        return Lookup({n: x if not isinstance(x, stagg.interface.Stagg) else x._copy() for n, x in self.items()})
 
     def __repr__(self):
         tmp = [repr(n) + ": " + repr(x) for n, x in self.items()]
