@@ -32,7 +32,7 @@ import unittest
 
 import numpy
 
-from portally import *
+from stagg import *
 
 class Test(unittest.TestCase):
     def runTest(self):

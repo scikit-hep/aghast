@@ -39,76 +39,76 @@ import sys
 import numpy
 import flatbuffers
 
-import portally.portally_generated.MetadataLanguage
-import portally.portally_generated.Metadata
-import portally.portally_generated.DecorationLanguage
-import portally.portally_generated.Decoration
-import portally.portally_generated.DType
-import portally.portally_generated.Endianness
-import portally.portally_generated.DimensionOrder
-import portally.portally_generated.Filter
-import portally.portally_generated.Slice
-import portally.portally_generated.ExternalSource
-import portally.portally_generated.RawInlineBuffer
-import portally.portally_generated.RawExternalBuffer
-import portally.portally_generated.InterpretedInlineBuffer
-import portally.portally_generated.InterpretedExternalBuffer
-import portally.portally_generated.RawBuffer
-import portally.portally_generated.InterpretedBuffer
-import portally.portally_generated.StatisticFilter
-import portally.portally_generated.Moments
-import portally.portally_generated.Extremes
-import portally.portally_generated.Quantiles
-import portally.portally_generated.Modes
-import portally.portally_generated.Statistics
-import portally.portally_generated.Covariance
-import portally.portally_generated.BinLocation
-import portally.portally_generated.IntegerBinning
-import portally.portally_generated.RealInterval
-import portally.portally_generated.NonRealMapping
-import portally.portally_generated.RealOverflow
-import portally.portally_generated.RegularBinning
-import portally.portally_generated.TicTacToeOverflowBinning
-import portally.portally_generated.HexagonalCoordinates
-import portally.portally_generated.HexagonalBinning
-import portally.portally_generated.EdgesBinning
-import portally.portally_generated.OverlappingFillStrategy
-import portally.portally_generated.IrregularBinning
-import portally.portally_generated.CategoryBinning
-import portally.portally_generated.SparseRegularBinning
-import portally.portally_generated.FractionLayout
-import portally.portally_generated.FractionErrorMethod
-import portally.portally_generated.FractionBinning
-import portally.portally_generated.PredicateBinning
-import portally.portally_generated.Assignment
-import portally.portally_generated.Variation
-import portally.portally_generated.VariationBinning
-import portally.portally_generated.Binning
-import portally.portally_generated.Axis
-import portally.portally_generated.Profile
-import portally.portally_generated.UnweightedCounts
-import portally.portally_generated.WeightedCounts
-import portally.portally_generated.Counts
-import portally.portally_generated.Parameter
-import portally.portally_generated.ParameterizedFunction
-import portally.portally_generated.EvaluatedFunction
-import portally.portally_generated.FunctionData
-import portally.portally_generated.Function
-import portally.portally_generated.BinnedEvaluatedFunction
-import portally.portally_generated.FunctionObjectData
-import portally.portally_generated.FunctionObject
-import portally.portally_generated.Histogram
-import portally.portally_generated.Page
-import portally.portally_generated.ColumnChunk
-import portally.portally_generated.Chunk
-import portally.portally_generated.Column
-import portally.portally_generated.NtupleInstance
-import portally.portally_generated.Ntuple
-import portally.portally_generated.ObjectData
-import portally.portally_generated.Object
-import portally.portally_generated.Collection
+import stagg.stagg_generated.MetadataLanguage
+import stagg.stagg_generated.Metadata
+import stagg.stagg_generated.DecorationLanguage
+import stagg.stagg_generated.Decoration
+import stagg.stagg_generated.DType
+import stagg.stagg_generated.Endianness
+import stagg.stagg_generated.DimensionOrder
+import stagg.stagg_generated.Filter
+import stagg.stagg_generated.Slice
+import stagg.stagg_generated.ExternalSource
+import stagg.stagg_generated.RawInlineBuffer
+import stagg.stagg_generated.RawExternalBuffer
+import stagg.stagg_generated.InterpretedInlineBuffer
+import stagg.stagg_generated.InterpretedExternalBuffer
+import stagg.stagg_generated.RawBuffer
+import stagg.stagg_generated.InterpretedBuffer
+import stagg.stagg_generated.StatisticFilter
+import stagg.stagg_generated.Moments
+import stagg.stagg_generated.Extremes
+import stagg.stagg_generated.Quantiles
+import stagg.stagg_generated.Modes
+import stagg.stagg_generated.Statistics
+import stagg.stagg_generated.Covariance
+import stagg.stagg_generated.BinLocation
+import stagg.stagg_generated.IntegerBinning
+import stagg.stagg_generated.RealInterval
+import stagg.stagg_generated.NonRealMapping
+import stagg.stagg_generated.RealOverflow
+import stagg.stagg_generated.RegularBinning
+import stagg.stagg_generated.TicTacToeOverflowBinning
+import stagg.stagg_generated.HexagonalCoordinates
+import stagg.stagg_generated.HexagonalBinning
+import stagg.stagg_generated.EdgesBinning
+import stagg.stagg_generated.OverlappingFillStrategy
+import stagg.stagg_generated.IrregularBinning
+import stagg.stagg_generated.CategoryBinning
+import stagg.stagg_generated.SparseRegularBinning
+import stagg.stagg_generated.FractionLayout
+import stagg.stagg_generated.FractionErrorMethod
+import stagg.stagg_generated.FractionBinning
+import stagg.stagg_generated.PredicateBinning
+import stagg.stagg_generated.Assignment
+import stagg.stagg_generated.Variation
+import stagg.stagg_generated.VariationBinning
+import stagg.stagg_generated.Binning
+import stagg.stagg_generated.Axis
+import stagg.stagg_generated.Profile
+import stagg.stagg_generated.UnweightedCounts
+import stagg.stagg_generated.WeightedCounts
+import stagg.stagg_generated.Counts
+import stagg.stagg_generated.Parameter
+import stagg.stagg_generated.ParameterizedFunction
+import stagg.stagg_generated.EvaluatedFunction
+import stagg.stagg_generated.FunctionData
+import stagg.stagg_generated.Function
+import stagg.stagg_generated.BinnedEvaluatedFunction
+import stagg.stagg_generated.FunctionObjectData
+import stagg.stagg_generated.FunctionObject
+import stagg.stagg_generated.Histogram
+import stagg.stagg_generated.Page
+import stagg.stagg_generated.ColumnChunk
+import stagg.stagg_generated.Chunk
+import stagg.stagg_generated.Column
+import stagg.stagg_generated.NtupleInstance
+import stagg.stagg_generated.Ntuple
+import stagg.stagg_generated.ObjectData
+import stagg.stagg_generated.Object
+import stagg.stagg_generated.Collection
 
-import portally.checktype
+import stagg.checktype
 
 def _name2fb(name):
     return "".join(x.capitalize() for x in name.split("_"))
@@ -125,21 +125,21 @@ def typedproperty(check):
             fbnametag = fbname + "ByTag"
             if hasattr(self._flatbuffers, fbnametag):
                 value = getattr(self._flatbuffers, fbnametag)()
-                portally.checktype.setparent(self, value)
+                stagg.checktype.setparent(self, value)
             elif hasattr(self._flatbuffers, fbnamelookup):
-                value = portally.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
+                value = stagg.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
             elif hasattr(self._flatbuffers, fbnamelen):
-                value = portally.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
+                value = stagg.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
             else:
                 value = check.fromflatbuffers(getattr(self._flatbuffers, fbname)())
-                portally.checktype.setparent(self, value)
+                stagg.checktype.setparent(self, value)
             setattr(self, private, value)
         return getattr(self, private)
 
     @prop.setter
     def prop(self, value):
         value = check(value)
-        portally.checktype.setparent(self, value)
+        stagg.checktype.setparent(self, value)
         setattr(self, "_" + check.paramname, value)
 
     return prop
@@ -147,16 +147,16 @@ def typedproperty(check):
 def _valid(obj, seen, recursive):
     if obj is None:
         pass
-    elif isinstance(obj, Portally):
+    elif isinstance(obj, Stagg):
         if id(obj) in seen:
             raise ValueError("hierarchy is recursively nested")
         seen.add(id(obj))
         obj._validtypes()
         obj._valid(seen, recursive)
-    elif isinstance(obj, portally.checktype.Vector):
+    elif isinstance(obj, stagg.checktype.Vector):
         for x in obj:
             _valid(x, seen, recursive)
-    elif isinstance(obj, portally.checktype.Lookup):
+    elif isinstance(obj, stagg.checktype.Lookup):
         for x in obj.values():
             _valid(x, seen, recursive)
     else:
@@ -166,11 +166,11 @@ def _getbykey(self, field, where):
     lookup = "_lookup_" + field
     if not hasattr(self, lookup):
         values = getattr(self, field)
-        if isinstance(values, portally.checktype.Vector):
+        if isinstance(values, stagg.checktype.Vector):
             setattr(self, lookup, {x.identifier: x for x in values})
             if len(getattr(self, lookup)) != len(values):
                 raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
-        elif isinstance(values, portally.checktype.Lookup):
+        elif isinstance(values, stagg.checktype.Lookup):
             setattr(self, lookup, values)
         else:
             raise AssertionError(type(values))
@@ -195,9 +195,9 @@ class _MockFlatbuffers(object):
             fb.Init(data.Bytes, data.Pos)
             return interface._fromflatbuffers(fb)
 
-################################################# Portally
+################################################# Stagg
 
-class Portally(object):
+class Stagg(object):
     def __repr__(self):
         if "identifier" in self._params:
             identifier = " " + repr(self.identifier)
@@ -254,7 +254,7 @@ class Portally(object):
         for n in self._params:
             selfn = getattr(self, n)
             othern = getattr(other, n)
-            if selfn is None or isinstance(selfn, (Portally, Enum)):
+            if selfn is None or isinstance(selfn, (Stagg, Enum)):
                 if selfn != othern:
                     return False
             else:
@@ -296,7 +296,7 @@ class Enum(object):
     
 ################################################# Object
 
-class Object(Portally):
+class Object(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -356,7 +356,7 @@ class Object(Portally):
                 file.close()
 
 def frombuffer(buffer, checkvalid=False, offset=0):
-    out = Object._fromflatbuffers(portally.portally_generated.Object.Object.GetRootAsObject(buffer, offset))
+    out = Object._fromflatbuffers(stagg.stagg_generated.Object.Object.GetRootAsObject(buffer, offset))
     if checkvalid:
         out.checkvalid()
     return out
@@ -379,14 +379,14 @@ def fromfile(file, mode="r+", checkvalid=False):
 class MetadataLanguageEnum(Enum):
     base = "Metadata"
 
-class Metadata(Portally):
-    unspecified = MetadataLanguageEnum("unspecified", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
-    json = MetadataLanguageEnum("json", portally.portally_generated.MetadataLanguage.MetadataLanguage.meta_json)
+class Metadata(Stagg):
+    unspecified = MetadataLanguageEnum("unspecified", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
+    json = MetadataLanguageEnum("json", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
     _params = {
-        "data":     portally.checktype.CheckString("Metadata", "data", required=True),
-        "language": portally.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
+        "data":     stagg.checktype.CheckString("Metadata", "data", required=True),
+        "language": stagg.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -398,27 +398,27 @@ class Metadata(Portally):
 
     def _toflatbuffers(self, builder):
         data = builder.CreateString(self.data.encode("utf-8"))
-        portally.portally_generated.Metadata.MetadataStart(builder)
-        portally.portally_generated.Metadata.MetadataAddData(builder, data)
+        stagg.stagg_generated.Metadata.MetadataStart(builder)
+        stagg.stagg_generated.Metadata.MetadataAddData(builder, data)
         if self.language != self.unspecified:
-            portally.portally_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
-        return portally.portally_generated.Metadata.MetadataEnd(builder)
+            stagg.stagg_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
+        return stagg.stagg_generated.Metadata.MetadataEnd(builder)
 
 ################################################# Decoration
 
 class DecorationLanguageEnum(Enum):
     base = "Decoration"
 
-class Decoration(Portally):
-    unspecified = DecorationLanguageEnum("unspecified", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
-    css         = DecorationLanguageEnum("css", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_css)
-    vega        = DecorationLanguageEnum("vega", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    root_json   = DecorationLanguageEnum("root_json", portally.portally_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
+class Decoration(Stagg):
+    unspecified = DecorationLanguageEnum("unspecified", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
+    css         = DecorationLanguageEnum("css", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega        = DecorationLanguageEnum("vega", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    root_json   = DecorationLanguageEnum("root_json", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
     language = [unspecified, css, vega, root_json]
 
     _params = {
-        "data":     portally.checktype.CheckString("Decoration", "data", required=True),
-        "language": portally.checktype.CheckEnum("Decoration", "language", required=True, choices=language),
+        "data":     stagg.checktype.CheckString("Decoration", "data", required=True),
+        "language": stagg.checktype.CheckEnum("Decoration", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -430,22 +430,22 @@ class Decoration(Portally):
 
     def _toflatbuffers(self, builder):
         data = builder.CreateString(self.data.encode("utf-8"))
-        portally.portally_generated.Decoration.DecorationStart(builder)
-        portally.portally_generated.Decoration.DecorationAddData(builder, data)
+        stagg.stagg_generated.Decoration.DecorationStart(builder)
+        stagg.stagg_generated.Decoration.DecorationAddData(builder, data)
         if self.language != self.unspecified:
-            portally.portally_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
-        return portally.portally_generated.Decoration.DecorationEnd(builder)
+            stagg.stagg_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
+        return stagg.stagg_generated.Decoration.DecorationEnd(builder)
 
 ################################################# Buffers
 
 class BufferFilterEnum(Enum):
     base = "Buffer"
 
-class Buffer(Portally):
-    none = BufferFilterEnum("none", portally.portally_generated.Filter.Filter.filter_none)
-    gzip = BufferFilterEnum("gzip", portally.portally_generated.Filter.Filter.filter_gzip)
-    lzma = BufferFilterEnum("lzma", portally.portally_generated.Filter.Filter.filter_lzma)
-    lz4  = BufferFilterEnum("lz4", portally.portally_generated.Filter.Filter.filter_lz4)
+class Buffer(Stagg):
+    none = BufferFilterEnum("none", stagg.stagg_generated.Filter.Filter.filter_none)
+    gzip = BufferFilterEnum("gzip", stagg.stagg_generated.Filter.Filter.filter_gzip)
+    lzma = BufferFilterEnum("lzma", stagg.stagg_generated.Filter.Filter.filter_lzma)
+    lz4  = BufferFilterEnum("lz4", stagg.stagg_generated.Filter.Filter.filter_lz4)
     filters = [none, gzip, lzma, lz4]
 
     def __init__(self):
@@ -459,10 +459,10 @@ class ExternalSourceEnum(Enum):
     base = "ExternalBuffer"
 
 class ExternalBuffer(object):
-    memory   = ExternalSourceEnum("memory", portally.portally_generated.ExternalSource.ExternalSource.external_memory)
-    samefile = ExternalSourceEnum("samefile", portally.portally_generated.ExternalSource.ExternalSource.external_samefile)
-    file     = ExternalSourceEnum("file", portally.portally_generated.ExternalSource.ExternalSource.external_file)
-    url      = ExternalSourceEnum("url", portally.portally_generated.ExternalSource.ExternalSource.external_url)
+    memory   = ExternalSourceEnum("memory", stagg.stagg_generated.ExternalSource.ExternalSource.external_memory)
+    samefile = ExternalSourceEnum("samefile", stagg.stagg_generated.ExternalSource.ExternalSource.external_samefile)
+    file     = ExternalSourceEnum("file", stagg.stagg_generated.ExternalSource.ExternalSource.external_file)
+    url      = ExternalSourceEnum("url", stagg.stagg_generated.ExternalSource.ExternalSource.external_url)
     types = [memory, samefile, file, url]
 
     def __init__(self):
@@ -487,21 +487,21 @@ class EndiannessEnum(Enum):
         self.endianness = endianness
 
 class Interpretation(object):
-    none    = DTypeEnum("none", portally.portally_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
-    int8    = DTypeEnum("int8", portally.portally_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
-    uint8   = DTypeEnum("uint8", portally.portally_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
-    int16   = DTypeEnum("int16", portally.portally_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
-    uint16  = DTypeEnum("uint16", portally.portally_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
-    int32   = DTypeEnum("int32", portally.portally_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
-    uint32  = DTypeEnum("uint32", portally.portally_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
-    int64   = DTypeEnum("int64", portally.portally_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
-    uint64  = DTypeEnum("uint64", portally.portally_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
-    float32 = DTypeEnum("float32", portally.portally_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
-    float64 = DTypeEnum("float64", portally.portally_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
+    none    = DTypeEnum("none", stagg.stagg_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    int8    = DTypeEnum("int8", stagg.stagg_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
+    uint8   = DTypeEnum("uint8", stagg.stagg_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
+    int16   = DTypeEnum("int16", stagg.stagg_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
+    uint16  = DTypeEnum("uint16", stagg.stagg_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
+    int32   = DTypeEnum("int32", stagg.stagg_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
+    uint32  = DTypeEnum("uint32", stagg.stagg_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
+    int64   = DTypeEnum("int64", stagg.stagg_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
+    uint64  = DTypeEnum("uint64", stagg.stagg_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
+    float32 = DTypeEnum("float32", stagg.stagg_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
+    float64 = DTypeEnum("float64", stagg.stagg_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
     dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
-    little_endian = EndiannessEnum("little_endian", portally.portally_generated.Endianness.Endianness.little_endian, "<")
-    big_endian    = EndiannessEnum("big_endian", portally.portally_generated.Endianness.Endianness.big_endian, ">")
+    little_endian = EndiannessEnum("little_endian", stagg.stagg_generated.Endianness.Endianness.little_endian, "<")
+    big_endian    = EndiannessEnum("big_endian", stagg.stagg_generated.Endianness.Endianness.big_endian, ">")
     endiannesses = [little_endian, big_endian]
 
     def __init__(self):
@@ -558,8 +558,8 @@ class DimensionOrderEnum(Enum):
         self.dimension_order = dimension_order
 
 class InterpretedBuffer(Interpretation):
-    c_order       = DimensionOrderEnum("c_order", portally.portally_generated.DimensionOrder.DimensionOrder.c_order, "C")
-    fortran_order = DimensionOrderEnum("fortran", portally.portally_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
+    c_order       = DimensionOrderEnum("c_order", stagg.stagg_generated.DimensionOrder.DimensionOrder.c_order, "C")
+    fortran_order = DimensionOrderEnum("fortran", stagg.stagg_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
     orders = [c_order, fortran_order]
 
     def __init__(self):
@@ -569,7 +569,7 @@ class InterpretedBuffer(Interpretation):
 
 class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     _params = {
-        "buffer": portally.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
+        "buffer": stagg.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -593,22 +593,22 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         return out
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.RawInlineBuffer.RawInlineBufferStartBufferVector(builder, len(self.buffer))
+        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferStartBufferVector(builder, len(self.buffer))
         builder.head = builder.head - len(self.buffer)
         builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
         buffer = builder.EndVector(len(self.buffer))
 
-        portally.portally_generated.RawInlineBuffer.RawInlineBufferStart(builder)
-        portally.portally_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
-        return portally.portally_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
+        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferStart(builder)
+        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
+        return stagg.stagg_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
 
 ################################################# RawExternalBuffer
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
-        "pointer":         portally.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":        portally.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_source": portally.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
+        "pointer":         stagg.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":        stagg.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
+        "external_source": stagg.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
         }
 
     pointer       = typedproperty(_params["pointer"])
@@ -625,22 +625,22 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.RawExternalBuffer.RawExternalBufferStart(builder)
-        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
-        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
-        portally.portally_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
-        return portally.portally_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
+        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferStart(builder)
+        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
+        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
+        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
+        return stagg.stagg_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
 
 ################################################# InlineBuffer
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
-        "buffer":           portally.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
-        "filters":          portally.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": portally.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
-        "dtype":            portally.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       portally.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  portally.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "buffer":           stagg.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
+        "filters":          stagg.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": stagg.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
+        "dtype":            stagg.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       stagg.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  stagg.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         }
 
     buffer           = typedproperty(_params["buffer"])
@@ -713,7 +713,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return out
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, len(self.buffer))
+        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, len(self.buffer))
         builder.head = builder.head - len(self.buffer)
         builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
         buffer = builder.EndVector(len(self.buffer))
@@ -721,38 +721,38 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         if len(self.filters) == 0:
             filters = None
         else:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUInt32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
-        portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddBuffer(builder, buffer)
+        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
+        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddBuffer(builder, buffer)
         if filters is not None:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
         if self.postfilter_slice is not None:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if self.dtype != self.none:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
         if self.endianness != self.little_endian:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
         if self.dimension_order != self.c_order:
-            portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
-        return portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
+            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
+        return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
 ################################################# ExternalBuffer
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
-        "pointer":          portally.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         portally.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
-        "external_source":  portally.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
-        "filters":          portally.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": portally.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
-        "dtype":            portally.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       portally.checktype.CheckEnum("InterpretedExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  portally.checktype.CheckEnum("InterpretedExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
-        "location":         portally.checktype.CheckString("InterpretedExternalBuffer", "location", required=False),
+        "pointer":          stagg.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         stagg.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
+        "external_source":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
+        "filters":          stagg.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": stagg.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
+        "dtype":            stagg.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       stagg.checktype.CheckEnum("InterpretedExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "location":         stagg.checktype.CheckString("InterpretedExternalBuffer", "location", required=False),
         }
 
     pointer          = typedproperty(_params["pointer"])
@@ -814,39 +814,39 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         if len(self.filters) == 0:
             filters = None
         else:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUInt32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
-        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPointer(builder, self.pointer)
-        portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddNumbytes(builder, self.numbytes)
+        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
+        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPointer(builder, self.pointer)
+        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddNumbytes(builder, self.numbytes)
         if self.external_source != ExternalBuffer.memory:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddExternalSource(builder, self.external_source.values)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddExternalSource(builder, self.external_source.values)
         if filters is not None:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddFilters(builder, filters)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddFilters(builder, filters)
         if self.postfilter_slice is not None:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if self.dtype != self.none:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDtype(builder, self.dtype.value)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDtype(builder, self.dtype.value)
         if self.endianness != self.little_endian:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddEndianness(builder, self.endianness.value)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddEndianness(builder, self.endianness.value)
         if self.dimension_order != self.c_order:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDimensionOrder(builder, self.dimension_order.value)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDimensionOrder(builder, self.dimension_order.value)
         if location is not None:
-            portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
-        return portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
+            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
+        return stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
 
 ################################################# StatisticFilter
 
-class StatisticFilter(Portally):
+class StatisticFilter(Stagg):
     _params = {
-        "min": portally.checktype.CheckNumber("StatisticFilter", "min", required=False),
-        "max": portally.checktype.CheckNumber("StatisticFilter", "max", required=False),
-        "excludes_minf": portally.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
-        "excludes_pinf": portally.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
-        "excludes_nan":  portally.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
+        "min": stagg.checktype.CheckNumber("StatisticFilter", "min", required=False),
+        "max": stagg.checktype.CheckNumber("StatisticFilter", "max", required=False),
+        "excludes_minf": stagg.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
+        "excludes_pinf": stagg.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
+        "excludes_nan":  stagg.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
         }
 
     min       = typedproperty(_params["min"])
@@ -867,27 +867,27 @@ class StatisticFilter(Portally):
             raise ValueError("StatisticFilter.min ({0}) must be strictly less than StatisticFilter.max ({1})".format(self.min, self.max))
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.StatisticFilter.StatisticFilterStart(builder)
+        stagg.stagg_generated.StatisticFilter.StatisticFilterStart(builder)
         if self.min != float("-inf"):
-            portally.portally_generated.StatisticFilter.StatisticFilterAddMin(builder, self.min)
+            stagg.stagg_generated.StatisticFilter.StatisticFilterAddMin(builder, self.min)
         if self.max != float("inf"):
-            portally.portally_generated.StatisticFilter.StatisticFilterAddMax(builder, self.max)
+            stagg.stagg_generated.StatisticFilter.StatisticFilterAddMax(builder, self.max)
         if self.excludes_minf is not False:
-            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesMinf(builder, self.excludes_minf)
+            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesMinf(builder, self.excludes_minf)
         if self.excludes_pinf is not False:
-            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesPinf(builder, self.excludes_pinf)
+            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesPinf(builder, self.excludes_pinf)
         if self.excludes_nan is not False:
-            portally.portally_generated.StatisticFilter.StatisticFilterAddExcludesNan(builder, self.excludes_nan)
-        return portally.portally_generated.StatisticFilter.StatisticFilterEnd(builder)
+            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesNan(builder, self.excludes_nan)
+        return stagg.stagg_generated.StatisticFilter.StatisticFilterEnd(builder)
 
 ################################################# Moments
 
-class Moments(Portally):
+class Moments(Stagg):
     _params = {
-        "sumwxn":   portally.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
-        "n":        portally.checktype.CheckInteger("Moments", "n", required=True, min=0),
-        "weighted": portally.checktype.CheckBool("Moments", "weighted", required=False),
-        "filter": portally.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
+        "sumwxn":   stagg.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
+        "n":        stagg.checktype.CheckInteger("Moments", "n", required=True, min=0),
+        "weighted": stagg.checktype.CheckBool("Moments", "weighted", required=False),
+        "filter": stagg.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }
 
     sumwxn   = typedproperty(_params["sumwxn"])
@@ -920,22 +920,22 @@ class Moments(Portally):
         sumwxn = self.sumwxn._toflatbuffers(builder)
         filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
-        portally.portally_generated.Moments.MomentsStart(builder)
-        portally.portally_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
-        portally.portally_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
-        portally.portally_generated.Moments.MomentsAddN(builder, self.n)
+        stagg.stagg_generated.Moments.MomentsStart(builder)
+        stagg.stagg_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
+        stagg.stagg_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
+        stagg.stagg_generated.Moments.MomentsAddN(builder, self.n)
         if self.weighted is not True:
-            portally.portally_generated.Moments.MomentsAddWeighted(builder, self.weighted)
+            stagg.stagg_generated.Moments.MomentsAddWeighted(builder, self.weighted)
         if filter is not None:
-            portally.portally_generated.Moments.MomentsAddFilter(builder, filter)
-        return portally.portally_generated.Moments.MomentsEnd(builder)
+            stagg.stagg_generated.Moments.MomentsAddFilter(builder, filter)
+        return stagg.stagg_generated.Moments.MomentsEnd(builder)
 
 ################################################# Extremes
 
-class Extremes(Portally):
+class Extremes(Stagg):
     _params = {
-        "values": portally.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Extremes", "filter", required=False, type=StatisticFilter),
+        "values": stagg.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
+        "filter": stagg.checktype.CheckClass("Extremes", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -962,21 +962,21 @@ class Extremes(Portally):
         values = self.values._toflatbuffers(builder)
         filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
-        portally.portally_generated.Extremes.ExtremesStart(builder)
-        portally.portally_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.Extremes.ExtremesAddValues(builder, values)
+        stagg.stagg_generated.Extremes.ExtremesStart(builder)
+        stagg.stagg_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.Extremes.ExtremesAddValues(builder, values)
         if filter is not None:
-            portally.portally_generated.Extremes.ExtremesAddFilter(builder, filter)
-        return portally.portally_generated.Extremes.ExtremesEnd(builder)
+            stagg.stagg_generated.Extremes.ExtremesAddFilter(builder, filter)
+        return stagg.stagg_generated.Extremes.ExtremesEnd(builder)
 
 ################################################# Quantiles
 
-class Quantiles(Portally):
+class Quantiles(Stagg):
     _params = {
-        "values": portally.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
-        "p":      portally.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
-        "weighted": portally.checktype.CheckBool("Quantiles", "weighted", required=False),
-        "filter": portally.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
+        "values": stagg.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
+        "p":      stagg.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "weighted": stagg.checktype.CheckBool("Quantiles", "weighted", required=False),
+        "filter": stagg.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
     values   = typedproperty(_params["values"])
@@ -1009,22 +1009,22 @@ class Quantiles(Portally):
         values = self.values._toflatbuffers(builder)
         filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
-        portally.portally_generated.Quantiles.QuantilesStart(builder)
-        portally.portally_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.Quantiles.QuantilesAddValues(builder, values)
-        portally.portally_generated.Quantiles.QuantilesAddP(builder, self.p)
+        stagg.stagg_generated.Quantiles.QuantilesStart(builder)
+        stagg.stagg_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.Quantiles.QuantilesAddValues(builder, values)
+        stagg.stagg_generated.Quantiles.QuantilesAddP(builder, self.p)
         if self.weighted is not True:
-            portally.portally_generated.Quantiles.QuantilesAddWeighted(builder, self.weighted)
+            stagg.stagg_generated.Quantiles.QuantilesAddWeighted(builder, self.weighted)
         if filter is not None:
-            portally.portally_generated.Quantiles.QuantilesAddFilter(builder, filter)
-        return portally.portally_generated.Quantiles.QuantilesEnd(builder)
+            stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, filter)
+        return stagg.stagg_generated.Quantiles.QuantilesEnd(builder)
 
 ################################################# Modes
 
-class Modes(Portally):
+class Modes(Stagg):
     _params = {
-        "values": portally.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
-        "filter": portally.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
+        "values": stagg.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
+        "filter": stagg.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
     values   = typedproperty(_params["values"])
@@ -1051,22 +1051,22 @@ class Modes(Portally):
         values = self.values._toflatbuffers(builder)
         filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
-        portally.portally_generated.Modes.ModesStart(builder)
-        portally.portally_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.Modes.ModesAddValues(builder, values)
+        stagg.stagg_generated.Modes.ModesStart(builder)
+        stagg.stagg_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.Modes.ModesAddValues(builder, values)
         if filter is not None:
-            portally.portally_generated.Modes.ModesAddFilter(builder, filter)
-        return portally.portally_generated.Modes.ModesEnd(builder)
+            stagg.stagg_generated.Modes.ModesAddFilter(builder, filter)
+        return stagg.stagg_generated.Modes.ModesEnd(builder)
 
 ################################################# Statistics
 
-class Statistics(Portally):
+class Statistics(Stagg):
     _params = {
-        "moments":   portally.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
-        "quantiles": portally.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
-        "mode":     portally.checktype.CheckClass("Statistics", "mode", required=False, type=Modes),
-        "min":    portally.checktype.CheckClass("Statistics", "min", required=False, type=Extremes),
-        "max":    portally.checktype.CheckClass("Statistics", "max", required=False, type=Extremes),
+        "moments":   stagg.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
+        "quantiles": stagg.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
+        "mode":     stagg.checktype.CheckClass("Statistics", "mode", required=False, type=Modes),
+        "min":    stagg.checktype.CheckClass("Statistics", "min", required=False, type=Extremes),
+        "max":    stagg.checktype.CheckClass("Statistics", "max", required=False, type=Extremes),
         }
 
     moments   = typedproperty(_params["moments"])
@@ -1102,39 +1102,39 @@ class Statistics(Portally):
         max = None if self.max is None else self.max._toflatbuffers(builder)
 
         if moments is not None:
-            portally.portally_generated.Statistics.StatisticsStartMomentsVector(builder, len(moments))
+            stagg.stagg_generated.Statistics.StatisticsStartMomentsVector(builder, len(moments))
             for x in moments[::-1]:
                 builder.PrependUOffsetTRelative(x)
             moments = builder.EndVector(len(moments))
 
         if quantiles is not None:
-            portally.portally_generated.Statistics.StatisticsStartQuantilesVector(builder, len(quantiles))
+            stagg.stagg_generated.Statistics.StatisticsStartQuantilesVector(builder, len(quantiles))
             for x in quantiles[::-1]:
                 builder.PrependUOffsetTRelative(x)
             quantiles = builder.EndVector(len(quantiles))
 
-        portally.portally_generated.Statistics.StatisticsStart(builder)
+        stagg.stagg_generated.Statistics.StatisticsStart(builder)
         if moments is not None:
-            portally.portally_generated.Statistics.StatisticsAddMoments(builder, moments)
+            stagg.stagg_generated.Statistics.StatisticsAddMoments(builder, moments)
         if quantiles is not None:
-            portally.portally_generated.Statistics.StatisticsAddQuantiles(builder, quantiles)
+            stagg.stagg_generated.Statistics.StatisticsAddQuantiles(builder, quantiles)
         if mode is not None:
-            portally.portally_generated.Statistics.StatisticsAddMode(builder, mode)
+            stagg.stagg_generated.Statistics.StatisticsAddMode(builder, mode)
         if min is not None:
-            portally.portally_generated.Statistics.StatisticsAddMin(builder, min)
+            stagg.stagg_generated.Statistics.StatisticsAddMin(builder, min)
         if max is not None:
-            portally.portally_generated.Statistics.StatisticsAddMax(builder, max)
-        return portally.portally_generated.Statistics.StatisticsEnd(builder)
+            stagg.stagg_generated.Statistics.StatisticsAddMax(builder, max)
+        return stagg.stagg_generated.Statistics.StatisticsEnd(builder)
 
 ################################################# Covariance
 
-class Covariance(Portally):
+class Covariance(Stagg):
     _params = {
-        "xindex": portally.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
-        "yindex": portally.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
-        "sumwxy": portally.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
-        "weighted": portally.checktype.CheckBool("Covariance", "weighted", required=False),
-        "filter": portally.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
+        "xindex": stagg.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
+        "yindex": stagg.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
+        "sumwxy": stagg.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
+        "weighted": stagg.checktype.CheckBool("Covariance", "weighted", required=False),
+        "filter": stagg.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
         }
 
     xindex   = typedproperty(_params["xindex"])
@@ -1180,20 +1180,20 @@ class Covariance(Portally):
         sumwxy = self.sumwxy._toflatbuffers(builder)
         filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
-        portally.portally_generated.Covariance.CovarianceStart(builder)
-        portally.portally_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
-        portally.portally_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
-        portally.portally_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
-        portally.portally_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
+        stagg.stagg_generated.Covariance.CovarianceStart(builder)
+        stagg.stagg_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
+        stagg.stagg_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
+        stagg.stagg_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
+        stagg.stagg_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
         if self.weighted is not True:
-            portally.portally_generated.Covariance.CovarianceAddWeighted(builder, self.weighted)
+            stagg.stagg_generated.Covariance.CovarianceAddWeighted(builder, self.weighted)
         if filter is not None:
-            portally.portally_generated.Covariance.CovarianceAddFilter(builder, filter)
-        return portally.portally_generated.Covariance.CovarianceEnd(builder)
+            stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, filter)
+        return stagg.stagg_generated.Covariance.CovarianceEnd(builder)
 
 ################################################# Binning
 
-class Binning(Portally):
+class Binning(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -1211,13 +1211,13 @@ class BinLocationEnum(Enum):
     base = "BinLocation"
 
 class BinLocation(object):
-    below3      = BinLocationEnum("below3", portally.portally_generated.BinLocation.BinLocation.loc_below3)
-    below2      = BinLocationEnum("below2", portally.portally_generated.BinLocation.BinLocation.loc_below2)
-    below1      = BinLocationEnum("below1", portally.portally_generated.BinLocation.BinLocation.loc_below1)
-    nonexistent = BinLocationEnum("nonexistent", portally.portally_generated.BinLocation.BinLocation.loc_nonexistent)
-    above1      = BinLocationEnum("above1", portally.portally_generated.BinLocation.BinLocation.loc_above1)
-    above2      = BinLocationEnum("above2", portally.portally_generated.BinLocation.BinLocation.loc_above2)
-    above3      = BinLocationEnum("above3", portally.portally_generated.BinLocation.BinLocation.loc_above3)
+    below3      = BinLocationEnum("below3", stagg.stagg_generated.BinLocation.BinLocation.loc_below3)
+    below2      = BinLocationEnum("below2", stagg.stagg_generated.BinLocation.BinLocation.loc_below2)
+    below1      = BinLocationEnum("below1", stagg.stagg_generated.BinLocation.BinLocation.loc_below1)
+    nonexistent = BinLocationEnum("nonexistent", stagg.stagg_generated.BinLocation.BinLocation.loc_nonexistent)
+    above1      = BinLocationEnum("above1", stagg.stagg_generated.BinLocation.BinLocation.loc_above1)
+    above2      = BinLocationEnum("above2", stagg.stagg_generated.BinLocation.BinLocation.loc_above2)
+    above3      = BinLocationEnum("above3", stagg.stagg_generated.BinLocation.BinLocation.loc_above3)
     locations = [below3, below2, below1, nonexistent, above1, above2, above3]
 
     def __init__(self):
@@ -1227,10 +1227,10 @@ class BinLocation(object):
 
 class IntegerBinning(Binning, BinLocation):
     _params = {
-        "min":       portally.checktype.CheckInteger("IntegerBinning", "min", required=True),
-        "max":       portally.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "loc_underflow": portally.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations),
-        "loc_overflow":  portally.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations),
+        "min":       stagg.checktype.CheckInteger("IntegerBinning", "min", required=True),
+        "max":       stagg.checktype.CheckInteger("IntegerBinning", "max", required=True),
+        "loc_underflow": stagg.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations),
+        "loc_overflow":  stagg.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations),
         }
 
     min       = typedproperty(_params["min"])
@@ -1254,23 +1254,23 @@ class IntegerBinning(Binning, BinLocation):
         return (self.max - self.min + 1 + int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent),)
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.IntegerBinning.IntegerBinningStart(builder)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
-        portally.portally_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
+        stagg.stagg_generated.IntegerBinning.IntegerBinningStart(builder)
+        stagg.stagg_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
+        stagg.stagg_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
         if self.loc_underflow != self.nonexistent:
-            portally.portally_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
+            stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
         if self.loc_overflow != self.nonexistent:
-            portally.portally_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
-        return portally.portally_generated.IntegerBinning.IntegerBinningEnd(builder)
+            stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
+        return stagg.stagg_generated.IntegerBinning.IntegerBinningEnd(builder)
 
 ################################################# RealInterval
 
-class RealInterval(Portally):
+class RealInterval(Stagg):
     _params = {
-        "low":            portally.checktype.CheckNumber("RealInterval", "low", required=True),
-        "high":           portally.checktype.CheckNumber("RealInterval", "high", required=True),
-        "low_inclusive":  portally.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
-        "high_inclusive": portally.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
+        "low":            stagg.checktype.CheckNumber("RealInterval", "low", required=True),
+        "high":           stagg.checktype.CheckNumber("RealInterval", "high", required=True),
+        "low_inclusive":  stagg.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
+        "high_inclusive": stagg.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
 
     low            = typedproperty(_params["low"])
@@ -1291,34 +1291,34 @@ class RealInterval(Portally):
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.RealInterval.RealIntervalStart(builder)
-        portally.portally_generated.RealInterval.RealIntervalAddLow(builder, self.low)
-        portally.portally_generated.RealInterval.RealIntervalAddHigh(builder, self.high)
+        stagg.stagg_generated.RealInterval.RealIntervalStart(builder)
+        stagg.stagg_generated.RealInterval.RealIntervalAddLow(builder, self.low)
+        stagg.stagg_generated.RealInterval.RealIntervalAddHigh(builder, self.high)
         if self.low_inclusive is not True:
-            portally.portally_generated.RealInterval.RealIntervalAddLowInclusive(builder, self.low_inclusive)
+            stagg.stagg_generated.RealInterval.RealIntervalAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
-            portally.portally_generated.RealInterval.RealIntervalAddHighInclusive(builder, self.high_inclusive)
-        return portally.portally_generated.RealInterval.RealIntervalEnd(builder)
+            stagg.stagg_generated.RealInterval.RealIntervalAddHighInclusive(builder, self.high_inclusive)
+        return stagg.stagg_generated.RealInterval.RealIntervalEnd(builder)
 
 ################################################# RealOverflow
 
 class NonRealMappingEnum(Enum):
     base = "RealOverflow"
 
-class RealOverflow(Portally, BinLocation):
-    missing      = NonRealMappingEnum("missing", portally.portally_generated.NonRealMapping.NonRealMapping.missing)
-    in_underflow = NonRealMappingEnum("in_underflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_underflow)
-    in_overflow  = NonRealMappingEnum("in_overflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_overflow)
-    in_nanflow   = NonRealMappingEnum("in_nanflow", portally.portally_generated.NonRealMapping.NonRealMapping.in_nanflow)
+class RealOverflow(Stagg, BinLocation):
+    missing      = NonRealMappingEnum("missing", stagg.stagg_generated.NonRealMapping.NonRealMapping.missing)
+    in_underflow = NonRealMappingEnum("in_underflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_underflow)
+    in_overflow  = NonRealMappingEnum("in_overflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_overflow)
+    in_nanflow   = NonRealMappingEnum("in_nanflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_nanflow)
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "loc_underflow": portally.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations),
-        "loc_overflow":  portally.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations),
-        "loc_nanflow":   portally.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations),
-        "minf_mapping":  portally.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
-        "pinf_mapping":  portally.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
-        "nan_mapping":   portally.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
+        "loc_underflow": stagg.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations),
+        "loc_overflow":  stagg.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations),
+        "loc_nanflow":   stagg.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations),
+        "minf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
+        "pinf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
+        "nan_mapping":   stagg.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
     loc_underflow = typedproperty(_params["loc_underflow"])
@@ -1348,29 +1348,29 @@ class RealOverflow(Portally, BinLocation):
         return int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent) + int(self.loc_nanflow != BinLocation.nonexistent)
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.RealOverflow.RealOverflowStart(builder)
+        stagg.stagg_generated.RealOverflow.RealOverflowStart(builder)
         if self.loc_underflow is not self.nonexistent:
-            portally.portally_generated.RealOverflow.RealOverflowAddLocUnderflow(builder, self.loc_underflow.value)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddLocUnderflow(builder, self.loc_underflow.value)
         if self.loc_overflow is not self.nonexistent:
-            portally.portally_generated.RealOverflow.RealOverflowAddLocOverflow(builder, self.loc_overflow.value)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddLocOverflow(builder, self.loc_overflow.value)
         if self.loc_nanflow is not self.nonexistent:
-            portally.portally_generated.RealOverflow.RealOverflowAddLocNanflow(builder, self.loc_nanflow.value)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddLocNanflow(builder, self.loc_nanflow.value)
         if self.minf_mapping is not self.in_underflow:
-            portally.portally_generated.RealOverflow.RealOverflowAddMinfMapping(builder, self.minf_mapping.value)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddMinfMapping(builder, self.minf_mapping.value)
         if self.pinf_mapping is not self.in_overflow:
-            portally.portally_generated.RealOverflow.RealOverflowAddPinfMapping(builder, self.pinf_mapping.value)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddPinfMapping(builder, self.pinf_mapping.value)
         if self.nan_mapping is not self.in_nanflow:
-            portally.portally_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
-        return portally.portally_generated.RealOverflow.RealOverflowEnd(builder)
+            stagg.stagg_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
+        return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
 
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
     _params = {
-        "num":      portally.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
-        "interval": portally.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
-        "overflow": portally.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
-        "circular": portally.checktype.CheckBool("RegularBinning", "circular", required=False),
+        "num":      stagg.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
+        "interval": stagg.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
+        "overflow": stagg.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
+        "circular": stagg.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
     num      = typedproperty(_params["num"])
@@ -1403,25 +1403,25 @@ class RegularBinning(Binning):
     def _toflatbuffers(self, builder):
         interval = self.interval._toflatbuffers(builder)
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
-        portally.portally_generated.RegularBinning.RegularBinningStart(builder)
-        portally.portally_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
-        portally.portally_generated.RegularBinning.RegularBinningAddInterval(builder, interval)
+        stagg.stagg_generated.RegularBinning.RegularBinningStart(builder)
+        stagg.stagg_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
+        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, interval)
         if overflow is not None:
-            portally.portally_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
+            stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
         if self.circular is not False:
-            portally.portally_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
-        return portally.portally_generated.RegularBinning.RegularBinningEnd(builder)
+            stagg.stagg_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
+        return stagg.stagg_generated.RegularBinning.RegularBinningEnd(builder)
 
 ################################################# TicTacToeOverflowBinning
 
 class TicTacToeOverflowBinning(Binning):
     _params = {
-        "xnum":      portally.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
-        "ynum":      portally.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
-        "xinterval": portally.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
-        "yinterval": portally.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
-        "xoverflow": portally.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
-        "yoverflow": portally.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
+        "xnum":      stagg.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
+        "ynum":      stagg.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
+        "xinterval": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
+        "yinterval": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
+        "xoverflow": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
+        "yoverflow": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
         }
 
     xnum      = typedproperty(_params["xnum"])
@@ -1463,16 +1463,16 @@ class TicTacToeOverflowBinning(Binning):
         xoverflow = None if self.xoverflow is None else self.xoverflow._toflatbuffers(builder)
         yoverflow = None if self.yoverflow is None else self.yoverflow._toflatbuffers(builder)
 
-        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningStart(builder)
-        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXnum(builder, self.xnum)
-        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYnum(builder, self.ynum)
-        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXinterval(builder, xinterval)
-        portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYinterval(builder, yinterval)
+        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningStart(builder)
+        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXnum(builder, self.xnum)
+        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYnum(builder, self.ynum)
+        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXinterval(builder, xinterval)
+        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYinterval(builder, yinterval)
         if xoverflow is not None:
-            portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXoverflow(builder, xoverflow)
+            stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXoverflow(builder, xoverflow)
         if yoverflow is not None:
-            portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYoverflow(builder, yoverflow)
-        return portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningEnd(builder)
+            stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYoverflow(builder, yoverflow)
+        return stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningEnd(builder)
         
 ################################################# HexagonalBinning
 
@@ -1480,24 +1480,24 @@ class HexagonalCoordinatesEnum(Enum):
     base = "HexagonalBinning"
 
 class HexagonalBinning(Binning):
-    offset         = HexagonalCoordinatesEnum("offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
-    doubled_offset = HexagonalCoordinatesEnum("doubled_offset", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
-    cube_xy        = HexagonalCoordinatesEnum("cube_xy", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
-    cube_yz        = HexagonalCoordinatesEnum("cube_yz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
-    cube_xz        = HexagonalCoordinatesEnum("cube_xz", portally.portally_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
+    offset         = HexagonalCoordinatesEnum("offset", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
+    doubled_offset = HexagonalCoordinatesEnum("doubled_offset", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
+    cube_xy        = HexagonalCoordinatesEnum("cube_xy", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
+    cube_yz        = HexagonalCoordinatesEnum("cube_yz", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
+    cube_xz        = HexagonalCoordinatesEnum("cube_xz", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
-        "qmin":        portally.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
-        "qmax":        portally.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
-        "rmin":        portally.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
-        "rmax":        portally.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
-        "coordinates": portally.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
-        "xorigin":     portally.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "yorigin":     portally.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "qangle":      portally.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
-        "qoverflow":   portally.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
-        "roverflow":   portally.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
+        "qmin":        stagg.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
+        "qmax":        stagg.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
+        "rmin":        stagg.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
+        "rmax":        stagg.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
+        "coordinates": stagg.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "yorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "qangle":      stagg.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
+        "qoverflow":   stagg.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
+        "roverflow":   stagg.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
         }
 
     qmin        = typedproperty(_params["qmin"])
@@ -1549,31 +1549,31 @@ class HexagonalBinning(Binning):
         qoverflow = None if self.qoverflow is None else self.qoverflow._toflatbuffers(builder)
         roverflow = None if self.roverflow is None else self.roverflow._toflatbuffers(builder)
 
-        portally.portally_generated.HexagonalBinning.HexagonalBinningStart(builder)
-        portally.portally_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
-        portally.portally_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
-        portally.portally_generated.HexagonalBinning.HexagonalBinningAddRmin(builder, self.rmin)
-        portally.portally_generated.HexagonalBinning.HexagonalBinningAddRmax(builder, self.rmax)
+        stagg.stagg_generated.HexagonalBinning.HexagonalBinningStart(builder)
+        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
+        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
+        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRmin(builder, self.rmin)
+        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRmax(builder, self.rmax)
         if self.coordinates != self.offset:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddOffset(builder, self.coordinates)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddOffset(builder, self.coordinates)
         if self.xorigin != 0.0:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddXorigin(builder, self.xorigin)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddXorigin(builder, self.xorigin)
         if self.yorigin != 0.0:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
         if self.qangle != 0.0:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
         if qoverflow is not None:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, qoverflow)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, qoverflow)
         if roverflow is not None:
-            portally.portally_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
-        return portally.portally_generated.HexagonalBinning.HexagonalBinningEnd(builder)
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
+        return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
 ################################################# EdgesBinning
 
 class EdgesBinning(Binning):
     _params = {
-        "edges":    portally.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
-        "overflow": portally.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        "edges":    stagg.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
+        "overflow": stagg.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
         }
 
     edges    = typedproperty(_params["edges"])
@@ -1601,17 +1601,17 @@ class EdgesBinning(Binning):
         return (len(self.edges) - 1 + numoverflowbins,)
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
+        stagg.stagg_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
         for x in self.edges[::-1]:
             builder.PrependFloat64(x)
         edges = builder.EndVector(len(self.edges))
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
-        portally.portally_generated.EdgesBinning.EdgesBinningStart(builder)
-        portally.portally_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
+        stagg.stagg_generated.EdgesBinning.EdgesBinningStart(builder)
+        stagg.stagg_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
         if overflow is not None:
-            portally.portally_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
-        return portally.portally_generated.EdgesBinning.EdgesBinningEnd(builder)
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
 
 ################################################# IrregularBinning
 
@@ -1619,15 +1619,15 @@ class OverlappingFillStrategyEnum(Enum):
     base = "IrregularBinning"
 
 class IrregularBinning(Binning):
-    all   = OverlappingFillStrategyEnum("all", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first = OverlappingFillStrategyEnum("first", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last  = OverlappingFillStrategyEnum("last", portally.portally_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    all   = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last  = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
     overlapping_fill_strategies = [all, first, last]
 
     _params = {
-        "intervals":        portally.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
-        "overflow":         portally.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
-        "overlapping_fill": portally.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
+        "intervals":        stagg.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
+        "overflow":         stagg.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
+        "overlapping_fill": stagg.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
         }
 
     intervals        = typedproperty(_params["intervals"])
@@ -1655,25 +1655,25 @@ class IrregularBinning(Binning):
         intervals = [x._toflatbuffers(builder) for x in self.intervals]
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
-        portally.portally_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(intervals))
+        stagg.stagg_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(intervals))
         for x in intervals[::-1]:
             builder.PrependUOffsetTRelative(x)
         intervals = builder.EndVector(len(intervals))
 
-        portally.portally_generated.IrregularBinning.IrregularBinningStart(builder)
-        portally.portally_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
+        stagg.stagg_generated.IrregularBinning.IrregularBinningStart(builder)
+        stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
         if overflow is not None:
-            portally.portally_generated.IrregularBinning.IrregularBinningAddOverflow(builder, overflow)
+            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, overflow)
         if self.overlapping_fill != self.all:
-            portally.portally_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
-        return portally.portally_generated.IrregularBinning.IrregularBinningEnd(builder)
+            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
+        return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
 
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning, BinLocation):
     _params = {
-        "categories": portally.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
-        "loc_overflow":  portally.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations),
+        "categories": stagg.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
+        "loc_overflow":  stagg.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations),
         }
 
     categories = typedproperty(_params["categories"])
@@ -1697,25 +1697,25 @@ class CategoryBinning(Binning, BinLocation):
     def _toflatbuffers(self, builder):
         categories = [builder.CreateString(x.encode("utf-8")) for x in self.categories]
 
-        portally.portally_generated.CategoryBinning.CategoryBinningStartCategoriesVector(builder, len(categories))
+        stagg.stagg_generated.CategoryBinning.CategoryBinningStartCategoriesVector(builder, len(categories))
         for x in categories[::-1]:
             builder.PrependUOffsetTRelative(x)
         categories = builder.EndVector(len(categories))
 
-        portally.portally_generated.CategoryBinning.CategoryBinningStart(builder)
-        portally.portally_generated.CategoryBinning.CategoryBinningAddCategories(builder, categories)
+        stagg.stagg_generated.CategoryBinning.CategoryBinningStart(builder)
+        stagg.stagg_generated.CategoryBinning.CategoryBinningAddCategories(builder, categories)
         if self.loc_overflow != self.nonexistent:
-            portally.portally_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
-        return portally.portally_generated.CategoryBinning.CategoryBinningEnd(builder)
+            stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
+        return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
 
 ################################################# SparseRegularBinning
 
 class SparseRegularBinning(Binning, BinLocation):
     _params = {
-        "bins":        portally.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
-        "bin_width":   portally.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
-        "origin":      portally.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "loc_nanflow": portally.checktype.CheckEnum("SparseRegularBinning", "loc_nanflow", required=False, choices=BinLocation.locations),
+        "bins":        stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
+        "bin_width":   stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        "origin":      stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        "loc_nanflow": stagg.checktype.CheckEnum("SparseRegularBinning", "loc_nanflow", required=False, choices=BinLocation.locations),
         }
 
     bins        = typedproperty(_params["bins"])
@@ -1737,19 +1737,19 @@ class SparseRegularBinning(Binning, BinLocation):
         return (len(self.bins) + (self.loc_nanflow != BinLocation.nonexistent),)
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
+        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
         for x in self.bins[::-1]:
             builder.PrependInt64(x)
         bins = builder.EndVector(len(self.bins))
 
-        portally.portally_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
-        portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
-        portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
+        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
+        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
+        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
         if self.origin != 0.0:
-            portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
+            stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
         if self.loc_nanflow != self.nonexistent:
-            portally.portally_generated.SparseRegularBinning.SparseRegularBinningAddLocNanflow(builder, self.loc_nanflow.value)
-        return portally.portally_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
+            stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddLocNanflow(builder, self.loc_nanflow.value)
+        return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
 ################################################# FractionBinning
 
@@ -1760,24 +1760,24 @@ class FractionErrorMethodEnum(Enum):
     base = "FractionBinning"
 
 class FractionBinning(Binning):
-    passall  = FractionLayoutEnum("passall", portally.portally_generated.FractionLayout.FractionLayout.frac_passall)
-    failall  = FractionLayoutEnum("failall", portally.portally_generated.FractionLayout.FractionLayout.frac_failall)
-    passfail = FractionLayoutEnum("passfail", portally.portally_generated.FractionLayout.FractionLayout.frac_passfail)
+    passall  = FractionLayoutEnum("passall", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passall)
+    failall  = FractionLayoutEnum("failall", stagg.stagg_generated.FractionLayout.FractionLayout.frac_failall)
+    passfail = FractionLayoutEnum("passfail", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passfail)
     layouts = [passall, failall, passfail]
 
-    normal           = FractionErrorMethodEnum("normal", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
-    clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
-    wilson           = FractionErrorMethodEnum("wilson", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
-    agresti_coull    = FractionErrorMethodEnum("agresti_coull", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
-    feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
-    jeffrey          = FractionErrorMethodEnum("jeffrey", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
-    bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", portally.portally_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
+    normal           = FractionErrorMethodEnum("normal", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
+    clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
+    wilson           = FractionErrorMethodEnum("wilson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
+    agresti_coull    = FractionErrorMethodEnum("agresti_coull", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
+    feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
+    jeffrey          = FractionErrorMethodEnum("jeffrey", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
+    bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
     error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
-        "layout": portally.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
-        "layout_reversed": portally.checktype.CheckBool("FractionBinning", "layout_reversed", required=False),
-        "error_method": portally.checktype.CheckEnum("FractionBinning", "error_method", required=False, choices=error_methods),
+        "layout": stagg.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
+        "layout_reversed": stagg.checktype.CheckBool("FractionBinning", "layout_reversed", required=False),
+        "error_method": stagg.checktype.CheckEnum("FractionBinning", "error_method", required=False, choices=error_methods),
         }
 
     layout          = typedproperty(_params["layout"])
@@ -1797,20 +1797,20 @@ class FractionBinning(Binning):
         return (2,)
 
     def _toflatbuffers(self, builder):
-        portally.portally_generated.FractionBinning.FractionBinningStart(builder)
+        stagg.stagg_generated.FractionBinning.FractionBinningStart(builder)
         if self.layout != self.passall:
-            portally.portally_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
+            stagg.stagg_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
         if self.layout_reversed is not False:
-            portally.portally_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
+            stagg.stagg_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
         if self.error_method != self.normal:
-            portally.portally_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
-        return portally.portally_generated.FractionBinning.FractionBinningEnd(builder)
+            stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
+        return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
 
 ################################################# PredicateBinning
 
 class PredicateBinning(Binning):
     _params = {
-        "predicates": portally.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
+        "predicates": stagg.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
         }
 
     predicates = typedproperty(_params["predicates"])
@@ -1824,21 +1824,21 @@ class PredicateBinning(Binning):
     def _toflatbuffers(self, builder):
         predicates = [builder.CreateString(x.encode("utf-8")) for x in self.predicates]
 
-        portally.portally_generated.PredicateBinning.PredicateBinningStartPredicatesVector(builder, len(predicates))
+        stagg.stagg_generated.PredicateBinning.PredicateBinningStartPredicatesVector(builder, len(predicates))
         for x in predicates[::-1]:
             builder.PrependUOffsetTRelative(x)
         predicates = builder.EndVector(len(predicates))
 
-        portally.portally_generated.PredicateBinning.PredicateBinningStart(builder)
-        portally.portally_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
-        return portally.portally_generated.PredicateBinning.PredicateBinningEnd(builder)
+        stagg.stagg_generated.PredicateBinning.PredicateBinningStart(builder)
+        stagg.stagg_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
+        return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
 
 ################################################# Assignment
 
-class Assignment(Portally):
+class Assignment(Stagg):
     _params = {
-        "identifier": portally.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
-        "expression": portally.checktype.CheckString("Assignment", "expression", required=True),
+        "identifier": stagg.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
+        "expression": stagg.checktype.CheckString("Assignment", "expression", required=True),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -1851,18 +1851,18 @@ class Assignment(Portally):
     def _toflatbuffers(self, builder):
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         expression = builder.CreateString(self.expression.encode("utf-8"))
-        portally.portally_generated.Assignment.AssignmentStart(builder)
-        portally.portally_generated.Assignment.AssignmentAddIdentifier(builder, identifier)
-        portally.portally_generated.Assignment.AssignmentAddExpression(builder, expression)
-        return portally.portally_generated.Assignment.AssignmentEnd(builder)
+        stagg.stagg_generated.Assignment.AssignmentStart(builder)
+        stagg.stagg_generated.Assignment.AssignmentAddIdentifier(builder, identifier)
+        stagg.stagg_generated.Assignment.AssignmentAddExpression(builder, expression)
+        return stagg.stagg_generated.Assignment.AssignmentEnd(builder)
 
 ################################################# Variation
 
-class Variation(Portally):
+class Variation(Stagg):
     _params = {
-        "assignments":         portally.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
-        "systematic":          portally.checktype.CheckVector("Variation", "systematic", required=False, type=float),
-        "category_systematic": portally.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
+        "assignments":         stagg.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
+        "systematic":          stagg.checktype.CheckVector("Variation", "systematic", required=False, type=float),
+        "category_systematic": stagg.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
     assignments         = typedproperty(_params["assignments"])
@@ -1897,7 +1897,7 @@ class Variation(Portally):
         assignments = [x._toflatbuffers(builder) for x in self.assignments]
         category_systematic = None if len(self.category_systematic) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic]
 
-        portally.portally_generated.Variation.VariationStartAssignmentsVector(builder, len(assignments))
+        stagg.stagg_generated.Variation.VariationStartAssignmentsVector(builder, len(assignments))
         for x in assignments[::-1]:
             builder.PrependUOffsetTRelative(x)
         assignments = builder.EndVector(len(assignments))
@@ -1905,30 +1905,30 @@ class Variation(Portally):
         if len(self.systematic) == 0:
             systematic = None
         else:
-            portally.portally_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
+            stagg.stagg_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
             for x in self.systematic[::-1]:
                 builder.PrependFloat64(x)
             systematic = builder.EndVector(len(self.systematic))
 
         if category_systematic is not None:
-            portally.portally_generated.Variation.VariationStartCategorySystematicVector(builder, len(category_systematic))
+            stagg.stagg_generated.Variation.VariationStartCategorySystematicVector(builder, len(category_systematic))
             for x in category_systematic[::-1]:
                 builder.PrependUOffsetTRelative(x)
             category_systematic = builder.EndVector(len(category_systematic))
 
-        portally.portally_generated.Variation.VariationStart(builder)
-        portally.portally_generated.Variation.VariationAddAssignments(builder, assignments)
+        stagg.stagg_generated.Variation.VariationStart(builder)
+        stagg.stagg_generated.Variation.VariationAddAssignments(builder, assignments)
         if systematic is not None:
-            portally.portally_generated.Variation.VariationAddSystematic(builder, systematic)
+            stagg.stagg_generated.Variation.VariationAddSystematic(builder, systematic)
         if category_systematic is not None:
-            portally.portally_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
-        return portally.portally_generated.Variation.VariationEnd(builder)
+            stagg.stagg_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
+        return stagg.stagg_generated.Variation.VariationEnd(builder)
 
 ################################################# VariationBinning
 
 class VariationBinning(Binning):
     _params = {
-        "variations": portally.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        "variations": stagg.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
         }
 
     variations = typedproperty(_params["variations"])
@@ -1946,25 +1946,25 @@ class VariationBinning(Binning):
     def _toflatbuffers(self, builder):
         variations = [x._toflatbuffers(builder) for x in self.variations]
 
-        portally.portally_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
+        stagg.stagg_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
         for x in variations[::-1]:
             builder.PrependUOffsetTRelative(x)
         variations = builder.EndVector(len(variations))
 
-        portally.portally_generated.VariationBinning.VariationBinningStart(builder)
-        portally.portally_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
-        return portally.portally_generated.VariationBinning.VariationBinningEnd(builder)
+        stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
+        stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
+        return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
 
 ################################################# Axis
 
-class Axis(Portally):
+class Axis(Stagg):
     _params = {
-        "binning":    portally.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
-        "expression": portally.checktype.CheckString("Axis", "expression", required=False),
-        "statistics": portally.checktype.CheckClass("Axis", "statistics", required=False, type=Statistics),
-        "title":      portally.checktype.CheckString("Axis", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
+        "binning":    stagg.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
+        "expression": stagg.checktype.CheckString("Axis", "expression", required=False),
+        "statistics": stagg.checktype.CheckClass("Axis", "statistics", required=False, type=Statistics),
+        "title":      stagg.checktype.CheckString("Axis", "title", required=False),
+        "metadata":   stagg.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
+        "decoration": stagg.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
 
     binning    = typedproperty(_params["binning"])
@@ -2015,31 +2015,31 @@ class Axis(Portally):
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
 
-        portally.portally_generated.Axis.AxisStart(builder)
+        stagg.stagg_generated.Axis.AxisStart(builder)
         if binning is not None:
-            portally.portally_generated.Axis.AxisAddBinningType(builder, _Binning_invlookup[type(self.binning)])
-            portally.portally_generated.Axis.AxisAddBinning(builder, binning)
+            stagg.stagg_generated.Axis.AxisAddBinningType(builder, _Binning_invlookup[type(self.binning)])
+            stagg.stagg_generated.Axis.AxisAddBinning(builder, binning)
         if expression is not None:
-            portally.portally_generated.Axis.AxisAddExpression(builder, expression)
+            stagg.stagg_generated.Axis.AxisAddExpression(builder, expression)
         if statistics is not None:
-            portally.portally_generated.Axis.AxisAddStatistics(builder, statistics)
+            stagg.stagg_generated.Axis.AxisAddStatistics(builder, statistics)
         if title is not None:
-            portally.portally_generated.Axis.AxisAddTitle(builder, title)
+            stagg.stagg_generated.Axis.AxisAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Axis.AxisAddMetadata(builder, metadata)
+            stagg.stagg_generated.Axis.AxisAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Axis.AxisAddDecoration(builder, decoration)
-        return portally.portally_generated.Axis.AxisEnd(builder)
+            stagg.stagg_generated.Axis.AxisAddDecoration(builder, decoration)
+        return stagg.stagg_generated.Axis.AxisEnd(builder)
 
 ################################################# Profile
 
-class Profile(Portally):
+class Profile(Stagg):
     _params = {
-        "expression": portally.checktype.CheckString("Profile", "expression", required=True),
-        "statistics": portally.checktype.CheckClass("Profile", "statistics", required=True, type=Statistics),
-        "title":      portally.checktype.CheckString("Profile", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
+        "expression": stagg.checktype.CheckString("Profile", "expression", required=True),
+        "statistics": stagg.checktype.CheckClass("Profile", "statistics", required=True, type=Statistics),
+        "title":      stagg.checktype.CheckString("Profile", "title", required=False),
+        "metadata":   stagg.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
+        "decoration": stagg.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
     expression = typedproperty(_params["expression"])
@@ -2068,20 +2068,20 @@ class Profile(Portally):
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
 
-        portally.portally_generated.Profile.ProfileStart(builder)
-        portally.portally_generated.Profile.ProfileAddExpression(builder, expression)
-        portally.portally_generated.Profile.ProfileAddStatistics(builder, statistics)
+        stagg.stagg_generated.Profile.ProfileStart(builder)
+        stagg.stagg_generated.Profile.ProfileAddExpression(builder, expression)
+        stagg.stagg_generated.Profile.ProfileAddStatistics(builder, statistics)
         if title is not None:
-            portally.portally_generated.Profile.ProfileAddTitle(builder, title)
+            stagg.stagg_generated.Profile.ProfileAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Profile.ProfileAddMetadata(builder, metadata)
+            stagg.stagg_generated.Profile.ProfileAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Profile.ProfileAddDecoration(builder, decoration)
-        return portally.portally_generated.Profile.ProfileEnd(builder)
+            stagg.stagg_generated.Profile.ProfileAddDecoration(builder, decoration)
+        return stagg.stagg_generated.Profile.ProfileEnd(builder)
 
 ################################################# Counts
 
-class Counts(Portally):
+class Counts(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -2089,7 +2089,7 @@ class Counts(Portally):
 
 class UnweightedCounts(Counts):
     _params = {
-        "counts": portally.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
+        "counts": stagg.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
     counts = typedproperty(_params["counts"])
@@ -2110,18 +2110,18 @@ class UnweightedCounts(Counts):
 
     def _toflatbuffers(self, builder):
         counts = self.counts._toflatbuffers(builder)
-        portally.portally_generated.UnweightedCounts.UnweightedCountsStart(builder)
-        portally.portally_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
-        portally.portally_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
-        return portally.portally_generated.UnweightedCounts.UnweightedCountsEnd(builder)
+        stagg.stagg_generated.UnweightedCounts.UnweightedCountsStart(builder)
+        stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
+        stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
+        return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
     
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
     _params = {
-        "sumw":       portally.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
-        "sumw2":      portally.checktype.CheckClass("WeightedCounts", "sumw2", required=False, type=InterpretedBuffer),
-        "unweighted": portally.checktype.CheckClass("WeightedCounts", "unweighted", required=False, type=UnweightedCounts),
+        "sumw":       stagg.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
+        "sumw2":      stagg.checktype.CheckClass("WeightedCounts", "sumw2", required=False, type=InterpretedBuffer),
+        "unweighted": stagg.checktype.CheckClass("WeightedCounts", "unweighted", required=False, type=UnweightedCounts),
         }
 
     sumw       = typedproperty(_params["sumw"])
@@ -2153,22 +2153,22 @@ class WeightedCounts(Counts):
         sumw2 = None if self.sumw2 is None else self.sumw2._toflatbuffers(builder)
         unweighted = None if self.unweighted is None else self.unweighted._toflatbuffers(builder)
 
-        portally.portally_generated.WeightedCounts.WeightedCountsStart(builder)
-        portally.portally_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
-        portally.portally_generated.WeightedCounts.WeightedCountsAddSumw(builder, sumw)
+        stagg.stagg_generated.WeightedCounts.WeightedCountsStart(builder)
+        stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
+        stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw(builder, sumw)
         if sumw2 is not None:
-            portally.portally_generated.WeightedCounts.WeightedCountsAddSumw2Type(builder, _InterpretedBuffer_invlookup[type(self.sumw2)])
-            portally.portally_generated.WeightedCounts.WeightedCountsAddSumw2(builder, sumw2)
+            stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw2Type(builder, _InterpretedBuffer_invlookup[type(self.sumw2)])
+            stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw2(builder, sumw2)
         if unweighted is not None:
-            portally.portally_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
-        return portally.portally_generated.WeightedCounts.WeightedCountsEnd(builder)
+            stagg.stagg_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
+        return stagg.stagg_generated.WeightedCounts.WeightedCountsEnd(builder)
 
 ################################################# Parameter
 
-class Parameter(Portally):
+class Parameter(Stagg):
     _params = {
-        "identifier": portally.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
-        "values":     portally.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
+        "identifier": stagg.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
+        "values":     stagg.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -2194,15 +2194,15 @@ class Parameter(Portally):
         values = self.values._toflatbuffers(builder)
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         
-        portally.portally_generated.Parameter.ParameterStart(builder)
-        portally.portally_generated.Parameter.ParameterAddIdentifier(builder, identifier)
-        portally.portally_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.Parameter.ParameterAddValues(builder, values)
-        return portally.portally_generated.Parameter.ParameterEnd(builder)
+        stagg.stagg_generated.Parameter.ParameterStart(builder)
+        stagg.stagg_generated.Parameter.ParameterAddIdentifier(builder, identifier)
+        stagg.stagg_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.Parameter.ParameterAddValues(builder, values)
+        return stagg.stagg_generated.Parameter.ParameterEnd(builder)
 
 ################################################# Function
 
-class Function(Portally):
+class Function(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -2232,12 +2232,12 @@ class FunctionObject(Object):
 
 class ParameterizedFunction(Function, FunctionObject):
     _params = {
-        "expression": portally.checktype.CheckString("ParameterizedFunction", "expression", required=True),
-        "parameters": portally.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
-        "title":      portally.checktype.CheckString("ParameterizedFunction", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
-        "script":     portally.checktype.CheckString("ParameterizedFunction", "script", required=False),
+        "expression": stagg.checktype.CheckString("ParameterizedFunction", "expression", required=True),
+        "parameters": stagg.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
+        "title":      stagg.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":   stagg.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration": stagg.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        "script":     stagg.checktype.CheckString("ParameterizedFunction", "script", required=False),
         }
 
     expression = typedproperty(_params["expression"])
@@ -2298,61 +2298,61 @@ class ParameterizedFunction(Function, FunctionObject):
         expression = builder.CreateString(self.expression.encode("utf-8"))
 
         if parameters is not None:
-            portally.portally_generated.ParameterizedFunction.ParameterizedFunctionStartParametersVector(builder, len(parameters))
+            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStartParametersVector(builder, len(parameters))
             for x in parameters[::-1]:
                 builder.PrependUOffsetTRelative(x)
             parameters = builder.EndVector(len(parameters))
 
-        portally.portally_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
-        portally.portally_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
+        stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
+        stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
         if parameters is not None:
-            portally.portally_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
-        parameterized = portally.portally_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
+            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
+        parameterized = stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
 
         if isinstance(getattr(self, "_parent", None), Histogram):
-            portally.portally_generated.Function.FunctionStart(builder)
-            portally.portally_generated.Function.FunctionAddDataType(builder, portally.portally_generated.FunctionData.FunctionData.ParameterizedFunction)
-            portally.portally_generated.Function.FunctionAddData(builder, parameterized)
+            stagg.stagg_generated.Function.FunctionStart(builder)
+            stagg.stagg_generated.Function.FunctionAddDataType(builder, stagg.stagg_generated.FunctionData.FunctionData.ParameterizedFunction)
+            stagg.stagg_generated.Function.FunctionAddData(builder, parameterized)
             if title is not None:
-                portally.portally_generated.Function.FunctionAddTitle(builder, title)
+                stagg.stagg_generated.Function.FunctionAddTitle(builder, title)
             if metadata is not None:
-                portally.portally_generated.Function.FunctionAddMetadata(builder, metadata)
+                stagg.stagg_generated.Function.FunctionAddMetadata(builder, metadata)
             if decoration is not None:
-                portally.portally_generated.Function.FunctionAddDecoration(builder, decoration)
+                stagg.stagg_generated.Function.FunctionAddDecoration(builder, decoration)
             if script is not None:
-                portally.portally_generated.Function.FunctionAddScript(builder, script)
-            return portally.portally_generated.Function.FunctionEnd(builder)
+                stagg.stagg_generated.Function.FunctionAddScript(builder, script)
+            return stagg.stagg_generated.Function.FunctionEnd(builder)
 
         else:
-            portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
-            portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
-            portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
-            function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
+            stagg.stagg_generated.FunctionObject.FunctionObjectStart(builder)
+            stagg.stagg_generated.FunctionObject.FunctionObjectAddDataType(builder, stagg.stagg_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
+            stagg.stagg_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
+            function_object = stagg.stagg_generated.FunctionObject.FunctionObjectEnd(builder)
 
-            portally.portally_generated.Object.ObjectStart(builder)
-            portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
-            portally.portally_generated.Object.ObjectAddData(builder, function_object)
+            stagg.stagg_generated.Object.ObjectStart(builder)
+            stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.FunctionObject)
+            stagg.stagg_generated.Object.ObjectAddData(builder, function_object)
             if title is not None:
-                portally.portally_generated.Object.ObjectAddTitle(builder, title)
+                stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
             if metadata is not None:
-                portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+                stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
             if decoration is not None:
-                portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+                stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
             if script is not None:
-                portally.portally_generated.Object.ObjectAddScript(builder, script)
-            return portally.portally_generated.Object.ObjectEnd(builder)
+                stagg.stagg_generated.Object.ObjectAddScript(builder, script)
+            return stagg.stagg_generated.Object.ObjectEnd(builder)
        
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
     _params = {
-        "values":      portally.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives": portally.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "errors":      portally.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
-        "title":       portally.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":    portally.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":  portally.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
-        "script":      portally.checktype.CheckString("EvaluatedFunction", "script", required=False),
+        "values":      stagg.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": stagg.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "errors":      stagg.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       stagg.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":    stagg.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  stagg.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      stagg.checktype.CheckString("EvaluatedFunction", "script", required=False),
         }
 
     values      = typedproperty(_params["values"])
@@ -2404,46 +2404,46 @@ class EvaluatedFunction(Function):
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
 
         if errors is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
             for x in errors[::-1]:
                 builder.PrependUOffsetTRelative(x)
             errors = builder.EndVector(len(errors))
 
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
-        evaluated = portally.portally_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
 
-        portally.portally_generated.Function.FunctionStart(builder)
-        portally.portally_generated.Function.FunctionAddDataType(builder, portally.portally_generated.FunctionData.FunctionData.EvaluatedFunction)
-        portally.portally_generated.Function.FunctionAddData(builder, evaluated)
+        stagg.stagg_generated.Function.FunctionStart(builder)
+        stagg.stagg_generated.Function.FunctionAddDataType(builder, stagg.stagg_generated.FunctionData.FunctionData.EvaluatedFunction)
+        stagg.stagg_generated.Function.FunctionAddData(builder, evaluated)
         if title is not None:
-            portally.portally_generated.Function.FunctionAddTitle(builder, title)
+            stagg.stagg_generated.Function.FunctionAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Function.FunctionAddMetadata(builder, metadata)
+            stagg.stagg_generated.Function.FunctionAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Function.FunctionAddDecoration(builder, decoration)
+            stagg.stagg_generated.Function.FunctionAddDecoration(builder, decoration)
         if script is not None:
-            portally.portally_generated.Function.FunctionAddScript(builder, script)
-        return portally.portally_generated.Function.FunctionEnd(builder)
+            stagg.stagg_generated.Function.FunctionAddScript(builder, script)
+        return stagg.stagg_generated.Function.FunctionEnd(builder)
 
 ################################################# BinnedEvaluatedFunction
 
 class BinnedEvaluatedFunction(FunctionObject):
     _params = {
-        "axis":        portally.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
-        "values":      portally.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives": portally.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "errors":      portally.checktype.CheckVector("BinnedEvaluatedFunction", "errors", required=False, type=Quantiles),
-        "title":       portally.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
-        "metadata":    portally.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":  portally.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
-        "script":      portally.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
+        "axis":        stagg.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
+        "values":      stagg.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": stagg.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "errors":      stagg.checktype.CheckVector("BinnedEvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       stagg.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
+        "metadata":    stagg.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  stagg.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      stagg.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
         }
 
     axis        = typedproperty(_params["axis"])
@@ -2509,63 +2509,63 @@ class BinnedEvaluatedFunction(FunctionObject):
         axis = [x._toflatbuffers(builder) for x in self.axis]
         
         if errors is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
             for x in errors[::-1]:
                 builder.PrependUOffsetTRelative(x)
             errors = builder.EndVector(len(errors))
 
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
-            portally.portally_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
-        evaluated = portally.portally_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
 
-        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
+        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
         for x in axis[::-1]:
             builder.PrependUOffsetTRelative(x)
         axis = builder.EndVector(len(axis))
 
-        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
-        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)
-        portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddData(builder, evaluated)
-        binned_evaluated = portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionEnd(builder)
+        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
+        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)
+        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddData(builder, evaluated)
+        binned_evaluated = stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionEnd(builder)
 
-        portally.portally_generated.FunctionObject.FunctionObjectStart(builder)
-        portally.portally_generated.FunctionObject.FunctionObjectAddDataType(builder, portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction)
-        portally.portally_generated.FunctionObject.FunctionObjectAddData(builder, binned_evaluated)
-        function_object = portally.portally_generated.FunctionObject.FunctionObjectEnd(builder)
+        stagg.stagg_generated.FunctionObject.FunctionObjectStart(builder)
+        stagg.stagg_generated.FunctionObject.FunctionObjectAddDataType(builder, stagg.stagg_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction)
+        stagg.stagg_generated.FunctionObject.FunctionObjectAddData(builder, binned_evaluated)
+        function_object = stagg.stagg_generated.FunctionObject.FunctionObjectEnd(builder)
 
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.FunctionObject)
-        portally.portally_generated.Object.ObjectAddData(builder, function_object)
+        stagg.stagg_generated.Object.ObjectStart(builder)
+        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.FunctionObject)
+        stagg.stagg_generated.Object.ObjectAddData(builder, function_object)
         if title is not None:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            portally.portally_generated.Object.ObjectAddScript(builder, script)
-        return portally.portally_generated.Object.ObjectEnd(builder)
+            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
+        return stagg.stagg_generated.Object.ObjectEnd(builder)
 
 ################################################# Histogram
 
 class Histogram(Object):
     _params = {
-        "axis":                 portally.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "counts":               portally.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
-        "profile":              portally.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
-        "axis_covariances":    portally.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
-        "profile_covariances": portally.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
-        "functions":            portally.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
-        "title":                portally.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":             portally.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":           portally.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
-        "script":               portally.checktype.CheckString("Histogram", "script", required=False),
+        "axis":                 stagg.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "counts":               stagg.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
+        "profile":              stagg.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
+        "axis_covariances":    stagg.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
+        "profile_covariances": stagg.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
+        "functions":            stagg.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
+        "title":                stagg.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":             stagg.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":           stagg.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "script":               stagg.checktype.CheckString("Histogram", "script", required=False),
         }
 
     axis                 = typedproperty(_params["axis"])
@@ -2660,75 +2660,75 @@ class Histogram(Object):
         profile = None if len(self.profile) == 0 else [x._toflatbuffers(builder) for x in self.profile]
         axis = [x._toflatbuffers(builder) for x in self.axis]
 
-        portally.portally_generated.Histogram.HistogramStartAxisVector(builder, len(axis))
+        stagg.stagg_generated.Histogram.HistogramStartAxisVector(builder, len(axis))
         for x in axis[::-1]:
             builder.PrependUOffsetTRelative(x)
         axis = builder.EndVector(len(axis))
 
         if profile is not None:
-            portally.portally_generated.Histogram.HistogramStartProfileVector(builder, len(profile))
+            stagg.stagg_generated.Histogram.HistogramStartProfileVector(builder, len(profile))
             for x in profile[::-1]:
                 builder.PrependUOffsetTRelative(x)
             profile = builder.EndVector(len(profile))
 
         if axis_covariances is not None:
-            portally.portally_generated.Histogram.HistogramStartAxisCovariancesVector(builder, len(axis_covariances))
+            stagg.stagg_generated.Histogram.HistogramStartAxisCovariancesVector(builder, len(axis_covariances))
             for x in axis_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             axis_covariances = builder.EndVector(len(axis_covariances))
 
         if profile_covariances is not None:
-            portally.portally_generated.Histogram.HistogramStartProfileCovariancesVector(builder, len(profile_covariances))
+            stagg.stagg_generated.Histogram.HistogramStartProfileCovariancesVector(builder, len(profile_covariances))
             for x in profile_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             profile_covariances = builder.EndVector(len(profile_covariances))
 
         if functions is not None:
-            portally.portally_generated.Histogram.HistogramStartFunctionsVector(builder, len(functions))
+            stagg.stagg_generated.Histogram.HistogramStartFunctionsVector(builder, len(functions))
             for x in functions[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions = builder.EndVector(len(functions))
 
         functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
         if functions_lookup is not None:
-            portally.portally_generated.Histogram.HistogramStartFunctionsLookupVector(builder, len(functions_lookup))
+            stagg.stagg_generated.Histogram.HistogramStartFunctionsLookupVector(builder, len(functions_lookup))
             for x in functions_lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions_lookup = builder.EndVector(len(functions_lookup))
 
-        portally.portally_generated.Histogram.HistogramStart(builder)
-        portally.portally_generated.Histogram.HistogramAddAxis(builder, axis)
-        portally.portally_generated.Histogram.HistogramAddCountsType(builder, _Counts_invlookup[type(self.counts)])
-        portally.portally_generated.Histogram.HistogramAddCounts(builder, counts)
+        stagg.stagg_generated.Histogram.HistogramStart(builder)
+        stagg.stagg_generated.Histogram.HistogramAddAxis(builder, axis)
+        stagg.stagg_generated.Histogram.HistogramAddCountsType(builder, _Counts_invlookup[type(self.counts)])
+        stagg.stagg_generated.Histogram.HistogramAddCounts(builder, counts)
         if profile is not None:
-            portally.portally_generated.Histogram.HistogramAddProfile(builder, profile)
+            stagg.stagg_generated.Histogram.HistogramAddProfile(builder, profile)
         if axis_covariances is not None:
-            portally.portally_generated.Histogram.HistogramAddAxisCovariances(builder, axis_covariances)
+            stagg.stagg_generated.Histogram.HistogramAddAxisCovariances(builder, axis_covariances)
         if profile_covariances is not None:
-            portally.portally_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
+            stagg.stagg_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
         if functions is not None:
-            portally.portally_generated.Histogram.HistogramAddFunctionsLookup(builder, functions_lookup)
-            portally.portally_generated.Histogram.HistogramAddFunctions(builder, functions)
-        data = portally.portally_generated.Histogram.HistogramEnd(builder)
+            stagg.stagg_generated.Histogram.HistogramAddFunctionsLookup(builder, functions_lookup)
+            stagg.stagg_generated.Histogram.HistogramAddFunctions(builder, functions)
+        data = stagg.stagg_generated.Histogram.HistogramEnd(builder)
 
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Histogram)
-        portally.portally_generated.Object.ObjectAddData(builder, data)
+        stagg.stagg_generated.Object.ObjectStart(builder)
+        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Histogram)
+        stagg.stagg_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            portally.portally_generated.Object.ObjectAddScript(builder, script)
-        return portally.portally_generated.Object.ObjectEnd(builder)
+            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
+        return stagg.stagg_generated.Object.ObjectEnd(builder)
 
 ################################################# Page
 
-class Page(Portally):
+class Page(Stagg):
     _params = {
-        "buffer": portally.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
+        "buffer": stagg.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -2788,19 +2788,19 @@ class Page(Portally):
 
     def _toflatbuffers(self, builder):
         buffer = self.buffer._toflatbuffers(builder)
-        portally.portally_generated.Page.PageStart(builder)
-        portally.portally_generated.Page.PageAddBufferType(builder, _RawBuffer_invlookup[type(self.buffer)])
-        portally.portally_generated.Page.PageAddBuffer(builder, buffer)
-        return portally.portally_generated.Page.PageEnd(builder)
+        stagg.stagg_generated.Page.PageStart(builder)
+        stagg.stagg_generated.Page.PageAddBufferType(builder, _RawBuffer_invlookup[type(self.buffer)])
+        stagg.stagg_generated.Page.PageAddBuffer(builder, buffer)
+        return stagg.stagg_generated.Page.PageEnd(builder)
 
 ################################################# ColumnChunk
 
-class ColumnChunk(Portally):
+class ColumnChunk(Stagg):
     _params = {
-        "pages":        portally.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
-        "page_offsets": portally.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_min":  portally.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
-        "page_max":  portally.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
+        "pages":        stagg.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
+        "page_offsets": stagg.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
+        "page_min":  stagg.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
+        "page_max":  stagg.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
         }
 
     pages        = typedproperty(_params["pages"])
@@ -2879,43 +2879,43 @@ class ColumnChunk(Portally):
         page_min = None if len(self.page_min) == 0 else [x._toflatbuffers(builder) for x in self.page_min]
         page_max = None if len(self.page_max) == 0 else [x._toflatbuffers(builder) for x in self.page_max]
 
-        portally.portally_generated.ColumnChunk.ColumnChunkStartPagesVector(builder, len(pages))
+        stagg.stagg_generated.ColumnChunk.ColumnChunkStartPagesVector(builder, len(pages))
         for x in pages[::-1]:
             builder.PrependUOffsetTRelative(x)
         pages = builder.EndVector(len(pages))
 
-        portally.portally_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
+        stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
         for x in self.page_offsets[::-1]:
             builder.PrependInt64(x)
         page_offsets = builder.EndVector(len(self.page_offsets))
 
         if page_min is not None:
-            portally.portally_generated.ColumnChunk.ColumnChunkStartPageMinVector(builder, len(page_min))
+            stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageMinVector(builder, len(page_min))
             for x in page_min[::-1]:
                 builder.PrependUOffsetTRelative(x)
             page_min = builder.EndVector(len(page_min))
 
         if page_max is not None:
-            portally.portally_generated.ColumnChunk.ColumnChunkStartPageMaxVector(builder, len(page_max))
+            stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageMaxVector(builder, len(page_max))
             for x in page_max[::-1]:
                 builder.PrependUOffsetTRelative(x)
             page_max = builder.EndVector(len(page_max))
 
-        portally.portally_generated.ColumnChunk.ColumnChunkStart(builder)
-        portally.portally_generated.ColumnChunk.ColumnChunkAddPages(builder, pages)
-        portally.portally_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
+        stagg.stagg_generated.ColumnChunk.ColumnChunkStart(builder)
+        stagg.stagg_generated.ColumnChunk.ColumnChunkAddPages(builder, pages)
+        stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
         if page_min is not None:
-            portally.portally_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
+            stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
         if page_max is not None:
-            portally.portally_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
-        return portally.portally_generated.ColumnChunk.ColumnChunkEnd(builder)
+            stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
+        return stagg.stagg_generated.ColumnChunk.ColumnChunkEnd(builder)
         
 ################################################# Chunk
 
-class Chunk(Portally):
+class Chunk(Stagg):
     _params = {
-        "column_chunks": portally.checktype.CheckVector("Chunk", "column_chunks", required=True, type=ColumnChunk),
-        "metadata":      portally.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
+        "column_chunks": stagg.checktype.CheckVector("Chunk", "column_chunks", required=True, type=ColumnChunk),
+        "metadata":      stagg.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
     column_chunks = typedproperty(_params["column_chunks"])
@@ -2950,29 +2950,29 @@ class Chunk(Portally):
         column_chunks = [x._toflatbuffers(builder) for x in self.column_chunks]
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
 
-        portally.portally_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
+        stagg.stagg_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
         for x in column_chunks[::-1]:
             builder.PrependUOffsetTRelative(x)
         column_chunks = builder.EndVector(len(column_chunks))
 
-        portally.portally_generated.Chunk.ChunkStart(builder)
-        portally.portally_generated.Chunk.ChunkAddColumnChunks(builder, column_chunks)
+        stagg.stagg_generated.Chunk.ChunkStart(builder)
+        stagg.stagg_generated.Chunk.ChunkAddColumnChunks(builder, column_chunks)
         if metadata is not None:
-            portally.portally_generated.Chunk.ChunkAddMetadata(builder, metadata)
-        return portally.portally_generated.Chunk.ChunkEnd(builder)
+            stagg.stagg_generated.Chunk.ChunkAddMetadata(builder, metadata)
+        return stagg.stagg_generated.Chunk.ChunkEnd(builder)
 
 ################################################# Column
 
-class Column(Portally, Interpretation):
+class Column(Stagg, Interpretation):
     _params = {
-        "identifier":       portally.checktype.CheckKey("Column", "identifier", required=True, type=str),
-        "dtype":            portally.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
-        "endianness":       portally.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
-        "filters":          portally.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": portally.checktype.CheckSlice("Column", "postfilter_slice", required=False),
-        "title":            portally.checktype.CheckString("Column", "title", required=False),
-        "metadata":         portally.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
-        "decoration":       portally.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
+        "identifier":       stagg.checktype.CheckKey("Column", "identifier", required=True, type=str),
+        "dtype":            stagg.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
+        "endianness":       stagg.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
+        "filters":          stagg.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": stagg.checktype.CheckSlice("Column", "postfilter_slice", required=False),
+        "title":            stagg.checktype.CheckString("Column", "title", required=False),
+        "metadata":         stagg.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
+        "decoration":       stagg.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
     identifier       = typedproperty(_params["identifier"])
@@ -3010,34 +3010,34 @@ class Column(Portally, Interpretation):
         if len(self.filters) == 0:
             filters = None
         else:
-            portally.portally_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
+            stagg.stagg_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUInt32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        portally.portally_generated.Column.ColumnStart(builder)
-        portally.portally_generated.Column.ColumnAddIdentifier(builder, identifier)
-        portally.portally_generated.Column.ColumnAddDtype(builder, self.dtype.value)
+        stagg.stagg_generated.Column.ColumnStart(builder)
+        stagg.stagg_generated.Column.ColumnAddIdentifier(builder, identifier)
+        stagg.stagg_generated.Column.ColumnAddDtype(builder, self.dtype.value)
         if self.endianness != InterpretedBuffer.little_endian:
-            portally.portally_generated.Column.ColumnAddEndianness(builder, self.endianness.value)
+            stagg.stagg_generated.Column.ColumnAddEndianness(builder, self.endianness.value)
         if filters is not None:
-            portally.portally_generated.Column.ColumnAddFilters(builder, self.filters)
+            stagg.stagg_generated.Column.ColumnAddFilters(builder, self.filters)
         if self.postfilter_slice is not None:
-            portally.portally_generated.Column.ColumnAddPostfilterSlice(builder, portally.portally_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            stagg.stagg_generated.Column.ColumnAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if title is not None:
-            portally.portally_generated.Column.ColumnAddTitle(builder, title)
+            stagg.stagg_generated.Column.ColumnAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Column.ColumnAddMetadata(builder, metadata)
+            stagg.stagg_generated.Column.ColumnAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Column.ColumnAddDecoration(builder, decoration)
-        return portally.portally_generated.Column.ColumnEnd(builder)
+            stagg.stagg_generated.Column.ColumnAddDecoration(builder, decoration)
+        return stagg.stagg_generated.Column.ColumnEnd(builder)
 
 ################################################# NtupleInstance
 
-class NtupleInstance(Portally):
+class NtupleInstance(Stagg):
     _params = {
-        "chunks":        portally.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
-        "chunk_offsets": portally.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
+        "chunks":        stagg.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
+        "chunk_offsets": stagg.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
         }
 
     chunks              = typedproperty(_params["chunks"])
@@ -3095,7 +3095,7 @@ class NtupleInstance(Portally):
     def _toflatbuffers(self, builder):
         chunks = [x._toflatbuffers(builder) for x in self.chunks]
 
-        portally.portally_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
+        stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
         for x in chunks[::-1]:
             builder.PrependUOffsetTRelative(x)
         chunks = builder.EndVector(len(chunks))
@@ -3103,30 +3103,30 @@ class NtupleInstance(Portally):
         if len(self.chunk_offsets) == 0:
             chunk_offsets = None
         else:
-            portally.portally_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
+            stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
             for x in self.chunk_offsets[::-1]:
                 builder.PrependInt64(x)
             chunk_offsets = builder.EndVector(len(self.chunk_offsets))
 
-        portally.portally_generated.NtupleInstance.NtupleInstanceStart(builder)
-        portally.portally_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
+        stagg.stagg_generated.NtupleInstance.NtupleInstanceStart(builder)
+        stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
         if chunk_offsets is not None:
-            portally.portally_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
-        return portally.portally_generated.NtupleInstance.NtupleInstanceEnd(builder)
+            stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
+        return stagg.stagg_generated.NtupleInstance.NtupleInstanceEnd(builder)
 
 ################################################# Ntuple
 
 class Ntuple(Object):
     _params = {
-        "columns":            portally.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":          portally.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "column_statistics":  portally.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
-        "column_covariances": portally.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
-        "functions":          portally.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
-        "title":              portally.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":           portally.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration":         portally.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
-        "script":             portally.checktype.CheckString("Ntuple", "script", required=False),
+        "columns":            stagg.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":          stagg.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "column_statistics":  stagg.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "column_covariances": stagg.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
+        "functions":          stagg.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":              stagg.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":           stagg.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":         stagg.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "script":             stagg.checktype.CheckString("Ntuple", "script", required=False),
         }
 
     columns             = typedproperty(_params["columns"])
@@ -3212,76 +3212,76 @@ class Ntuple(Object):
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         columns = [x._toflatbuffers(builder) for x in self.columns]
 
-        portally.portally_generated.Ntuple.NtupleStartColumnsVector(builder, len(columns))
+        stagg.stagg_generated.Ntuple.NtupleStartColumnsVector(builder, len(columns))
         for x in columns[::-1]:
             builder.PrependUOffsetTRelative(x)
         columns = builder.EndVector(len(columns))
 
-        portally.portally_generated.Ntuple.NtupleStartInstancesVector(builder, len(instances))
+        stagg.stagg_generated.Ntuple.NtupleStartInstancesVector(builder, len(instances))
         for x in instances[::-1]:
             builder.PrependUOffsetTRelative(x)
         instances = builder.EndVector(len(instances))
 
         if column_statistics is not None:
-            portally.portally_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
+            stagg.stagg_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
             for x in column_statistics[::-1]:
                 builder.PrependUOffsetTRelative(x)
             column_statistics = builder.EndVector(len(column_statistics))
 
         if column_covariances is not None:
-            portally.portally_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
+            stagg.stagg_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
             for x in column_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             column_covariances = builder.EndVector(len(column_covariances))
 
         if functions is not None:
-            portally.portally_generated.Ntuple.NtupleStartFunctionsVector(builder, len(functions))
+            stagg.stagg_generated.Ntuple.NtupleStartFunctionsVector(builder, len(functions))
             for x in functions[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions = builder.EndVector(len(functions))
 
         functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
         if functions_lookup is not None:
-            portally.portally_generated.Ntuple.NtupleStartFunctionsLookupVector(builder, len(functions_lookup))
+            stagg.stagg_generated.Ntuple.NtupleStartFunctionsLookupVector(builder, len(functions_lookup))
             for x in functions_lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions_lookup = builder.EndVector(len(functions_lookup))
 
-        portally.portally_generated.Ntuple.NtupleStart(builder)
-        portally.portally_generated.Ntuple.NtupleAddColumns(builder, columns)
-        portally.portally_generated.Ntuple.NtupleAddInstances(builder, instances)
+        stagg.stagg_generated.Ntuple.NtupleStart(builder)
+        stagg.stagg_generated.Ntuple.NtupleAddColumns(builder, columns)
+        stagg.stagg_generated.Ntuple.NtupleAddInstances(builder, instances)
         if column_statistics is not None:
-            portally.portally_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
+            stagg.stagg_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
         if column_covariances is not None:
-            portally.portally_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
+            stagg.stagg_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
         if functions is not None:
-            portally.portally_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
-            portally.portally_generated.Ntuple.NtupleAddFunctions(builder, functions)
-        data = portally.portally_generated.Ntuple.NtupleEnd(builder)
+            stagg.stagg_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
+            stagg.stagg_generated.Ntuple.NtupleAddFunctions(builder, functions)
+        data = stagg.stagg_generated.Ntuple.NtupleEnd(builder)
 
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Ntuple)
-        portally.portally_generated.Object.ObjectAddData(builder, data)
+        stagg.stagg_generated.Object.ObjectStart(builder)
+        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Ntuple)
+        stagg.stagg_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            portally.portally_generated.Object.ObjectAddScript(builder, script)
-        return portally.portally_generated.Object.ObjectEnd(builder)
+            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
+        return stagg.stagg_generated.Object.ObjectEnd(builder)
 
 ################################################# Collection
 
 class Collection(Object):
     _params = {
-        "objects":    portally.checktype.CheckLookup("Collection", "objects", required=False, type=Object),
-        "axis":       portally.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
-        "title":      portally.checktype.CheckString("Collection", "title", required=False),
-        "metadata":   portally.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
-        "decoration": portally.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
-        "script":     portally.checktype.CheckString("Collection", "script", required=False),
+        "objects":    stagg.checktype.CheckLookup("Collection", "objects", required=False, type=Object),
+        "axis":       stagg.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
+        "title":      stagg.checktype.CheckString("Collection", "title", required=False),
+        "metadata":   stagg.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration": stagg.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "script":     stagg.checktype.CheckString("Collection", "script", required=False),
         }
 
     objects        = typedproperty(_params["objects"])
@@ -3351,94 +3351,94 @@ class Collection(Object):
         axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
 
         if axis is not None:
-            portally.portally_generated.Collection.CollectionStartAxisVector(builder, len(axis))
+            stagg.stagg_generated.Collection.CollectionStartAxisVector(builder, len(axis))
             for x in axis[::-1]:
                 builder.PrependUOffsetTRelative(x)
             axis = builder.EndVector(len(axis))
 
         if objects is not None:
-            portally.portally_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
+            stagg.stagg_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
             for x in objects[::-1]:
                 builder.PrependUOffsetTRelative(x)
             objects = builder.EndVector(len(objects))
 
         lookup = None if len(self.objects) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.objects.keys()]
         if lookup is not None:
-            portally.portally_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
+            stagg.stagg_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
             for x in lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             lookup = builder.EndVector(len(lookup))
 
-        portally.portally_generated.Collection.CollectionStart(builder)
+        stagg.stagg_generated.Collection.CollectionStart(builder)
         if objects is not None:
-            portally.portally_generated.Collection.CollectionAddLookup(builder, lookup)
-            portally.portally_generated.Collection.CollectionAddObjects(builder, objects)
+            stagg.stagg_generated.Collection.CollectionAddLookup(builder, lookup)
+            stagg.stagg_generated.Collection.CollectionAddObjects(builder, objects)
         if axis is not None:
-            portally.portally_generated.Collection.CollectionAddAxis(builder, axis)
-        data = portally.portally_generated.Collection.CollectionEnd(builder)
+            stagg.stagg_generated.Collection.CollectionAddAxis(builder, axis)
+        data = stagg.stagg_generated.Collection.CollectionEnd(builder)
 
-        portally.portally_generated.Object.ObjectStart(builder)
-        portally.portally_generated.Object.ObjectAddDataType(builder, portally.portally_generated.ObjectData.ObjectData.Collection)
-        portally.portally_generated.Object.ObjectAddData(builder, data)
+        stagg.stagg_generated.Object.ObjectStart(builder)
+        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Collection)
+        stagg.stagg_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            portally.portally_generated.Object.ObjectAddTitle(builder, title)
+            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            portally.portally_generated.Object.ObjectAddMetadata(builder, metadata)
+            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            portally.portally_generated.Object.ObjectAddDecoration(builder, decoration)
+            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            portally.portally_generated.Object.ObjectAddScript(builder, script)
-        return portally.portally_generated.Object.ObjectEnd(builder)
+            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
+        return stagg.stagg_generated.Object.ObjectEnd(builder)
 
 _RawBuffer_lookup = {
-    portally.portally_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, portally.portally_generated.RawInlineBuffer.RawInlineBuffer),
-    portally.portally_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, portally.portally_generated.RawExternalBuffer.RawExternalBuffer),
+    stagg.stagg_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, stagg.stagg_generated.RawInlineBuffer.RawInlineBuffer),
+    stagg.stagg_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, stagg.stagg_generated.RawExternalBuffer.RawExternalBuffer),
     }
 _RawBuffer_invlookup = {x[0]: n for n, x in _RawBuffer_lookup.items()}
 
 _InterpretedBuffer_lookup = {
-    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, portally.portally_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
-    portally.portally_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, portally.portally_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
+    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
+    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
     }
 _InterpretedBuffer_invlookup = {x[0]: n for n, x in _InterpretedBuffer_lookup.items()}
 
 _ObjectData_lookup = {
-    portally.portally_generated.ObjectData.ObjectData.Histogram: (Histogram, portally.portally_generated.Histogram.Histogram),
-    portally.portally_generated.ObjectData.ObjectData.Ntuple: (Ntuple, portally.portally_generated.Ntuple.Ntuple),
-    portally.portally_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, portally.portally_generated.FunctionObject.FunctionObject),
-    portally.portally_generated.ObjectData.ObjectData.Collection: (Collection, portally.portally_generated.Collection.Collection),
+    stagg.stagg_generated.ObjectData.ObjectData.Histogram: (Histogram, stagg.stagg_generated.Histogram.Histogram),
+    stagg.stagg_generated.ObjectData.ObjectData.Ntuple: (Ntuple, stagg.stagg_generated.Ntuple.Ntuple),
+    stagg.stagg_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, stagg.stagg_generated.FunctionObject.FunctionObject),
+    stagg.stagg_generated.ObjectData.ObjectData.Collection: (Collection, stagg.stagg_generated.Collection.Collection),
     }
 _ObjectData_invlookup = {x[0]: n for n, x in _ObjectData_lookup.items()}
 
 _FunctionObjectData_lookup = {
-    portally.portally_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
-    portally.portally_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, portally.portally_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
+    stagg.stagg_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, stagg.stagg_generated.ParameterizedFunction.ParameterizedFunction),
+    stagg.stagg_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
     }
 _FunctionObjectData_invlookup = {x[0]: n for n, x in _FunctionObjectData_lookup.items()}
 
 _FunctionData_lookup = {
-    portally.portally_generated.FunctionData.FunctionData.ParameterizedFunction: (ParameterizedFunction, portally.portally_generated.ParameterizedFunction.ParameterizedFunction),
-    portally.portally_generated.FunctionData.FunctionData.EvaluatedFunction: (EvaluatedFunction, portally.portally_generated.EvaluatedFunction.EvaluatedFunction),
+    stagg.stagg_generated.FunctionData.FunctionData.ParameterizedFunction: (ParameterizedFunction, stagg.stagg_generated.ParameterizedFunction.ParameterizedFunction),
+    stagg.stagg_generated.FunctionData.FunctionData.EvaluatedFunction: (EvaluatedFunction, stagg.stagg_generated.EvaluatedFunction.EvaluatedFunction),
     }
 _FunctionData_invlookup = {x[0]: n for n, x in _FunctionData_lookup.items()}
 
 _Binning_lookup = {
-    portally.portally_generated.Binning.Binning.IntegerBinning: (IntegerBinning, portally.portally_generated.IntegerBinning.IntegerBinning),
-    portally.portally_generated.Binning.Binning.RegularBinning: (RegularBinning, portally.portally_generated.RegularBinning.RegularBinning),
-    portally.portally_generated.Binning.Binning.TicTacToeOverflowBinning: (TicTacToeOverflowBinning, portally.portally_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinning),
-    portally.portally_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, portally.portally_generated.HexagonalBinning.HexagonalBinning),
-    portally.portally_generated.Binning.Binning.EdgesBinning: (EdgesBinning, portally.portally_generated.EdgesBinning.EdgesBinning),
-    portally.portally_generated.Binning.Binning.IrregularBinning: (IrregularBinning, portally.portally_generated.IrregularBinning.IrregularBinning),
-    portally.portally_generated.Binning.Binning.CategoryBinning: (CategoryBinning, portally.portally_generated.CategoryBinning.CategoryBinning),
-    portally.portally_generated.Binning.Binning.SparseRegularBinning: (SparseRegularBinning, portally.portally_generated.SparseRegularBinning.SparseRegularBinning),
-    portally.portally_generated.Binning.Binning.FractionBinning: (FractionBinning, portally.portally_generated.FractionBinning.FractionBinning),
-    portally.portally_generated.Binning.Binning.PredicateBinning: (PredicateBinning, portally.portally_generated.PredicateBinning.PredicateBinning),
-    portally.portally_generated.Binning.Binning.VariationBinning: (VariationBinning, portally.portally_generated.VariationBinning.VariationBinning),
+    stagg.stagg_generated.Binning.Binning.IntegerBinning: (IntegerBinning, stagg.stagg_generated.IntegerBinning.IntegerBinning),
+    stagg.stagg_generated.Binning.Binning.RegularBinning: (RegularBinning, stagg.stagg_generated.RegularBinning.RegularBinning),
+    stagg.stagg_generated.Binning.Binning.TicTacToeOverflowBinning: (TicTacToeOverflowBinning, stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinning),
+    stagg.stagg_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, stagg.stagg_generated.HexagonalBinning.HexagonalBinning),
+    stagg.stagg_generated.Binning.Binning.EdgesBinning: (EdgesBinning, stagg.stagg_generated.EdgesBinning.EdgesBinning),
+    stagg.stagg_generated.Binning.Binning.IrregularBinning: (IrregularBinning, stagg.stagg_generated.IrregularBinning.IrregularBinning),
+    stagg.stagg_generated.Binning.Binning.CategoryBinning: (CategoryBinning, stagg.stagg_generated.CategoryBinning.CategoryBinning),
+    stagg.stagg_generated.Binning.Binning.SparseRegularBinning: (SparseRegularBinning, stagg.stagg_generated.SparseRegularBinning.SparseRegularBinning),
+    stagg.stagg_generated.Binning.Binning.FractionBinning: (FractionBinning, stagg.stagg_generated.FractionBinning.FractionBinning),
+    stagg.stagg_generated.Binning.Binning.PredicateBinning: (PredicateBinning, stagg.stagg_generated.PredicateBinning.PredicateBinning),
+    stagg.stagg_generated.Binning.Binning.VariationBinning: (VariationBinning, stagg.stagg_generated.VariationBinning.VariationBinning),
     }
 _Binning_invlookup = {x[0]: n for n, x in _Binning_lookup.items()}
     
 _Counts_lookup = {
-    portally.portally_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, portally.portally_generated.UnweightedCounts.UnweightedCounts),
-    portally.portally_generated.Counts.Counts.WeightedCounts: (WeightedCounts, portally.portally_generated.WeightedCounts.WeightedCounts),
+    stagg.stagg_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, stagg.stagg_generated.UnweightedCounts.UnweightedCounts),
+    stagg.stagg_generated.Counts.Counts.WeightedCounts: (WeightedCounts, stagg.stagg_generated.WeightedCounts.WeightedCounts),
     }
 _Counts_invlookup = {x[0]: n for n, x in _Counts_lookup.items()}

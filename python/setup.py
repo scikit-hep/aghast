@@ -35,30 +35,30 @@ from setuptools import setup
 
 def get_version():
     g = {}
-    exec(open(os.path.join("portally", "version.py")).read(), g)
+    exec(open(os.path.join("stagg", "version.py")).read(), g)
     return g["__version__"]
 
-setup(name = "portally",
+setup(name = "stagg",
       version = get_version(),
       packages = find_packages(exclude = ["tests"]),
       scripts = [],
       data_files = ["README.rst"],
-      description = "Portable \"tallies,\" nested collections of counts, sums, histograms, profiles, and ntuples.",
+      description = "Statistical Aggregates: collections of histograms, profiles, and ntuples as Flatbuffers.",
       long_description = "",
       author = "Jim Pivarski (DIANA-HEP)",
       author_email = "pivarski@fnal.gov",
       maintainer = "Jim Pivarski (DIANA-HEP)",
       maintainer_email = "pivarski@fnal.gov",
-      url = "https://github.com/diana-hep/portally",
-      download_url = "https://github.com/diana-hep/portally/releases",
+      url = "https://github.com/diana-hep/stagg",
+      download_url = "https://github.com/diana-hep/stagg/releases",
       license = "BSD 3-clause",
       test_suite = "tests",
       install_requires = ["flatbuffers>=1.8.0", "numpy"],
       setup_requires = ["pytest-runner"],
       tests_require = ["pytest"],
       classifiers = [
-          "Development Status :: 1 - Planning",
-          # "Development Status :: 2 - Pre-Alpha",
+          # "Development Status :: 1 - Planning",
+          "Development Status :: 2 - Pre-Alpha",
           # "Development Status :: 3 - Alpha",
           # "Development Status :: 4 - Beta",
           # "Development Status :: 5 - Production/Stable",

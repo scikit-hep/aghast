@@ -32,13 +32,13 @@ import os
 import shutil
 
 if __name__ == "__main__":
-    if os.path.exists(os.path.join("portally", "portally_generated")):
-        shutil.rmtree(os.path.join("portally", "portally_generated"))
+    if os.path.exists(os.path.join("stagg", "stagg_generated")):
+        shutil.rmtree(os.path.join("stagg", "stagg_generated"))
 
-    os.chdir("portally")
-    os.system("flatc --python ../../flatbuffers/portally.fbs")
+    os.chdir("stagg")
+    os.system("flatc --python ../../flatbuffers/stagg.fbs")
 
-    with open("portally_generated/StatisticFilter.py") as f:
+    with open("stagg_generated/StatisticFilter.py") as f:
         tmp = f.read().replace("inf.0", "float('inf')")
-    with open("portally_generated/StatisticFilter.py", "w") as f:
+    with open("stagg_generated/StatisticFilter.py", "w") as f:
         f.write(tmp)
