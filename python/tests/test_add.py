@@ -90,16 +90,16 @@ class Test(unittest.TestCase):
     #     (h + h).checkvalid()
     #     (frombuffer(h.tobuffer()) + h).checkvalid()
 
-    def test_add_IntegerBinning(self):
-        h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
-        (h + h).checkvalid()
-        (frombuffer(h.tobuffer()) + h).checkvalid()
-        h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(12))))
-        (h + h).checkvalid()
-        (frombuffer(h.tobuffer()) + h).checkvalid()
-        h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1, loc_overflow=IntegerBinning.above2))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
-        (h + h).checkvalid()
-        (frombuffer(h.tobuffer()) + h).checkvalid()
+    # def test_add_IntegerBinning(self):
+    #     h = Histogram([Axis(IntegerBinning(10, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))
+    #     (h + h).checkvalid()
+    #     (frombuffer(h.tobuffer()) + h).checkvalid()
+    #     h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(12))))
+    #     (h + h).checkvalid()
+    #     (frombuffer(h.tobuffer()) + h).checkvalid()
+    #     h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=IntegerBinning.above1, loc_overflow=IntegerBinning.above2))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+    #     (h + h).checkvalid()
+    #     (frombuffer(h.tobuffer()) + h).checkvalid()
 
     # def test_add_RealInterval(self):
     #     h = BinnedEvaluatedFunction([Axis(RegularBinning(10, RealInterval(-5, 5)))], InterpretedInlineBuffer(numpy.zeros(10), dtype=InterpretedInlineBuffer.float64))

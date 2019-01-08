@@ -1241,6 +1241,17 @@ class Binning(Stagg):
     def dimensions(self):
         return len(self._binshape())
 
+    @staticmethod
+    def _promote(one, two):
+        if type(one) is type(two):
+            return one, two
+        elif hasattr(one, "to" + type(two).__name__):
+            return getattr(one, "to" + type(two).__name__)(), two
+        elif hasattr(two, "to" + type(one).__name__):
+            return one, getattr(two, "to" + type(one).__name__)()
+        else:
+            raise ValueError("{0} and {1} can't be promoted to the same type of Binning".format(one, two))
+
 ################################################# BinLocation
 
 class BinLocationEnum(Enum):
@@ -1258,6 +1269,18 @@ class BinLocation(object):
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
+
+    @classmethod
+    def _belows(cls, *tuples):
+        out = [x for x in tuples if x[0].value < cls.nonexistent.value]
+        out.sort(key=lambda x, y: x[0].value < y[0].value)
+        return out
+
+    @classmethod
+    def _aboves(cls, *tuples):
+        out = [x for x in tuples if x[0].value > cls.nonexistent.value]
+        out.sort(key=lambda x, y: x[0].value < y[0].value)
+        return out
 
 ################################################# IntegerBinning
 
@@ -1283,11 +1306,11 @@ class IntegerBinning(Binning, BinLocation):
     def _valid(self, seen, recursive):
         if self.min >= self.max:
             raise ValueError("IntegerBinning.min ({0}) must be strictly less than IntegerBinning.max ({1})".format(self.min, self.max))
-        if self.loc_underflow != BinLocation.nonexistent and self.loc_overflow != BinLocation.nonexistent and self.loc_underflow == self.loc_overflow:
+        if self.loc_underflow != self.nonexistent and self.loc_overflow != self.nonexistent and self.loc_underflow == self.loc_overflow:
             raise ValueError("IntegerBinning.loc_underflow and IntegerBinning.loc_overflow must not be equal unless they are both nonexistent")
 
     def _binshape(self):
-        return (self.max - self.min + 1 + int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent),)
+        return (self.max - self.min + 1 + int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent),)
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.IntegerBinning.IntegerBinningStart(builder)
@@ -1298,6 +1321,35 @@ class IntegerBinning(Binning, BinLocation):
         if self.loc_overflow != self.nonexistent:
             stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.IntegerBinning.IntegerBinningEnd(builder)
+
+    def toRegularBinning(self):
+        if self.loc_underflow == self.nonexistent and self.loc_overflow == self.nonexistent:
+            overflow = None
+        else:
+            overflow = RealOverflow(loc_underflow=self.loc_underflow, loc_overflow=self.loc_overflow, loc_nanflow=RealOverflow.nonexistent)
+        return RegularBinning(1 + self.max - self.min, RealInterval(self.min - 0.5, self.max + 0.5), overflow=overflow)
+
+    def toEdgesBinning(self):
+        return self.toRegularBinning().toEdgesBinning()
+
+    def toIrregularBinning(self):
+        return self.toEdgesBinning().toIrregularBinning()
+
+    def toCategoryBinning(self):
+        flows = [(self.loc_underflow, "(-inf, {0}]".format(self.min - 1)), (self.loc_overflow, "[{0}, +inf)".format(self.max + 1))]
+        cats = []
+        for loc, cat in self._belows(*flows):
+            cats.append(cat)
+        cats.extend([str(x) for x in range(self.min, self.max + 1)])
+        for loc, cat in self._aboves(*flows):
+            cats.append(cat)
+        return CategoryBinning(cats)
+
+    def toSparseRegularBinning(self):
+        return self.toRegularBinning().toSparseRegularBinning()
+
+    def _merger(self, other):
+        HERE
 
 ################################################# RealInterval
 
@@ -1373,15 +1425,19 @@ class RealOverflow(Stagg, BinLocation):
         self.nan_mapping = nan_mapping
 
     def _valid(self, seen, recursive):
-        if self.loc_underflow != BinLocation.nonexistent and self.loc_overflow != BinLocation.nonexistent and self.loc_underflow == self.loc_overflow:
+        if self.loc_underflow != self.nonexistent and self.loc_overflow != self.nonexistent and self.loc_underflow == self.loc_overflow:
             raise ValueError("RealOverflow.loc_underflow and RealOverflow.loc_overflow must not be equal unless they are both nonexistent")
-        if self.loc_underflow != BinLocation.nonexistent and self.loc_nanflow != BinLocation.nonexistent and self.loc_underflow == self.loc_nanflow:
+        if self.loc_underflow != self.nonexistent and self.loc_nanflow != self.nonexistent and self.loc_underflow == self.loc_nanflow:
             raise ValueError("RealOverflow.loc_underflow and RealOverflow.loc_nanflow must not be equal unless they are both nonexistent")
-        if self.loc_overflow != BinLocation.nonexistent and self.loc_nanflow != BinLocation.nonexistent and self.loc_overflow == self.loc_nanflow:
+        if self.loc_overflow != self.nonexistent and self.loc_nanflow != self.nonexistent and self.loc_overflow == self.loc_nanflow:
             raise ValueError("RealOverflow.loc_overflow and RealOverflow.loc_nanflow must not be equal unless they are both nonexistent")
+        if self.minf_mapping == self.in_overflow:
+            raise ValueError("RealOverflow.minf_mapping (-inf mapping) can only be in_underflow or in_nanflow, not in_overflow")
+        if self.pinf_mapping == self.in_underflow:
+            raise ValueError("RealOverflow.pinf_mapping (+inf mapping) can only be in_overflow or in_nanflow, not in_underflow")
 
     def _numbins(self):
-        return int(self.loc_underflow != BinLocation.nonexistent) + int(self.loc_overflow != BinLocation.nonexistent) + int(self.loc_nanflow != BinLocation.nonexistent)
+        return int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent) + int(self.loc_nanflow != self.nonexistent)
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.RealOverflow.RealOverflowStart(builder)
@@ -1425,6 +1481,8 @@ class RegularBinning(Binning):
             raise ValueError("RegularBinning.interval.low must be finite")
         if math.isinf(self.interval.high):
             raise ValueError("RegularBinning.interval.high must be finite")
+        if self.interval.low_inclusive and self.interval.high_inclusive:
+            raise ValueError("RegularBinning.interval.low_inclusive and RegularBinning.interval.high_inclusive cannot both be True")
         if recursive:
             _valid(self.interval, seen, recursive)
             _valid(self.overflow, seen, recursive)
@@ -1447,6 +1505,60 @@ class RegularBinning(Binning):
         if self.circular is not False:
             stagg.stagg_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.RegularBinning.RegularBinningEnd(builder)
+
+    def toEdgesBinning(self):
+        edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
+        return EdgesBinning(edges, overflow=self.overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive, circular=self.circular)
+
+    def toIrregularBinning(self):
+        return self.toEdgesBinning().toIrregularBinning()
+
+    def toCategoryBinning(self):
+        flows = []
+        flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format(
+            "[" if self.overflow.minf_mapping == self.overflow.in_underflow else "(",
+            self.interval.low,
+            ")" if self.interval.low_inclusive else "]")))
+        flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format(
+            "(" if self.interval.high_inclusive else "[",
+            self.interval.high,
+            "]" if self.overflow.pinf_mapping == self.overflow.in_overflow else ")")))
+        nanflow = []
+        if self.overflow.minf_mapping == self.overflow.in_nanflow:
+            nanflow.append("-inf")
+        if self.overflow.pinf_mapping == self.overflow.in_nanflow:
+            nanflow.append("+inf")
+        if self.overflow.nan_mapping == self.overflow.in_nanflow:
+            nanflow.append("nan")
+        if len(nanflow) != 0:
+            flows.append((self.overflow.loc_nanflow, "{" + ", ".join(nanflow) + "}"))
+
+        cats = []
+        for loc, cat in self._belows(*flows):
+            cats.append(cat)
+
+        edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
+        if self.interval.low_inclusive and self.interval.high_inclusive:
+            raise ValueError("RegularBinning.interval.low_inclusive and RegularBinning.interval.high_inclusive cannot both be True")
+        elif not self.interval.low_inclusive and not self.interval.high_inclusive:
+            cats.extend(["({0}, {1})".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
+        elif self.interval.low_inclusive:
+            cats.extend(["[{0}, {1})".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
+        elif self.interval.high_inclusive:
+            cats.extend(["({0}, {1}]".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
+
+        for loc, cat in self._aboves(*flows):
+            cats.append(cat)
+
+        return CategoryBinning(cats)
+
+    def toSparseRegularBinning(self):
+        if self.overflow.loc_underflow != self.overflow.nonexistent or self.overflow.loc_overflow != self.overflow.nonexistent:
+            raise ValueError("cannot convert RegularBinning with underflow or overflow bins to SparseRegularBinning")
+        bin_width = self.interval.high - self.interval.low
+        lowindex, origin = divmod(self.interval.low, bin_width)
+        bins = range(lowindex, lowindex + self.num)
+        return SparseRegularBinning(bins, bin_width, origin=origin, loc_nanflow=self.overflow.loc_nanflow)
 
 ################################################# TicTacToeOverflowBinning
 
@@ -1608,16 +1720,25 @@ class HexagonalBinning(Binning):
 
 class EdgesBinning(Binning):
     _params = {
-        "edges":    stagg.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
-        "overflow": stagg.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        "edges":          stagg.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
+        "overflow":       stagg.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        "low_inclusive":  stagg.checktype.CheckBool("EdgesBinning", "low_inclusive", required=False),
+        "high_inclusive": stagg.checktype.CheckBool("EdgesBinning", "high_inclusive", required=False),
+        "circular":       stagg.checktype.CheckBool("EdgesBinning", "circular", required=False),
         }
 
-    edges    = typedproperty(_params["edges"])
-    overflow = typedproperty(_params["overflow"])
+    edges          = typedproperty(_params["edges"])
+    overflow       = typedproperty(_params["overflow"])
+    low_inclusive  = typedproperty(_params["low_inclusive"])
+    high_inclusive = typedproperty(_params["high_inclusive"])
+    circular       = typedproperty(_params["circular"])
 
-    def __init__(self, edges, overflow=None):
+    def __init__(self, edges, overflow=None, low_inclusive=True, high_inclusive=False, circular=False):
         self.edges = edges
         self.overflow = overflow
+        self.low_inclusive = low_inclusive
+        self.high_inclusive = high_inclusive
+        self.circular = circular
 
     def _valid(self, seen, recursive):
         if numpy.isinf(self.edges).any():
@@ -1626,6 +1747,8 @@ class EdgesBinning(Binning):
             raise ValueError("EdgesBinning.edges must be strictly increasing")
         if len(self.edges) == 1 and (self.overflow is None or self.overflow._numbins() == 0):
             raise ValueError("EdgesBinning.edges must have more than one edge if EdgesBinning.overflow is missing or has zero bins")
+        if self.low_inclusive and self.high_inclusive:
+            raise ValueError("EdgesBinning.low_inclusive and EdgesBinning.high_inclusive cannot both be True")
         if recursive:
             _valid(self.overflow, seen, recursive)
 
@@ -1647,6 +1770,12 @@ class EdgesBinning(Binning):
         stagg.stagg_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
         if overflow is not None:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        if self.low_inclusive is not True:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
+        if self.high_inclusive is not False:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
+        if self.circular is not False:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
 
 ################################################# IrregularBinning
@@ -1728,7 +1857,7 @@ class CategoryBinning(Binning, BinLocation):
         return False
 
     def _binshape(self):
-        return (len(self.categories) + (self.loc_overflow != BinLocation.nonexistent),)
+        return (len(self.categories) + (self.loc_overflow != self.nonexistent),)
 
     def _toflatbuffers(self, builder):
         categories = [builder.CreateString(x.encode("utf-8")) for x in self.categories]
@@ -1770,7 +1899,7 @@ class SparseRegularBinning(Binning, BinLocation):
             raise ValueError("SparseRegularBinning.bins must be unique")
 
     def _binshape(self):
-        return (len(self.bins) + (self.loc_nanflow != BinLocation.nonexistent),)
+        return (len(self.bins) + (self.loc_nanflow != self.nonexistent),)
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
@@ -2761,7 +2890,14 @@ class Histogram(Object):
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
     def _add(self, other, shape, noclobber):
-        HERE
+        if not isinstance(other, Histogram):
+            raise ValueError("cannot add {0} and {1}".format(self, other))
+        # FIXME: check axis
+        # FIXME: add counts
+        # FIXME: add profile, if applicable
+        # FIXME: add axis_covariances
+        # FIXME: add profile_covariances
+        # FIXME: add functions, if applicable
 
 ################################################# Page
 

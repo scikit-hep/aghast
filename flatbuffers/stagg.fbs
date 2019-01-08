@@ -251,6 +251,9 @@ table HexagonalBinning {
 table EdgesBinning {
   edges: [double] (required);
   overflow: RealOverflow;
+  low_inclusive: bool = true;
+  high_inclusive: bool = false;
+  circular: bool = false;
 }
 
 enum OverlappingFillStrategy: byte {
