@@ -260,7 +260,7 @@ class Stagg(object):
                 setattr(out, private, x)
         return out
 
-    def _add(self, other, noclobber):
+    def _add(self, other, shape, noclobber):
         raise NotImplementedError(type(self))
 
     @classmethod
@@ -326,11 +326,11 @@ class Object(Stagg):
 
     def __add__(self, other):
         out = self._copy()
-        out._add(other, noclobber=True)
+        out._add(other, (), noclobber=True)
         return out
 
     def __iadd__(self, other):
-        self._add(other, noclobber=False)
+        self._add(other, (), noclobber=False)
         return self
 
     def __radd__(self, other):
@@ -2759,6 +2759,9 @@ class Histogram(Object):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    def _add(self, other, shape, noclobber):
+        HERE
 
 ################################################# Page
 
