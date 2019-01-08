@@ -260,6 +260,9 @@ class Stagg(object):
                 setattr(out, private, x)
         return out
 
+    def _add(self, other, noclobber):
+        raise NotImplementedError(type(self))
+
     @classmethod
     def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
@@ -2589,16 +2592,16 @@ class BinnedEvaluatedFunction(FunctionObject):
 
 class Histogram(Object):
     _params = {
-        "axis":                 stagg.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "counts":               stagg.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
-        "profile":              stagg.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
+        "axis":                stagg.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "counts":              stagg.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
+        "profile":             stagg.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
         "axis_covariances":    stagg.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
         "profile_covariances": stagg.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
-        "functions":            stagg.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
-        "title":                stagg.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":             stagg.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":           stagg.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
-        "script":               stagg.checktype.CheckString("Histogram", "script", required=False),
+        "functions":           stagg.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
+        "title":               stagg.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":            stagg.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":          stagg.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "script":              stagg.checktype.CheckString("Histogram", "script", required=False),
         }
 
     axis                 = typedproperty(_params["axis"])
