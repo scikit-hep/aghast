@@ -69,7 +69,6 @@ import stagg.stagg_generated.RealInterval
 import stagg.stagg_generated.NonRealMapping
 import stagg.stagg_generated.RealOverflow
 import stagg.stagg_generated.RegularBinning
-import stagg.stagg_generated.TicTacToeOverflowBinning
 import stagg.stagg_generated.HexagonalCoordinates
 import stagg.stagg_generated.HexagonalBinning
 import stagg.stagg_generated.EdgesBinning
@@ -1560,68 +1559,6 @@ class RegularBinning(Binning):
         bins = range(lowindex, lowindex + self.num)
         return SparseRegularBinning(bins, bin_width, origin=origin, loc_nanflow=self.overflow.loc_nanflow)
 
-################################################# TicTacToeOverflowBinning
-
-class TicTacToeOverflowBinning(Binning):
-    _params = {
-        "xnum":      stagg.checktype.CheckInteger("TicTacToeOverflowBinning", "xnum", required=True, min=1),
-        "ynum":      stagg.checktype.CheckInteger("TicTacToeOverflowBinning", "ynum", required=True, min=1),
-        "xinterval": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "xinterval", required=True, type=RealInterval),
-        "yinterval": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "yinterval", required=True, type=RealInterval),
-        "xoverflow": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "xoverflow", required=False, type=RealOverflow),
-        "yoverflow": stagg.checktype.CheckClass("TicTacToeOverflowBinning", "yoverflow", required=False, type=RealOverflow),
-        }
-
-    xnum      = typedproperty(_params["xnum"])
-    ynum      = typedproperty(_params["ynum"])
-    xinterval = typedproperty(_params["xinterval"])
-    yinterval = typedproperty(_params["yinterval"])
-    xoverflow = typedproperty(_params["xoverflow"])
-    yoverflow = typedproperty(_params["yoverflow"])
-
-    def __init__(self, xnum, ynum, xinterval, yinterval, xoverflow=None, yoverflow=None):
-        self.xnum = xnum
-        self.ynum = ynum
-        self.xinterval = xinterval
-        self.yinterval = yinterval
-        self.xoverflow = xoverflow
-        self.yoverflow = yoverflow
-
-    def _valid(self, seen, recursive):
-        if recursive:
-            _valid(self.xinterval, seen, recursive)
-            _valid(self.yinterval, seen, recursive)
-            _valid(self.xoverflow, seen, recursive)
-            _valid(self.yoverflow, seen, recursive)
-
-    def _binshape(self):
-        if self.xoverflow is None:
-            numxoverflowbins = 0
-        else:
-            numxoverflowbins = self.xoverflow._numbins()
-        if self.yoverflow is None:
-            numyoverflowbins = 0
-        else:
-            numyoverflowbins = self.yoverflow._numbins()
-        return (self.xnum + numxoverflowbins, self.ynum + numyoverflowbins)
-
-    def _toflatbuffers(self, builder):
-        xinterval = self.xinterval._toflatbuffers(builder)
-        yinterval = self.yinterval._toflatbuffers(builder)
-        xoverflow = None if self.xoverflow is None else self.xoverflow._toflatbuffers(builder)
-        yoverflow = None if self.yoverflow is None else self.yoverflow._toflatbuffers(builder)
-
-        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningStart(builder)
-        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXnum(builder, self.xnum)
-        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYnum(builder, self.ynum)
-        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXinterval(builder, xinterval)
-        stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYinterval(builder, yinterval)
-        if xoverflow is not None:
-            stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddXoverflow(builder, xoverflow)
-        if yoverflow is not None:
-            stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningAddYoverflow(builder, yoverflow)
-        return stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinningEnd(builder)
-        
 ################################################# HexagonalBinning
 
 class HexagonalCoordinatesEnum(Enum):
@@ -3600,7 +3537,6 @@ _FunctionData_invlookup = {x[0]: n for n, x in _FunctionData_lookup.items()}
 _Binning_lookup = {
     stagg.stagg_generated.Binning.Binning.IntegerBinning: (IntegerBinning, stagg.stagg_generated.IntegerBinning.IntegerBinning),
     stagg.stagg_generated.Binning.Binning.RegularBinning: (RegularBinning, stagg.stagg_generated.RegularBinning.RegularBinning),
-    stagg.stagg_generated.Binning.Binning.TicTacToeOverflowBinning: (TicTacToeOverflowBinning, stagg.stagg_generated.TicTacToeOverflowBinning.TicTacToeOverflowBinning),
     stagg.stagg_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, stagg.stagg_generated.HexagonalBinning.HexagonalBinning),
     stagg.stagg_generated.Binning.Binning.EdgesBinning: (EdgesBinning, stagg.stagg_generated.EdgesBinning.EdgesBinning),
     stagg.stagg_generated.Binning.Binning.IrregularBinning: (IrregularBinning, stagg.stagg_generated.IrregularBinning.IrregularBinning),

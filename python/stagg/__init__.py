@@ -54,7 +54,6 @@ from stagg.interface import IntegerBinning
 from stagg.interface import RealInterval
 from stagg.interface import RealOverflow
 from stagg.interface import RegularBinning
-from stagg.interface import TicTacToeOverflowBinning
 from stagg.interface import HexagonalBinning
 from stagg.interface import EdgesBinning
 from stagg.interface import IrregularBinning
