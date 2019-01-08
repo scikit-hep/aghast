@@ -101,7 +101,7 @@ class Vector(Sequence):
             return "[" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "]"
 
     def __eq__(self, other):
-        if not isinstance(other, Vector):
+        if not isinstance(other, (Vector, Iterable)):
             return False
         if len(self) != len(other):
             return False
@@ -167,7 +167,7 @@ class Lookup(Mapping):
             return "{" + ",\n ".join(tmp[:50]) + ",\n ..." + ",\n ".join(tmp[:50]) + "}"
 
     def __eq__(self, other):
-        if not isinstance(other, Lookup):
+        if not isinstance(other, (Lookup, Mapping)):
             return False
         if set(self) != set(other):
             return False
