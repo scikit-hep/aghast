@@ -176,72 +176,72 @@ class Test(unittest.TestCase):
 
     def test_serialization_Axis(self):
         h = BinnedEvaluatedFunction([Axis(expression="x", title="wow")], InterpretedInlineBuffer(numpy.array([0.0]), dtype=InterpretedInlineBuffer.float64))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_UnweightedCounts(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_WeightedCounts(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2)))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(10)**2), unweighted=UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_StatisticFilter(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1, filter=StatisticFilter(excludes_nan=False))]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Moments(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=False), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Extremes(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Quantiles(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=False), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
-        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+
     def test_serialization_Modes(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(mode=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Statistics(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Covariance(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), axis_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1000))), axis_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1))), Covariance(0, 2, InterpretedInlineBuffer.fromarray(numpy.arange(1))), Covariance(1, 2, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)])), Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))], profile_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=True), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=False)])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Profile(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 2)]))])
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)        
-        
+        assert h == frombuffer(h.tobuffer(), checkvalid=True)
+
     def test_serialization_Histogram(self):
         h = Histogram([Axis()], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(1))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
