@@ -1272,13 +1272,13 @@ class BinLocation(object):
     @classmethod
     def _belows(cls, tuples):
         out = [x for x in tuples if x[0].value < cls.nonexistent.value]
-        out.sort(key=lambda x, y: x[0].value < y[0].value)
+        out.sort(key=lambda x: x[0].value)
         return out
 
     @classmethod
     def _aboves(cls, tuples):
         out = [x for x in tuples if x[0].value > cls.nonexistent.value]
-        out.sort(key=lambda x, y: x[0].value < y[0].value)
+        out.sort(key=lambda x: x[0].value)
         return out
 
 ################################################# IntegerBinning
@@ -1507,7 +1507,8 @@ class RegularBinning(Binning):
 
     def toEdgesBinning(self):
         edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
-        return EdgesBinning(edges, overflow=self.overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive, circular=self.circular)
+        overflow = None if self.overflow is None else self.overflow.copy()
+        return EdgesBinning(edges, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive, circular=self.circular)
 
     def toIrregularBinning(self):
         return self.toEdgesBinning().toIrregularBinning()
@@ -1523,7 +1524,8 @@ class RegularBinning(Binning):
         lowindex, origin = divmod(self.interval.low, bin_width)
         lowindex = int(lowindex)
         bins = range(lowindex, lowindex + self.num)
-        return SparseRegularBinning(bins, bin_width, origin=origin, overflow=self.overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
+        overflow = None if self.overflow is None else self.overflow.copy()
+        return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
 
 ################################################# HexagonalBinning
 
@@ -1687,7 +1689,8 @@ class EdgesBinning(Binning):
         intervals = []
         for i in range(len(self.edges) - 1):
             intervals.append(RealInterval(self.edges[i], self.edges[i + 1], low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive))
-        return IrregularBinning(intervals, overflow=self.overflow)
+        overflow = None if self.overflow is None else self.overflow.copy()
+        return IrregularBinning(intervals, overflow=overflow)
 
     def toCategoryBinning(self, format="%g"):
         return self.toIrregularBinning().toCategoryBinning(format=format)
@@ -1752,11 +1755,11 @@ class IrregularBinning(Binning):
         if self.overflow is not None:
             flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format(
                 "[" if self.overflow.minf_mapping == self.overflow.in_underflow else "(",
-                format % self.interval.low,
-                ")" if self.interval.low_inclusive else "]")))
+                format % self.intervals[0].low,
+                ")" if self.intervals[0].low_inclusive else "]")))
             flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format(
-                "(" if self.interval.high_inclusive else "[",
-                format % self.interval.high,
+                "(" if self.intervals[-1].high_inclusive else "[",
+                format % self.intervals[-1].high,
                 "]" if self.overflow.pinf_mapping == self.overflow.in_overflow else ")")))
             nanflow = []
             if self.overflow.minf_mapping == self.overflow.in_nanflow:
