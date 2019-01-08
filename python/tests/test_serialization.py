@@ -141,8 +141,6 @@ class Test(unittest.TestCase):
     def test_serialization_SparseRegularBinning(self):
         h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-        h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, loc_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
-        assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_FractionBinning(self):
         h = BinnedEvaluatedFunction([Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))

@@ -1270,13 +1270,13 @@ class BinLocation(object):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     @classmethod
-    def _belows(cls, *tuples):
+    def _belows(cls, tuples):
         out = [x for x in tuples if x[0].value < cls.nonexistent.value]
         out.sort(key=lambda x, y: x[0].value < y[0].value)
         return out
 
     @classmethod
-    def _aboves(cls, *tuples):
+    def _aboves(cls, tuples):
         out = [x for x in tuples if x[0].value > cls.nonexistent.value]
         out.sort(key=lambda x, y: x[0].value < y[0].value)
         return out
@@ -1337,10 +1337,10 @@ class IntegerBinning(Binning, BinLocation):
     def toCategoryBinning(self):
         flows = [(self.loc_underflow, "(-inf, {0}]".format(self.min - 1)), (self.loc_overflow, "[{0}, +inf)".format(self.max + 1))]
         cats = []
-        for loc, cat in self._belows(*flows):
+        for loc, cat in self._belows(flows):
             cats.append(cat)
         cats.extend([str(x) for x in range(self.min, self.max + 1)])
-        for loc, cat in self._aboves(*flows):
+        for loc, cat in self._aboves(flows):
             cats.append(cat)
         return CategoryBinning(cats)
 
@@ -1513,43 +1513,7 @@ class RegularBinning(Binning):
         return self.toEdgesBinning().toIrregularBinning()
 
     def toCategoryBinning(self):
-        flows = []
-        flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format(
-            "[" if self.overflow.minf_mapping == self.overflow.in_underflow else "(",
-            self.interval.low,
-            ")" if self.interval.low_inclusive else "]")))
-        flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format(
-            "(" if self.interval.high_inclusive else "[",
-            self.interval.high,
-            "]" if self.overflow.pinf_mapping == self.overflow.in_overflow else ")")))
-        nanflow = []
-        if self.overflow.minf_mapping == self.overflow.in_nanflow:
-            nanflow.append("-inf")
-        if self.overflow.pinf_mapping == self.overflow.in_nanflow:
-            nanflow.append("+inf")
-        if self.overflow.nan_mapping == self.overflow.in_nanflow:
-            nanflow.append("nan")
-        if len(nanflow) != 0:
-            flows.append((self.overflow.loc_nanflow, "{" + ", ".join(nanflow) + "}"))
-
-        cats = []
-        for loc, cat in self._belows(*flows):
-            cats.append(cat)
-
-        edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
-        if self.interval.low_inclusive and self.interval.high_inclusive:
-            raise ValueError("RegularBinning.interval.low_inclusive and RegularBinning.interval.high_inclusive cannot both be True")
-        elif not self.interval.low_inclusive and not self.interval.high_inclusive:
-            cats.extend(["({0}, {1})".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
-        elif self.interval.low_inclusive:
-            cats.extend(["[{0}, {1})".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
-        elif self.interval.high_inclusive:
-            cats.extend(["({0}, {1}]".format(edges[i], edges[i + 1]) for i in range(len(edges) - 1)])
-
-        for loc, cat in self._aboves(*flows):
-            cats.append(cat)
-
-        return CategoryBinning(cats)
+        return self.toIrregularBinning().toCategoryBinning()
 
     def toSparseRegularBinning(self):
         if self.overflow.loc_underflow != self.overflow.nonexistent or self.overflow.loc_overflow != self.overflow.nonexistent:
@@ -1557,7 +1521,7 @@ class RegularBinning(Binning):
         bin_width = self.interval.high - self.interval.low
         lowindex, origin = divmod(self.interval.low, bin_width)
         bins = range(lowindex, lowindex + self.num)
-        return SparseRegularBinning(bins, bin_width, origin=origin, loc_nanflow=self.overflow.loc_nanflow)
+        return SparseRegularBinning(bins, bin_width, origin=origin, overflow=self.overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
 
 ################################################# HexagonalBinning
 
@@ -1715,6 +1679,17 @@ class EdgesBinning(Binning):
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
 
+    def toIrregularBinning(self):
+        if self.low_inclusive and self.high_inclusive:
+            raise ValueError("EdgesBinning.interval.low_inclusive and EdgesBinning.interval.high_inclusive cannot both be True")
+        intervals = []
+        for i in range(len(self.edges) - 1):
+            intervals.append(RealInterval(self.edges[i], self.edges[i + 1], low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive))
+        return IrregularBinning(intervals, overflow=self.overflow)
+
+    def toCategoryBinning(self):
+        return self.toIrregularBinning().toCategoryBinning()
+
 ################################################# IrregularBinning
 
 class OverlappingFillStrategyEnum(Enum):
@@ -1770,6 +1745,42 @@ class IrregularBinning(Binning):
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
 
+    def toCategoryBinning(self):
+        flows = []
+        flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format(
+            "[" if self.overflow.minf_mapping == self.overflow.in_underflow else "(",
+            self.interval.low,
+            ")" if self.interval.low_inclusive else "]")))
+        flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format(
+            "(" if self.interval.high_inclusive else "[",
+            self.interval.high,
+            "]" if self.overflow.pinf_mapping == self.overflow.in_overflow else ")")))
+        nanflow = []
+        if self.overflow.minf_mapping == self.overflow.in_nanflow:
+            nanflow.append("-inf")
+        if self.overflow.pinf_mapping == self.overflow.in_nanflow:
+            nanflow.append("+inf")
+        if self.overflow.nan_mapping == self.overflow.in_nanflow:
+            nanflow.append("nan")
+        if len(nanflow) != 0:
+            flows.append((self.overflow.loc_nanflow, "{" + ", ".join(nanflow) + "}"))
+
+        cats = []
+        for loc, cat in self._belows(flows):
+            cats.append(cat)
+
+        for interval in self.intervals:
+            cats.append("{0}{1}, {2}{3}".format(
+                "[" if interval.low_inclusive else "(",
+                interval.low,
+                interval.high,
+                "]" if interval.high_inclusive else ")"))
+
+        for loc, cat in self._aboves(flows):
+            cats.append(cat)
+
+        return CategoryBinning(cats)
+        
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning, BinLocation):
@@ -1814,44 +1825,75 @@ class CategoryBinning(Binning, BinLocation):
 
 class SparseRegularBinning(Binning, BinLocation):
     _params = {
-        "bins":        stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
-        "bin_width":   stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
-        "origin":      stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "loc_nanflow": stagg.checktype.CheckEnum("SparseRegularBinning", "loc_nanflow", required=False, choices=BinLocation.locations),
+        "bins":           stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
+        "bin_width":      stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        "origin":         stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        "overflow":       stagg.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
+        "low_inclusive":  stagg.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
+        "high_inclusive": stagg.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
         }
 
-    bins        = typedproperty(_params["bins"])
-    bin_width   = typedproperty(_params["bin_width"])
-    origin      = typedproperty(_params["origin"])
-    loc_nanflow = typedproperty(_params["loc_nanflow"])
+    bins           = typedproperty(_params["bins"])
+    bin_width      = typedproperty(_params["bin_width"])
+    origin         = typedproperty(_params["origin"])
+    overflow       = typedproperty(_params["overflow"])
+    low_inclusive  = typedproperty(_params["low_inclusive"])
+    high_inclusive = typedproperty(_params["high_inclusive"])
 
-    def __init__(self, bins, bin_width, origin=0.0, loc_nanflow=BinLocation.nonexistent):
+    def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False):
         self.bins = bins
         self.bin_width = bin_width
         self.origin = origin
-        self.loc_nanflow = loc_nanflow
+        self.overflow = overflow
+        self.low_inclusive = low_inclusive
+        self.high_inclusive = high_inclusive
 
     def _valid(self, seen, recursive):
         if len(self.bins) != len(numpy.unique(self.bins)):
             raise ValueError("SparseRegularBinning.bins must be unique")
+        if self.low_inclusive and self.high_inclusive:
+            raise ValueError("SparseRegularBinning.low_inclusive and SparseRegularBinning.high_inclusive cannot both be True")
+        if recursive:
+            _valid(self.overflow, seen, recursive)
 
     def _binshape(self):
-        return (len(self.bins) + (self.loc_nanflow != self.nonexistent),)
+        if self.overflow is None:
+            numoverflowbins = 0
+        else:
+            numoverflowbins = self.overflow._numbins()
+        return (len(self.bins) + numoverflowbins,)
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
         for x in self.bins[::-1]:
             builder.PrependInt64(x)
         bins = builder.EndVector(len(self.bins))
+        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
         if self.origin != 0.0:
             stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
-        if self.loc_nanflow != self.nonexistent:
-            stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddLocNanflow(builder, self.loc_nanflow.value)
+        if overflow is not None:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        if self.low_inclusive is not True:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
+        if self.high_inclusive is not False:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
+
+    def toCategoryBinning(self):
+        # flows = [(self.loc_underflow, "(-inf, {0}]".format(self.min - 1)), (self.loc_overflow, "[{0}, +inf)".format(self.max + 1))]
+        # cats = []
+        # for loc, cat in self._belows(flows):
+        #     cats.append(cat)
+        # cats.extend([str(x) for x in range(self.min, self.max + 1)])
+        # for loc, cat in self._aboves(flows):
+        #     cats.append(cat)
+        # return CategoryBinning(cats)
+
+        HERE
 
 ################################################# FractionBinning
 

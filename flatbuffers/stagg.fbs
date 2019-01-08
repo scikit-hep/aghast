@@ -268,7 +268,9 @@ table SparseRegularBinning {
   bins: [long] (required);
   bin_width: double;
   origin: double = 0.0;
-  loc_nanflow: BinLocation = loc_nonexistent;
+  overflow: RealOverflow;
+  low_inclusive: bool = true;
+  high_inclusive: bool = false;
 }
 
 enum FractionLayout: byte {

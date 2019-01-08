@@ -176,9 +176,6 @@ class Test(unittest.TestCase):
     #     h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
     #     (h + h).checkvalid()
     #     (frombuffer(h.tobuffer()) + h).checkvalid()
-    #     h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, loc_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
-    #     (h + h).checkvalid()
-    #     (frombuffer(h.tobuffer()) + h).checkvalid()
 
     # def test_add_FractionBinning(self):
     #     h = BinnedEvaluatedFunction([Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))

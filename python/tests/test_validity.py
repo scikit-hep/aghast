@@ -180,9 +180,6 @@ class Test(unittest.TestCase):
         h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
         h.checkvalid()
         assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0]
-        h = BinnedEvaluatedFunction([Axis(SparseRegularBinning([-5, -3, 10, 1000], 0.1, loc_nanflow=SparseRegularBinning.above1))], InterpretedInlineBuffer(numpy.array([0.0, 0.0, 0.0, 0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
-        h.checkvalid()
-        assert h.values.array.tolist() == [0.0, 0.0, 0.0, 0.0, 0.0]
 
     def test_validity_FractionBinning(self):
         h = BinnedEvaluatedFunction([Axis(FractionBinning())], InterpretedInlineBuffer(numpy.array([0.0, 0.0]), dtype=InterpretedInlineBuffer.float64))
