@@ -248,34 +248,17 @@ class Stagg(object):
 
     def _copy(self):
         out = type(self).__new__(type(self))
+        if hasattr(self, "_flatbuffers"):
+            out._flatbuffers = self._flatbuffers
         for n in self._params:
-            x = getattr(self, n)
-            if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
-                x = x._copy()
-            stagg.checktype.setparent(out, x)
-            setattr(out, "_" + n, x)
+            private = "_" + n
+            if hasattr(self, private):
+                x = getattr(self, private)
+                if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
+                    x = x._copy()
+                stagg.checktype.setparent(out, x)
+                setattr(out, private, x)
         return out
-
-    def _add(self, other, noclobber):
-        if (isinstance(self, Stagg) and type(self) is not type(other)) or \
-           (isinstance(self, stagg.checktype.Vector) and not isinstance(self, stagg.checktype.Vector)) or \
-           (isinstance(self, stagg.checktype.Lookup) and not isinstance(self, stagg.checktype.Lookup)):
-            raise ValueError("incompatible objects in add: {0} and {1}".format(self, other))
-        for n in self._params:
-            selfn = getattr(self, n)
-            othern = getattr(other, n)
-            if isinstance(selfn, Stagg):
-                selfn._add(othern, noclobber)
-            elif isinstance(selfn, stagg.checktype.Vector):
-                if len(selfn) != len(othern):
-                    raise ValueError("incompatible lists in add: length {0} vs length {1}".format(len(selfn), len(othern)))
-                for x, y in zip(selfn, othern):
-                    x._add(y, noclobber)
-            elif isinstance(selfn, stagg.checktype.Lookup):
-                if set(selfn.keys()) != set(othern.keys()):
-                    raise ValueError("incompatible dicts in add:\n\n    keys {0}\n    keys {1}".format(sorted(selfn), sorted(othern)))
-                for n in selfn:
-                    selfn[n]._add(othern[n], noclobber)
 
     @classmethod
     def _fromflatbuffers(cls, fb):

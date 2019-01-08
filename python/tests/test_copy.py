@@ -205,8 +205,9 @@ class Test(unittest.TestCase):
     def test_copy_Extremes(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h == h.copy(checkvalid=True)        
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-        assert h == h.copy(checkvalid=True)        
+        assert h == frombuffer(h.tobuffer()).copy(checkvalid=True)        
+        # h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        # assert h == h.copy(checkvalid=True)        
 
     def test_copy_Quantiles(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
