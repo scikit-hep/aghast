@@ -48,10 +48,21 @@ class Test(unittest.TestCase):
 
         h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=RealOverflow.below2, loc_overflow=RealOverflow.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["(-inf, 9]", "[21, +inf)", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+        assert h.axis[0].binning.toRegularBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[20.5, +inf]", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[20.5, +inf]", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[20.5, +inf]", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)"]
+
         h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=RealOverflow.below2, loc_overflow=RealOverflow.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["(-inf, 9]", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "[21, +inf)"]
+        assert h.axis[0].binning.toRegularBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[-inf, 9.5)", "[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]"]
+
         h = Histogram([Axis(IntegerBinning(10, 20, loc_underflow=RealOverflow.above2, loc_overflow=RealOverflow.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "[21, +inf)", "(-inf, 9]"]
+        assert h.axis[0].binning.toRegularBinning().toCategoryBinning().categories == ["[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]", "[-inf, 9.5)"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]", "[-inf, 9.5)"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[9.5, 10.5)", "[10.5, 11.5)", "[11.5, 12.5)", "[12.5, 13.5)", "[13.5, 14.5)", "[14.5, 15.5)", "[15.5, 16.5)", "[16.5, 17.5)", "[17.5, 18.5)", "[18.5, 19.5)", "[19.5, 20.5)", "[20.5, +inf]", "[-inf, 9.5)"]
 
     def test_binning_RegularBinning(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(0.1, 10.1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
@@ -72,10 +83,18 @@ class Test(unittest.TestCase):
 
         h = Histogram([Axis(RegularBinning(10, RealInterval(-100, 100), overflow=RealOverflow(loc_underflow=RealOverflow.below2, loc_overflow=RealOverflow.below1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["[-inf, -100)", "[100, +inf]", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[-inf, -100)", "[100, +inf]", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[-inf, -100)", "[100, +inf]", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)"]
+
         h = Histogram([Axis(RegularBinning(10, RealInterval(-100, 100), overflow=RealOverflow(loc_underflow=RealOverflow.below2, loc_overflow=RealOverflow.above1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["[-inf, -100)", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[-inf, -100)", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[-inf, -100)", "[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]"]
+
         h = Histogram([Axis(RegularBinning(10, RealInterval(-100, 100), overflow=RealOverflow(loc_underflow=RealOverflow.above2, loc_overflow=RealOverflow.above1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h.axis[0].binning.toCategoryBinning().categories == ["[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]", "[-inf, -100)"]
+        assert h.axis[0].binning.toEdgesBinning().toCategoryBinning().categories == ["[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]", "[-inf, -100)"]
+        assert h.axis[0].binning.toIrregularBinning().toCategoryBinning().categories == ["[-100, -80)", "[-80, -60)", "[-60, -40)", "[-40, -20)", "[-20, 0)", "[0, 20)", "[20, 40)", "[40, 60)", "[60, 80)", "[80, 100)", "[100, +inf]", "[-inf, -100)"]
 
     def test_binning_EdgesBinning(self):
         h = Histogram([Axis(EdgesBinning([3, 4.5, 10, 20]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(5))))
