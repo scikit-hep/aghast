@@ -1270,7 +1270,7 @@ class BinLocation(object):
     above1      = BinLocationEnum("above1", stagg.stagg_generated.BinLocation.BinLocation.loc_above1)
     above2      = BinLocationEnum("above2", stagg.stagg_generated.BinLocation.BinLocation.loc_above2)
     above3      = BinLocationEnum("above3", stagg.stagg_generated.BinLocation.BinLocation.loc_above3)
-    locations = [below3, below2, below1, nonexistent, above1, above2, above3]
+    locations = [below3, below2, below1, nonexistent, above1, above2, above3]   # implementation depends on this order
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
@@ -1315,7 +1315,7 @@ class IntegerBinning(Binning, BinLocation):
             raise ValueError("IntegerBinning.loc_underflow and IntegerBinning.loc_overflow must not be equal unless they are both nonexistent")
 
     def _binshape(self):
-        return (self.max - self.min + 1 + int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent),)
+        return (1 + self.max - self.min + int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent),)
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.IntegerBinning.IntegerBinningStart(builder)
@@ -1354,7 +1354,58 @@ class IntegerBinning(Binning, BinLocation):
         return self.toRegularBinning().toSparseRegularBinning()
 
     def _merger(self, other):
-        HERE
+        assert isinstance(other, IntegerBinning)
+
+        if self.min == other.min and self.max == other.max and self.loc_underflow == other.loc_underflow and self.loc_overflow == other.loc_overflow:
+            return self, None, None
+
+        else:
+            newmin = min(self.min, other.min)
+            newmax = max(self.max, other.max)
+
+            loc = BinLocations.locations.index[self.loc_nonexistent]
+            pos = 1 + newmax - newmin
+            if self.loc_underflow != self.loc_nonexistent or other.loc_underflow != other.loc_nonexistent:
+                loc += 1
+                loc_underflow = BinLocations.locations[loc]
+                pos_underflow = pos
+                pos += 1
+            else:
+                loc_underflow = self.loc_nonexistent
+                pos_underflow = 123 # FIXME
+
+            if self.loc_overflow != self.loc_nonexistent or other.loc_overflow != other.loc_nonexistent:
+                loc += 1
+                loc_overflow = BinLocations.locations[loc]
+                pos_overflow = pos
+                pos += 1
+            else:
+                loc_overflow = self.loc_nonexistent
+                pos_overflow = 123 # FIXME
+
+            selfmap = numpy.zeros(self._binshape(), dtype=numpy.int64) * 999   # FIXME
+            numbins = 1 + self.max - self.min
+            flows = [(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)]
+            belows = BinLocation._belows(flows)
+            aboves = BinLocation._aboves(flows)
+            selfmap[len(belows) : len(belows) + numbins] = numpy.arange(self.min - newmin, 1 + self.max - newmin, dtype=numpy.int64)
+            for loc, pos in belows:
+                selfmap[loc] = pos
+            for loc, pos in aboves:
+                selfmap[loc] = pos
+
+            othermap = numpy.zeros(other._binshape(), dtype=numpy.int64) * 999   # FIXME
+            numbins = 1 + other.max - other.min
+            flows = [(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)]
+            belows = BinLocation._belows(flows)
+            aboves = BinLocation._aboves(flows)
+            othermap[len(belows) : len(belows) + numbins] = numpy.arange(other.min - newmin, 1 + other.max - newmin, dtype=numpy.int64)
+            for loc, pos in belows:
+                othermap[loc] = pos
+            for loc, pos in aboves:
+                othermap[loc] = pos
+
+            return IntegerBinning(newmin, newmax, loc_underflow=loc_underflow, loc_overflow=loc_overflow), selfmap, othermap
 
 ################################################# RealInterval
 
