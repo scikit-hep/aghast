@@ -707,9 +707,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
 
     @property
-    def array(self):
-        shape = self._shape((), ())
-
+    def flatarray(self):
         if len(self.filters) == 0:
             array = self.buffer
         else:
@@ -731,9 +729,14 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         except ValueError:
             raise ValueError("InterpretedInlineBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
 
+        return array
+
+    @property
+    def array(self):
+        array = self.flatarray
+        shape = self._shape((), ())
         if len(array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedInlineBuffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
-
         return array.reshape(shape, order=self.dimension_order.dimension_order)
 
     @classmethod
@@ -777,6 +780,18 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
         return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
+    def _add(self, other, noclobber):
+        if noclobber:
+            return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
+                                           filters=self.filters,
+                                           postfilter_slice=self.postfilter_slice,
+                                           dtype=self.dtype,
+                                           endianness=self.endianness,
+                                           dimension_order=self.dimension_order)
+        else:
+            self.flatarray += other.flatarray
+            return self
+
 ################################################# ExternalBuffer
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
@@ -819,9 +834,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         self.array
 
     @property
-    def array(self):
-        shape = self._shape((), ())
-
+    def flatarray(self):
         self._buffer = numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
         if len(self.filters) == 0:
@@ -840,9 +853,14 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         except ValueError:
             raise ValueError("InterpretedExternalBuffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
 
+        return array
+
+    @property
+    def array(self):
+        array = self.flatarray
+        shape = self._shape((), ())
         if len(array) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("InterpretedExternalBuffer.buffer length is {0} but multiplicity at this position in the hierarchy is {1}".format(len(array), functools.reduce(operator.mul, shape, 1)))
-
         return array.reshape(shape, order=self.dimension_order.dimension_order)
 
     def _toflatbuffers(self, builder):
@@ -874,6 +892,18 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         if location is not None:
             stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
         return stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
+
+    def _add(self, other, noclobber):
+        if noclobber or self.external_source != self.memory or len(self.filters) != 0:
+            return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
+                                           filters=self.filters,
+                                           postfilter_slice=self.postfilter_slice,
+                                           dtype=self.dtype,
+                                           endianness=self.endianness,
+                                           dimension_order=self.dimension_order)
+        else:
+            self.flatarray += other.flatarray
+            return self
 
 ################################################# StatisticFilter
 
@@ -1245,7 +1275,14 @@ class Binning(Stagg):
     @staticmethod
     def _promote(one, two):
         if type(one) is type(two):
-            return one, two
+            if isinstance(one, RegularBinning) and (one.num != two.num or one.interval != two.interval):
+                return one.toIrregularBinning(), two.toIrregularBinning()
+            elif isinstance(one, EdgesBinning) and (one.edges != two.edges or one.low_inclusive != two.low_inclusive or one.high_inclusive != two.high_inclusive):
+                return one.toIrregularBinning(), two.toIrregularBinning()
+            elif isinstance(one, SparseRegularBinning) and (self.bin_width != other.bin_width or self.origin != other.origin):
+                return one.toIrregularBinning(), two.toIrregularBinning()
+            else:
+                return one, two
         elif hasattr(one, "to" + type(two).__name__):
             return getattr(one, "to" + type(two).__name__)(), two
         elif hasattr(two, "to" + type(one).__name__):
@@ -2352,6 +2389,28 @@ class Counts(Stagg):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+    @staticmethod
+    def _promote(one, two):
+        if isinstance(one, UnweightedCounts) and isinstance(two, UnweightedCounts):
+            return one, two
+
+        has_sumw2 = (isinstance(one, WeightedCounts) and one.sumw2 is not None) and (isinstance(two, WeightedCounts) and two.sumw2 is not None)
+        has_unweighted = (isinstance(one, UnweightedCounts) or one.unweighted is not None) and (isinstance(two, UnweightedCounts) or two.unweighted is not None)
+
+        if isinstance(one, UnweightedCounts) or has_sumw2 != (one.sumw2 is not None) or has_unweighted != (one.unweighted is not None):
+            sumw = one.counts.unattached() if isinstance(one, UnweightedCounts) else one.sumw.unattached()
+            sumw2 = one.sumw2.unattached() if has_sumw2 else None
+            unweighted = one.unattached() if isinstance(one, UnweightedCounts) else one.unweighted.unattached()
+            one = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
+
+        if isinstance(two, UnweightedCounts) or has_sumw2 != (two.sumw2 is not None) or has_unweighted != (two.unweighted is not None):
+            sumw = two.counts.unattached() if isinstance(two, UnweightedCounts) else two.sumw.unattached()
+            sumw2 = two.sumw2.unattached() if has_sumw2 else None
+            unweighted = two.unattached() if isinstance(two, UnweightedCounts) else two.unweighted.unattached()
+            two = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
+
+        return one, two
+
 ################################################# UnweightedCounts
 
 class UnweightedCounts(Counts):
@@ -2381,7 +2440,13 @@ class UnweightedCounts(Counts):
         stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
         stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
         return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
-    
+
+    def _add(self, other, noclobber):
+        assert isinstance(other, UnweightedCounts)
+        counts = self.counts._add(other.counts, noclobber)
+        if counts is not self.counts:
+            self.counts = counts
+
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
@@ -2429,6 +2494,23 @@ class WeightedCounts(Counts):
         if unweighted is not None:
             stagg.stagg_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
         return stagg.stagg_generated.WeightedCounts.WeightedCountsEnd(builder)
+
+    def _add(self, other, noclobber):
+        assert isinstance(other, WeightedCounts)
+
+        sumw = self.sumw._add(other.sumw, noclobber)
+        if sumw is not self.sumw:
+            self.sumw = sumw
+
+        if self.sumw2 is not None:
+            sumw2 = self.sumw2._add(other.sumw2, noclobber)
+            if sumw2 is not self.sumw2:
+                self.sumw2 = sumw2
+
+        if self.unweighted is not None:
+            unweighted = self.unweighted._add(other.unweighted, noclobber)
+            if unweighted is not self.unweighted:
+                self.unweighted = unweighted
 
 ################################################# Parameter
 
@@ -2835,16 +2917,16 @@ class Histogram(Object):
         "script":              stagg.checktype.CheckString("Histogram", "script", required=False),
         }
 
-    axis                 = typedproperty(_params["axis"])
-    counts               = typedproperty(_params["counts"])
-    profile              = typedproperty(_params["profile"])
+    axis                = typedproperty(_params["axis"])
+    counts              = typedproperty(_params["counts"])
+    profile             = typedproperty(_params["profile"])
     axis_covariances    = typedproperty(_params["axis_covariances"])
     profile_covariances = typedproperty(_params["profile_covariances"])
-    functions            = typedproperty(_params["functions"])
-    title                = typedproperty(_params["title"])
-    metadata             = typedproperty(_params["metadata"])
-    decoration           = typedproperty(_params["decoration"])
-    script               = typedproperty(_params["script"])
+    functions           = typedproperty(_params["functions"])
+    title               = typedproperty(_params["title"])
+    metadata            = typedproperty(_params["metadata"])
+    decoration          = typedproperty(_params["decoration"])
+    script              = typedproperty(_params["script"])
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
@@ -2994,12 +3076,33 @@ class Histogram(Object):
     def _add(self, other, shape, noclobber):
         if not isinstance(other, Histogram):
             raise ValueError("cannot add {0} and {1}".format(self, other))
-        # FIXME: check axis
-        # FIXME: add counts
-        # FIXME: add profile, if applicable
-        # FIXME: add axis_covariances
-        # FIXME: add profile_covariances
-        # FIXME: add functions, if applicable
+        if len(self.axis) != len(other.axis):
+            raise ValueError("cannot add {0}-dimensional Histogram and {1}-dimensional Histogram".format(len(self.axis), len(other.axis)))
+
+        pairs = [Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis)]
+        triples = [one._merger(two) for one, two in pairs]
+
+        selfcounts, othercounts = Counts._promote(self.counts, other.counts)
+
+        if any(oldaxis.binning is not binning or selfmap is not None or othermap is not None for oldaxis, (binning, selfmap, othermap) in zip(self.axis, triples)):
+            raise NotImplementedError
+
+        selfcounts._add(othercounts, noclobber)
+
+        if self.counts is not selfcounts:
+            self.counts = selfcounts
+
+        if len(self.profile) != 0:
+            raise NotImplementedError
+
+        if len(self.axis_covariances) != 0:
+            raise NotImplementedError
+
+        if len(self.profile_covariances) != 0:
+            raise NotImplementedError
+
+        if len(self.functions) != 0:
+            raise NotImplementedError
 
 ################################################# Page
 
