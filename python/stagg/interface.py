@@ -1895,6 +1895,18 @@ class SparseRegularBinning(Binning, BinLocation):
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
+    def toIrregularBinning(self):
+        if self.low_inclusive and self.high_inclusive:
+            raise ValueError("SparseRegularBinning.interval.low_inclusive and SparseRegularBinning.interval.high_inclusive cannot both be True")
+        if self.overflow is not None:
+            if self.overflow.loc_underflow != self.overflow.nonexistent or self.overflow.loc_overflow != self.overflow.nonexistent:
+                raise ValueError("SparseRegularBinning with underflow or overflow (infinity singletons) cannot be converted to IrregularBinning")
+        intervals = []
+        for x in self.bins:
+            intervals.append(RealInterval(self.bin_width*(x) + self.origin, self.bin_width*(x + 1) + self.origin))
+        overflow = None if self.overflow is None else self.overflow.copy()
+        return IrregularBinning(intervals, overflow=overflow)
+
     def toCategoryBinning(self, format="%g"):
         flows = []
         if self.overflow is not None:
