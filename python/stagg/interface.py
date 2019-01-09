@@ -28,7 +28,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import copy
 import ctypes
 import functools
 import math
@@ -239,25 +238,28 @@ class Stagg(object):
         else:
             return True
 
-    def copy(self, checkvalid=False):
-        out = self._copy()
+    def unattached(self, checkvalid=False):
+        out = self._unattached()
         if checkvalid:
             out.checkvalid()
         return out
 
-    def _copy(self):
-        out = type(self).__new__(type(self))
-        if hasattr(self, "_flatbuffers"):
-            out._flatbuffers = self._flatbuffers
-        for n in self._params:
-            private = "_" + n
-            if hasattr(self, private):
-                x = getattr(self, private)
-                if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
-                    x = x._copy()
-                stagg.checktype.setparent(out, x)
-                setattr(out, private, x)
-        return out
+    def _unattached(self):
+        if not hasattr(self, "_parent"):
+            return self
+        else:
+            out = type(self).__new__(type(self))
+            if hasattr(self, "_flatbuffers"):
+                out._flatbuffers = self._flatbuffers
+            for n in self._params:
+                private = "_" + n
+                if hasattr(self, private):
+                    x = getattr(self, private)
+                    if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
+                        x = x._unattached()
+                    stagg.checktype.setparent(out, x)
+                    setattr(out, private, x)
+            return out
 
     def _add(self, other, shape, noclobber):
         raise NotImplementedError(type(self))
@@ -324,7 +326,7 @@ class Object(Stagg):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     def __add__(self, other):
-        out = self._copy()
+        out = self._unattached()
         out._add(other, (), noclobber=True)
         return out
 
@@ -1248,6 +1250,10 @@ class Binning(Stagg):
             return getattr(one, "to" + type(two).__name__)(), two
         elif hasattr(two, "to" + type(one).__name__):
             return one, getattr(two, "to" + type(one).__name__)()
+        elif hasattr(one, "toIrregularBinning") and hasattr(two, "toIrregularBinning"):
+            return one.toIrregularBinning(), two.toIrregularBinning()
+        elif hasattr(one, "toCategoryBinning") and hasattr(two, "toCategoryBinning"):
+            return one.toCategoryBinning(), two.toCategoryBinning()
         else:
             raise ValueError("{0} and {1} can't be promoted to the same type of Binning".format(one, two))
 
@@ -1507,7 +1513,7 @@ class RegularBinning(Binning):
 
     def toEdgesBinning(self):
         edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
-        overflow = None if self.overflow is None else self.overflow.copy()
+        overflow = None if self.overflow is None else self.overflow.unattached()
         return EdgesBinning(edges, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive, circular=self.circular)
 
     def toIrregularBinning(self):
@@ -1524,7 +1530,7 @@ class RegularBinning(Binning):
         lowindex, origin = divmod(self.interval.low, bin_width)
         lowindex = int(lowindex)
         bins = range(lowindex, lowindex + self.num)
-        overflow = None if self.overflow is None else self.overflow.copy()
+        overflow = None if self.overflow is None else self.overflow.unattached()
         return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
 
 ################################################# HexagonalBinning
@@ -1689,7 +1695,7 @@ class EdgesBinning(Binning):
         intervals = []
         for i in range(len(self.edges) - 1):
             intervals.append(RealInterval(self.edges[i], self.edges[i + 1], low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive))
-        overflow = None if self.overflow is None else self.overflow.copy()
+        overflow = None if self.overflow is None else self.overflow.unattached()
         return IrregularBinning(intervals, overflow=overflow)
 
     def toCategoryBinning(self, format="%g"):
@@ -1904,7 +1910,7 @@ class SparseRegularBinning(Binning, BinLocation):
         intervals = []
         for x in self.bins:
             intervals.append(RealInterval(self.bin_width*(x) + self.origin, self.bin_width*(x + 1) + self.origin))
-        overflow = None if self.overflow is None else self.overflow.copy()
+        overflow = None if self.overflow is None else self.overflow.unattached()
         return IrregularBinning(intervals, overflow=overflow)
 
     def toCategoryBinning(self, format="%g"):
