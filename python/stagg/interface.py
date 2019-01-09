@@ -1270,7 +1270,8 @@ class BinLocation(object):
     above1      = BinLocationEnum("above1", stagg.stagg_generated.BinLocation.BinLocation.loc_above1)
     above2      = BinLocationEnum("above2", stagg.stagg_generated.BinLocation.BinLocation.loc_above2)
     above3      = BinLocationEnum("above3", stagg.stagg_generated.BinLocation.BinLocation.loc_above3)
-    locations = [below3, below2, below1, nonexistent, above1, above2, above3]   # implementation depends on this order
+    locations  = [below3, below2, below1, nonexistent, above1, above2, above3]
+    _locations = {-3: below3, -2: below2, -1: below1, 0: nonexistent, 1: above1, 2: above2, 3: above3}
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
@@ -1293,8 +1294,8 @@ class IntegerBinning(Binning, BinLocation):
     _params = {
         "min":       stagg.checktype.CheckInteger("IntegerBinning", "min", required=True),
         "max":       stagg.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "loc_underflow": stagg.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations),
-        "loc_overflow":  stagg.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations),
+        "loc_underflow": stagg.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_overflow":  stagg.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
         }
 
     min       = typedproperty(_params["min"])
@@ -1363,49 +1364,59 @@ class IntegerBinning(Binning, BinLocation):
             newmin = min(self.min, other.min)
             newmax = max(self.max, other.max)
 
-            loc = BinLocations.locations.index[self.loc_nonexistent]
+            loc = 0
             pos = 1 + newmax - newmin
-            if self.loc_underflow != self.loc_nonexistent or other.loc_underflow != other.loc_nonexistent:
+            if self.loc_underflow != self.nonexistent or other.loc_underflow != other.nonexistent:
                 loc += 1
-                loc_underflow = BinLocations.locations[loc]
+                loc_underflow = BinLocation._locations[loc]
                 pos_underflow = pos
                 pos += 1
             else:
-                loc_underflow = self.loc_nonexistent
-                pos_underflow = 123 # FIXME
+                loc_underflow = self.nonexistent
+                pos_underflow = None
 
-            if self.loc_overflow != self.loc_nonexistent or other.loc_overflow != other.loc_nonexistent:
+            if self.loc_overflow != self.nonexistent or other.loc_overflow != other.nonexistent:
                 loc += 1
-                loc_overflow = BinLocations.locations[loc]
+                loc_overflow = BinLocation._locations[loc]
                 pos_overflow = pos
                 pos += 1
             else:
-                loc_overflow = self.loc_nonexistent
-                pos_overflow = 123 # FIXME
+                loc_overflow = self.nonexistent
+                pos_overflow = None
 
-            selfmap = numpy.zeros(self._binshape(), dtype=numpy.int64) * 999   # FIXME
-            numbins = 1 + self.max - self.min
-            flows = [(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)]
-            belows = BinLocation._belows(flows)
-            aboves = BinLocation._aboves(flows)
-            selfmap[len(belows) : len(belows) + numbins] = numpy.arange(self.min - newmin, 1 + self.max - newmin, dtype=numpy.int64)
-            for loc, pos in belows:
-                selfmap[loc] = pos
-            for loc, pos in aboves:
-                selfmap[loc] = pos
-
-            othermap = numpy.zeros(other._binshape(), dtype=numpy.int64) * 999   # FIXME
+            othermap = numpy.empty(other._binshape(), dtype=numpy.int64)
             numbins = 1 + other.max - other.min
             flows = [(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)]
             belows = BinLocation._belows(flows)
             aboves = BinLocation._aboves(flows)
             othermap[len(belows) : len(belows) + numbins] = numpy.arange(other.min - newmin, 1 + other.max - newmin, dtype=numpy.int64)
+            i = 0
             for loc, pos in belows:
-                othermap[loc] = pos
+                othermap[i] = pos
+                i += 1
+            i += numbins
             for loc, pos in aboves:
-                othermap[loc] = pos
-
-            return IntegerBinning(newmin, newmax, loc_underflow=loc_underflow, loc_overflow=loc_overflow), selfmap, othermap
+                othermap[i] = pos
+                i += 1
+                
+            if newmin == self.min and newmax == self.max and loc_underflow == self.loc_underflow and loc_overflow == self.loc_overflow:
+                return self, None, othermap
+            else:
+                selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
+                numbins = 1 + self.max - self.min
+                flows = [(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)]
+                belows = BinLocation._belows(flows)
+                aboves = BinLocation._aboves(flows)
+                selfmap[len(belows) : len(belows) + numbins] = numpy.arange(self.min - newmin, 1 + self.max - newmin, dtype=numpy.int64)
+                i = 0
+                for loc, pos in belows:
+                    selfmap[i] = pos
+                    i += 1
+                i += numbins
+                for loc, pos in aboves:
+                    selfmap[i] = pos
+                    i += 1
+                return IntegerBinning(newmin, newmax, loc_underflow=loc_underflow, loc_overflow=loc_overflow), selfmap, othermap
 
 ################################################# RealInterval
 
@@ -1457,9 +1468,9 @@ class RealOverflow(Stagg, BinLocation):
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "loc_underflow": stagg.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations),
-        "loc_overflow":  stagg.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations),
-        "loc_nanflow":   stagg.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations),
+        "loc_underflow": stagg.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_overflow":  stagg.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_nanflow":   stagg.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
         "minf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
         "pinf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
         "nan_mapping":   stagg.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
@@ -1850,7 +1861,7 @@ class IrregularBinning(Binning, OverlappingFill):
 class CategoryBinning(Binning, BinLocation):
     _params = {
         "categories": stagg.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
-        "loc_overflow":  stagg.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations),
+        "loc_overflow":  stagg.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
         }
 
     categories = typedproperty(_params["categories"])

@@ -297,9 +297,10 @@ class CheckInteger(Check):
             return int(obj)
 
 class CheckEnum(Check):
-    def __init__(self, classname, paramname, required, choices):
+    def __init__(self, classname, paramname, required, choices, intlookup=None):
         super(CheckEnum, self).__init__(classname, paramname, required)
         self.choices = choices
+        self.intlookup = intlookup
 
     def __call__(self, obj):
         super(CheckEnum, self).__call__(obj)
@@ -313,8 +314,10 @@ class CheckEnum(Check):
     def fromflatbuffers(self, obj):
         if obj is None:
             return obj
-        else:
+        elif self.intlookup is None:
             return self.choices[obj]
+        else:
+            return self.intlookup[obj]
 
 class CheckClass(Check):
     def __init__(self, classname, paramname, required, type):
