@@ -1700,23 +1700,25 @@ class EdgesBinning(Binning):
 class OverlappingFillStrategyEnum(Enum):
     base = "IrregularBinning"
 
-class IrregularBinning(Binning):
-    all   = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last  = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
-    overlapping_fill_strategies = [all, first, last]
+class OverlappingFill(object):
+    undefined = OverlappingFillStrategyEnum("undefined", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_undefined)
+    all       = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first     = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last      = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    overlapping_fill_strategies = [undefined, all, first, last]
 
+class IrregularBinning(Binning, OverlappingFill):
     _params = {
         "intervals":        stagg.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
         "overflow":         stagg.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
-        "overlapping_fill": stagg.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=overlapping_fill_strategies),
+        "overlapping_fill": stagg.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
         }
 
     intervals        = typedproperty(_params["intervals"])
     overflow         = typedproperty(_params["overflow"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    def __init__(self, intervals, overflow=None, overlapping_fill=all):
+    def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
         self.intervals = intervals
         self.overflow = overflow
         self.overlapping_fill = overlapping_fill
@@ -1746,7 +1748,7 @@ class IrregularBinning(Binning):
         stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
         if overflow is not None:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, overflow)
-        if self.overlapping_fill != self.all:
+        if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
 
@@ -1988,15 +1990,18 @@ class FractionBinning(Binning):
 
 ################################################# PredicateBinning
 
-class PredicateBinning(Binning):
+class PredicateBinning(Binning, OverlappingFill):
     _params = {
-        "predicates": stagg.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
+        "predicates":       stagg.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
+        "overlapping_fill": stagg.checktype.CheckEnum("PredicateBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
         }
 
-    predicates = typedproperty(_params["predicates"])
+    predicates       = typedproperty(_params["predicates"])
+    overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    def __init__(self, predicates):
+    def __init__(self, predicates, overlapping_fill=OverlappingFill.undefined):
         self.predicates = predicates
+        self.overlapping_fill = overlapping_fill
 
     def _binshape(self):
         return (len(self.predicates),)
@@ -2011,6 +2016,8 @@ class PredicateBinning(Binning):
 
         stagg.stagg_generated.PredicateBinning.PredicateBinningStart(builder)
         stagg.stagg_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
+        if self.overlapping_fill != self.undefined:
+            stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
 
 ################################################# Assignment

@@ -248,15 +248,16 @@ table EdgesBinning {
 }
 
 enum OverlappingFillStrategy: byte {
-  overfill_all = 0,
-  overfill_first = 1,
-  overfill_last = 2
+  overfill_undefined = 0,
+  overfill_all = 1,
+  overfill_first = 2,
+  overfill_last = 3
 }
 
 table IrregularBinning {
   intervals: [RealInterval] (required);
   overflow: RealOverflow;
-  overlapping_fill: OverlappingFillStrategy = overfill_all;
+  overlapping_fill: OverlappingFillStrategy = overfill_undefined;
 }
 
 table CategoryBinning {
@@ -297,6 +298,7 @@ table FractionBinning {
 
 table PredicateBinning {
   predicates: [string] (required);
+  overlapping_fill: OverlappingFillStrategy = overfill_undefined;
 }
 
 table Assignment {
