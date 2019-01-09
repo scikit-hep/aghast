@@ -261,7 +261,7 @@ class Stagg(object):
                     setattr(out, private, x)
             return out
 
-    def _add(self, other, shape, noclobber):
+    def _add(self, other, collectionaxis, pairs, triples, noclobber):
         raise NotImplementedError(type(self))
 
     @classmethod
@@ -327,11 +327,11 @@ class Object(Stagg):
 
     def __add__(self, other):
         out = self._unattached()
-        out._add(other, (), noclobber=True)
+        out._add(other, stagg.checktype.Vector([]), (), (), noclobber=True)
         return out
 
     def __iadd__(self, other):
-        self._add(other, (), noclobber=False)
+        self._add(other, stagg.checktype.Vector([]), (), (), noclobber=False)
         return self
 
     def __radd__(self, other):
@@ -3073,18 +3073,26 @@ class Histogram(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
-    def _add(self, other, shape, noclobber):
+    def _add(self, other, collectionaxis, pairs, triples, noclobber):
         if not isinstance(other, Histogram):
             raise ValueError("cannot add {0} and {1}".format(self, other))
         if len(self.axis) != len(other.axis):
             raise ValueError("cannot add {0}-dimensional Histogram and {1}-dimensional Histogram".format(len(self.axis), len(other.axis)))
 
-        pairs = [Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis)]
-        triples = [one._merger(two) for one, two in pairs]
+        wholeaxis = tuple(collectionaxis) + tuple(self.axis)
+        pairs = pairs + tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
+        triples = triples + tuple(one._merger(two) for one, two in pairs)
 
         selfcounts, othercounts = Counts._promote(self.counts, other.counts)
 
-        if any(oldaxis.binning is not binning or selfmap is not None or othermap is not None for oldaxis, (binning, selfmap, othermap) in zip(self.axis, triples)):
+        if any(wholeaxis[i].binning is not binning or selfmap is not None or othermap is not None for i, (binning, selfmap, othermap) in enumerate(triples)):
+            for i, (binning, selfmap, othermap) in enumerate(triples):
+                HERE
+
+
+
+
+
             raise NotImplementedError
 
         selfcounts._add(othercounts, noclobber)
