@@ -1893,10 +1893,22 @@ class EdgesBinning(Binning):
             numoverflowbins = self.overflow._numbins()
         return (len(self.edges) - 1 + numoverflowbins,)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Edges = fb.EdgesAsNumpy
+        out._flatbuffers.Overflow = fb.Overflow
+        out._flatbuffers.LowInclusive = fb.LowInclusive
+        out._flatbuffers.HighInclusive = fb.HighInclusive
+        out._flatbuffers.Circular = fb.Circular
+        return out
+
     def _toflatbuffers(self, builder):
+        edgesbuf = self.edges.tostring()
         stagg.stagg_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
-        for x in self.edges[::-1]:
-            builder.PrependFloat64(x)
+        builder.head = builder.head - len(edgesbuf)
+        builder.Bytes[builder.head : builder.head + len(edgesbuf)] = edgesbuf
         edges = builder.EndVector(len(self.edges))
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
@@ -2393,6 +2405,17 @@ class Variation(Stagg):
         else:
             return out[tail]
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Assignments = fb.Assignments
+        out._flatbuffers.AssignmentsLength = fb.AssignmentsLength
+        out._flatbuffers.Systematic = lambda: numpy.empty(0, dtype="<f8") if fb.SystematicLength() == 0 else fb.SystematicAsNumpy()
+        out._flatbuffers.CategorySystematic = fb.CategorySystematic
+        out._flatbuffers.CategorySystematicLength = fb.CategorySystematicLength
+        return out
+
     def _toflatbuffers(self, builder):
         assignments = [x._toflatbuffers(builder) for x in self.assignments]
         category_systematic = None if len(self.category_systematic) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic]
@@ -2405,9 +2428,10 @@ class Variation(Stagg):
         if len(self.systematic) == 0:
             systematic = None
         else:
+            systematicbuf = systematic.tostring()
             stagg.stagg_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
-            for x in self.systematic[::-1]:
-                builder.PrependFloat64(x)
+            builder.head = builder.head - len(systematicbuf)
+            builder.Bytes[builder.head : builder.head + len(systematicbuf)] = systematicbuf
             systematic = builder.EndVector(len(self.systematic))
 
         if category_systematic is not None:
@@ -3703,7 +3727,7 @@ class NtupleInstance(Stagg):
         out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Chunks = fb.Chunks
         out._flatbuffers.ChunksLength = fb.ChunksLength
-        out._flatbuffers.ChunkOffsets = lambda: numpy.empty(0, dtype=numpy.int64) if fb.ChunkOffsetsLength() == 0 else fb.ChunkOffsetsAsNumpy()
+        out._flatbuffers.ChunkOffsets = lambda: numpy.empty(0, dtype="<i8") if fb.ChunkOffsetsLength() == 0 else fb.ChunkOffsetsAsNumpy()
         return out
 
     def _toflatbuffers(self, builder):
