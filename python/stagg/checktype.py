@@ -397,11 +397,10 @@ class CheckVector(Check):
                 if not ((sys.version_info[0] >= 3 and isinstance(x, str)) or (sys.version_info[0] < 3 and isinstance(x, basestring))):
                     raise TypeError("{0}.{1} elements must be strings, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
             return Vector(obj)
+        elif self.type is int:
+            return numpy.array(obj, dtype="<i8")
         elif self.type is float:
-            for x in obj:
-                if not isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
-                    raise TypeError("{0}.{1} elements must be numbers, cannot pass {2} (type {3})".format(self.classname, self.paramname, repr(x), type(x)))
-            return Vector(float(x) for x in obj)
+            return numpy.array(obj, dtype="<f8")
         elif isinstance(self.type, list):
             for x in obj:
                 if not x in self.type:

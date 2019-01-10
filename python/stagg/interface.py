@@ -109,6 +109,17 @@ import stagg.stagg_generated.Collection
 
 import stagg.checktype
 
+def _sameedges(one, two):
+    assert isinstance(one, numpy.ndarray) and isinstance(two, numpy.ndarray)
+    if len(one) != len(two):
+        return False
+    if len(one) == 1:
+        return one[0] - two[0] < 1e-10
+    gap = min((one[1:] - one[:-1]).min(), (two[1:] - two[:-1]).min())
+    if gap <= 0:
+        return False
+    return (numpy.absolute(one - two) / gap < 1e-10).all()
+
 def _name2fb(name):
     return "".join(x.capitalize() for x in name.split("_"))
 
@@ -283,6 +294,8 @@ class Stagg(object):
             if selfn is None or isinstance(selfn, (Stagg, Enum)):
                 if selfn != othern:
                     return False
+            elif isinstance(selfn, numpy.ndarray) and isinstance(othern, numpy.ndarray):
+                return selfn.shape == othern.shape and (selfn == othern).all()
             else:
                 try:
                     if len(selfn) != len(othern):
@@ -1297,11 +1310,11 @@ class Binning(Stagg):
     @staticmethod
     def _promote(one, two):
         if type(one) is type(two):
-            if isinstance(one, RegularBinning) and (one.num != two.num or one.interval != two.interval):
+            if isinstance(two, RegularBinning) and (one.num != two.num or one.interval != two.interval):
                 return one.toIrregularBinning(), two.toIrregularBinning()
-            elif isinstance(one, EdgesBinning) and (one.edges != two.edges or one.low_inclusive != two.low_inclusive or one.high_inclusive != two.high_inclusive):
+            elif isinstance(two, EdgesBinning) and (not _sameedges(one.edges, two.edges) or one.low_inclusive != two.low_inclusive or one.high_inclusive != two.high_inclusive):
                 return one.toIrregularBinning(), two.toIrregularBinning()
-            elif isinstance(one, SparseRegularBinning) and (self.bin_width != other.bin_width or self.origin != other.origin):
+            elif isinstance(two, SparseRegularBinning) and (one.bin_width != two.bin_width or one.origin != two.origin or one.low_inclusive != two.low_inclusive or one.high_inclusive != two.high_inclusive):
                 return one.toIrregularBinning(), two.toIrregularBinning()
             else:
                 return one, two
@@ -1912,7 +1925,7 @@ class EdgesBinning(Binning):
         return self.toIrregularBinning().toCategoryBinning(format=format)
 
     def _restructure(self, other):
-        assert isinstance(other, EdgesBinning) and self.edges == other.edges and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
+        assert isinstance(other, EdgesBinning) and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive   # and _sameedges(self.edges, other.edges)
         circular = self.circular and other.circular
 
         if self.overflow == other.overflow:
@@ -2030,7 +2043,10 @@ class IrregularBinning(Binning, OverlappingFill):
             cats.append(cat)
 
         return CategoryBinning(cats)
-        
+
+    def _restructure(self, other):
+        HERE
+
 ################################################# CategoryBinning
 
 class CategoryBinning(Binning, BinLocation):
@@ -2070,6 +2086,9 @@ class CategoryBinning(Binning, BinLocation):
         if self.loc_overflow != self.nonexistent:
             stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
+
+    def _restructure(self, other):
+        HERE
 
 ################################################# SparseRegularBinning
 
@@ -2118,11 +2137,25 @@ class SparseRegularBinning(Binning, BinLocation):
             numoverflowbins = self.overflow._numbins()
         return (len(self.bins) + numoverflowbins,)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Bins = fb.BinsAsNumpy
+        out._flatbuffers.BinWidth = fb.BinWidth
+        out._flatbuffers.Origin = fb.Origin
+        out._flatbuffers.Overflow = fb.Overflow
+        out._flatbuffers.LowInclusive = fb.LowInclusive
+        out._flatbuffers.HighInclusive = fb.HighInclusive
+        return out
+
     def _toflatbuffers(self, builder):
+        binsbuf = self.bins.tostring()
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
-        for x in self.bins[::-1]:
-            builder.PrependInt64(x)
+        builder.head = builder.head - len(binsbuf)
+        builder.Bytes[builder.head : builder.head + len(binsbuf)] = binsbuf
         bins = builder.EndVector(len(self.bins))
+
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
@@ -2187,6 +2220,31 @@ class SparseRegularBinning(Binning, BinLocation):
             cats.append(cat)
 
         return CategoryBinning(cats)
+
+    def _restructure(self, other):
+        assert isinstance(other, SparseRegularBinning) and self.bin_width == other.bin_width and self.origin == other.origin and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
+
+        HERE
+
+
+
+        lookup = set(self.bins)
+        bins = self.bins + [x for x in other.bins if x not in lookup]
+
+
+
+
+
+
+
+
+        HERE
+        # "bins":           stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
+        # "bin_width":      stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        # "origin":         stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        # "overflow":       stagg.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
+        # "low_inclusive":  stagg.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
+        # "high_inclusive": stagg.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
 
 ################################################# FractionBinning
 
@@ -3407,6 +3465,19 @@ class ColumnChunk(Stagg):
         else:
             return numpy.concatenate(out)
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Pages = fb.Pages
+        out._flatbuffers.PagesLength = fb.PagesLength
+        out._flatbuffers.PageOffsets = fb.PageOffsetsAsNumpy
+        out._flatbuffers.PageMin = fb.PageMin
+        out._flatbuffers.PageMinLength = fb.PageMinLength
+        out._flatbuffers.PageMax = fb.PageMax
+        out._flatbuffers.PageMaxLength = fb.PageMaxLength
+        return out
+
     def _toflatbuffers(self, builder):
         pages = [x._toflatbuffers(builder) for x in self.pages]
         page_min = None if len(self.page_min) == 0 else [x._toflatbuffers(builder) for x in self.page_min]
@@ -3417,9 +3488,10 @@ class ColumnChunk(Stagg):
             builder.PrependUOffsetTRelative(x)
         pages = builder.EndVector(len(pages))
 
+        pageoffsetsbuf = self.page_offsets.tostring()
         stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
-        for x in self.page_offsets[::-1]:
-            builder.PrependInt64(x)
+        builder.head = builder.head - len(pageoffsetsbuf)
+        builder.Bytes[builder.head : builder.head + len(pageoffsetsbuf)] = pageoffsetsbuf
         page_offsets = builder.EndVector(len(self.page_offsets))
 
         if page_min is not None:
@@ -3625,6 +3697,15 @@ class NtupleInstance(Stagg):
         for x in self.chunks:
             yield x.arrays
 
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Chunks = fb.Chunks
+        out._flatbuffers.ChunksLength = fb.ChunksLength
+        out._flatbuffers.ChunkOffsets = lambda: numpy.empty(0, dtype=numpy.int64) if fb.ChunkOffsetsLength() == 0 else fb.ChunkOffsetsAsNumpy()
+        return out
+
     def _toflatbuffers(self, builder):
         chunks = [x._toflatbuffers(builder) for x in self.chunks]
 
@@ -3636,9 +3717,10 @@ class NtupleInstance(Stagg):
         if len(self.chunk_offsets) == 0:
             chunk_offsets = None
         else:
+            chunkoffsetsbuf = self.chunk_offsets.tostring()
             stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
-            for x in self.chunk_offsets[::-1]:
-                builder.PrependInt64(x)
+            builder.head = builder.head - len(chunkoffsetsbuf)
+            builder.Bytes[builder.head : builder.head + len(chunkoffsetsbuf)] = chunkoffsetsbuf
             chunk_offsets = builder.EndVector(len(self.chunk_offsets))
 
         stagg.stagg_generated.NtupleInstance.NtupleInstanceStart(builder)
