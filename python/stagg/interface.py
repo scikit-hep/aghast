@@ -2066,29 +2066,34 @@ class IrregularBinning(Binning, OverlappingFill):
     def _restructure(self, other):
         assert isinstance(other, IrregularBinning)
 
-        # selfcat = list(self.categories)
-        # othercat = list(other.categories)
+        if self.overlapping_fill == other.overlapping_fill:
+            overlapping_fill = self.overlapping_fill
+        else:
+            overlapping_fill = self.undefined
 
-        # lookup = {x: i for i, x in enumerate(selfcat)}
-        # categories = selfcat + [x for x in othercat if x not in lookup]
+        selfints = list(self.intervals)
+        otherints = list(other.intervals)
 
-        # if len(categories) == len(selfcat) == len(othercat) and selfcat == othercat and self.overflow == other.overflow:
-        #     return self, (None,), (None,)
+        lookup = {x: i for i, x in enumerate(selfints)}
+        intervals = selfints + [x for x in otherints if x not in lookup]
 
-        # else:
-        #     overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(categories))
+        if len(intervals) == len(selfints) == len(otherints) and selfints == otherints and self.overflow == other.overflow:
+            return self, (None,), (None,)
 
-        #     lookup = {x: i for i, x in enumerate(categories)}
-        #     othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
-        #                               numpy.array([lookup[x] for x in othercat], dtype=numpy.int64))
+        else:
+            overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(intervals))
 
-        #     if ((self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow)) and len(selfcat) == len(categories):
-        #         return self, (None,), (othermap,)
+            lookup = {x: i for i, x in enumerate(intervals)}
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
+                                      numpy.array([lookup[x] for x in otherints], dtype=numpy.int64))
 
-        #     else:
-        #         selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
-        #                                 numpy.arange(len(selfcat), dtype=numpy.int64))
-        #         return CategoryBinning(categories, loc_overview=loc_overflow), (selfmap,), (othermap,)
+            if ((self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow)) and len(selfints) == len(intervals):
+                return self, (None,), (othermap,)
+
+            else:
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
+                                        numpy.arange(len(selfints), dtype=numpy.int64))
+                return IrregularBinning([x.detached() for x in intervals], overflow=overflow, overlapping_fill=overlapping_fill), (selfmap,), (othermap,)
 
 ################################################# CategoryBinning
 

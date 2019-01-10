@@ -801,3 +801,69 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [999, 4, 5, 6]
         assert b.axis[0].binning.categories == ["three", "four", "one", "five"]
         assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+
+    def test_add_IrregularBinning_same(self):
+        a = Histogram([Axis(IrregularBinning([RealInterval(1, 1.1), RealInterval(2, 2.2), RealInterval(3, 3.3)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([4, 5, 6]))))
+        b = Histogram([Axis(IrregularBinning([RealInterval(1, 1.1), RealInterval(2, 2.2), RealInterval(3, 3.3)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+
+    def test_add_IrregularBinning_permuted(self):
+        a = Histogram([Axis(IrregularBinning([RealInterval(1, 1.1), RealInterval(2, 2.2), RealInterval(3, 3.3)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([4, 5, 6]))))
+        b = Histogram([Axis(IrregularBinning([RealInterval(3, 3.3), RealInterval(2, 2.2), RealInterval(1, 1.1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[2, 2.2)", "[1, 1.1)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert ab.counts.counts.array.tolist() == [34, 25, 16]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[2, 2.2)", "[1, 1.1)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[2, 2.2)", "[1, 1.1)"]
+        assert ab.counts.counts.array.tolist() == [16, 25, 34]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[2, 2.2)", "[1, 1.1)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30]
+
+    def test_add_IrregularBinning_different(self):
+        a = Histogram([Axis(IrregularBinning([RealInterval(1, 1.1), RealInterval(2, 2.2), RealInterval(3, 3.3)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([4, 5, 6]))))
+        b = Histogram([Axis(IrregularBinning([RealInterval(3, 3.3), RealInterval(4, 4.4), RealInterval(1, 1.1), RealInterval(5, 5.5)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30, 40]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[4, 4.4)", "[1, 1.1)", "[5, 5.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)", "[4, 4.4)", "[5, 5.5)"]
+        assert ab.counts.counts.array.tolist() == [34, 5, 16, 20, 40]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[4, 4.4)", "[1, 1.1)", "[5, 5.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[4, 4.4)", "[1, 1.1)", "[5, 5.5)", "[2, 2.2)"]
+        assert ab.counts.counts.array.tolist() == [16, 20, 34, 40, 5]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[1, 1.1)", "[2, 2.2)", "[3, 3.3)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3, 3.3)", "[4, 4.4)", "[1, 1.1)", "[5, 5.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
