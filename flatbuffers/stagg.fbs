@@ -281,19 +281,20 @@ enum FractionLayout: byte {
 }
 
 enum FractionErrorMethod: byte {
-  frac_normal = 0,
-  frac_clopper_pearson = 1,
-  frac_wilson = 2,
-  frac_agresti_coull = 3,
-  frac_feldman_cousins = 4,
-  frac_jeffrey = 5,
-  frac_bayesian_uniform = 6
+  frac_undefined = 0,
+  frac_normal = 1,
+  frac_clopper_pearson = 2,
+  frac_wilson = 3,
+  frac_agresti_coull = 4,
+  frac_feldman_cousins = 5,
+  frac_jeffrey = 6,
+  frac_bayesian_uniform = 7
 }
 
 table FractionBinning {
   layout: FractionLayout = frac_passall;
   layout_reversed: bool = false;
-  error_method: FractionErrorMethod = frac_normal;
+  error_method: FractionErrorMethod = frac_undefined;
 }
 
 table PredicateBinning {

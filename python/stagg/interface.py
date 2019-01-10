@@ -2334,6 +2334,7 @@ class FractionBinning(Binning):
     passfail = FractionLayoutEnum("passfail", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passfail)
     layouts = [passall, failall, passfail]
 
+    undefined        = FractionErrorMethodEnum("undefined", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_undefined)
     normal           = FractionErrorMethodEnum("normal", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
     clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
     wilson           = FractionErrorMethodEnum("wilson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
@@ -2341,7 +2342,7 @@ class FractionBinning(Binning):
     feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
     jeffrey          = FractionErrorMethodEnum("jeffrey", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
     bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
-    error_methods = [normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
+    error_methods = [undefined, normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
         "layout": stagg.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
@@ -2353,7 +2354,7 @@ class FractionBinning(Binning):
     layout_reversed = typedproperty(_params["layout_reversed"])
     error_method    = typedproperty(_params["error_method"])
 
-    def __init__(self, layout=passall, layout_reversed=False, error_method=normal):
+    def __init__(self, layout=passall, layout_reversed=False, error_method=undefined):
         self.layout = layout
         self.layout_reversed = layout_reversed
         self.error_method = error_method
@@ -2371,9 +2372,17 @@ class FractionBinning(Binning):
             stagg.stagg_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
         if self.layout_reversed is not False:
             stagg.stagg_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
-        if self.error_method != self.normal:
+        if self.error_method != self.undefined:
             stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
         return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
+
+    def _restructure(self, other):
+        assert isinstance(other, FractionBinning)
+
+        
+
+
+        raise NotImplementedError
 
 ################################################# PredicateBinning
 
@@ -2406,6 +2415,9 @@ class PredicateBinning(Binning, OverlappingFill):
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
+
+    def _restructure(self, other):
+        raise NotImplementedError
 
 ################################################# Assignment
 
@@ -2540,6 +2552,9 @@ class VariationBinning(Binning):
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
+
+    def _restructure(self, other):
+        raise NotImplementedError
 
 ################################################# Axis
 
