@@ -86,3 +86,75 @@ class Test(unittest.TestCase):
         b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert (a + b).counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert (b + a).counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20, 30)))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted.counts.array.tolist() == [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted.counts.array.tolist() == [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]

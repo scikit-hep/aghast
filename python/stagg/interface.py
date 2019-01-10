@@ -2418,13 +2418,13 @@ class Counts(Stagg):
         if isinstance(one, UnweightedCounts) or has_sumw2 != (one.sumw2 is not None) or has_unweighted != (one.unweighted is not None):
             sumw = one.counts.detached() if isinstance(one, UnweightedCounts) else one.sumw.detached()
             sumw2 = one.sumw2.detached() if has_sumw2 else None
-            unweighted = one.detached() if isinstance(one, UnweightedCounts) else one.unweighted.detached()
+            unweighted = one.detached() if isinstance(one, UnweightedCounts) else None if one.unweighted is None else one.unweighted.detached()
             one = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
 
         if isinstance(two, UnweightedCounts) or has_sumw2 != (two.sumw2 is not None) or has_unweighted != (two.unweighted is not None):
             sumw = two.counts.detached() if isinstance(two, UnweightedCounts) else two.sumw.detached()
             sumw2 = two.sumw2.detached() if has_sumw2 else None
-            unweighted = two.detached() if isinstance(two, UnweightedCounts) else two.unweighted.detached()
+            unweighted = two.detached() if isinstance(two, UnweightedCounts) else None if two.unweighted is None else two.unweighted.detached()
             two = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
 
         return one, two
@@ -2465,6 +2465,7 @@ class UnweightedCounts(Counts):
     def _add(self, other, noclobber):
         assert isinstance(other, UnweightedCounts)
         self.counts = self.counts._add(other.counts, noclobber)
+        return self
         
 ################################################# WeightedCounts
 
@@ -2524,11 +2525,17 @@ class WeightedCounts(Counts):
 
         self.sumw = self.sumw._add(other.sumw, noclobber)
 
-        if self.sumw2 is not None:
+        if self.sumw2 is not None and other.sumw2 is not None:
             self.sumw2 = self.sumw2._add(other.sumw2, noclobber)
+        else:
+            self.sumw2 = None
 
-        if self.unweighted is not None:
+        if self.unweighted is not None and other.unweighted is not None:
             self.unweighted = self.unweighted._add(other.unweighted, noclobber)
+        else:
+            self.unweighted = None
+
+        return self
 
 ################################################# Parameter
 
