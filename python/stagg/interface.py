@@ -2133,29 +2133,33 @@ class CategoryBinning(Binning, BinLocation):
     def _restructure(self, other):
         assert isinstance(other, CategoryBinning)
 
-        # selfcat = list(self.categories)
-        # othercat = list(other.categories)
+        selfcat = list(self.categories)
+        othercat = list(other.categories)
 
-        # lookup = {x: i for i, x in enumerate(selfcat)}
-        # categories = selfcat + [x for x in othercat if x not in lookup]
+        lookup = {x: i for i, x in enumerate(selfcat)}
+        categories = selfcat + [x for x in othercat if x not in lookup]
 
-        # if len(categories) == len(selfcat) == len(othercat) and selfcat == othercat and self.overflow == other.overflow:
-        #     return self, (None,), (None,)
+        if len(categories) == len(selfcat) == len(othercat) and selfcat == othercat and self.loc_overflow == other.loc_overflow:
+            return self, (None,), (None,)
 
-        # else:
-        #     overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(categories))
+        else:
+            if self.loc_overflow != self.nonexistent or other.loc_overflow != other.nonexistent:
+                loc_overflow = self.above1
+                pos_overflow = len(categories)
+            else:
+                loc_overflow = self.nonexistent
+                pos_overflow = None
 
-        #     lookup = {x: i for i, x in enumerate(categories)}
-        #     othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
-        #                               numpy.array([lookup[x] for x in othercat], dtype=numpy.int64))
+            lookup = {x: i for i, x in enumerate(categories)}
+            othermap = other._selfmap([(other.loc_overflow, pos_overflow)],
+                                      numpy.array([lookup[x] for x in othercat], dtype=numpy.int64))
 
-        #     if ((self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow)) and len(selfcat) == len(categories):
-        #         return self, (None,), (othermap,)
-
-        #     else:
-        #         selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
-        #                                 numpy.arange(len(selfcat), dtype=numpy.int64))
-        #         return CategoryBinning(categories, loc_overview=loc_overflow), (selfmap,), (othermap,)
+            if self.loc_overflow == loc_overflow and len(selfcat) == len(categories):
+                return self, (None,), (othermap,)
+            else:
+                selfmap = self._selfmap([(self.loc_overflow, pos_overflow)],
+                                        numpy.arange(len(selfcat), dtype=numpy.int64))
+                return CategoryBinning(categories, loc_overflow=loc_overflow), (selfmap,), (othermap,)
 
 ################################################# SparseRegularBinning
 
