@@ -613,6 +613,9 @@ class InterpretedBuffer(Interpretation):
         print("buf", buf)
         print("selfmap", selfmap)
 
+        oldshape = tuple(len(sm) if sm is not None else ns for ns, sm in zip(newshape, selfmap))
+        print("oldshape", oldshape)
+
         for i in range(len(newshape) - 1, -1, -1):
             if selfmap[i] is None:
                 selfmapi = numpy.arange(newshape[i], dtype=numpy.int64)
@@ -621,10 +624,14 @@ class InterpretedBuffer(Interpretation):
 
             print("i", i, "selfmapi", selfmapi)
 
-            print("reshaped", buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :]))
+            print("newbuf shape", oldshape[:i] + newshape[i:])
+            newbuf = numpy.zeros(oldshape[:i] + newshape[i:], dtype=dtype, order=order)
+            print("newbuf", newbuf)
 
-            newbuf = numpy.zeros(newshape[i:], dtype=dtype, order=order)
-            newbuf[selfmapi] = buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :])
+            print("LHS", newbuf[i*(slice(None),) + (selfmapi,)])
+            print("RHS", buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :]))
+
+            newbuf[i*(slice(None),) + (selfmapi,)] = buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :])
             buf = newbuf
 
         return InterpretedInlineBuffer(buf.view(numpy.uint8),
