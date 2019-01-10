@@ -1722,11 +1722,7 @@ class RegularBinning(Binning):
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, self.num)
 
-            if other.overflow is None:
-                flows = []
-            else:
-                flows = [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)]
-            othermap = other._selfmap(flows, 0, other.num)
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)], 0, other.num)
 
             if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow):
                 if self.circular == circular:
@@ -1735,11 +1731,7 @@ class RegularBinning(Binning):
                     return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (othermap,)
 
             else:
-                if self.overflow is None:
-                    flows = []
-                else:
-                    flows = [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
-                selfmap = self._selfmap(flows, 0, self.num)
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)], 0, self.num)
                 return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
@@ -1836,6 +1828,13 @@ class HexagonalBinning(Binning):
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
         return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
+    def _restructure(self, other):
+        assert isinstance(other, HexagonalBinning)
+        if self == other:
+            return self, (None,), (None,)
+        else:
+            raise NotImplementedError
+
 ################################################# EdgesBinning
 
 class EdgesBinning(Binning):
@@ -1909,6 +1908,31 @@ class EdgesBinning(Binning):
 
     def toCategoryBinning(self, format="%g"):
         return self.toIrregularBinning().toCategoryBinning(format=format)
+
+    def _restructure(self, other):
+        assert isinstance(other, EdgesBinning) and self.edges == other.edges and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
+        circular = self.circular and other.circular
+
+        if self.overflow == other.overflow:
+            if self.circular == circular:
+                return self, (None,), (None,)
+            else:
+                return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (None,)
+
+        else:
+            overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(self.edges) - 1)
+
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)], 0, len(other.edges) - 1)
+
+            if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow):
+                if self.circular == circular:
+                    return self, (None,), (othermap,)
+                else:
+                    return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (othermap,)
+
+            else:
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)], 0, len(self.edges) - 1)
+                return EdgesBinning(self.edges, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (selfmap,), (othermap,)
 
 ################################################# IrregularBinning
 
