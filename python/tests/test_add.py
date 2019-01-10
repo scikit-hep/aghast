@@ -538,6 +538,94 @@ class Test(unittest.TestCase):
         assert b.axis[0].binning.toCategoryBinning().categories == ["[5, +inf]", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "{nan}"]
         assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
 
+    def test_add_SparseRegularBinning_same(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([4, 5, 6, 7]))))
+        b = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30, 40]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36, 47]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36, 47]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+
+    def test_add_SparseRegularBinning_overflow(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1, overflow=RealOverflow(loc_nanflow=RealOverflow.below1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([999, 4, 5, 6, 7]))))
+        b = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30, 40]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36, 47, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [14, 25, 36, 47, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+
+    def test_add_SparseRegularBinning_permuted(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([4, 5, 6, 7]))))
+        b = Histogram([Axis(SparseRegularBinning([33, 22, 77, 44], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30, 40]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert ab.counts.counts.array.tolist() == [44, 35, 26, 17]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert ab.counts.counts.array.tolist() == [17, 26, 35, 44]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+
+    def test_add_SparseRegularBinning_permuted_overflow(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1, overflow=RealOverflow(loc_nanflow=RealOverflow.below1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([999, 4, 5, 6, 7]))))
+        b = Histogram([Axis(SparseRegularBinning([33, 22, 77, 44], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 20, 30, 40]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [44, 35, 26, 17, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [17, 26, 35, 44, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[3.3, 3.4)", "[2.2, 2.3)", "[7.7, 7.8)", "[4.4, 4.5)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40]
+
     def test_add_SparseRegularBinning_different(self):
         a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(4, 8))))
         b = Histogram([Axis(SparseRegularBinning([66, 22, 77, 99, 55], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10, 60, 10))))
@@ -557,5 +645,27 @@ class Test(unittest.TestCase):
         assert ab.counts.counts.array.tolist() == [10, 26, 35, 40, 50, 4, 7]
         assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
         assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
+
+    def test_add_SparseRegularBinning_different_overflow(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1, overflow=RealOverflow(loc_nanflow=RealOverflow.below1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray([999, 4, 5, 6, 7])))
+        b = Histogram([Axis(SparseRegularBinning([66, 22, 77, 99, 55], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10, 60, 10))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)", "[6.6, 6.7)", "[9.9, 10)", "[5.5, 5.6)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [4, 35, 26, 7, 10, 40, 50, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)", "[4.4, 4.5)", "[3.3, 3.4)", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [10, 26, 35, 40, 50, 4, 7, 999]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["{nan}", "[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [999, 4, 5, 6, 7]
         assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
         assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]

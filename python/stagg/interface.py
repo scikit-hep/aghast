@@ -737,6 +737,8 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     @classmethod
     def fromarray(cls, array):
+        if not isinstance(array, numpy.ndarray):
+            array = numpy.array(array)
         dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
         order = InterpretedBuffer.fortran_order if numpy.isfortran(array) else InterpretedBuffer.c_order
         return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
