@@ -261,7 +261,7 @@ class Stagg(object):
                     setattr(out, private, x)
             return out
 
-    def _add(self, other, shape, pairs, triples, noclobber):
+    def _add(self, other, pairs, triples, noclobber):
         raise NotImplementedError(type(self))
 
     @classmethod
@@ -327,11 +327,11 @@ class Object(Stagg):
 
     def __add__(self, other):
         out = self._unattached()
-        out._add(other, (), (), (), noclobber=True)
+        out._add(other, (), (), noclobber=True)
         return out
 
     def __iadd__(self, other):
-        self._add(other, (), (), (), noclobber=False)
+        self._add(other, (), (), noclobber=False)
         return self
 
     def __radd__(self, other):
@@ -1412,11 +1412,11 @@ class IntegerBinning(Binning, BinLocation):
     def toSparseRegularBinning(self):
         return self.toRegularBinning().toSparseRegularBinning()
 
-    def _merger(self, other):
+    def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
 
         if self.min == other.min and self.max == other.max and self.loc_underflow == other.loc_underflow and self.loc_overflow == other.loc_overflow:
-            return self, None, None
+            return self, (None,), (None,)
 
         else:
             newmin = min(self.min, other.min)
@@ -1458,7 +1458,7 @@ class IntegerBinning(Binning, BinLocation):
                 i += 1
                 
             if newmin == self.min and newmax == self.max and loc_underflow == self.loc_underflow and loc_overflow == self.loc_overflow:
-                return self, None, (othermap,)
+                return self, (None,), (othermap,)
             else:
                 selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
                 numbins = 1 + self.max - self.min
@@ -2467,9 +2467,7 @@ class UnweightedCounts(Counts):
 
     def _add(self, other, noclobber):
         assert isinstance(other, UnweightedCounts)
-        counts = self.counts._add(other.counts, noclobber)
-        if counts is not self.counts:
-            self.counts = counts
+        self.counts = self.counts._add(other.counts, noclobber)
         
 ################################################# WeightedCounts
 
@@ -2527,19 +2525,13 @@ class WeightedCounts(Counts):
     def _add(self, other, noclobber):
         assert isinstance(other, WeightedCounts)
 
-        sumw = self.sumw._add(other.sumw, noclobber)
-        if sumw is not self.sumw:
-            self.sumw = sumw
+        self.sumw = self.sumw._add(other.sumw, noclobber)
 
         if self.sumw2 is not None:
-            sumw2 = self.sumw2._add(other.sumw2, noclobber)
-            if sumw2 is not self.sumw2:
-                self.sumw2 = sumw2
+            self.sumw2 = self.sumw2._add(other.sumw2, noclobber)
 
         if self.unweighted is not None:
-            unweighted = self.unweighted._add(other.unweighted, noclobber)
-            if unweighted is not self.unweighted:
-                self.unweighted = unweighted
+            self.unweighted = self.unweighted._add(other.unweighted, noclobber)
 
 ################################################# Parameter
 
@@ -3102,32 +3094,27 @@ class Histogram(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
-    def _add(self, other, shape, pairs, triples, noclobber):
+    def _add(self, other, pairs, triples, noclobber):
         if not isinstance(other, Histogram):
             raise ValueError("cannot add {0} and {1}".format(self, other))
         if len(self.axis) != len(other.axis):
             raise ValueError("cannot add {0}-dimensional Histogram and {1}-dimensional Histogram".format(len(self.axis), len(other.axis)))
-        
+
         pairs = pairs + tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
-        triples = triples + tuple(one._merger(two) for one, two in pairs)
+        triples = triples + tuple(one._restructure(two) for one, two in pairs)
 
         selfcounts, othercounts = Counts._promote(self.counts, other.counts)
 
-        if any(sm is not None for binning, sm, om in triples):
-            newshape, selfmap = (), ()
-            for binning, sm, om in triples:
-                newshape = newshape + binning._binshape()
-                selfmap = selfmap + (sm if sm is not None else (None,))
-            selfcounts = selfcounts._remap(newshape, selfmap)
+        if not all(isinstance(sm, tuple) and sm[0] is None for binning, sm, om in triples):
+            newshape = sum((binning._binshape() for binning, sm, om in triples), ())
+            selfcounts = selfcounts._remap(newshape, sum((sm for binning, sm, om in triples), ()))
 
-        if any(om is not None for binning, sm, om in triples):
-            newshape, othermap = (), ()
-            for binning, sm, om in triples:
-                newshape = newshape + binning._binshape()
-                othermap = othermap + (om if om is not None else (None,))
-            othercounts = othercounts._remap(newshape, othermap)
+        if not all(isinstance(om, tuple) and om[0] is None for binning, sm, om in triples):
+            newshape = sum((binning._binshape() for binning, sm, om in triples), ())
+            othercounts = othercounts._remap(newshape, sum((om for binning, sm, om in triples), ()))
 
-        # FIXME: set new axis
+        for axis, (binning, sm, om) in zip(self.axis, triples[-len(self.axis):]):
+            axis.binning = binning
 
         selfcounts._add(othercounts, noclobber)
 

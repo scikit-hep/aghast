@@ -46,7 +46,7 @@ def setparent(parent, value):
     import stagg.interface
 
     if isinstance(value, stagg.interface.Stagg):
-        if hasattr(value, "_parent"):
+        if getattr(value, "_parent", parent) is not parent:
             raise ValueError("already attached to another hierarchy: {0}".format(repr(value)))
         else:
             value._parent = parent
