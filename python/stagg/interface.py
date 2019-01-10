@@ -608,31 +608,13 @@ class InterpretedBuffer(Interpretation):
 
         buf = self.flatarray
 
-        print("newshape", newshape)
-        print("list(...)", list(range(len(newshape) - 1, -1, -1)))
-        print("buf", buf)
-        print("selfmap", selfmap)
-
         oldshape = tuple(len(sm) if sm is not None else ns for ns, sm in zip(newshape, selfmap))
-        print("oldshape", oldshape)
 
         for i in range(len(newshape) - 1, -1, -1):
-            if selfmap[i] is None:
-                selfmapi = numpy.arange(newshape[i], dtype=numpy.int64)
-            else:
-                selfmapi = selfmap[i]
-
-            print("i", i, "selfmapi", selfmapi)
-
-            print("newbuf shape", oldshape[:i] + newshape[i:])
-            newbuf = numpy.zeros(oldshape[:i] + newshape[i:], dtype=dtype, order=order)
-            print("newbuf", newbuf)
-
-            print("LHS", newbuf[i*(slice(None),) + (selfmapi,)])
-            print("RHS", buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :]))
-
-            newbuf[i*(slice(None),) + (selfmapi,)] = buf.reshape((-1, len(selfmapi)) + newshape[i + 1 :])
-            buf = newbuf
+            if selfmap[i] is not None:
+                newbuf = numpy.zeros(oldshape[:i] + newshape[i:], dtype=dtype, order=order)
+                newbuf[i*(slice(None),) + (selfmap[i],)] = buf.reshape((-1, len(selfmap[i])) + newshape[i + 1 :])
+                buf = newbuf
 
         return InterpretedInlineBuffer(buf.view(numpy.uint8),
                                        filters=self.filters,
@@ -3136,7 +3118,6 @@ class Histogram(Object):
             for binning, sm, om in triples:
                 newshape = newshape + binning._binshape()
                 selfmap = selfmap + (sm if sm is not None else (None,))
-            print("selfmap", selfmap)
             selfcounts = selfcounts._remap(newshape, selfmap)
 
         if any(om is not None for binning, sm, om in triples):
@@ -3144,7 +3125,6 @@ class Histogram(Object):
             for binning, sm, om in triples:
                 newshape = newshape + binning._binshape()
                 othermap = othermap + (om if om is not None else (None,))
-            print("othermap", othermap)
             othercounts = othercounts._remap(newshape, othermap)
 
         # FIXME: set new axis
