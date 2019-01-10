@@ -271,6 +271,10 @@ class Stagg(object):
         raise NotImplementedError("missing _toflatbuffers implementation in {0}".format(type(self)))
 
     def __eq__(self, other):
+        if self is other:
+            return True
+        if getattr(self, "_flatbuffers", None) is not None and self._flatbuffers is getattr(other, "_flatbuffers", None):
+            return True
         if type(self) is not type(other):
             return False
         for n in self._params:
@@ -1577,6 +1581,27 @@ class RealOverflow(Stagg, BinLocation):
             stagg.stagg_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
         return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
 
+    def _checkmapping(self, other):
+        if self.minf_mapping != other.minf_mapping:
+            if (self.minf_mapping == self.in_underflow or other.minf_mapping == other.in_underflow) and (self.loc_underflow != self.nonexistent and other.loc_underflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps -inf to underflow, the other doesn't, and both underflows exist")
+            if (self.minf_mapping == self.in_nanflow or other.minf_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps -inf to nanflow, the other doesn't, and both nanflows exist")
+
+        if self.pinf_mapping != other.pinf_mapping:
+            if (self.pinf_mapping == self.in_overflow or other.pinf_mapping == other.in_overflow) and (self.loc_overflow != self.nonexistent and other.loc_overflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps +inf to overflow, the other doesn't, and both overflows exist")
+            if (self.pinf_mapping == self.in_nanflow or other.pinf_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps +inf to nanflow, the other doesn't, and both nanflows exist")
+
+        if self.nan_mapping != other.nan_mapping:
+            if (self.nan_mapping == self.in_underflow or other.nan_mapping == other.in_underflow) and (self.loc_underflow != self.nonexistent and other.loc_underflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps nan to underflow, the other doesn't, and both underflows exist")
+            if (self.nan_mapping == self.in_overflow or other.nan_mapping == other.in_overflow) and (self.loc_overflow != self.nonexistent and other.loc_overflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps nan to overflow, the other doesn't, and both overflows exist")
+            if (self.nan_mapping == self.in_nanflow or other.nan_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
+                raise ValueError("cannot combine RealOverflows in which one maps nan to nanflow, the other doesn't, and both nanflows exist")
+
 ################################################# RegularBinning
 
 class RegularBinning(Binning):
@@ -1649,6 +1674,101 @@ class RegularBinning(Binning):
         bins = range(lowindex, lowindex + self.num)
         overflow = None if self.overflow is None else self.overflow.detached()
         return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
+
+    def _restructure(self, other):
+        assert isinstance(other, RegularBinning) and self.num == other.num and self.interval == other.interval
+        circular = self.circular and other.circular
+
+        if self.overflow == other.overflow:
+            if self.circular == circular:
+                return self, (None,), (None,)
+            else:
+                return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (None,)
+
+        else:
+            if self.overflow is not None and other.overflow is not None:
+                self.overflow._checkmapping(other.overflow)
+
+            loc = 0
+            pos = self.num
+            if (self.overflow is not None and self.overflow.loc_underflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_underflow != other.overflow.nonexistent):
+                loc += 1
+                loc_underflow = BinLocation._locations[loc]
+                pos_underflow = pos
+                pos += 1
+            else:
+                loc_underflow = BinLocation.nonexistent
+                pos_underflow = None
+
+            if (self.overflow is not None and self.overflow.loc_overflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_overflow != other.overflow.nonexistent):
+                loc += 1
+                loc_overflow = BinLocation._locations[loc]
+                pos_overflow = pos
+                pos += 1
+            else:
+                loc_overflow = BinLocation.nonexistent
+                pos_overflow = None
+
+            if (self.overflow is not None and self.overflow.loc_nanflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_nanflow != other.overflow.nonexistent):
+                loc += 1
+                loc_nanflow = BinLocation._locations[loc]
+                pos_nanflow = pos
+                pos += 1
+            else:
+                loc_nanflow = BinLocation.nonexistent
+                pos_nanflow = None
+
+            if loc_underflow == BinLocation.nonexistent and loc_overflow == BinLocation.nonexistent and loc_nanflow == BinLocation.nonexistent:
+                overflow = None
+            else:
+                if self.overflow is not None:
+                    minf_mapping = self.overflow.minf_mapping
+                    pinf_mapping = self.overflow.pinf_mapping
+                    nan_mapping  = self.overflow.nan_mapping
+                overflow = RealOverflow(loc_underflow=loc_underflow, loc_overflow=loc_overflow, loc_nanflow=loc_nanflow, minf_mapping=minf_mapping, pinf_mapping=pinf_mapping, nan_mapping=nan_mapping)
+
+            othermap = numpy.empty(other._binshape(), dtype=numpy.int64)
+            if other.overflow is None:
+                flows = []
+            else:
+                flows = [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)]
+            belows = BinLocation._belows(flows)
+            aboves = BinLocation._aboves(flows)
+            othermap[len(belows) : len(belows) + other.num] = numpy.arange(other.num, dtype=numpy.int64)
+            i = 0
+            for loc, pos in belows:
+                othermap[i] = pos
+                i += 1
+            i += other.num
+            for loc, pos in aboves:
+                othermap[i] = pos
+                i += 1
+
+            if (self.overflow is None and overflow is None) or (self.overflow.loc_underflow == loc_underflow and self.overflow.loc_overflow == loc_overflow and self.overflow.loc_nanflow == loc_nanflow):
+                if self.circular == circular:
+                    return self, (None,), (othermap,)
+                else:
+                    return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (othermap,)
+
+            else:
+                selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
+                if self.overflow is None:
+                    flows = []
+                else:
+                    flows = [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
+                belows = BinLocation._belows(flows)
+                aboves = BinLocation._aboves(flows)
+                selfmap[len(belows) : len(belows) + self.num] = numpy.arange(self.num, dtype=numpy.int64)
+                i = 0
+                for loc, pos in belows:
+                    selfmap[i] = pos
+                    i += 1
+                i += self.num
+                for loc, pos in aboves:
+                    selfmap[i] = pos
+                    i += 1
+
+                return RegularBinning(self.num, self.interval, overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
 

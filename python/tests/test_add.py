@@ -323,3 +323,11 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         assert b.axis[0].binning.toCategoryBinning().categories == ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+
+    def test_add_RegularBinning_same(self):
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        b = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100, 110))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
