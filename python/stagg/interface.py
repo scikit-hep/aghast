@@ -238,14 +238,11 @@ class Stagg(object):
         else:
             return True
 
-    def unattached(self, checkvalid=False):
-        out = self._unattached()
-        if checkvalid:
-            out.checkvalid()
-        return out
+    def detached(self):
+        return self._detached(True)
 
-    def _unattached(self):
-        if not hasattr(self, "_parent"):
+    def _detached(self, top):
+        if not top and not hasattr(self, "_parent"):
             return self
         else:
             out = type(self).__new__(type(self))
@@ -256,7 +253,7 @@ class Stagg(object):
                 if hasattr(self, private):
                     x = getattr(self, private)
                     if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
-                        x = x._unattached()
+                        x = x._detached(False)
                     stagg.checktype.setparent(out, x)
                     setattr(out, private, x)
             return out
@@ -326,7 +323,7 @@ class Object(Stagg):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     def __add__(self, other):
-        out = self._unattached()
+        out = self.detached()
         out._add(other, (), (), noclobber=True)
         return out
 
@@ -1633,7 +1630,7 @@ class RegularBinning(Binning):
 
     def toEdgesBinning(self):
         edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
-        overflow = None if self.overflow is None else self.overflow.unattached()
+        overflow = None if self.overflow is None else self.overflow.detached()
         return EdgesBinning(edges, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive, circular=self.circular)
 
     def toIrregularBinning(self):
@@ -1650,7 +1647,7 @@ class RegularBinning(Binning):
         lowindex, origin = divmod(self.interval.low, bin_width)
         lowindex = int(lowindex)
         bins = range(lowindex, lowindex + self.num)
-        overflow = None if self.overflow is None else self.overflow.unattached()
+        overflow = None if self.overflow is None else self.overflow.detached()
         return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
 
 ################################################# HexagonalBinning
@@ -1815,7 +1812,7 @@ class EdgesBinning(Binning):
         intervals = []
         for i in range(len(self.edges) - 1):
             intervals.append(RealInterval(self.edges[i], self.edges[i + 1], low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive))
-        overflow = None if self.overflow is None else self.overflow.unattached()
+        overflow = None if self.overflow is None else self.overflow.detached()
         return IrregularBinning(intervals, overflow=overflow)
 
     def toCategoryBinning(self, format="%g"):
@@ -2030,7 +2027,7 @@ class SparseRegularBinning(Binning, BinLocation):
         intervals = []
         for x in self.bins:
             intervals.append(RealInterval(self.bin_width*(x) + self.origin, self.bin_width*(x + 1) + self.origin))
-        overflow = None if self.overflow is None else self.overflow.unattached()
+        overflow = None if self.overflow is None else self.overflow.detached()
         return IrregularBinning(intervals, overflow=overflow)
 
     def toCategoryBinning(self, format="%g"):
@@ -2419,15 +2416,15 @@ class Counts(Stagg):
         has_unweighted = (isinstance(one, UnweightedCounts) or one.unweighted is not None) and (isinstance(two, UnweightedCounts) or two.unweighted is not None)
 
         if isinstance(one, UnweightedCounts) or has_sumw2 != (one.sumw2 is not None) or has_unweighted != (one.unweighted is not None):
-            sumw = one.counts.unattached() if isinstance(one, UnweightedCounts) else one.sumw.unattached()
-            sumw2 = one.sumw2.unattached() if has_sumw2 else None
-            unweighted = one.unattached() if isinstance(one, UnweightedCounts) else one.unweighted.unattached()
+            sumw = one.counts.detached() if isinstance(one, UnweightedCounts) else one.sumw.detached()
+            sumw2 = one.sumw2.detached() if has_sumw2 else None
+            unweighted = one.detached() if isinstance(one, UnweightedCounts) else one.unweighted.detached()
             one = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
 
         if isinstance(two, UnweightedCounts) or has_sumw2 != (two.sumw2 is not None) or has_unweighted != (two.unweighted is not None):
-            sumw = two.counts.unattached() if isinstance(two, UnweightedCounts) else two.sumw.unattached()
-            sumw2 = two.sumw2.unattached() if has_sumw2 else None
-            unweighted = two.unattached() if isinstance(two, UnweightedCounts) else two.unweighted.unattached()
+            sumw = two.counts.detached() if isinstance(two, UnweightedCounts) else two.sumw.detached()
+            sumw2 = two.sumw2.detached() if has_sumw2 else None
+            unweighted = two.detached() if isinstance(two, UnweightedCounts) else two.unweighted.detached()
             two = WeightedCounts(sumw, sumw2=sumw2, unweighted=unweighted)
 
         return one, two
