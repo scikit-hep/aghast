@@ -1316,16 +1316,16 @@ class Binning(Stagg):
         else:
             raise ValueError("{0} and {1} can't be promoted to the same type of Binning".format(one, two))
 
-    def _selfmap(self, flows, start, stop):
+    def _selfmap(self, flows, index):
         selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
         belows = BinLocation._belows(flows)
         aboves = BinLocation._aboves(flows)
-        selfmap[len(belows) : len(belows) + stop - start] = numpy.arange(start, stop, dtype=numpy.int64)
+        selfmap[len(belows) : len(belows) + len(index)] = index
         i = 0
         for loc, pos in belows:
             selfmap[i] = pos
             i += 1
-        i += stop - start
+        i += len(index)
         for loc, pos in aboves:
             selfmap[i] = pos
             i += 1
@@ -1458,12 +1458,12 @@ class IntegerBinning(Binning, BinLocation):
                 loc_overflow = self.nonexistent
                 pos_overflow = None
 
-            othermap = other._selfmap([(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)], other.min - newmin, 1 + other.max - newmin)
+            othermap = other._selfmap([(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)], numpy.arange(other.min - newmin, 1 + other.max - newmin, dtype=numpy.int64))
 
             if newmin == self.min and newmax == self.max and loc_underflow == self.loc_underflow and loc_overflow == self.loc_overflow:
                 return self, (None,), (othermap,)
             else:
-                selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], self.min - newmin, 1 + self.max - newmin)
+                selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], numpy.arange(self.min - newmin, 1 + self.max - newmin, dtype=numpy.int64))
                 return IntegerBinning(newmin, newmax, loc_underflow=loc_underflow, loc_overflow=loc_overflow), (selfmap,), (othermap,)
 
 ################################################# RealInterval
@@ -1722,7 +1722,8 @@ class RegularBinning(Binning):
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, self.num)
 
-            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)], 0, other.num)
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
+                                      numpy.arange(other.num, dtype=numpy.int64))
 
             if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow):
                 if self.circular == circular:
@@ -1731,7 +1732,8 @@ class RegularBinning(Binning):
                     return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (othermap,)
 
             else:
-                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)], 0, self.num)
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
+                                        numpy.arange(other.num, dtype=numpy.int64))
                 return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
@@ -1922,7 +1924,8 @@ class EdgesBinning(Binning):
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(self.edges) - 1)
 
-            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)], 0, len(other.edges) - 1)
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
+                                      numpy.arange(len(other.edges) - 1, dtype=numpy.int64))
 
             if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow):
                 if self.circular == circular:
@@ -1931,7 +1934,8 @@ class EdgesBinning(Binning):
                     return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (othermap,)
 
             else:
-                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)], 0, len(self.edges) - 1)
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
+                                        numpy.arange(len(self.edges) - 1, dtype=numpy.int64))
                 return EdgesBinning(self.edges, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (selfmap,), (othermap,)
 
 ################################################# IrregularBinning
