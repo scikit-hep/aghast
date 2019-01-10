@@ -1746,7 +1746,7 @@ class RegularBinning(Binning):
 
             else:
                 selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
-                                        numpy.arange(other.num, dtype=numpy.int64))
+                                        numpy.arange(self.num, dtype=numpy.int64))
                 return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
@@ -2236,27 +2236,25 @@ class SparseRegularBinning(Binning, BinLocation):
     def _restructure(self, other):
         assert isinstance(other, SparseRegularBinning) and self.bin_width == other.bin_width and self.origin == other.origin and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
 
-        HERE
+        bins = numpy.concatenate((self.bins, other.bins[~numpy.isin(other.bins, self.bins, assume_unique=True)]))
 
+        if len(bins) == len(self.bins) == len(other.bins) and (self.bins == other.bins).all() and self.overflow == other.overflow:
+            return self, (None,), (None,)
 
+        else:
+            overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(bins))
 
-        lookup = set(self.bins)
-        bins = self.bins + [x for x in other.bins if x not in lookup]
+            lookup = numpy.argsort(bins)
+            othermap = other._selfmap([] if other.overflow is None else [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)],
+                                      lookup[numpy.searchsorted(bins[lookup], other.bins, side="left")])
 
+            if ((self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow)) and len(self.bins) == len(bins):
+                return self, (None,), (othermap,)
 
-
-
-
-
-
-
-        HERE
-        # "bins":           stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
-        # "bin_width":      stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
-        # "origin":         stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        # "overflow":       stagg.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
-        # "low_inclusive":  stagg.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
-        # "high_inclusive": stagg.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
+            else:
+                selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
+                                        numpy.arange(len(self.bins), dtype=numpy.int64))
+                return SparseRegularBinning(bins, self.bin_width, self.origin, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive), (selfmap,), (othermap,)
 
 ################################################# FractionBinning
 

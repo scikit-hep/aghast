@@ -537,3 +537,25 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         assert b.axis[0].binning.toCategoryBinning().categories == ["[5, +inf]", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "{nan}"]
         assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+
+    def test_add_SparseRegularBinning_different(self):
+        a = Histogram([Axis(SparseRegularBinning([44, 77, 22, 33], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(4, 8))))
+        b = Histogram([Axis(SparseRegularBinning([66, 22, 77, 99, 55], 0.1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10, 60, 10))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)", "[6.6, 6.7)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert ab.counts.counts.array.tolist() == [4, 35, 26, 7, 10, 40, 50]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)", "[4.4, 4.5)", "[3.3, 3.4)"]
+        assert ab.counts.counts.array.tolist() == [10, 26, 35, 40, 50, 4, 7]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[4.4, 4.5)", "[7.7, 7.8)", "[2.2, 2.3)", "[3.3, 3.4)"]
+        assert a.counts.counts.array.tolist() == [4, 5, 6, 7]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[6.6, 6.7)", "[2.2, 2.3)", "[7.7, 7.8)", "[9.9, 10)", "[5.5, 5.6)"]
+        assert b.counts.counts.array.tolist() == [10, 20, 30, 40, 50]
