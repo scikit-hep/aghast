@@ -2078,7 +2078,10 @@ class IrregularBinning(Binning, OverlappingFill):
         intervals = selfints + [x for x in otherints if x not in lookup]
 
         if len(intervals) == len(selfints) == len(otherints) and selfints == otherints and self.overflow == other.overflow:
-            return self, (None,), (None,)
+            if overlapping_fill == self.overlapping_fill:
+                return self, (None,), (None,)
+            else:
+                return IrregularBinning([x.detached() for x in intervals], overflow=self.overflow.detached(), overlapping_fill=overlapping_fill), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(intervals))
@@ -2379,10 +2382,22 @@ class FractionBinning(Binning):
     def _restructure(self, other):
         assert isinstance(other, FractionBinning)
 
-        
+        if self.error_method == other.error_method:
+            error_method = self.error_method
+        else:
+            error_method = self.undefined
 
+        if self.layout == other.layout and self.reversed == other.reversed:
+            if self.error_method == error_method:
+                return self, (None,), (None,)
+            else:
+                return FractionBinning(layout=self.layout, layout_reversed=self.layout_reversed, error_method=error_method)
 
-        raise NotImplementedError
+        elif self.layout == other.layout:
+            return self, (None,), (numpy.array([1, 0], dtype=numpy.int64),)
+
+        else:
+            raise NotImplementedError("{0}, {1}".format(self.layout, other.layout))
 
 ################################################# PredicateBinning
 
@@ -2417,7 +2432,33 @@ class PredicateBinning(Binning, OverlappingFill):
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
 
     def _restructure(self, other):
-        raise NotImplementedError
+        assert isinstance(other, PredicateBinning)
+
+        if self.overlapping_fill == other.overlapping_fill:
+            overlapping_fill = self.overlapping_fill
+        else:
+            overlapping_fill = self.undefined
+
+        selfpred = list(self.predicates)
+        otherpred = list(other.predicates)
+
+        lookup = {x: i for i, x in enumerate(selfpred)}
+        predicates = selfpred + [x for x in otherpred if x not in lookup]
+
+        if len(predicates) == len(selfpred) == len(otherpred) and selfpred == otherpred:
+            if overlapping_fill == self.overlapping_fill:
+                return self, (None,), (None,)
+            else:
+                return PredicateBinning(selfpred, overlapping_fill=overlapping_fill), (None,), (None,)
+
+        else:
+            lookup = {x: i for i, x in enumerate(predicates)}
+            othermap = numpy.array([lookup[x] for x in otherpred], dtype=numpy.int64)
+
+            if overlapping_fill == self.overlapping_fill:
+                return self, (None,), (othermap,)
+            else:
+                return PredicateBinning(selfpred, overlapping_fill=overlapping_fill), (None,), (othermap,)
 
 ################################################# Assignment
 
@@ -2554,7 +2595,12 @@ class VariationBinning(Binning):
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
 
     def _restructure(self, other):
-        raise NotImplementedError
+        assert isinstance(other, VariationBinning)
+
+        if self.variations != other.variations:
+            raise ValueError("cannot add VariationBinnings with different sets of variations")
+
+        return self, (None,), (None,)
 
 ################################################# Axis
 
