@@ -1316,6 +1316,21 @@ class Binning(Stagg):
         else:
             raise ValueError("{0} and {1} can't be promoted to the same type of Binning".format(one, two))
 
+    def _selfmap(self, flows, start, stop):
+        selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
+        belows = BinLocation._belows(flows)
+        aboves = BinLocation._aboves(flows)
+        selfmap[len(belows) : len(belows) + stop - start] = numpy.arange(start, stop, dtype=numpy.int64)
+        i = 0
+        for loc, pos in belows:
+            selfmap[i] = pos
+            i += 1
+        i += stop - start
+        for loc, pos in aboves:
+            selfmap[i] = pos
+            i += 1
+        return selfmap
+        
 ################################################# BinLocation
 
 class BinLocationEnum(Enum):
@@ -1443,38 +1458,12 @@ class IntegerBinning(Binning, BinLocation):
                 loc_overflow = self.nonexistent
                 pos_overflow = None
 
-            othermap = numpy.empty(other._binshape(), dtype=numpy.int64)
-            numbins = 1 + other.max - other.min
-            flows = [(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)]
-            belows = BinLocation._belows(flows)
-            aboves = BinLocation._aboves(flows)
-            othermap[len(belows) : len(belows) + numbins] = numpy.arange(other.min - newmin, 1 + other.max - newmin, dtype=numpy.int64)
-            i = 0
-            for loc, pos in belows:
-                othermap[i] = pos
-                i += 1
-            i += numbins
-            for loc, pos in aboves:
-                othermap[i] = pos
-                i += 1
-                
+            othermap = other._selfmap([(other.loc_underflow, pos_underflow), (other.loc_overflow, pos_overflow)], other.min - newmin, 1 + other.max - newmin)
+
             if newmin == self.min and newmax == self.max and loc_underflow == self.loc_underflow and loc_overflow == self.loc_overflow:
                 return self, (None,), (othermap,)
             else:
-                selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
-                numbins = 1 + self.max - self.min
-                flows = [(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)]
-                belows = BinLocation._belows(flows)
-                aboves = BinLocation._aboves(flows)
-                selfmap[len(belows) : len(belows) + numbins] = numpy.arange(self.min - newmin, 1 + self.max - newmin, dtype=numpy.int64)
-                i = 0
-                for loc, pos in belows:
-                    selfmap[i] = pos
-                    i += 1
-                i += numbins
-                for loc, pos in aboves:
-                    selfmap[i] = pos
-                    i += 1
+                selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], self.min - newmin, 1 + self.max - newmin)
                 return IntegerBinning(newmin, newmax, loc_underflow=loc_underflow, loc_overflow=loc_overflow), (selfmap,), (othermap,)
 
 ################################################# RealInterval
@@ -1581,26 +1570,71 @@ class RealOverflow(Stagg, BinLocation):
             stagg.stagg_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
         return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
 
-    def _checkmapping(self, other):
-        if self.minf_mapping != other.minf_mapping:
-            if (self.minf_mapping == self.in_underflow or other.minf_mapping == other.in_underflow) and (self.loc_underflow != self.nonexistent and other.loc_underflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps -inf to underflow, the other doesn't, and both underflows exist")
-            if (self.minf_mapping == self.in_nanflow or other.minf_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps -inf to nanflow, the other doesn't, and both nanflows exist")
+    @staticmethod
+    def _common(one, two, pos):
+        if one is not None and two is not None:
+            if one.minf_mapping != two.minf_mapping:
+                if (one.minf_mapping == one.in_underflow or two.minf_mapping == two.in_underflow) and (one.loc_underflow != one.nonexistent and two.loc_underflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps -inf to underflow, the other doesn't, and both underflows exist")
+                if (one.minf_mapping == one.in_nanflow or two.minf_mapping == two.in_nanflow) and (one.loc_nanflow != one.nonexistent and two.loc_nanflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps -inf to nanflow, the other doesn't, and both nanflows exist")
 
-        if self.pinf_mapping != other.pinf_mapping:
-            if (self.pinf_mapping == self.in_overflow or other.pinf_mapping == other.in_overflow) and (self.loc_overflow != self.nonexistent and other.loc_overflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps +inf to overflow, the other doesn't, and both overflows exist")
-            if (self.pinf_mapping == self.in_nanflow or other.pinf_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps +inf to nanflow, the other doesn't, and both nanflows exist")
+            if one.pinf_mapping != two.pinf_mapping:
+                if (one.pinf_mapping == one.in_overflow or two.pinf_mapping == two.in_overflow) and (one.loc_overflow != one.nonexistent and two.loc_overflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps +inf to overflow, the other doesn't, and both overflows exist")
+                if (one.pinf_mapping == one.in_nanflow or two.pinf_mapping == two.in_nanflow) and (one.loc_nanflow != one.nonexistent and two.loc_nanflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps +inf to nanflow, the other doesn't, and both nanflows exist")
 
-        if self.nan_mapping != other.nan_mapping:
-            if (self.nan_mapping == self.in_underflow or other.nan_mapping == other.in_underflow) and (self.loc_underflow != self.nonexistent and other.loc_underflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps nan to underflow, the other doesn't, and both underflows exist")
-            if (self.nan_mapping == self.in_overflow or other.nan_mapping == other.in_overflow) and (self.loc_overflow != self.nonexistent and other.loc_overflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps nan to overflow, the other doesn't, and both overflows exist")
-            if (self.nan_mapping == self.in_nanflow or other.nan_mapping == other.in_nanflow) and (self.loc_nanflow != self.nonexistent and other.loc_nanflow != other.nonexistent):
-                raise ValueError("cannot combine RealOverflows in which one maps nan to nanflow, the other doesn't, and both nanflows exist")
+            if one.nan_mapping != two.nan_mapping:
+                if (one.nan_mapping == one.in_underflow or two.nan_mapping == two.in_underflow) and (one.loc_underflow != one.nonexistent and two.loc_underflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps nan to underflow, the other doesn't, and both underflows exist")
+                if (one.nan_mapping == one.in_overflow or two.nan_mapping == two.in_overflow) and (one.loc_overflow != one.nonexistent and two.loc_overflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps nan to overflow, the other doesn't, and both overflows exist")
+                if (one.nan_mapping == one.in_nanflow or two.nan_mapping == two.in_nanflow) and (one.loc_nanflow != one.nonexistent and two.loc_nanflow != two.nonexistent):
+                    raise ValueError("cannot combine RealOverflows in which one maps nan to nanflow, the other doesn't, and both nanflows exist")
+
+        loc = 0
+        if (one is not None and one.loc_underflow != one.nonexistent) or (two is not None and two.loc_underflow != two.nonexistent):
+            loc += 1
+            loc_underflow = BinLocation._locations[loc]
+            pos_underflow = pos
+            pos += 1
+        else:
+            loc_underflow = BinLocation.nonexistent
+            pos_underflow = None
+
+        if (one is not None and one.loc_overflow != one.nonexistent) or (two is not None and two.loc_overflow != two.nonexistent):
+            loc += 1
+            loc_overflow = BinLocation._locations[loc]
+            pos_overflow = pos
+            pos += 1
+        else:
+            loc_overflow = BinLocation.nonexistent
+            pos_overflow = None
+
+        if (one is not None and one.loc_nanflow != one.nonexistent) or (two is not None and two.loc_nanflow != two.nonexistent):
+            loc += 1
+            loc_nanflow = BinLocation._locations[loc]
+            pos_nanflow = pos
+            pos += 1
+        else:
+            loc_nanflow = BinLocation.nonexistent
+            pos_nanflow = None
+
+        if loc_underflow == BinLocation.nonexistent and loc_overflow == BinLocation.nonexistent and loc_nanflow == BinLocation.nonexistent:
+            overflow = None
+        else:
+            if one is not None:
+                minf_mapping = one.minf_mapping
+                pinf_mapping = one.pinf_mapping
+                nan_mapping  = one.nan_mapping
+            else:
+                minf_mapping = two.minf_mapping
+                pinf_mapping = two.pinf_mapping
+                nan_mapping  = two.nan_mapping
+            overflow = RealOverflow(loc_underflow=loc_underflow, loc_overflow=loc_overflow, loc_nanflow=loc_nanflow, minf_mapping=minf_mapping, pinf_mapping=pinf_mapping, nan_mapping=nan_mapping)
+
+        return overflow, pos_underflow, pos_overflow, pos_nanflow
 
 ################################################# RegularBinning
 
@@ -1686,95 +1720,26 @@ class RegularBinning(Binning):
                 return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (None,)
 
         else:
-            if self.overflow is not None and other.overflow is not None:
-                self.overflow._checkmapping(other.overflow)
+            overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, self.num)
 
-            loc = 0
-            pos = self.num
-            if (self.overflow is not None and self.overflow.loc_underflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_underflow != other.overflow.nonexistent):
-                loc += 1
-                loc_underflow = BinLocation._locations[loc]
-                pos_underflow = pos
-                pos += 1
-            else:
-                loc_underflow = BinLocation.nonexistent
-                pos_underflow = None
-
-            if (self.overflow is not None and self.overflow.loc_overflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_overflow != other.overflow.nonexistent):
-                loc += 1
-                loc_overflow = BinLocation._locations[loc]
-                pos_overflow = pos
-                pos += 1
-            else:
-                loc_overflow = BinLocation.nonexistent
-                pos_overflow = None
-
-            if (self.overflow is not None and self.overflow.loc_nanflow != self.overflow.nonexistent) or (other.overflow is not None and other.overflow.loc_nanflow != other.overflow.nonexistent):
-                loc += 1
-                loc_nanflow = BinLocation._locations[loc]
-                pos_nanflow = pos
-                pos += 1
-            else:
-                loc_nanflow = BinLocation.nonexistent
-                pos_nanflow = None
-
-            if loc_underflow == BinLocation.nonexistent and loc_overflow == BinLocation.nonexistent and loc_nanflow == BinLocation.nonexistent:
-                overflow = None
-            else:
-                if self.overflow is not None:
-                    minf_mapping = self.overflow.minf_mapping
-                    pinf_mapping = self.overflow.pinf_mapping
-                    nan_mapping  = self.overflow.nan_mapping
-                else:
-                    minf_mapping = other.overflow.minf_mapping
-                    pinf_mapping = other.overflow.pinf_mapping
-                    nan_mapping  = other.overflow.nan_mapping
-                overflow = RealOverflow(loc_underflow=loc_underflow, loc_overflow=loc_overflow, loc_nanflow=loc_nanflow, minf_mapping=minf_mapping, pinf_mapping=pinf_mapping, nan_mapping=nan_mapping)
-
-            othermap = numpy.empty(other._binshape(), dtype=numpy.int64)
             if other.overflow is None:
                 flows = []
             else:
                 flows = [(other.overflow.loc_underflow, pos_underflow), (other.overflow.loc_overflow, pos_overflow), (other.overflow.loc_nanflow, pos_nanflow)]
-            belows = BinLocation._belows(flows)
-            aboves = BinLocation._aboves(flows)
-            othermap[len(belows) : len(belows) + other.num] = numpy.arange(other.num, dtype=numpy.int64)
-            i = 0
-            for loc, pos in belows:
-                othermap[i] = pos
-                i += 1
-            i += other.num
-            for loc, pos in aboves:
-                othermap[i] = pos
-                i += 1
+            othermap = other._selfmap(flows, 0, other.num)
 
-            if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == loc_underflow and self.overflow.loc_overflow == loc_overflow and self.overflow.loc_nanflow == loc_nanflow):
+            if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == overflow.loc_underflow and self.overflow.loc_overflow == overflow.loc_overflow and self.overflow.loc_nanflow == overflow.loc_nanflow):
                 if self.circular == circular:
                     return self, (None,), (othermap,)
                 else:
                     return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (othermap,)
 
             else:
-                selfmap = numpy.empty(self._binshape(), dtype=numpy.int64)
                 if self.overflow is None:
                     flows = []
                 else:
                     flows = [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
-                belows = BinLocation._belows(flows)
-                aboves = BinLocation._aboves(flows)
-                selfmap[len(belows) : len(belows) + self.num] = numpy.arange(self.num, dtype=numpy.int64)
-                i = 0
-                for loc, pos in belows:
-                    selfmap[i] = pos
-                    i += 1
-                i += self.num
-                for loc, pos in aboves:
-                    selfmap[i] = pos
-                    i += 1
-
-                print("selfmap", selfmap)
-                print("othermap", othermap)
-
+                selfmap = self._selfmap(flows, 0, self.num)
                 return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
