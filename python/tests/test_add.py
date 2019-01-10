@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def test_add_twodim_same_same(self):
+    def test_add_same_same(self):
         a = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20))))
         b = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(20, 100))))
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]]
@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]]
         assert b.counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100], [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
 
-    def test_add_twodim_same_different(self):
+    def test_add_same_different(self):
         a = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(9, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(2*12))))
         b = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(20, 100))))
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]]
@@ -62,14 +62,14 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]]
         assert b.counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100], [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
 
-    def test_add_twodim_different_same(self):
+    def test_add_different_same(self):
         a = Histogram([Axis(IntegerBinning(0, 3)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(4*10))))
         b = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(20, 100)))); 
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16, 17, 18, 19], [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], [30, 31, 32, 33, 34, 35, 36, 37, 38, 39]]
         assert b.counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100], [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
         assert (a + b).counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [110, 111, 112, 113, 114, 115, 116, 117, 118, 119], [120, 121, 122, 123, 124, 125, 126, 127, 128, 129], [30, 31, 32, 33, 34, 35, 36, 37, 38, 39]]
 
-    def test_add_twodim_different_different(self):
+    def test_add_different_different(self):
         a = Histogram([Axis(IntegerBinning(0, 3)), Axis(IntegerBinning(9, 20))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(4*12))))
         b = Histogram([Axis(IntegerBinning(1, 2)), Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(20, 100))))
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35], [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]]
@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35], [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]]
         assert b.counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100], [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
 
-    def test_add_weighting(self):
+    def test_add_unweighted_unweighted(self):
         a = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -93,6 +93,7 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
 
+    def test_add_sumw_unweighted(self):
         a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
         assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -112,6 +113,7 @@ class Test(unittest.TestCase):
         assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
 
+    def test_add_sumwsumw2_unweighted(self):
         a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20))))
         b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
         assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -134,6 +136,7 @@ class Test(unittest.TestCase):
         assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
 
+    def test_add_sumwsumw2counts_unweighted(self):
         a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20, 30)))))
         b = Histogram([Axis(IntegerBinning(10, 19))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
         assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -158,3 +161,99 @@ class Test(unittest.TestCase):
         assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
         assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
         assert b.counts.counts.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+
+    def test_add_sumwsumw2counts_sumw(self):
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20, 30)))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2 is None
+        assert b.counts.unweighted is None
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2 is None
+        assert b.counts.unweighted is None
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2 is None
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2 is None
+        assert b.counts.unweighted is None
+
+    def test_add_sumwsumw2counts_sumwsumw2(self):
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20, 30)))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100)), InterpretedInlineBuffer.fromarray(numpy.full(10, 200))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted is None
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2.array.tolist() == [210, 211, 212, 213, 214, 215, 216, 217, 218, 219]
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted is None
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2.array.tolist() == [210, 211, 212, 213, 214, 215, 216, 217, 218, 219]
+        assert ab.counts.unweighted is None
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted is None
+
+    def test_add_sumwsumw2counts_sumwsumw2counts(self):
+        a = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10)), InterpretedInlineBuffer.fromarray(numpy.arange(10, 20)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(20, 30)))))
+        b = Histogram([Axis(IntegerBinning(10, 19))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 100)), InterpretedInlineBuffer.fromarray(numpy.full(10, 200)), UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(10, 300)))))
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted.counts.array.tolist() == [300, 300, 300, 300, 300, 300, 300, 300, 300, 300]
+        ab = a + b
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2.array.tolist() == [210, 211, 212, 213, 214, 215, 216, 217, 218, 219]
+        assert ab.counts.unweighted.counts.array.tolist() == [320, 321, 322, 323, 324, 325, 326, 327, 328, 329]
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted.counts.array.tolist() == [300, 300, 300, 300, 300, 300, 300, 300, 300, 300]
+        ab = b + a
+        assert isinstance(ab.counts, WeightedCounts)
+        assert ab.counts.sumw.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        assert ab.counts.sumw2.array.tolist() == [210, 211, 212, 213, 214, 215, 216, 217, 218, 219]
+        assert ab.counts.unweighted.counts.array.tolist() == [320, 321, 322, 323, 324, 325, 326, 327, 328, 329]
+        assert a.counts.sumw.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts.sumw2.array.tolist() == [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        assert a.counts.unweighted.counts.array.tolist() == [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+        assert b.counts.sumw.array.tolist() == [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+        assert b.counts.sumw2.array.tolist() == [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+        assert b.counts.unweighted.counts.array.tolist() == [300, 300, 300, 300, 300, 300, 300, 300, 300, 300]
