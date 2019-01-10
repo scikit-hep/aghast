@@ -331,3 +331,102 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
         assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.below1, loc_overflow=RealOverflow.above1, loc_nanflow=RealOverflow.above2)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+        b = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.below1, loc_overflow=RealOverflow.above1, loc_nanflow=RealOverflow.above2)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100, 113))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+
+    def test_add_RegularBinning_different(self):
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.above2, loc_nanflow=RealOverflow.above3)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+        b = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100, 110))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 10, 11, 12]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 10, 11, 12]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.below1, loc_overflow=RealOverflow.above1, loc_nanflow=RealOverflow.above2)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+        b = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100, 110))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 0, 11, 12]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [101, 103, 105, 107, 109, 111, 113, 115, 117, 119, 0, 11, 12]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.below1, loc_overflow=RealOverflow.above1, loc_nanflow=RealOverflow.above2)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(13))))
+        b = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5), overflow=RealOverflow(loc_underflow=RealOverflow.above1, loc_overflow=RealOverflow.below1, loc_nanflow=RealOverflow.above2)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100, 113))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[5, +inf]", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+        ab = a + b
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 111, 111, 124]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[5, +inf]", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
+        ab = b + a
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "[5, +inf]", "{nan}"]
+        assert ab.counts.counts.array.tolist() == [102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 111, 111, 124]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-inf, -5)", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[5, +inf]", "{nan}"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        assert b.axis[0].binning.toCategoryBinning().categories == ["[5, +inf]", "[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)", "[-inf, -5)", "{nan}"]
+        assert b.counts.counts.array.tolist() == [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]

@@ -1725,6 +1725,10 @@ class RegularBinning(Binning):
                     minf_mapping = self.overflow.minf_mapping
                     pinf_mapping = self.overflow.pinf_mapping
                     nan_mapping  = self.overflow.nan_mapping
+                else:
+                    minf_mapping = other.overflow.minf_mapping
+                    pinf_mapping = other.overflow.pinf_mapping
+                    nan_mapping  = other.overflow.nan_mapping
                 overflow = RealOverflow(loc_underflow=loc_underflow, loc_overflow=loc_overflow, loc_nanflow=loc_nanflow, minf_mapping=minf_mapping, pinf_mapping=pinf_mapping, nan_mapping=nan_mapping)
 
             othermap = numpy.empty(other._binshape(), dtype=numpy.int64)
@@ -1744,7 +1748,7 @@ class RegularBinning(Binning):
                 othermap[i] = pos
                 i += 1
 
-            if (self.overflow is None and overflow is None) or (self.overflow.loc_underflow == loc_underflow and self.overflow.loc_overflow == loc_overflow and self.overflow.loc_nanflow == loc_nanflow):
+            if (self.overflow is None and overflow is None) or (self.overflow is not None and self.overflow.loc_underflow == loc_underflow and self.overflow.loc_overflow == loc_overflow and self.overflow.loc_nanflow == loc_nanflow):
                 if self.circular == circular:
                     return self, (None,), (othermap,)
                 else:
@@ -1768,7 +1772,10 @@ class RegularBinning(Binning):
                     selfmap[i] = pos
                     i += 1
 
-                return RegularBinning(self.num, self.interval, overflow=overflow, circular=circular), (selfmap,), (othermap,)
+                print("selfmap", selfmap)
+                print("othermap", othermap)
+
+                return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
 
