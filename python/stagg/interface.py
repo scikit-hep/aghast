@@ -206,6 +206,23 @@ class _MockFlatbuffers(object):
             fb.Init(data.Bytes, data.Pos)
             return interface._fromflatbuffers(fb)
 
+class _LocIndexer(object):
+    def __init__(self, obj, isiloc):
+        self.obj = obj
+        self._isiloc = isiloc
+
+    def __getitem__(self, where):
+        if not isinstance(where, tuple):
+            where = (where,)
+            
+        node = self.obj
+        binnings = ()
+        while hasattr(node, "_parent"):
+            node = node._parent
+            binnings = tuple(x.binning for x in node.axis) + binnings
+
+        return self.obj._loc(where, self._isiloc, binnings)
+
 ################################################# Stagg
 
 class Stagg(object):
@@ -3395,16 +3412,40 @@ class Histogram(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
-    # @property
-    # def allaxis(self):
-        
+    @property
+    def allaxis(self):
+        out = list(self.axis)
+        node = self
+        while hasattr(node, "_parent"):
+            node = node._parent
+            out = list(node.axis) + out
+        return stagg.checktype.Vector(out)
 
+    def _loc(self, where, isiloc, binnings):
+        binnings = binnings + tuple(x.binning for x in self.axis)
+        shape = sum((x._binshape() for x in binnings), ())
 
-    # def __getitem__(self, where):
-    #     if not isinstance(where, tuple):
-    #         where = (where,)
+        ellipsiscount = where.count(Ellipsis)
+        if ellipsiscount > 1:
+            raise IndexError("an index can only have a single ellipsis ('...')")
+        elif ellipsiscount == 1:
+            ellipsisindex = where.index(Ellipsis)
+            before = where[: ellipsisindex]
+            after  = where[ellipsisindex + 1 :]
+            num = max(0, len(shape) - len(before) - len(after))
+            where = before + num*(slice(None),) + after
 
+        where = where + max(0, len(shape) - len(where))*(slice(None),)
+        if len(where) != len(shape):
+            raise IndexError("too many indices for histogram")
 
+        pairs = [x._locpair(where, isiloc) for x in binnings]
+
+        out = self._detached()
+        for axis, (gather, newbinning) in zip(out.axis, pairs[-len(out.axis):]):
+            axis.binning = newbinning
+        out.counts._slice([s for gather, newbinning in pairs])
+        return out
 
     def _add(self, other, pairs, triples, noclobber):
         if not isinstance(other, Histogram):
