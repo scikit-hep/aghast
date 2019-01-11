@@ -200,7 +200,7 @@ class Test(unittest.TestCase):
     def test_validity_Assignments(self):
         h = Histogram([Axis(VariationBinning([Variation([Assignment("x", "1"), Assignment("y", "2"), Assignment("z", "3")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))
         h.checkvalid()
-        assert h.axis[0].binning.variations[0]["y"].expression == "2"
+        assert h.axis[0].binning.variations[0].assignments[1].expression == "2"
 
     def test_validity_Variation(self):
         h = Histogram([Axis(VariationBinning([Variation([Assignment("x", "1")]), Variation([Assignment("x", "2")])]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 0.0]))))
@@ -285,7 +285,7 @@ class Test(unittest.TestCase):
     def test_validity_Parameter(self):
         h = ParameterizedFunction("x**2", [Parameter("x", InterpretedInlineBuffer.fromarray(numpy.array([5]))), Parameter("y", InterpretedInlineBuffer.fromarray(numpy.array([6])))])
         h.checkvalid()
-        assert h["y"].values.array.tolist() == [6]
+        assert h.parameters[1].values.array.tolist() == [6]
 
     def test_validity_ParameterizedFunction(self):
         h = ParameterizedFunction("x**2")
@@ -296,7 +296,7 @@ class Test(unittest.TestCase):
     def test_validity_EvaluatedFunction(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions={"f": EvaluatedFunction(InterpretedInlineBuffer.fromarray(numpy.arange(100)))})
         h.checkvalid()
-        assert h["f"].values.array.tolist() == numpy.arange(100).reshape((10, 10)).tolist()
+        assert h.functions["f"].values.array.tolist() == numpy.arange(100).reshape((10, 10)).tolist()
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions={"f": EvaluatedFunction(InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)))})
         h.checkvalid()
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5))), Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))), functions={"f": EvaluatedFunction(InterpretedInlineBuffer.fromarray(numpy.arange(100)), InterpretedInlineBuffer.fromarray(numpy.arange(100)), [Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.zeros(100)), 0.75)])})
@@ -375,4 +375,4 @@ class Test(unittest.TestCase):
         h.checkvalid()
         h = Collection({"b": Collection({"c": Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(60)))), "d": Histogram([Axis(RegularBinning(100, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(600))))}, axis=[Axis(FractionBinning())])}, axis=[Axis(RegularBinning(3, RealInterval(-1, 1)))])
         h.checkvalid()
-        assert h["b", "c"].counts.counts.array.tolist() == numpy.arange(60).reshape((3, 2, 10)).tolist()
+        assert h.objects["b"].objects["c"].counts.counts.array.tolist() == numpy.arange(60).reshape((3, 2, 10)).tolist()

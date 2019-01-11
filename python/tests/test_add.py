@@ -940,120 +940,120 @@ class Test(unittest.TestCase):
         b = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11)))),
                         "y": Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))})
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x", "y"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert b["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert b["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         ab = a + b
         assert set(ab.objects) == set(["x", "y"])
-        assert ab["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert ab["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-        assert ab["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert ab["y"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+        assert ab.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.objects["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        assert ab.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.objects["y"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x", "y"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert b["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert b["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         ab = b + a
         assert set(ab.objects) == set(["x", "y"])
-        assert ab["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert ab["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-        assert ab["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert ab["y"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+        assert ab.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.objects["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        assert ab.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.objects["y"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x", "y"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert b["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert b["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert b.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     def test_add_collection_different(self):
         a = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11)))),
                         "y": Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))})
         b = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11))))})
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         ab = a + b
         assert set(ab.objects) == set(["x", "y"])
-        assert ab["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert ab["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-        assert ab["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert ab["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert ab.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.objects["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        assert ab.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         ab = b + a
         assert set(ab.objects) == set(["x", "y"])
-        assert ab["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert ab["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-        assert ab["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert ab["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert ab.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.objects["x"].counts.counts.array.tolist() == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+        assert ab.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert ab.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(a.objects) == set(["x", "y"])
-        assert a["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        assert a["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
-        assert a["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.objects["y"].axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.objects["y"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert set(b.objects) == set(["x"])
-        assert b["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert b["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert b.objects["x"].axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert b.objects["x"].counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     def test_add_collection_axis(self):
         a = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(22))))}, axis=[Axis(CategoryBinning(["one", "two"]))])
         b = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(11, 100))))}, axis=[Axis(CategoryBinning(["one"]))])
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
         ab = a + b
         assert set(ab.objects) == set(["x"])
         assert ab.axis[0].binning.categories == ["one", "two"]
-        assert ab["x"].counts.counts.array.tolist() == [[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert ab.objects["x"].counts.counts.array.tolist() == [[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
         ab = b + a
         assert set(ab.objects) == set(["x"])
         assert ab.axis[0].binning.categories == ["one", "two"]
-        assert ab["x"].counts.counts.array.tolist() == [[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert ab.objects["x"].counts.counts.array.tolist() == [[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
 
         a = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(22))))}, axis=[Axis(CategoryBinning(["one", "two"]))])
         b = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(11, 100))))}, axis=[Axis(CategoryBinning(["two"]))])
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
         ab = a + b
         assert set(ab.objects) == set(["x"])
         assert ab.axis[0].binning.categories == ["one", "two"]
-        assert ab["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]]
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert ab.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
         ab = b + a
         assert set(ab.objects) == set(["x"])
         assert ab.axis[0].binning.categories == ["two", "one"]
-        assert ab["x"].counts.counts.array.tolist() == [[111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
-        assert a["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
-        assert b["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        assert ab.objects["x"].counts.counts.array.tolist() == [[111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]

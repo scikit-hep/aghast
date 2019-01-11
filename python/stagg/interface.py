@@ -2513,19 +2513,6 @@ class Variation(Stagg):
         if recursive:
             _valid(self.assignments, seen, recursive)
 
-    def __getitem__(self, where):
-        if where == ():
-            return self
-        elif isinstance(where, tuple):
-            head, tail = where[0], where[1:]
-        else:
-            head, tail = where, ()
-        out = _getbykey(self, "assignments", head)
-        if tail == ():
-            return out
-        else:
-            return out[tail]
-
     @classmethod
     def _fromflatbuffers(cls, fb):
         out = cls.__new__(cls)
@@ -2968,19 +2955,6 @@ class ParameterizedFunction(Function, FunctionObject):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
-    def __getitem__(self, where):
-        if where == ():
-            return self
-        elif isinstance(where, tuple):
-            head, tail = where[0], where[1:]
-        else:
-            head, tail = where, ()
-        out = _getbykey(self, "parameters", head)
-        if tail == ():
-            return out
-        else:
-            return out[tail]
-
     @classmethod
     def _fromflatbuffers(cls, *args):
         out = cls.__new__(cls)
@@ -3316,19 +3290,6 @@ class Histogram(Object):
             _valid(self.functions, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
-
-    def __getitem__(self, where):
-        if where == ():
-            return self
-        elif isinstance(where, tuple):
-            head, tail = where[0], where[1:]
-        else:
-            head, tail = where, ()
-        out = _getbykey(self, "functions", head)
-        if tail == ():
-            return out
-        else:
-            return out[tail]
 
     def _shape(self, path, shape):
         shape = ()
@@ -3942,19 +3903,6 @@ class Ntuple(Object):
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
 
-    def __getitem__(self, where):
-        if where == ():
-            return self
-        elif isinstance(where, tuple):
-            head, tail = where[0], where[1:]
-        else:
-            head, tail = where, ()
-        out = _getbykey(self, "columns", head)
-        if tail == ():
-            return out
-        else:
-            return out[tail]
-
     @classmethod
     def _fromflatbuffers(cls, fbobject, fbntuple):
         out = cls.__new__(cls)
@@ -4083,19 +4031,6 @@ class Collection(Object):
             _valid(self.axis, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
-
-    def __getitem__(self, where):
-        if where == ():
-            return self
-        elif isinstance(where, tuple):
-            head, tail = where[0], where[1:]
-        else:
-            head, tail = where, ()
-        out = _getbykey(self, "objects", head)
-        if tail == ():
-            return out
-        else:
-            return out[tail]
 
     def _shape(self, path, shape):
         axisshape = ()
