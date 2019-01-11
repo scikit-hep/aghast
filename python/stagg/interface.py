@@ -647,6 +647,25 @@ class InterpretedBuffer(Interpretation):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+    def _rebin(self, oldshape, pairs):
+        order = "c" if self.dimension_order == self.c_order else "f"
+        dtype = self.numpy_dtype
+
+        array = self.flatarray.reshape(oldshape, order=order)
+
+        newshape = sum((() if binning is None else binning._binshape() for binning, selfmap in pairs), ())
+
+        newbuf = numpy.zeros(newshape, dtype=dtype, order=order)
+        assert len(pairs) == 1
+        numpy.add.at(newbuf, pairs[0][1], array)
+
+        return InterpretedInlineBuffer(newbuf.view(numpy.uint8),
+                                       filters=None,
+                                       postfilter_slice=None,
+                                       dtype=self.dtype,
+                                       endianness=self.endianness,
+                                       dimension_order=self.dimension_order)
+        
     def _remap(self, newshape, selfmap):
         order = "c" if self.dimension_order == self.c_order else "f"
         dtype = self.numpy_dtype
@@ -658,12 +677,12 @@ class InterpretedBuffer(Interpretation):
         for i in range(len(newshape) - 1, -1, -1):
             if selfmap[i] is not None:
                 newbuf = numpy.zeros(oldshape[:i] + newshape[i:], dtype=dtype, order=order)
-                newbuf[i*(slice(None),) + (selfmap[i],)] = buf.reshape((-1, len(selfmap[i])) + newshape[i + 1 :])
+                newbuf[i*(slice(None),) + (selfmap[i],)] = buf.reshape((-1, len(selfmap[i])) + newshape[i + 1 :], order=order)
                 buf = newbuf
 
         return InterpretedInlineBuffer(buf.view(numpy.uint8),
-                                       filters=self.filters,
-                                       postfilter_slice=self.postfilter_slice,
+                                       filters=None,
+                                       postfilter_slice=None,
                                        dtype=self.dtype,
                                        endianness=self.endianness,
                                        dimension_order=self.dimension_order)
@@ -1486,20 +1505,20 @@ class IntegerBinning(Binning, BinLocation):
             else:
                 start = self.min if where.start is None else where.start
                 stop = self.max + 1 if where.stop is None else where.stop
+                stop += 1    # inclusive because loc (not iloc) selections are inclusive
                 start -= self.min
                 stop -= self.min
                 step = 1 if where.step is None else where.step
             if step <= 0:
                 raise ValueError("slice step cannot be zero or negative")
-
-            min = start + self.min
-            max = stop + self.min - 1
+            start = max(start, 0)
+            stop  = min(stop, 1 + self.max - self.min)
 
             if stop - start > 0:
                 d, m = divmod(stop - start, step)
                 length = d + (1 if m != 0 else 0)
             else:
-                raise ValueError("IntegerBinning cannot be sliced {0}:{1}, as this would result in min={2} max={3}".format(where.start, where.stop, min, max))
+                raise ValueError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
 
             loc = 0
             pos = length
@@ -1520,13 +1539,16 @@ class IntegerBinning(Binning, BinLocation):
                 loc_overflow = self.nonexistent
                 pos_overflow = 0
 
-            binning = IntegerBinning(min, max, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
+            binning = IntegerBinning(start + self.min, stop + self.min - 1, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
             index[:start] = pos_underflow
             index[start:stop] = numpy.arange(stop - start)
             index[stop:] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
             return binning, selfmap
+
+        else:
+            raise NotImplementedError
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
@@ -2892,6 +2914,9 @@ class UnweightedCounts(Counts):
         stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
         return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
 
+    def _rebin(self, oldshape, pairs):
+        return UnweightedCounts(self.counts._rebin(oldshape, pairs))
+
     def _remap(self, newshape, selfmap):
         return UnweightedCounts(self.counts._remap(newshape, selfmap))
 
@@ -3522,7 +3547,7 @@ class Histogram(Object):
 
     def _getloc(self, isiloc, where, binnings):
         binnings = binnings + tuple(x.binning for x in self.axis)
-        shape = sum((x._binshape() for x in binnings), ())
+        oldshape = sum((x._binshape() for x in binnings), ())
 
         ellipsiscount = where.count(Ellipsis)
         if ellipsiscount > 1:
@@ -3531,11 +3556,11 @@ class Histogram(Object):
             ellipsisindex = where.index(Ellipsis)
             before = where[: ellipsisindex]
             after  = where[ellipsisindex + 1 :]
-            num = max(0, len(shape) - len(before) - len(after))
+            num = max(0, len(oldshape) - len(before) - len(after))
             where = before + num*(slice(None),) + after
 
-        where = where + max(0, len(shape) - len(where))*(slice(None),)
-        if len(where) != len(shape):
+        where = where + max(0, len(oldshape) - len(where))*(slice(None),)
+        if len(where) != len(oldshape):
             raise IndexError("too many indices for histogram")
 
         i = 0
@@ -3546,12 +3571,12 @@ class Histogram(Object):
 
         out = self.detached(exceptions=("axis", "counts"))
         newaxis = []
-        for axis, (newbinning, target) in zip(self.axis, pairs[-len(self.axis):]):
+        for axis, (newbinning, selfmap) in zip(self.axis, pairs[-len(self.axis):]):
             if newbinning is not None:
                 newaxis.append(axis.detached(exceptions=("binning")))
                 newaxis[-1].binning = newbinning
         out.axis = newaxis
-        out.counts._rebin(shape, pairs)
+        out.counts = self.counts._rebin(oldshape, pairs)
         return out
 
     def _add(self, other, pairs, triples, noclobber):
