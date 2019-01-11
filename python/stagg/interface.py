@@ -3441,8 +3441,9 @@ class Histogram(Object):
         if len(self.axis) != len(other.axis):
             raise ValueError("cannot add {0}-dimensional Histogram and {1}-dimensional Histogram".format(len(self.axis), len(other.axis)))
 
-        pairs = pairs + tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
-        triples = triples + tuple(one._restructure(two) for one, two in pairs)
+        tmppairs = tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
+        pairs = pairs + tmppairs
+        triples = triples + tuple(one._restructure(two) for one, two in tmppairs)
 
         selfcounts, othercounts = Counts._promote(self.counts, other.counts)
 
@@ -3454,10 +3455,10 @@ class Histogram(Object):
             newshape = sum((binning._binshape() for binning, sm, om in triples), ())
             othercounts = othercounts._remap(newshape, sum((om for binning, sm, om in triples), ()))
 
+        selfcounts._add(othercounts, noclobber)
+
         for axis, (binning, sm, om) in zip(self.axis, triples[-len(self.axis):]):
             axis.binning = binning
-
-        selfcounts._add(othercounts, noclobber)
 
         if self.counts is not selfcounts:
             self.counts = selfcounts
@@ -4173,23 +4174,27 @@ class Collection(Object):
         if len(self.axis) != len(other.axis):
             raise ValueError("cannot add {0}-dimensional Collection and {1}-dimensional Collection".format(len(self.axis), len(other.axis)))
 
-        pairs = pairs + tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
-        triples = triples + tuple(one._restructure(two) for one, two in pairs)
+        tmppairs = tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
+        pairs = pairs + tmppairs
+        triples = triples + tuple(one._restructure(two) for one, two in tmppairs)
 
         if set(self.objects) != set(other.objects):
             newobjects = collections.OrderedDict()
             for n, x in self.objects.items():
-                if n not in newobjects:
-                    newobjects[n] = x.detached(reclaim=True)
+                newobjects[n] = x.detached(reclaim=True)
             for n, x in other.objects.items():
-                if n not in newobjects:
+                if n in newobjects:
+                    newobjects[n]._add(x, pairs, triples, noclobber)
+                else:
                     newobjects[n] = x.detached(reclaim=True)
             self.objects = newobjects
 
-        HERE
+        else:
+            for n, x in self.objects.items():
+                x._add(other.objects[n], pairs, triples, noclobber)
 
-
-
+        for axis, (binning, sm, om) in zip(self.axis, triples[-len(self.axis):]):
+            axis.binning = binning
 
 _RawBuffer_lookup = {
     stagg.stagg_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, stagg.stagg_generated.RawInlineBuffer.RawInlineBuffer),
