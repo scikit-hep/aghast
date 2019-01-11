@@ -1484,29 +1484,49 @@ class IntegerBinning(Binning, BinLocation):
             if isiloc:
                 start, stop, step = where.indices(1 + self.max - self.min)
             else:
-                step = 1 if where.step is None else where.step
-                if step > 0:
-                    start = self.min if where.start is None else where.start
-                    stop = self.max + 1 if where.stop is None else where.stop
-                else:
-                    start = self.max if where.start is None else where.start
-                    stop = self.min - 1 if where.stop is None else where.stop
+                start = self.min if where.start is None else where.start
+                stop = self.max + 1 if where.stop is None else where.stop
                 start -= self.min
                 stop -= self.min
+                step = 1 if where.step is None else where.step
+            if step <= 0:
+                raise ValueError("slice step cannot be zero or negative")
 
-            if step == 0:
-                raise ValueError("slice step cannot be zero")
-            elif (step > 0 and stop - start > 0) or (step < 0 and stop - start < 0):
-                d, m = divmod(abs(start - stop), abs(step))
+            min = start + self.min
+            max = stop + self.min - 1
+
+            if stop - start > 0:
+                d, m = divmod(stop - start, step)
                 length = d + (1 if m != 0 else 0)
             else:
-                length = 0
+                raise ValueError("IntegerBinning cannot be sliced {0}:{1}, as this would result in min={2} max={3}".format(where.start, where.stop, min, max))
 
-            HERE
+            loc = 0
+            pos = length
+            if self.loc_underflow != self.nonexistent or start > 0:
+                loc += 1
+                loc_underflow = BinLocation._locations[loc]
+                pos_underflow = pos
+                pos += 1
+            else:
+                loc_underflow = self.nonexistent
+                pos_underflow = 0
+            if self.loc_overflow != self.nonexistent or stop < 1 + self.max - self.min:
+                loc += 1
+                loc_overflow = BinLocation._locations[loc]
+                pos_overflow = pos
+                pos += 1
+            else:
+                loc_overflow = self.nonexistent
+                pos_overflow = 0
 
-
-                
-        return newbinning, target
+            binning = IntegerBinning(min, max, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
+            index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
+            index[:start] = pos_underflow
+            index[start:stop] = numpy.arange(stop - start)
+            index[stop:] = pos_overflow
+            selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+            return binning, selfmap
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
