@@ -221,7 +221,7 @@ class _LocIndexer(object):
             node = node._parent
             binnings = tuple(x.binning for x in node.axis) + binnings
 
-        return self.obj._loc(where, self._isiloc, binnings)
+        return self.obj._getloc(self._isiloc, where, binnings)
 
 ################################################# Stagg
 
@@ -267,15 +267,15 @@ class Stagg(object):
         else:
             return True
 
-    def detached(self, reclaim=False):
+    def detached(self, reclaim=False, exceptions=()):
         if reclaim:
             if hasattr(self, "_parent"):
                 del self._parent
             return self
         else:
-            return self._detached(True)
+            return self._detached(True, exceptions=exceptions)
 
-    def _detached(self, top):
+    def _detached(self, top, exceptions=()):
         if not top and not hasattr(self, "_parent"):
             return self
         else:
@@ -283,13 +283,14 @@ class Stagg(object):
             if hasattr(self, "_flatbuffers"):
                 out._flatbuffers = self._flatbuffers
             for n in self._params:
-                private = "_" + n
-                if hasattr(self, private):
-                    x = getattr(self, private)
-                    if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
-                        x = x._detached(False)
-                    stagg.checktype.setparent(out, x)
-                    setattr(out, private, x)
+                if n not in exceptions:
+                    private = "_" + n
+                    if hasattr(self, private):
+                        x = getattr(self, private)
+                        if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
+                            x = x._detached(False)
+                        stagg.checktype.setparent(out, x)
+                        setattr(out, private, x)
             return out
 
     def _add(self, other, pairs, triples, noclobber):
@@ -372,6 +373,14 @@ class Object(Stagg):
         pairs, triples = Collection._pairs_triples(getattr(self, "_parent", None), getattr(other, "_parent", None))
         self._add(other, pairs, triples, noclobber=False)
         return self
+
+    @property
+    def loc(self):
+        return _LocIndexer(self, False)
+
+    @property
+    def iloc(self):
+        return _LocIndexer(self, True)
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -1327,10 +1336,6 @@ class Binning(Stagg):
     def isnumerical(self):
         return True
 
-    @property
-    def dimensions(self):
-        return len(self._binshape())
-
     @staticmethod
     def _promote(one, two):
         if type(one) is type(two):
@@ -1429,6 +1434,10 @@ class IntegerBinning(Binning, BinLocation):
     def _binshape(self):
         return (1 + self.max - self.min + int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent),)
 
+    @property
+    def dimensions(self):
+        return 1
+
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.IntegerBinning.IntegerBinningStart(builder)
         stagg.stagg_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
@@ -1464,6 +1473,40 @@ class IntegerBinning(Binning, BinLocation):
 
     def toSparseRegularBinning(self):
         return self.toRegularBinning().toSparseRegularBinning()
+
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (None,)
+
+        if isinstance(where, slice):
+            if isiloc:
+                start, stop, step = where.indices(1 + self.max - self.min)
+            else:
+                step = 1 if where.step is None else where.step
+                if step > 0:
+                    start = self.min if where.start is None else where.start
+                    stop = self.max + 1 if where.stop is None else where.stop
+                else:
+                    start = self.max if where.start is None else where.start
+                    stop = self.min - 1 if where.stop is None else where.stop
+                start -= self.min
+                stop -= self.min
+
+            if step == 0:
+                raise ValueError("slice step cannot be zero")
+            elif (step > 0 and stop - start > 0) or (step < 0 and stop - start < 0):
+                d, m = divmod(abs(start - stop), abs(step))
+                length = d + (1 if m != 0 else 0)
+            else:
+                length = 0
+
+            HERE
+
+
+                
+        return newbinning, target
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
@@ -1715,6 +1758,10 @@ class RegularBinning(Binning):
             numoverflowbins = self.overflow._numbins()
         return (self.num + numoverflowbins,)
 
+    @property
+    def dimensions(self):
+        return 1
+
     def _toflatbuffers(self, builder):
         interval = self.interval._toflatbuffers(builder)
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
@@ -1847,6 +1894,10 @@ class HexagonalBinning(Binning):
             numroverflowbins = self.roverflow._numbins()
         return (qnum + numqoverflowbins, rnum + numroverflowbins)
 
+    @property
+    def dimensions(self):
+        return 2
+
     def _toflatbuffers(self, builder):
         qoverflow = None if self.qoverflow is None else self.qoverflow._toflatbuffers(builder)
         roverflow = None if self.roverflow is None else self.roverflow._toflatbuffers(builder)
@@ -1919,6 +1970,10 @@ class EdgesBinning(Binning):
         else:
             numoverflowbins = self.overflow._numbins()
         return (len(self.edges) - 1 + numoverflowbins,)
+
+    @property
+    def dimensions(self):
+        return 1
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -2031,6 +2086,10 @@ class IrregularBinning(Binning, OverlappingFill):
         else:
             numoverflowbins = self.overflow._numbins()
         return (len(self.intervals) + numoverflowbins,)
+
+    @property
+    def dimensions(self):
+        return 1
 
     def _toflatbuffers(self, builder):
         intervals = [x._toflatbuffers(builder) for x in self.intervals]
@@ -2146,6 +2205,10 @@ class CategoryBinning(Binning, BinLocation):
     def _binshape(self):
         return (len(self.categories) + (self.loc_overflow != self.nonexistent),)
 
+    @property
+    def dimensions(self):
+        return 1
+
     def _toflatbuffers(self, builder):
         categories = [builder.CreateString(x.encode("utf-8")) for x in self.categories]
 
@@ -2237,6 +2300,10 @@ class SparseRegularBinning(Binning, BinLocation):
         else:
             numoverflowbins = self.overflow._numbins()
         return (len(self.bins) + numoverflowbins,)
+
+    @property
+    def dimensions(self):
+        return 1
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -2391,6 +2458,10 @@ class FractionBinning(Binning):
     def _binshape(self):
         return (2,)
 
+    @property
+    def dimensions(self):
+        return 1
+
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.FractionBinning.FractionBinningStart(builder)
         if self.layout != self.passall:
@@ -2438,6 +2509,10 @@ class PredicateBinning(Binning, OverlappingFill):
 
     def _binshape(self):
         return (len(self.predicates),)
+
+    @property
+    def dimensions(self):
+        return 1
 
     def _toflatbuffers(self, builder):
         predicates = [builder.CreateString(x.encode("utf-8")) for x in self.predicates]
@@ -2590,6 +2665,10 @@ class VariationBinning(Binning):
 
     def _binshape(self):
         return (len(self.variations),)
+
+    @property
+    def dimensions(self):
+        return 1
 
     def _toflatbuffers(self, builder):
         variations = [x._toflatbuffers(builder) for x in self.variations]
@@ -3421,7 +3500,7 @@ class Histogram(Object):
             out = list(node.axis) + out
         return stagg.checktype.Vector(out)
 
-    def _loc(self, where, isiloc, binnings):
+    def _getloc(self, isiloc, where, binnings):
         binnings = binnings + tuple(x.binning for x in self.axis)
         shape = sum((x._binshape() for x in binnings), ())
 
@@ -3439,12 +3518,20 @@ class Histogram(Object):
         if len(where) != len(shape):
             raise IndexError("too many indices for histogram")
 
-        pairs = [x._locpair(where, isiloc) for x in binnings]
+        i = 0
+        pairs = []
+        for binning in binnings:
+            pairs.append(binning._getloc(isiloc, *where[i : i + binning.dimensions]))
+            i += binning.dimensions
 
-        out = self._detached()
-        for axis, (gather, newbinning) in zip(out.axis, pairs[-len(out.axis):]):
-            axis.binning = newbinning
-        out.counts._slice([s for gather, newbinning in pairs])
+        out = self.detached(exceptions=("axis", "counts"))
+        newaxis = []
+        for axis, (newbinning, target) in zip(self.axis, pairs[-len(self.axis):]):
+            if newbinning is not None:
+                newaxis.append(axis.detached(exceptions=("binning")))
+                newaxis[-1].binning = newbinning
+        out.axis = newaxis
+        out.counts._rebin(shape, pairs)
         return out
 
     def _add(self, other, pairs, triples, noclobber):
