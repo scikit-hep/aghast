@@ -659,7 +659,7 @@ class InterpretedBuffer(Interpretation):
             i -= binning.dimensions
             newshape = binning._binshape() + newshape
             newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
-            numpy.add.at(newbuf, selfmap, buf)
+            numpy.add.at(newbuf, i*(slice(None),) + (selfmap,), buf)
             buf = newbuf
 
         return InterpretedInlineBuffer(buf.view(numpy.uint8),

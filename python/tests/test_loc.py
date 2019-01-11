@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def test_loc_simple(self):
+    def test_loc_onedim(self):
         a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(11, dtype=int)*10)))
         assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
         assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
@@ -55,3 +55,14 @@ class Test(unittest.TestCase):
         aloc = a.loc[-3:2]
         assert aloc.axis[0].binning.toCategoryBinning().categories == ["-3", "-2", "-1", "0", "1", "2", "(-inf, -4]", "[3, +inf)"]
         assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 20, 930]
+
+    def test_loc_twodim(self):
+        a = Histogram([Axis(IntegerBinning(5, 9)), Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(55, dtype=int)*10)))
+        a.checkvalid()
+        assert a.axis[0].binning.toCategoryBinning().categories == ["5", "6", "7", "8", "9"]
+        assert a.axis[1].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == (numpy.ones(55, dtype=int)*10).reshape((5, 11)).tolist()
+        aloc = a.loc[7:, -3:2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["7", "8", "9", "(-inf, 6]"]
+        assert aloc.axis[1].binning.toCategoryBinning().categories == ["-3", "-2", "-1", "0", "1", "2", "(-inf, -4]", "[3, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [[10, 10, 10, 10, 10, 10, 20, 30], [10, 10, 10, 10, 10, 10, 20, 30], [10, 10, 10, 10, 10, 10, 20, 30], [20, 20, 20, 20, 20, 20, 40, 60]]
