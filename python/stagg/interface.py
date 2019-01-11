@@ -346,16 +346,15 @@ class Object(Stagg):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
     def __add__(self, other):
+        pairs, triples = Collection._pairs_triples(getattr(self, "_parent", None), getattr(other, "_parent", None))
         out = self.detached()
-        out._add(other, (), (), noclobber=True)
+        out._add(other, pairs, triples, noclobber=True)
         return out
 
     def __iadd__(self, other):
-        self._add(other, (), (), noclobber=False)
+        pairs, triples = Collection._pairs_triples(getattr(self, "_parent", None), getattr(other, "_parent", None))
+        self._add(other, pairs, triples, noclobber=False)
         return self
-
-    def __radd__(self, other):
-        return self.__add__(other)
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -3396,6 +3395,17 @@ class Histogram(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
+    # @property
+    # def allaxis(self):
+        
+
+
+    # def __getitem__(self, where):
+    #     if not isinstance(where, tuple):
+    #         where = (where,)
+
+
+
     def _add(self, other, pairs, triples, noclobber):
         if not isinstance(other, Histogram):
             raise ValueError("cannot add {0} and {1}".format(self, other))
@@ -4102,6 +4112,24 @@ class Collection(Object):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    @staticmethod
+    def _pairs_triples(one, two):
+        oneaxis = [] if one is None else list(one.axis)
+        twoaxis = [] if two is None else list(two.axis)
+
+        if len(oneaxis) != len(twoaxis):
+            raise ValueError("cannot add {0}-dimensional Collection and {1}-dimensional Collection".format(len(oneaxis), len(twoaxis)))
+        if len(oneaxis) == 0:
+            return (), ()
+
+        pairs, triples = Collection._pairs_triples(getattr(one, "_parent", None), getattr(two, "_parent", None))
+
+        tmppairs = tuple(Binning._promote(one.binning, two.binning) for one, two in zip(oneaxis, twoaxis))
+        pairs = pairs + tmppairs
+        triples = triples + tuple(one._restructure(two) for one, two in tmppairs)
+
+        return pairs, triples
 
     def _add(self, other, pairs, triples, noclobber):
         if not isinstance(other, Collection):

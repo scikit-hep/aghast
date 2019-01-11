@@ -1057,3 +1057,23 @@ class Test(unittest.TestCase):
         assert ab.objects["x"].counts.counts.array.tolist() == [[111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]
         assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
         assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+
+    def test_add_collection_fromwithin(self):
+        a = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(22))))}, axis=[Axis(CategoryBinning(["one", "two"]))])
+        b = Collection({"x": Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.full(11, 100))))}, axis=[Axis(CategoryBinning(["one"]))])
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        ab = a.objects["x"] + b.objects["x"]
+        assert isinstance(ab, Histogram)
+        assert len(ab.axis) == 1
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.counts.counts.buffer.tostring() == numpy.array([[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]).reshape(-1).tostring()
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
+        ab = b.objects["x"] + a.objects["x"]
+        assert isinstance(ab, Histogram)
+        assert len(ab.axis) == 1
+        assert ab.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert ab.counts.counts.buffer.tostring() == numpy.array([[100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]).reshape(-1).tostring()
+        assert a.objects["x"].counts.counts.array.tolist() == [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]]
+        assert b.objects["x"].counts.counts.array.tolist() == [[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]]
