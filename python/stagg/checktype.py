@@ -137,7 +137,7 @@ class Lookup(Mapping):
     def __init__(self, data):
         import stagg.interface
         if data is None:
-            self._data = {}
+            self._data = collections.OrderedDict()
         else:
             self._data = collections.OrderedDict(data)
         for n, x in self._data.items():

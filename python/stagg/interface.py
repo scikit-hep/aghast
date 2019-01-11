@@ -28,6 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import collections
 import ctypes
 import functools
 import math
@@ -249,8 +250,13 @@ class Stagg(object):
         else:
             return True
 
-    def detached(self):
-        return self._detached(True)
+    def detached(self, reclaim=False):
+        if reclaim:
+            if hasattr(self, "_parent"):
+                del self._parent
+            return self
+        else:
+            return self._detached(True)
 
     def _detached(self, top):
         if not top and not hasattr(self, "_parent"):
@@ -1735,7 +1741,7 @@ class RegularBinning(Binning):
             if self.circular == circular:
                 return self, (None,), (None,)
             else:
-                return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (None,)
+                return RegularBinning(self.num, self.interval.detached(reclaim=True), overflow=(None if self.overflow is None else self.overflow.detached(reclaim=True)), circular=circular), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, self.num)
@@ -1747,12 +1753,12 @@ class RegularBinning(Binning):
                 if self.circular == circular:
                     return self, (None,), (othermap,)
                 else:
-                    return RegularBinning(self.num, self.interval.detached(), overflow=(None if self.overflow is None else self.overflow.detached()), circular=circular), (None,), (othermap,)
+                    return RegularBinning(self.num, self.interval.detached(reclaim=True), overflow=(None if self.overflow is None else self.overflow.detached(reclaim=True)), circular=circular), (None,), (othermap,)
 
             else:
                 selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
                                         numpy.arange(self.num, dtype=numpy.int64))
-                return RegularBinning(self.num, self.interval.detached(), overflow=overflow, circular=circular), (selfmap,), (othermap,)
+                return RegularBinning(self.num, self.interval.detached(reclaim=True), overflow=overflow, circular=circular), (selfmap,), (othermap,)
 
 ################################################# HexagonalBinning
 
@@ -1949,7 +1955,7 @@ class EdgesBinning(Binning):
             if self.circular == circular:
                 return self, (None,), (None,)
             else:
-                return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (None,)
+                return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached(reclaim=True)), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(self.edges) - 1)
@@ -1961,7 +1967,7 @@ class EdgesBinning(Binning):
                 if self.circular == circular:
                     return self, (None,), (othermap,)
                 else:
-                    return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (othermap,)
+                    return EdgesBinning(self.edges, overflow=(None if self.overflow is None else self.overflow.detached(reclaim=True)), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular), (None,), (othermap,)
 
             else:
                 selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
@@ -2081,7 +2087,7 @@ class IrregularBinning(Binning, OverlappingFill):
             if overlapping_fill == self.overlapping_fill:
                 return self, (None,), (None,)
             else:
-                return IrregularBinning([x.detached() for x in intervals], overflow=self.overflow.detached(), overlapping_fill=overlapping_fill), (None,), (None,)
+                return IrregularBinning([x.detached(reclaim=True) for x in intervals], overflow=self.overflow.detached(reclaim=True), overlapping_fill=overlapping_fill), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(intervals))
@@ -2096,7 +2102,7 @@ class IrregularBinning(Binning, OverlappingFill):
             else:
                 selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
                                         numpy.arange(len(selfints), dtype=numpy.int64))
-                return IrregularBinning([x.detached() for x in intervals], overflow=overflow, overlapping_fill=overlapping_fill), (selfmap,), (othermap,)
+                return IrregularBinning([x.detached(reclaim=True) for x in intervals], overflow=overflow, overlapping_fill=overlapping_fill), (selfmap,), (othermap,)
 
 ################################################# CategoryBinning
 
@@ -3040,7 +3046,10 @@ class ParameterizedFunction(Function, FunctionObject):
             if script is not None:
                 stagg.stagg_generated.Object.ObjectAddScript(builder, script)
             return stagg.stagg_generated.Object.ObjectEnd(builder)
-       
+
+    def _add(self, other, pairs, triples, noclobber):
+        raise NotImplementedError
+
 ################################################# EvaluatedFunction
 
 class EvaluatedFunction(Function):
@@ -3250,6 +3259,9 @@ class BinnedEvaluatedFunction(FunctionObject):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    def _add(self, other, pairs, triples, noclobber):
+        raise NotImplementedError
 
 ################################################# Histogram
 
@@ -4034,6 +4046,9 @@ class Ntuple(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
+    def _add(self, other, pairs, triples, noclobber):
+        raise NotImplementedError
+
 ################################################# Collection
 
 class Collection(Object):
@@ -4151,6 +4166,30 @@ class Collection(Object):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    def _add(self, other, pairs, triples, noclobber):
+        if not isinstance(other, Collection):
+            raise ValueError("cannot add {0} and {1}".format(self, other))
+        if len(self.axis) != len(other.axis):
+            raise ValueError("cannot add {0}-dimensional Collection and {1}-dimensional Collection".format(len(self.axis), len(other.axis)))
+
+        pairs = pairs + tuple(Binning._promote(one.binning, two.binning) for one, two in zip(self.axis, other.axis))
+        triples = triples + tuple(one._restructure(two) for one, two in pairs)
+
+        if set(self.objects) != set(other.objects):
+            newobjects = collections.OrderedDict()
+            for n, x in self.objects.items():
+                if n not in newobjects:
+                    newobjects[n] = x.detached(reclaim=True)
+            for n, x in other.objects.items():
+                if n not in newobjects:
+                    newobjects[n] = x.detached(reclaim=True)
+            self.objects = newobjects
+
+        HERE
+
+
+
 
 _RawBuffer_lookup = {
     stagg.stagg_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, stagg.stagg_generated.RawInlineBuffer.RawInlineBuffer),
