@@ -651,15 +651,18 @@ class InterpretedBuffer(Interpretation):
         order = "c" if self.dimension_order == self.c_order else "f"
         dtype = self.numpy_dtype
 
-        array = self.flatarray.reshape(oldshape, order=order)
+        buf = self.flatarray.reshape(oldshape, order=order)
 
-        newshape = sum((() if binning is None else binning._binshape() for binning, selfmap in pairs), ())
+        i = len(oldshape)
+        newshape = ()
+        for binning, selfmap in pairs[::-1]:
+            i -= binning.dimensions
+            newshape = binning._binshape() + newshape
+            newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
+            numpy.add.at(newbuf, selfmap, buf)
+            buf = newbuf
 
-        newbuf = numpy.zeros(newshape, dtype=dtype, order=order)
-        assert len(pairs) == 1
-        numpy.add.at(newbuf, pairs[0][1], array)
-
-        return InterpretedInlineBuffer(newbuf.view(numpy.uint8),
+        return InterpretedInlineBuffer(buf.view(numpy.uint8),
                                        filters=None,
                                        postfilter_slice=None,
                                        dtype=self.dtype,
@@ -1529,7 +1532,7 @@ class IntegerBinning(Binning, BinLocation):
                 pos += 1
             else:
                 loc_underflow = self.nonexistent
-                pos_underflow = 0
+                pos_underflow = None
             if self.loc_overflow != self.nonexistent or stop < 1 + self.max - self.min:
                 loc += 1
                 loc_overflow = BinLocation._locations[loc]
@@ -1537,7 +1540,7 @@ class IntegerBinning(Binning, BinLocation):
                 pos += 1
             else:
                 loc_overflow = self.nonexistent
-                pos_overflow = 0
+                pos_overflow = None
 
             binning = IntegerBinning(start + self.min, stop + self.min - 1, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
