@@ -1500,6 +1500,27 @@ class IntegerBinning(Binning, BinLocation):
     def toSparseRegularBinning(self):
         return self.toRegularBinning().toSparseRegularBinning()
 
+    def _getloc_flows(self, length, start, stop):
+        loc = 0
+        pos = length
+        if self.loc_underflow != self.nonexistent or start > 0:
+            loc += 1
+            loc_underflow = BinLocation._locations[loc]
+            pos_underflow = pos
+            pos += 1
+        else:
+            loc_underflow = self.nonexistent
+            pos_underflow = None
+        if self.loc_overflow != self.nonexistent or stop < 1 + self.max - self.min:
+            loc += 1
+            loc_overflow = BinLocation._locations[loc]
+            pos_overflow = pos
+            pos += 1
+        else:
+            loc_overflow = self.nonexistent
+            pos_overflow = None
+        return loc_underflow, pos_underflow, loc_overflow, pos_overflow
+
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
@@ -1525,26 +1546,9 @@ class IntegerBinning(Binning, BinLocation):
                 d, m = divmod(stop - start, step)
                 length = d + (1 if m != 0 else 0)
             else:
-                raise ValueError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
 
-            loc = 0
-            pos = length
-            if self.loc_underflow != self.nonexistent or start > 0:
-                loc += 1
-                loc_underflow = BinLocation._locations[loc]
-                pos_underflow = pos
-                pos += 1
-            else:
-                loc_underflow = self.nonexistent
-                pos_underflow = None
-            if self.loc_overflow != self.nonexistent or stop < 1 + self.max - self.min:
-                loc += 1
-                loc_overflow = BinLocation._locations[loc]
-                pos_overflow = pos
-                pos += 1
-            else:
-                loc_overflow = self.nonexistent
-                pos_overflow = None
+            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(length, start, stop)
 
             binning = IntegerBinning(start + self.min, stop + self.min - 1, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
@@ -1554,8 +1558,29 @@ class IntegerBinning(Binning, BinLocation):
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
             return binning, (selfmap,)
 
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            if isiloc:
+                i = where
+                if i < 0:
+                    i += 1 + self.max - self.min
+            else:
+                i = where - self.min
+
+            if not 0 <= i < 1 + self.max - self.min:
+                raise IndexError("index {0} is out of bounds".format(where))
+
+            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(length, i, i + 1)
+
+            binning = IntegerBinning(i + self.min, i + self.min, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
+            index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
+            index[:i] = pos_underflow
+            index[i : i + 1] = 0
+            index[i:] = pos_overflow
+            selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+            return binning, (selfmap,)
+
         else:
-            raise NotImplementedError
+            raise IndexError("IntegerBinning only allows integers, slices (`:`), ellipsis (`...`), and projections (`None`) as an index")
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
