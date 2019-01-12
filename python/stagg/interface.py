@@ -36,6 +36,10 @@ import numbers
 import operator
 import struct
 import sys
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import numpy
 import flatbuffers
@@ -1527,10 +1531,11 @@ class IntegerBinning(Binning, BinLocation):
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
+
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        if isinstance(where, slice):
+        elif isinstance(where, slice):
             if isiloc:
                 start, stop, step = where.indices(1 + self.max - self.min)
             else:
@@ -1583,7 +1588,7 @@ class IntegerBinning(Binning, BinLocation):
             return binning, (selfmap,)
 
         else:
-            raise IndexError("IntegerBinning only allows integers, slices (`:`), ellipsis (`...`), and projections (`None`) as an index")
+            raise IndexError("IntegerBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index")
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
@@ -1873,6 +1878,25 @@ class RegularBinning(Binning):
         overflow = None if self.overflow is None else self.overflow.detached()
         return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
 
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        else:
+            raise IndexError("RegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
+
     def _restructure(self, other):
         assert isinstance(other, RegularBinning) and self.num == other.num and self.interval == other.interval
         circular = self.circular and other.circular
@@ -1998,6 +2022,19 @@ class HexagonalBinning(Binning):
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
         return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
+    def _getloc(self, isiloc, where1, where2):
+        if where1 is None and where2 is None:
+            return None, (slice(None), slice(None))
+
+        elif isinstance(where1, slice) and where1.start is None and where1.stop is None and where1.step is None and isinstance(where2, slice) and where2.start is None and where2.stop is None and where2.step is None:
+            return self, (slice(None), slice(None))
+
+        elif isinstance(where1, slice) and isinstance(where1, slice):
+            raise NotImplementedError
+
+        else:
+            raise IndexError("HexagonalBinning.loc and .iloc only allow two slices (`:, :`), an ellipsis (`...`), or two projections (`None, None`) as index")
+
     def _restructure(self, other):
         assert isinstance(other, HexagonalBinning)
         if self == other:
@@ -2094,6 +2131,25 @@ class EdgesBinning(Binning):
 
     def toCategoryBinning(self, format="%g"):
         return self.toIrregularBinning().toCategoryBinning(format=format)
+
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        else:
+            raise IndexError("EdgesBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
 
     def _restructure(self, other):
         assert isinstance(other, EdgesBinning) and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive   # and _sameedges(self.edges, other.edges)
@@ -2221,6 +2277,33 @@ class IrregularBinning(Binning, OverlappingFill):
 
         return CategoryBinning(cats)
 
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        else:
+            where = numpy.array(where, copy=False)
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                raise NotImplementedError
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+            else:
+                raise IndexError("IrregularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows floating point numbers")
+
     def _restructure(self, other):
         assert isinstance(other, IrregularBinning)
 
@@ -2299,6 +2382,36 @@ class CategoryBinning(Binning, BinLocation):
         if self.loc_overflow != self.nonexistent:
             stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
+
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, str):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+            raise NotImplementedError
+
+        else:
+            where = numpy.array(where, copy=False)
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                raise NotImplementedError
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+            else:
+                raise IndexError("CategoryBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
 
     def _restructure(self, other):
         assert isinstance(other, CategoryBinning)
@@ -2466,6 +2579,33 @@ class SparseRegularBinning(Binning, BinLocation):
 
         return CategoryBinning(cats)
 
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        else:
+            where = numpy.array(where, copy=False)
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                raise NotImplementedError
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+            else:
+                raise IndexError("SparseRegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows floating point numbers")
+
     def _restructure(self, other):
         assert isinstance(other, SparseRegularBinning) and self.bin_width == other.bin_width and self.origin == other.origin and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
 
@@ -2549,6 +2689,22 @@ class FractionBinning(Binning):
             stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
         return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
 
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        else:
+            raise IndexError("FractionBinning only allows an ellipsis (`...`) or projection (`None`) as an index")
+
     def _restructure(self, other):
         assert isinstance(other, FractionBinning)
 
@@ -2604,6 +2760,36 @@ class PredicateBinning(Binning, OverlappingFill):
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
+
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, str):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+            raise NotImplementedError
+
+        else:
+            where = numpy.array(where, copy=False)
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                raise NotImplementedError
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+            else:
+                raise IndexError("PredicateBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
 
     def _restructure(self, other):
         assert isinstance(other, PredicateBinning)
@@ -2758,6 +2944,36 @@ class VariationBinning(Binning):
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
+
+    def _getloc(self, isiloc, where):
+        if where is None:
+            return None, (slice(None),)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            return self, (slice(None),)
+
+        elif isinstance(where, slice):
+            raise NotImplementedError
+
+        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, str):
+            raise NotImplementedError
+
+        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+            raise NotImplementedError
+
+        else:
+            where = numpy.array(where, copy=False)
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                raise NotImplementedError
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+            else:
+                raise IndexError("VariationBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
 
     def _restructure(self, other):
         assert isinstance(other, VariationBinning)
