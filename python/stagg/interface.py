@@ -656,11 +656,15 @@ class InterpretedBuffer(Interpretation):
         i = len(oldshape)
         newshape = ()
         for binning, selfmap in pairs[::-1]:
-            i -= binning.dimensions
-            newshape = binning._binshape() + newshape
-            newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
-            numpy.add.at(newbuf, i*(slice(None),) + (selfmap,), buf)
-            buf = newbuf
+            assert isinstance(selfmap, tuple)
+            i -= len(selfmap)
+            if binning is None:
+                buf = buf.sum(axis=i)
+            else:
+                newshape = binning._binshape() + newshape
+                newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
+                numpy.add.at(newbuf, i*(slice(None),) + selfmap, buf)
+                buf = newbuf
 
         return InterpretedInlineBuffer(buf.view(numpy.uint8),
                                        filters=None,
@@ -668,7 +672,7 @@ class InterpretedBuffer(Interpretation):
                                        dtype=self.dtype,
                                        endianness=self.endianness,
                                        dimension_order=self.dimension_order)
-        
+
     def _remap(self, newshape, selfmap):
         order = "c" if self.dimension_order == self.c_order else "f"
         dtype = self.numpy_dtype
@@ -1500,7 +1504,7 @@ class IntegerBinning(Binning, BinLocation):
         if where is None:
             return None, (slice(None),)
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
-            return self, (None,)
+            return self, (slice(None),)
 
         if isinstance(where, slice):
             if isiloc:
@@ -1548,7 +1552,7 @@ class IntegerBinning(Binning, BinLocation):
             index[start:stop] = numpy.arange(stop - start)
             index[stop:] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
-            return binning, selfmap
+            return binning, (selfmap,)
 
         else:
             raise NotImplementedError
@@ -3577,7 +3581,7 @@ class Histogram(Object):
         for axis, (newbinning, selfmap) in zip(self.axis, pairs[-len(self.axis):]):
             if newbinning is not None:
                 newaxis.append(axis.detached(exceptions=("binning")))
-                newaxis[-1].binning = newbinning
+                newaxis[-1].binning = newbinning.detached()
         out.axis = newaxis
         out.counts = self.counts._rebin(oldshape, pairs)
         return out
