@@ -666,6 +666,9 @@ class InterpretedBuffer(Interpretation):
                 numpy.add.at(newbuf, i*(slice(None),) + selfmap, buf)
                 buf = newbuf
 
+        if len(buf.shape) == 0:
+            buf = buf.reshape(1)
+
         return InterpretedInlineBuffer(buf.view(numpy.uint8),
                                        filters=None,
                                        postfilter_slice=None,
@@ -1569,13 +1572,13 @@ class IntegerBinning(Binning, BinLocation):
             if not 0 <= i < 1 + self.max - self.min:
                 raise IndexError("index {0} is out of bounds".format(where))
 
-            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(length, i, i + 1)
+            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(1, i, i + 1)
 
             binning = IntegerBinning(i + self.min, i + self.min, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
             index[:i] = pos_underflow
             index[i : i + 1] = 0
-            index[i:] = pos_overflow
+            index[i + 1 :] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
             return binning, (selfmap,)
 
@@ -3607,7 +3610,10 @@ class Histogram(Object):
             if newbinning is not None:
                 newaxis.append(axis.detached(exceptions=("binning")))
                 newaxis[-1].binning = newbinning.detached()
-        out.axis = newaxis
+        if len(newaxis) == 0:
+            out.axis = [Axis()]
+        else:
+            out.axis = newaxis
         out.counts = self.counts._rebin(oldshape, pairs)
         return out
 

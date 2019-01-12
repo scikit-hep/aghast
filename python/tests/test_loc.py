@@ -146,3 +146,20 @@ class Test(unittest.TestCase):
         assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 20, 930]
         assert a.axis[0].binning.toCategoryBinning().categories == ["[6, +inf)", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
         assert a.counts.counts.array.tolist() == [900, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(11, dtype=int)*10)))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        aloc = a.loc[2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["2", "(-inf, 1]", "[3, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [10, 70, 30]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(11, dtype=int)*10)))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        aloc = a.loc[None]
+        assert len(aloc.axis) == 1
+        assert aloc.axis[0].binning is None
+        assert aloc.counts.counts.array.tolist() == [110]
