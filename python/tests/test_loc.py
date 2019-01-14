@@ -163,3 +163,17 @@ class Test(unittest.TestCase):
         assert len(aloc.axis) == 1
         assert aloc.axis[0].binning is None
         assert aloc.counts.counts.array.tolist() == [110]
+
+    def test_loc_RegularBinning(self):
+        a = Histogram([Axis(RegularBinning(20, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4.5)", "[-4.5, -4)", "[-4, -3.5)", "[-3.5, -3)", "[-3, -2.5)", "[-2.5, -2)", "[-2, -1.5)", "[-1.5, -1)", "[-1, -0.5)", "[-0.5, 0)", "[0, 0.5)", "[0.5, 1)", "[1, 1.5)", "[1.5, 2)", "[2, 2.5)", "[2.5, 3)", "[3, 3.5)", "[3.5, 4)", "[4, 4.5)", "[4.5, 5)"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, 5)']
+        assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+        aloc = a.iloc[0:10:2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, +inf)']
+        assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 100]
+        aloc = a.iloc[10:20:2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ['[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, 5)', '(-inf, 0)']
+        assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 100]

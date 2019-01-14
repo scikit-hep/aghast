@@ -1545,20 +1545,18 @@ class IntegerBinning(Binning, BinLocation):
                 start -= self.min
                 stop -= self.min
                 step = 1 if where.step is None else where.step
-            if step <= 0:
-                raise ValueError("slice step cannot be zero or negative")
+            if step != 1:
+                raise ValueError("slice step can only be 1")
             start = max(start, 0)
             stop  = min(stop, 1 + self.max - self.min)
 
-            if stop - start > 0:
-                d, m = divmod(stop - start, step)
-                length = d + (1 if m != 0 else 0)
-            else:
-                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+            if stop - start <= 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
 
-            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(length, start, stop)
+            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(stop - start, start, stop)
 
             binning = IntegerBinning(start + self.min, stop + self.min - 1, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
+
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
             index[:start] = pos_underflow
             index[start:stop] = numpy.arange(stop - start)
@@ -1886,9 +1884,74 @@ class RegularBinning(Binning):
             return self, (slice(None),)
 
         elif isinstance(where, slice):
-            raise NotImplementedError
+            bin_width = (self.interval.high - self.interval.low) / float(self.num)
+            if isiloc:
+                start, stop, step = where.indices(self.num)
+            else:
+                start = 0 if where.start is None else int(round((where.start - self.interval.low)*bin_width))
+                stop = self.num if where.stop is None else int(round((where.stop - self.interval.low)*bin_width))
+                step = 1 if where.step is None else int(round(bin_width / where.step))
+            if step <= 0:
+                raise ValueError("slice step cannot be zero or negative")
+            start = max(start, 0)
+            stop  = min(stop, self.num)
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            if stop - start > 0:
+                d, m = divmod(stop - start, step)
+                length = d + (1 if m != 0 else 0)
+            else:
+                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+
+            loc = 0
+            pos = length
+            if (self.overflow is not None and self.overflow.loc_underflow != BinLocation.nonexistent) or start > 0:
+                loc += 1
+                loc_underflow = BinLocation._locations[loc]
+                pos_underflow = pos
+                pos += 1
+            else:
+                loc_underflow = BinLocation.nonexistent
+                pos_underflow = None
+            if (self.overflow is not None and self.overflow.loc_overflow != BinLocation.nonexistent) or stop < self.num:
+                loc += 1
+                loc_overflow = BinLocation._locations[loc]
+                pos_overflow = pos
+                pos += 1
+            else:
+                loc_overflow = BinLocation.nonexistent
+                pos_overflow = None
+            if (self.overflow is not None and self.overflow.loc_nanflow != BinLocation.nonexistent):
+                loc += 1
+                loc_nanflow = BinLocation._locations[loc]
+                pos_nanflow = pos
+                pos += 1
+            else:
+                loc_nanflow = BinLocation.nonexistent
+                pos_nanflow = None
+
+            interval = RealInterval(self.interval.low + start*bin_width,
+                                    self.interval.low + (start + step*length)*bin_width,
+                                    low_inclusive=self.interval.low_inclusive,
+                                    high_inclusive=self.interval.high_inclusive)
+            overflow = RealOverflow(loc_underflow=loc_underflow,
+                                    loc_overflow=loc_overflow,
+                                    loc_nanflow=loc_nanflow,
+                                    minf_mapping=RealOverflow.missing if self.overflow is None else self.overflow.minf_mapping,
+                                    pinf_mapping=RealOverflow.missing if self.overflow is None else self.overflow.pinf_mapping,
+                                    nan_mapping=RealOverflow.missing if self.overflow is None else self.overflow.nan_mapping)
+            circular = self.circular and start == 0 and stop == self.num
+            binning = RegularBinning(length, interval, overflow=overflow, circular=circular)
+
+            index = numpy.empty(self.num, dtype=numpy.int64)
+            index[:start] = pos_underflow
+            index[start:stop] = numpy.repeat(numpy.arange(length), step)
+            index[stop:] = pos_overflow
+
+            flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
+            selfmap = self._selfmap(flows, index)
+            return binning, (selfmap,)
+
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2142,7 +2205,7 @@ class EdgesBinning(Binning):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2287,7 +2350,7 @@ class IrregularBinning(Binning, OverlappingFill):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2396,10 +2459,10 @@ class CategoryBinning(Binning, BinLocation):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -2589,7 +2652,7 @@ class SparseRegularBinning(Binning, BinLocation):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2774,10 +2837,10 @@ class PredicateBinning(Binning, OverlappingFill):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -2958,10 +3021,10 @@ class VariationBinning(Binning):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
