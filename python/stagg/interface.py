@@ -1562,6 +1562,7 @@ class IntegerBinning(Binning, BinLocation):
             index[start:stop] = numpy.arange(stop - start)
             index[stop:] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+
             return binning, (selfmap,)
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -1583,6 +1584,7 @@ class IntegerBinning(Binning, BinLocation):
             index[i : i + 1] = 0
             index[i + 1 :] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+
             return binning, (selfmap,)
 
         else:
@@ -1969,9 +1971,9 @@ class RegularBinning(Binning):
             index[:start] = pos_underflow
             index[start:stop] = numpy.repeat(numpy.arange(length), step)
             index[stop:] = pos_overflow
-
             flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
             selfmap = self._selfmap(flows, index)
+
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
