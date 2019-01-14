@@ -1888,9 +1888,9 @@ class RegularBinning(Binning):
             if isiloc:
                 start, stop, step = where.indices(self.num)
             else:
-                start = 0 if where.start is None else int(round((where.start - self.interval.low)*bin_width))
-                stop = self.num if where.stop is None else int(round((where.stop - self.interval.low)*bin_width))
-                step = 1 if where.step is None else int(round(bin_width / where.step))
+                start = 0 if where.start is None else int(round((where.start - self.interval.low)/bin_width))
+                stop = self.num if where.stop is None else int(round((where.stop - self.interval.low)/bin_width))
+                step = 1 if where.step is None else int(round(where.step / bin_width))
             if step <= 0:
                 raise ValueError("slice step cannot be zero or negative")
             start = max(start, 0)
@@ -1929,6 +1929,19 @@ class RegularBinning(Binning):
                 loc_nanflow = BinLocation.nonexistent
                 pos_nanflow = None
 
+            if self.overflow is None:
+                minf_mapping = RealOverflow.missing
+                pinf_mapping = RealOverflow.missing
+                nan_mapping = RealOverflow.missing
+            else:
+                minf_mapping = self.overflow.minf_mapping
+                pinf_mapping = self.overflow.pinf_mapping
+                nan_mapping = self.overflow.nan_mapping
+            if start != 0 and self.interval.low == float("-inf") and self.interval.low_inclusive:
+                minf_mapping = RealOverflow.in_underflow
+            if stop != self.num and self.interval.high == float("inf") and self.interval.high_inclusive:
+                pinf_mapping = RealOverflow.in_overflow
+
             interval = RealInterval(self.interval.low + start*bin_width,
                                     self.interval.low + (start + step*length)*bin_width,
                                     low_inclusive=self.interval.low_inclusive,
@@ -1936,9 +1949,9 @@ class RegularBinning(Binning):
             overflow = RealOverflow(loc_underflow=loc_underflow,
                                     loc_overflow=loc_overflow,
                                     loc_nanflow=loc_nanflow,
-                                    minf_mapping=RealOverflow.missing if self.overflow is None else self.overflow.minf_mapping,
-                                    pinf_mapping=RealOverflow.missing if self.overflow is None else self.overflow.pinf_mapping,
-                                    nan_mapping=RealOverflow.missing if self.overflow is None else self.overflow.nan_mapping)
+                                    minf_mapping=minf_mapping,
+                                    pinf_mapping=pinf_mapping,
+                                    nan_mapping=nan_mapping)
             circular = self.circular and start == 0 and stop == self.num
             binning = RegularBinning(length, interval, overflow=overflow, circular=circular)
 
