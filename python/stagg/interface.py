@@ -1734,6 +1734,56 @@ class RealOverflow(Stagg, BinLocation):
         return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
 
     @staticmethod
+    def _getloc(overflow, yes_underflow, yes_overflow, length):
+        loc = 0
+        pos = length
+        if yes_underflow or (overflow is not None and overflow.loc_underflow != BinLocation.nonexistent):
+            loc += 1
+            loc_underflow = BinLocation._locations[loc]
+            pos_underflow = pos
+            pos += 1
+        else:
+            loc_underflow = BinLocation.nonexistent
+            pos_underflow = None
+        if yes_overflow or (overflow is not None and overflow.loc_overflow != BinLocation.nonexistent):
+            loc += 1
+            loc_overflow = BinLocation._locations[loc]
+            pos_overflow = pos
+            pos += 1
+        else:
+            loc_overflow = BinLocation.nonexistent
+            pos_overflow = None
+        if (overflow is not None and overflow.loc_nanflow != BinLocation.nonexistent):
+            loc += 1
+            loc_nanflow = BinLocation._locations[loc]
+            pos_nanflow = pos
+            pos += 1
+        else:
+            loc_nanflow = BinLocation.nonexistent
+            pos_nanflow = None
+
+        if overflow is None:
+            minf_mapping = RealOverflow.missing
+            pinf_mapping = RealOverflow.missing
+            nan_mapping = RealOverflow.missing
+        else:
+            minf_mapping = overflow.minf_mapping
+            pinf_mapping = overflow.pinf_mapping
+            nan_mapping = overflow.nan_mapping
+
+        if overflow is not None or yes_underflow or yes_overflow:
+            overflow = RealOverflow(loc_underflow=loc_underflow,
+                                    loc_overflow=loc_overflow,
+                                    loc_nanflow=loc_nanflow,
+                                    minf_mapping=minf_mapping,
+                                    pinf_mapping=pinf_mapping,
+                                    nan_mapping=nan_mapping)
+        else:
+            overflow = None
+
+        return overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow
+
+    @staticmethod
     def _common(one, two, pos):
         if one is not None and two is not None:
             if one.minf_mapping != two.minf_mapping:
@@ -1902,56 +1952,16 @@ class RegularBinning(Binning):
             else:
                 raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
 
-            loc = 0
-            pos = length
-            if (self.overflow is not None and self.overflow.loc_underflow != BinLocation.nonexistent) or start > 0:
-                loc += 1
-                loc_underflow = BinLocation._locations[loc]
-                pos_underflow = pos
-                pos += 1
-            else:
-                loc_underflow = BinLocation.nonexistent
-                pos_underflow = None
-            if (self.overflow is not None and self.overflow.loc_overflow != BinLocation.nonexistent) or stop < self.num:
-                loc += 1
-                loc_overflow = BinLocation._locations[loc]
-                pos_overflow = pos
-                pos += 1
-            else:
-                loc_overflow = BinLocation.nonexistent
-                pos_overflow = None
-            if (self.overflow is not None and self.overflow.loc_nanflow != BinLocation.nonexistent):
-                loc += 1
-                loc_nanflow = BinLocation._locations[loc]
-                pos_nanflow = pos
-                pos += 1
-            else:
-                loc_nanflow = BinLocation.nonexistent
-                pos_nanflow = None
-
-            if self.overflow is None:
-                minf_mapping = RealOverflow.missing
-                pinf_mapping = RealOverflow.missing
-                nan_mapping = RealOverflow.missing
-            else:
-                minf_mapping = self.overflow.minf_mapping
-                pinf_mapping = self.overflow.pinf_mapping
-                nan_mapping = self.overflow.nan_mapping
+            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, start != 0, stop != self.num, length)
             if start != 0 and self.interval.low == float("-inf") and self.interval.low_inclusive:
-                minf_mapping = RealOverflow.in_underflow
+                overflow.minf_mapping = RealOverflow.in_underflow
             if stop != self.num and self.interval.high == float("inf") and self.interval.high_inclusive:
-                pinf_mapping = RealOverflow.in_overflow
+                overflow.pinf_mapping = RealOverflow.in_overflow
 
             interval = RealInterval(self.interval.low + start*bin_width,
                                     self.interval.low + (start + step*length)*bin_width,
                                     low_inclusive=self.interval.low_inclusive,
                                     high_inclusive=self.interval.high_inclusive)
-            overflow = RealOverflow(loc_underflow=loc_underflow,
-                                    loc_overflow=loc_overflow,
-                                    loc_nanflow=loc_nanflow,
-                                    minf_mapping=minf_mapping,
-                                    pinf_mapping=pinf_mapping,
-                                    nan_mapping=nan_mapping)
             circular = self.circular and start == 0 and stop == self.num
             binning = RegularBinning(length, interval, overflow=overflow, circular=circular)
 
