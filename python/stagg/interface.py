@@ -574,6 +574,7 @@ class EndiannessEnum(Enum):
 
 class Interpretation(object):
     none    = DTypeEnum("none", stagg.stagg_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    bool    = DTypeEnum("bool", stagg.stagg_generated.DType.DType.dtype_bool, numpy.dtype(numpy.bool_))
     int8    = DTypeEnum("int8", stagg.stagg_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
     uint8   = DTypeEnum("uint8", stagg.stagg_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
     int16   = DTypeEnum("int16", stagg.stagg_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
@@ -584,7 +585,7 @@ class Interpretation(object):
     uint64  = DTypeEnum("uint64", stagg.stagg_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
     float32 = DTypeEnum("float32", stagg.stagg_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
     float64 = DTypeEnum("float64", stagg.stagg_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
-    dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
+    dtypes = [none, bool, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
     little_endian = EndiannessEnum("little_endian", stagg.stagg_generated.Endianness.Endianness.little_endian, "<")
     big_endian    = EndiannessEnum("big_endian", stagg.stagg_generated.Endianness.Endianness.big_endian, ">")
@@ -608,7 +609,10 @@ class Interpretation(object):
         elif dtype.byteorder == "<":
             endianness = cls.little_endian
 
-        if dtype.kind == "i":
+        if dtype.kind == "b":
+            return cls.bool, endianness
+
+        elif dtype.kind == "i":
             if dtype.itemsize == 1:
                 return cls.int8, endianness
             elif dtype.itemsize == 2:
@@ -864,7 +868,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         else:
             stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
@@ -972,7 +976,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         else:
             stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
@@ -4263,7 +4267,7 @@ class Column(Stagg, Interpretation):
         else:
             stagg.stagg_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.Column.ColumnStart(builder)
