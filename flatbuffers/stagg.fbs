@@ -202,7 +202,7 @@ enum NonRealMapping: byte {
   in_nanflow = 3
 }
 
-table RealOverflow {
+struct RealOverflow {
   loc_underflow: BinLocation = loc_nonexistent;
   loc_overflow: BinLocation = loc_nonexistent;
   loc_nanflow: BinLocation = loc_nonexistent;

@@ -1717,20 +1717,7 @@ class RealOverflow(Stagg, BinLocation):
         return int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent) + int(self.loc_nanflow != self.nonexistent)
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.RealOverflow.RealOverflowStart(builder)
-        if self.loc_underflow is not self.nonexistent:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddLocUnderflow(builder, self.loc_underflow.value)
-        if self.loc_overflow is not self.nonexistent:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddLocOverflow(builder, self.loc_overflow.value)
-        if self.loc_nanflow is not self.nonexistent:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddLocNanflow(builder, self.loc_nanflow.value)
-        if self.minf_mapping is not self.in_underflow:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddMinfMapping(builder, self.minf_mapping.value)
-        if self.pinf_mapping is not self.in_overflow:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddPinfMapping(builder, self.pinf_mapping.value)
-        if self.nan_mapping is not self.in_nanflow:
-            stagg.stagg_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
-        return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
+        return stagg.stagg_generated.RealOverflow.CreateRealOverflow(builder, self.loc_underflow.value, self.loc_overflow.value, self.loc_nanflow.value, self.minf_mapping.value, self.pinf_mapping.value, self.nan_mapping.value)
 
     @staticmethod
     def _getloc(overflow, yes_underflow, yes_overflow, length):
@@ -1892,12 +1879,11 @@ class RegularBinning(Binning):
         return 1
 
     def _toflatbuffers(self, builder):
-        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningStart(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
         stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))
-        if overflow is not None:
-            stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
+        if self.overflow is not None:
+            stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.circular is not False:
             stagg.stagg_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.RegularBinning.RegularBinningEnd(builder)
@@ -2084,9 +2070,6 @@ class HexagonalBinning(Binning):
         return 2
 
     def _toflatbuffers(self, builder):
-        qoverflow = None if self.qoverflow is None else self.qoverflow._toflatbuffers(builder)
-        roverflow = None if self.roverflow is None else self.roverflow._toflatbuffers(builder)
-
         stagg.stagg_generated.HexagonalBinning.HexagonalBinningStart(builder)
         stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
         stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
@@ -2100,10 +2083,10 @@ class HexagonalBinning(Binning):
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
         if self.qangle != 0.0:
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
-        if qoverflow is not None:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, qoverflow)
-        if roverflow is not None:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, roverflow)
+        if self.qoverflow is not None:
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, self.qoverflow._toflatbuffers(builder))
+        if self.roverflow is not None:
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, self.roverflow._toflatbuffers(builder))
         return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
     def _getloc(self, isiloc, where1, where2):
@@ -2190,12 +2173,11 @@ class EdgesBinning(Binning):
         builder.head = builder.head - len(edgesbuf)
         builder.Bytes[builder.head : builder.head + len(edgesbuf)] = edgesbuf
         edges = builder.EndVector(len(self.edges))
-        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
         stagg.stagg_generated.EdgesBinning.EdgesBinningStart(builder)
         stagg.stagg_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
-        if overflow is not None:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        if self.overflow is not None:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.low_inclusive is not True:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
@@ -2309,8 +2291,6 @@ class IrregularBinning(Binning, OverlappingFill):
         return 1
 
     def _toflatbuffers(self, builder):
-        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
-
         stagg.stagg_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(self.intervals))
         for x in self.intervals[::-1]:
             x._toflatbuffers(builder)
@@ -2318,8 +2298,8 @@ class IrregularBinning(Binning, OverlappingFill):
 
         stagg.stagg_generated.IrregularBinning.IrregularBinningStart(builder)
         stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
-        if overflow is not None:
-            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, overflow)
+        if self.overflow is not None:
+            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
@@ -2597,15 +2577,13 @@ class SparseRegularBinning(Binning, BinLocation):
         builder.Bytes[builder.head : builder.head + len(binsbuf)] = binsbuf
         bins = builder.EndVector(len(self.bins))
 
-        overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
-
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
         stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
         if self.origin != 0.0:
             stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
-        if overflow is not None:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, overflow)
+        if self.overflow is not None:
+            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.low_inclusive is not True:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
