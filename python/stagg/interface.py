@@ -574,6 +574,7 @@ class EndiannessEnum(Enum):
 
 class Interpretation(object):
     none    = DTypeEnum("none", stagg.stagg_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    bool    = DTypeEnum("bool", stagg.stagg_generated.DType.DType.dtype_bool, numpy.dtype(numpy.bool_))
     int8    = DTypeEnum("int8", stagg.stagg_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
     uint8   = DTypeEnum("uint8", stagg.stagg_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
     int16   = DTypeEnum("int16", stagg.stagg_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
@@ -584,7 +585,7 @@ class Interpretation(object):
     uint64  = DTypeEnum("uint64", stagg.stagg_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
     float32 = DTypeEnum("float32", stagg.stagg_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
     float64 = DTypeEnum("float64", stagg.stagg_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
-    dtypes = [none, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
+    dtypes = [none, bool, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
     little_endian = EndiannessEnum("little_endian", stagg.stagg_generated.Endianness.Endianness.little_endian, "<")
     big_endian    = EndiannessEnum("big_endian", stagg.stagg_generated.Endianness.Endianness.big_endian, ">")
@@ -608,7 +609,10 @@ class Interpretation(object):
         elif dtype.byteorder == "<":
             endianness = cls.little_endian
 
-        if dtype.kind == "i":
+        if dtype.kind == "b":
+            return cls.bool, endianness
+
+        elif dtype.kind == "i":
             if dtype.itemsize == 1:
                 return cls.int8, endianness
             elif dtype.itemsize == 2:
@@ -864,7 +868,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         else:
             stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
@@ -972,7 +976,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
         else:
             stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
@@ -1545,25 +1549,24 @@ class IntegerBinning(Binning, BinLocation):
                 start -= self.min
                 stop -= self.min
                 step = 1 if where.step is None else where.step
-            if step <= 0:
-                raise ValueError("slice step cannot be zero or negative")
+            if step != 1:
+                raise ValueError("slice step can only be 1")
             start = max(start, 0)
             stop  = min(stop, 1 + self.max - self.min)
 
-            if stop - start > 0:
-                d, m = divmod(stop - start, step)
-                length = d + (1 if m != 0 else 0)
-            else:
-                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+            if stop - start <= 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
 
-            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(length, start, stop)
+            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(stop - start, start, stop)
 
             binning = IntegerBinning(start + self.min, stop + self.min - 1, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
+
             index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
             index[:start] = pos_underflow
             index[start:stop] = numpy.arange(stop - start)
             index[stop:] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+
             return binning, (selfmap,)
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -1585,6 +1588,7 @@ class IntegerBinning(Binning, BinLocation):
             index[i : i + 1] = 0
             index[i + 1 :] = pos_overflow
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
+
             return binning, (selfmap,)
 
         else:
@@ -1727,6 +1731,56 @@ class RealOverflow(Stagg, BinLocation):
         if self.nan_mapping is not self.in_nanflow:
             stagg.stagg_generated.RealOverflow.RealOverflowAddNanMapping(builder, self.nan_mapping.value)
         return stagg.stagg_generated.RealOverflow.RealOverflowEnd(builder)
+
+    @staticmethod
+    def _getloc(overflow, yes_underflow, yes_overflow, length):
+        loc = 0
+        pos = length
+        if yes_underflow or (overflow is not None and overflow.loc_underflow != BinLocation.nonexistent):
+            loc += 1
+            loc_underflow = BinLocation._locations[loc]
+            pos_underflow = pos
+            pos += 1
+        else:
+            loc_underflow = BinLocation.nonexistent
+            pos_underflow = None
+        if yes_overflow or (overflow is not None and overflow.loc_overflow != BinLocation.nonexistent):
+            loc += 1
+            loc_overflow = BinLocation._locations[loc]
+            pos_overflow = pos
+            pos += 1
+        else:
+            loc_overflow = BinLocation.nonexistent
+            pos_overflow = None
+        if (overflow is not None and overflow.loc_nanflow != BinLocation.nonexistent):
+            loc += 1
+            loc_nanflow = BinLocation._locations[loc]
+            pos_nanflow = pos
+            pos += 1
+        else:
+            loc_nanflow = BinLocation.nonexistent
+            pos_nanflow = None
+
+        if overflow is None:
+            minf_mapping = RealOverflow.missing
+            pinf_mapping = RealOverflow.missing
+            nan_mapping = RealOverflow.missing
+        else:
+            minf_mapping = overflow.minf_mapping
+            pinf_mapping = overflow.pinf_mapping
+            nan_mapping = overflow.nan_mapping
+
+        if overflow is not None or yes_underflow or yes_overflow:
+            overflow = RealOverflow(loc_underflow=loc_underflow,
+                                    loc_overflow=loc_overflow,
+                                    loc_nanflow=loc_nanflow,
+                                    minf_mapping=minf_mapping,
+                                    pinf_mapping=pinf_mapping,
+                                    nan_mapping=nan_mapping)
+        else:
+            overflow = None
+
+        return overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow
 
     @staticmethod
     def _common(one, two, pos):
@@ -1878,9 +1932,47 @@ class RegularBinning(Binning):
             return self, (slice(None),)
 
         elif isinstance(where, slice):
-            raise NotImplementedError
+            bin_width = (self.interval.high - self.interval.low) / float(self.num)
+            if isiloc:
+                start, stop, step = where.indices(self.num)
+            else:
+                start = 0 if where.start is None else int(round((where.start - self.interval.low)/bin_width))
+                stop = self.num if where.stop is None else int(round((where.stop - self.interval.low)/bin_width))
+                step = 1 if where.step is None else int(round(where.step / bin_width))
+            if step <= 0:
+                raise ValueError("slice step cannot be zero or negative")
+            start = max(start, 0)
+            stop  = min(stop, self.num)
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            if stop - start > 0:
+                d, m = divmod(stop - start, step)
+                length = d + (1 if m != 0 else 0)
+            else:
+                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+
+            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, start != 0, stop != self.num, length)
+            if start != 0 and self.interval.low == float("-inf") and self.interval.low_inclusive:
+                overflow.minf_mapping = RealOverflow.in_underflow
+            if stop != self.num and self.interval.high == float("inf") and self.interval.high_inclusive:
+                overflow.pinf_mapping = RealOverflow.in_overflow
+
+            interval = RealInterval(self.interval.low + start*bin_width,
+                                    self.interval.low + (start + step*length)*bin_width,
+                                    low_inclusive=self.interval.low_inclusive,
+                                    high_inclusive=self.interval.high_inclusive)
+            circular = self.circular and start == 0 and stop == self.num
+            binning = RegularBinning(length, interval, overflow=overflow, circular=circular)
+
+            index = numpy.empty(self.num, dtype=numpy.int64)
+            index[:start] = pos_underflow
+            index[start:stop] = numpy.repeat(numpy.arange(length), step)
+            index[stop:] = pos_overflow
+            flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
+            selfmap = self._selfmap(flows, index)
+
+            return binning, (selfmap,)
+
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2134,7 +2226,7 @@ class EdgesBinning(Binning):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2278,7 +2370,7 @@ class IrregularBinning(Binning, OverlappingFill):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2387,10 +2479,10 @@ class CategoryBinning(Binning, BinLocation):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -2580,7 +2672,7 @@ class SparseRegularBinning(Binning, BinLocation):
         elif isinstance(where, slice):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -2765,10 +2857,10 @@ class PredicateBinning(Binning, OverlappingFill):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -2949,10 +3041,10 @@ class VariationBinning(Binning):
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, str):
+        elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
-        elif isiloc is False and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
+        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -4166,7 +4258,7 @@ class Column(Stagg, Interpretation):
         else:
             stagg.stagg_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
-                builder.PrependUInt32(x.value)
+                builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
         stagg.stagg_generated.Column.ColumnStart(builder)
