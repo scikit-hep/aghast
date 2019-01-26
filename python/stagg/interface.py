@@ -1656,14 +1656,7 @@ class RealInterval(Stagg):
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.RealInterval.RealIntervalStart(builder)
-        stagg.stagg_generated.RealInterval.RealIntervalAddLow(builder, self.low)
-        stagg.stagg_generated.RealInterval.RealIntervalAddHigh(builder, self.high)
-        if self.low_inclusive is not True:
-            stagg.stagg_generated.RealInterval.RealIntervalAddLowInclusive(builder, self.low_inclusive)
-        if self.high_inclusive is not False:
-            stagg.stagg_generated.RealInterval.RealIntervalAddHighInclusive(builder, self.high_inclusive)
-        return stagg.stagg_generated.RealInterval.RealIntervalEnd(builder)
+        return stagg.stagg_generated.RealInterval.CreateRealInterval(builder, self.low, self.high, self.low_inclusive, self.high_inclusive)
 
     def __hash__(self):
         return hash((RealInterval, self.low, self.high, self.low_inclusive, self.high_inclusive))
@@ -1845,11 +1838,10 @@ class RegularBinning(Binning):
         return 1
 
     def _toflatbuffers(self, builder):
-        interval = self.interval._toflatbuffers(builder)
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningStart(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
-        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, interval)
+        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))  # interval
         if overflow is not None:
             stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
         if self.circular is not False:
@@ -2225,13 +2217,12 @@ class IrregularBinning(Binning, OverlappingFill):
         return 1
 
     def _toflatbuffers(self, builder):
-        intervals = [x._toflatbuffers(builder) for x in self.intervals]
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
 
-        stagg.stagg_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(intervals))
-        for x in intervals[::-1]:
-            builder.PrependUOffsetTRelative(x)
-        intervals = builder.EndVector(len(intervals))
+        stagg.stagg_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(self.intervals))
+        for x in self.intervals[::-1]:
+            x._toflatbuffers(builder)
+        intervals = builder.EndVector(len(self.intervals))
 
         stagg.stagg_generated.IrregularBinning.IrregularBinningStart(builder)
         stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
