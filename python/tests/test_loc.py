@@ -254,3 +254,15 @@ class Test(unittest.TestCase):
         aloc = a.loc[5:18]
         assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[8, 18)", "(-inf, 5)"]
         assert aloc.counts.counts.array.tolist() == [10, 10, 10]
+
+        aloc = a.loc[6:17]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[8, 18)", "(-inf, 5)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10]
+
+        aloc = a.loc[8:17]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[8, 18)", "(-inf, 5)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10]
+
+        aloc = a.loc[10:17]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[8, 18)", "(-inf, 8)"]
+        assert aloc.counts.counts.array.tolist() == [10, 20]
