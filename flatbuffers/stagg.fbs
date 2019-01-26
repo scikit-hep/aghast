@@ -188,7 +188,7 @@ table IntegerBinning {
   loc_overflow: BinLocation = loc_nonexistent;
 }
 
-table RealInterval {
+struct RealInterval {
   low: double;
   high: double;
   low_inclusive: bool = true;

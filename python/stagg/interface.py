@@ -1895,7 +1895,7 @@ class RegularBinning(Binning):
         overflow = None if self.overflow is None else self.overflow._toflatbuffers(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningStart(builder)
         stagg.stagg_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
-        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))  # interval
+        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))
         if overflow is not None:
             stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, overflow)
         if self.circular is not False:
