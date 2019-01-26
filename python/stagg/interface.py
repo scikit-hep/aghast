@@ -1928,25 +1928,26 @@ class RegularBinning(Binning):
             if step <= 0:
                 raise ValueError("slice step cannot be zero or negative")
             start = max(start, 0)
-            stop  = min(stop, self.num)
+            stop = min(stop, self.num)
+            length = (stop - start) // step
+            stop = start + step*length
 
-            if stop - start > 0:
-                d, m = divmod(stop - start, step)
-                length = d + (1 if m != 0 else 0)
-            else:
-                raise IndexError("slice {0}:{1}:{2} would result in no bins".format(where.start, where.stop, where.step))
+            if stop - start <= 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
 
-            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, start != 0, stop != self.num, length)
-            if start != 0 and self.interval.low == float("-inf") and self.interval.low_inclusive:
+            yes_underflow = (start != 0)
+            yes_overflow = (stop != self.num)
+            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, yes_underflow, yes_overflow, length)
+            if yes_underflow and self.interval.low == float("-inf") and self.interval.low_inclusive:
                 overflow.minf_mapping = RealOverflow.in_underflow
-            if stop != self.num and self.interval.high == float("inf") and self.interval.high_inclusive:
+            if yes_overflow and self.interval.high == float("inf") and self.interval.high_inclusive:
                 overflow.pinf_mapping = RealOverflow.in_overflow
 
             interval = RealInterval(self.interval.low + start*bin_width,
-                                    self.interval.low + (start + step*length)*bin_width,
+                                    self.interval.low + stop*bin_width,
                                     low_inclusive=self.interval.low_inclusive,
                                     high_inclusive=self.interval.high_inclusive)
-            circular = self.circular and start == 0 and stop == self.num
+            circular = self.circular and not yes_underflow and not yes_overflow
             binning = RegularBinning(length, interval, overflow=overflow, circular=circular)
 
             index = numpy.empty(self.num, dtype=numpy.int64)
@@ -2206,7 +2207,46 @@ class EdgesBinning(Binning):
             return self, (slice(None),)
 
         elif isinstance(where, slice):
-            raise NotImplementedError
+            if isiloc:
+                start, stop, step = where.indices(len(self.edges) - 1)
+                if step <= 0:
+                    raise ValueError("slice step cannot be zero or negative")
+            else:
+                xstart = self.edges[0] if where.start is None else where.start
+                xstop = self.edges[-1] if where.stop is None else where.stop
+                if where.step is not None:
+                    raise ValueError("EdgesBinning.loc slice cannot have a step")
+                start, stop = numpy.searchsorted(self.edges, (xstart, xstop), side="left")
+                if self.edges[start] > xstart:
+                    start -= 1
+                step = 1
+            start = max(start, 0)
+            stop = min(stop, len(self.edges) - 1)
+            length = (stop - start) // step
+            stop = start + step*length
+
+            if stop - start <= 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+            yes_underflow = (start != 0)
+            yes_overflow  = (stop != len(self.edges) - 1)
+            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, yes_underflow, yes_overflow, length)
+            if yes_underflow and self.edges[0] == float("-inf") and self.low_inclusive:
+                overflow.minf_mapping = RealOverflow.in_underflow
+            if yes_overflow and self.edges[-1] == float("inf") and self.high_inclusive:
+                overflow.pinf_mapping = RealOverflow.in_overflow
+
+            circular = self.circular and not yes_underflow and not yes_overflow
+            binning = EdgesBinning(self.edges[start:(stop + 1):step], overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, circular=circular)
+
+            index = numpy.empty(len(self.edges) - 1, dtype=numpy.int64)
+            index[:start] = pos_underflow
+            index[start:stop] = numpy.repeat(numpy.arange(length), step)
+            index[stop:] = pos_overflow
+            flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
+            selfmap = self._selfmap(flows, index)
+
+            return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError

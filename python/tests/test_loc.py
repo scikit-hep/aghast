@@ -191,3 +191,53 @@ class Test(unittest.TestCase):
         aloc = a.loc[0:100:1]
         assert aloc.axis[0].binning.toCategoryBinning().categories == ['[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, 5)', '(-inf, 0)']
         assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 100]
+
+        a = Histogram([Axis(RegularBinning(19, RealInterval(-5, 4.5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4.5)", "[-4.5, -4)", "[-4, -3.5)", "[-3.5, -3)", "[-3, -2.5)", "[-2.5, -2)", "[-2, -1.5)", "[-1.5, -1)", "[-1, -0.5)", "[-0.5, 0)", "[0, 0.5)", "[0.5, 1)", "[1, 1.5)", "[1.5, 2)", "[2, 2.5)", "[2.5, 3)", "[3, 3.5)", "[3.5, 4)", "[4, 4.5)"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+
+        aloc = a.iloc[::2]
+        print(aloc.axis[0].binning.toCategoryBinning().categories)
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, +inf)']
+        assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 20, 20, 20, 20, 10]
+
+    def test_loc_EdgesBinning(self):
+        a = Histogram([Axis(EdgesBinning([3.3, 5.5, 10.0, 55.5, 100.0]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10, 10]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)", "[55.5, 100)"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 10)", "[10, 100)"]
+        assert aloc.counts.counts.array.tolist() == [20, 20]
+
+        aloc = a.loc[5.4:]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)", "[55.5, 100)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.loc[5.5:]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5.5, 10)", "[10, 55.5)", "[55.5, 100)", "(-inf, 5.5)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.loc[5.6:]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5.5, 10)", "[10, 55.5)", "[55.5, 100)", "(-inf, 5.5)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.loc[:55.6]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)", "[55.5, 100)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.loc[:55.5]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)", "[55.5, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        aloc = a.loc[:55.4]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)", "[55.5, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 10]
+
+        a = Histogram([Axis(EdgesBinning([3.3, 5.5, 10.0, 55.5]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[3.3, 5.5)", "[5.5, 10)", "[10, 55.5)"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10]
+
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 10)", "[10, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [20, 10]
