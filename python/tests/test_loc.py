@@ -241,3 +241,16 @@ class Test(unittest.TestCase):
         aloc = a.iloc[::2]
         assert aloc.axis[0].binning.toCategoryBinning().categories == ["[3.3, 10)", "[10, +inf)"]
         assert aloc.counts.counts.array.tolist() == [20, 10]
+
+    def test_loc_IrregularBinning(self):
+        a = Histogram([Axis(IrregularBinning([RealInterval(5, 10), RealInterval(8, 18), RealInterval(0, 1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[8, 18)", "[0, 1)"]
+        assert a.counts.counts.array.tolist() == [10, 10, 10]
+
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[0, 1)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10]
+
+        aloc = a.loc[5:18]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[5, 10)", "[8, 18)", "(-inf, 5)"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10]

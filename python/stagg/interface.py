@@ -660,6 +660,7 @@ class InterpretedBuffer(Interpretation):
         dtype = self.numpy_dtype
 
         buf = self.flatarray.reshape(oldshape, order=order)
+        original = buf
 
         i = len(oldshape)
         newshape = ()
@@ -671,6 +672,14 @@ class InterpretedBuffer(Interpretation):
             else:
                 newshape = binning._binshape() + newshape
                 newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
+                for j in range(len(selfmap)):
+                    if isinstance(selfmap[j], numpy.ndarray):
+                        clear = (selfmap[j] < 0)
+                        if clear.any():
+                            if buf is original:
+                                buf = buf.copy()
+                            buf[(Ellipsis, clear) + (slice(None),)*(len(selfmap) - j - 1)] = 0
+                            selfmap[j][clear] = 0
                 numpy.add.at(newbuf, i*(slice(None),) + selfmap, buf)
                 buf = newbuf
 
@@ -1550,7 +1559,7 @@ class IntegerBinning(Binning, BinLocation):
                 stop -= self.min
                 step = 1 if where.step is None else where.step
             if step != 1:
-                raise ValueError("slice step can only be 1")
+                raise IndexError("IntegerBinning slice step can only be 1 or None")
             start = max(start, 0)
             stop  = min(stop, 1 + self.max - self.min)
 
@@ -1926,7 +1935,7 @@ class RegularBinning(Binning):
                 stop = self.num if where.stop is None else int(round((where.stop - self.interval.low)/bin_width))
                 step = 1 if where.step is None else int(round(where.step / bin_width))
             if step <= 0:
-                raise ValueError("slice step cannot be zero or negative")
+                raise IndexError("slice step cannot be zero or negative")
             start = max(start, 0)
             stop = min(stop, self.num)
             length = (stop - start) // step
@@ -2210,12 +2219,12 @@ class EdgesBinning(Binning):
             if isiloc:
                 start, stop, step = where.indices(len(self.edges) - 1)
                 if step <= 0:
-                    raise ValueError("slice step cannot be zero or negative")
+                    raise IndexError("slice step cannot be zero or negative")
             else:
+                if where.step is not None:
+                    raise IndexError("EdgesBinning.loc slice cannot have a step")
                 xstart = self.edges[0] if where.start is None else where.start
                 xstop = self.edges[-1] if where.stop is None else where.stop
-                if where.step is not None:
-                    raise ValueError("EdgesBinning.loc slice cannot have a step")
                 start, stop = numpy.searchsorted(self.edges, (xstart, xstop), side="left")
                 if self.edges[start] > xstart:
                     start -= 1
@@ -2388,8 +2397,55 @@ class IrregularBinning(Binning, OverlappingFill):
             return self, (slice(None),)
 
         elif isinstance(where, slice):
-            raise NotImplementedError
+            if isiloc:
+                start, stop, step = where.indices(len(self.intervals))
+                if step <= 0:
+                    raise IndexError("slice step cannot be zero or negative")
+                start = max(start, 0)
+                stop = min(stop, len(self.intervals))
+                d, m = divmod(stop - start, step)
+                length = d + (1 if m != 0 else 0)
+                stop = start + step*length
 
+                yes_underflow, yes_overflow = False, False
+                index = numpy.full(len(self.intervals), -1, dtype=numpy.int64)
+                index[start:stop:step] = numpy.arange(length)
+                intervals = [x.detached() for x in self.intervals[start:stop:step]]
+
+            else:
+                if where.step is not None:
+                    raise IndexError("IrregularBinning.loc slice cannot have a step")
+                yes_underflow, yes_overflow = False, False
+                index = numpy.empty(len(self.intervals), dtype=numpy.int64)
+                length = 0
+                intervals = []
+                for i, interval in enumerate(self.intervals):
+                    if where.start is not None and where.start >= interval.high:
+                        yes_underflow = True
+                        index[i] = -3
+                    elif where.stop is not None and where.stop <= interval.low:
+                        yes_overflow = True
+                        index[i] = -2
+                    else:
+                        index[i] = length
+                        length += 1
+                        intervals.append(interval.detached())
+
+            if length == 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+            overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, yes_underflow, yes_overflow, length)
+            binning = IrregularBinning(intervals, overflow=overflow, overlapping_fill=self.overlapping_fill)
+
+            if pos_underflow is not None:
+                index[index == -3] = pos_underflow
+            if pos_overflow is not None:
+                index[index == -2] = pos_overflow
+            flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
+            selfmap = self._selfmap(flows, index)
+
+            return binning, (selfmap,)
+                
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             raise NotImplementedError
 
