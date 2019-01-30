@@ -2549,18 +2549,62 @@ class CategoryBinning(Binning, BinLocation):
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif isinstance(where, slice):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, slice):
+            start, stop, step = where.indices(len(self.categories))
+            if step <= 0:
+                raise IndexError("slice step cannot be zero or negative")
+            start = max(start, 0)
+            stop = min(stop, len(self.categories))
+            d, m = divmod(stop - start, step)
+            length = d + (1 if m != 0 else 0)
+            stop = start + step*length
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
+            if length == 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+            categories = self.categories[start:stop:step]
+            index = numpy.full(len(self.categories), len(categories), dtype=numpy.int64)
+            index[start:stop:step] = numpy.arange(length)
+
+            if self.loc_overflow != BinLocation.nonexistent or (index == len(categories)).any():
+                loc_overflow = BinLocation.above1
+                pos_overflow = len(categories)
+            else:
+                loc_overflow = BinLocation.nonexistent
+                pos_overflow = None
+
+            binning = CategoryBinning(categories, loc_overflow=loc_overflow)
+            selfmap = self._selfmap([(self.loc_overflow, pos_overflow)], index)
+
+            return binning, (selfmap,)
+            
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
 
         elif not isiloc and isinstance(where, str):
             raise NotImplementedError
 
         elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
-            raise NotImplementedError
+            lookup = {x: j for j, x in enumerate(self.categories)}
+            index = numpy.full(len(lookup), len(where), dtype=numpy.int64)
+            for i, x in enumerate(where):
+                j = lookup.get(x, None)
+                if j is None:
+                    raise IndexError("CategoryBinning does not have category {0}".format(repr(x)))
+                index[j] = i
 
+            if self.loc_overflow != BinLocation.nonexistent or (index == len(where)).any():
+                loc_overflow = BinLocation.above1
+                pos_overflow = len(where)
+            else:
+                loc_overflow = BinLocation.nonexistent
+                pos_overflow = None
+
+            binning = CategoryBinning(where, loc_overflow=loc_overflow)
+            selfmap = self._selfmap([(self.loc_overflow, pos_overflow)], index)
+
+            return binning, (selfmap,)
+            
         else:
             where = numpy.array(where, copy=False)
             if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):

@@ -197,7 +197,6 @@ class Test(unittest.TestCase):
         assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 
         aloc = a.iloc[::2]
-        print(aloc.axis[0].binning.toCategoryBinning().categories)
         assert aloc.axis[0].binning.toCategoryBinning().categories == ['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, +inf)']
         assert aloc.counts.counts.array.tolist() == [20, 20, 20, 20, 20, 20, 20, 20, 20, 10]
 
@@ -266,3 +265,43 @@ class Test(unittest.TestCase):
         aloc = a.loc[10:17]
         assert aloc.axis[0].binning.toCategoryBinning().categories == ["[8, 18)", "(-inf, 8)"]
         assert aloc.counts.counts.array.tolist() == [10, 20]
+
+    def test_loc_CategoryBinning(self):
+        a = Histogram([Axis(CategoryBinning(["one", "two", "three", "four", "five"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([10, 10, 10, 10, 10]))))
+        assert a.axis[0].binning.loc_overflow == CategoryBinning.nonexistent
+        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10]
+
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
+        assert aloc.axis[0].binning.categories == ["one", "three", "five"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 20]
+
+        aloc = a.iloc[3:]
+        assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
+        assert aloc.axis[0].binning.categories == ["four", "five"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 30]
+
+        a = Histogram([Axis(CategoryBinning(["one", "two", "three", "four", "five"], loc_overflow=CategoryBinning.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([100, 10, 10, 10, 10, 10]))))
+        assert a.axis[0].binning.loc_overflow == CategoryBinning.below1
+        assert a.counts.counts.array.tolist() == [100, 10, 10, 10, 10, 10]
+
+        aloc = a.iloc[::2]
+        assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
+        assert aloc.axis[0].binning.categories == ["one", "three", "five"]
+        assert aloc.counts.counts.array.tolist() == [10, 10, 10, 120]
+
+        a = Histogram([Axis(CategoryBinning(["one", "two", "three", "four", "five"]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([1, 2, 3, 4, 5]))))
+        assert a.axis[0].binning.loc_overflow == CategoryBinning.nonexistent
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
+        aloc = a.loc[["four", "two", "three"]]
+        assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
+        assert aloc.counts.counts.array.tolist() == [4, 2, 3, 6]
+
+        a = Histogram([Axis(CategoryBinning(["one", "two", "three", "four", "five"], loc_overflow=CategoryBinning.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([100, 1, 2, 3, 4, 5]))))
+        assert a.axis[0].binning.loc_overflow == CategoryBinning.below1
+        assert a.counts.counts.array.tolist() == [100, 1, 2, 3, 4, 5]
+
+        aloc = a.loc[["four", "two", "three"]]
+        assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
+        assert aloc.counts.counts.array.tolist() == [4, 2, 3, 106]
