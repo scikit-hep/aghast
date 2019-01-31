@@ -1579,26 +1579,12 @@ class IntegerBinning(Binning, BinLocation):
             return binning, (selfmap,)
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
-            if isiloc:
-                i = where
-                if i < 0:
-                    i += 1 + self.max - self.min
-            else:
-                i = where - self.min
-
+            i = where
+            if i < 0:
+                i += 1 + self.max - self.min
             if not 0 <= i < 1 + self.max - self.min:
                 raise IndexError("index {0} is out of bounds".format(where))
-
-            loc_underflow, pos_underflow, loc_overflow, pos_overflow = self._getloc_flows(1, i, i + 1)
-
-            binning = IntegerBinning(i + self.min, i + self.min, loc_underflow=loc_underflow, loc_overflow=loc_overflow)
-            index = numpy.empty(1 + self.max - self.min, dtype=numpy.int64)
-            index[:i] = pos_underflow
-            index[i : i + 1] = 0
-            index[i + 1 :] = pos_overflow
-            selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
-
-            return binning, (selfmap,)
+            return self._getloc(isiloc, slice(i, i))
 
         else:
             raise IndexError("IntegerBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index")
@@ -1970,10 +1956,17 @@ class RegularBinning(Binning):
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             i = int(round((where - self.interval.low) / bin_width))
-            return self._getloc(True, slice(i, i + 1))
+            if not 0 <= i < self.num:
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += self.num
+            if not 0 <= i < self.num:
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         else:
             raise IndexError("RegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
@@ -2267,10 +2260,17 @@ class EdgesBinning(Binning):
             i = numpy.searchsorted(self.edges, where, side="left")
             if self.edges[i] > where:
                 i -= 1
-            return self._getloc(True, slice(i, i + 1))
+            if not 0 <= i < len(self.edges) - 1:
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.edges)
+            if not 0 <= i < len(self.edges) - 1:
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         else:
             raise IndexError("EdgesBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
@@ -2463,10 +2463,20 @@ class IrregularBinning(Binning, OverlappingFill):
             return binning, (selfmap,)
                 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+            for interval in self.intervals:
+                if interval.low <= where <= interval.high:
+                    break
+            else:
+                raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(False, slice(where, where))
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.intervals)
+            if not 0 <= i < len(self.intervals):
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         else:
             where = numpy.array(where, copy=False)
@@ -2595,7 +2605,12 @@ class CategoryBinning(Binning, BinLocation):
             return binning, (selfmap,)
             
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.categories)
+            if not 0 <= i < len(self.categories):
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         elif not isiloc and isinstance(where, str):
             return self._getloc(False, [where])
@@ -2898,10 +2913,17 @@ class SparseRegularBinning(Binning, BinLocation):
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
             i = int(round((where - self.origin) / self.bin_width))
-            return self._getloc(True, slice(i, i + 1))
+            if not self.minbin <= i <= self.maxbin:
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(False, slice(where, where))
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.bins)
+            if not 0 <= i < len(self.bins):
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         else:
             where = numpy.array(where, copy=False)
@@ -3114,7 +3136,12 @@ class PredicateBinning(Binning, OverlappingFill):
             return binning, (index,)
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.predicates)
+            if not 0 <= i < len(self.predicates):
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         elif not isiloc and isinstance(where, str):
             return self._getloc(False, [where])
@@ -3326,7 +3353,12 @@ class VariationBinning(Binning):
             return binning, (index,)
 
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            return self._getloc(True, slice(where, where + 1))
+            i = where
+            if i < 0:
+                i += len(self.variations)
+            if not 0 <= i < len(self.variations):
+                raise IndexError("index {0} is out of bounds".format(where))
+            return self._getloc(True, slice(i, i))
 
         else:
             where = numpy.array(where, copy=False)
