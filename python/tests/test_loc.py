@@ -335,3 +335,9 @@ class Test(unittest.TestCase):
         assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
         assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
 
+        aloc = a.loc[::20]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[40, 60)", "[20, 40)", "[-20, 0)", "[80, 100)", "[-60, -40)"]
+        assert aloc.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+

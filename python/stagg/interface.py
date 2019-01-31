@@ -2826,16 +2826,18 @@ class SparseRegularBinning(Binning, BinLocation):
                 binning = SparseRegularBinning(self.bins[start:stop], self.bin_width, origin=self.origin, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=self.minbin, maxbin=self.maxbin)
 
             else:
-                lowest  = self.bins.min()
-                highest = self.bins.max() + 1
-                exactstart = lowest if where.start is None else int(round((where.start - self.origin) / self.bin_width))
-                exactstop = highest if where.stop is None else int(round((where.stop - self.origin) / self.bin_width))
                 step = 1 if where.step is None else int(round(where.step / self.bin_width))
                 if step <= 0:
                     raise IndexError("slice step cannot be zero or negative")
+                lowest  = (int(self.bins.min()) // step) * step
+                highest = int(self.bins.max()) + 1
+                exactstart = lowest if where.start is None else int(round((where.start - self.origin) / self.bin_width))
+                exactstop = highest if where.stop is None else int(round((where.stop - self.origin) / self.bin_width))
                 start = max(exactstart, lowest)
                 stop = min(exactstop, highest)
-                length = (stop - start) // step
+
+                d, m = divmod(stop - start, step)
+                length = d + (1 if m != 0 else 0)
                 stop = start + step*length
 
                 origin = self.bin_width*start + self.origin
@@ -2847,12 +2849,8 @@ class SparseRegularBinning(Binning, BinLocation):
                 if len(bins) <= 0:
                     raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
 
-                overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, (start != lowest), (stop != highest), len(bins))
+                overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, below.any(), above.any(), len(bins))
 
-                print("self.bins", self.bins, "self.bin_width", self.bin_width, "self.origin", self.origin)
-                print("bin", bins, "bin_width", self.bin_width*step, "origin", origin)
-                print("pos_underflow", pos_underflow, "pos_overflow", pos_overflow)
-                
                 index = numpy.empty(len(self.bins), dtype=numpy.int64)
                 if pos_underflow is not None:
                     index[below] = pos_underflow
@@ -2860,23 +2858,17 @@ class SparseRegularBinning(Binning, BinLocation):
                 if pos_overflow is not None:
                     index[above] = pos_overflow
 
-                print("index", index)
-
-                print("where.stop", where.stop, "exactstop", exactstop, "stop", stop)
-
                 minbin = self.minbin if where.start is None else exactstart
                 maxbin = self.maxbin if where.stop is None else exactstop - 1
                 minbin = (minbin - start) // step
                 maxbin = (maxbin - start) // step
-                minbin = max(int(minbin), -9223372036854775808)
-                maxbin = min(int(maxbin), 9223372036854775807)
+                minbin = max(minbin, -9223372036854775808)
+                maxbin = min(maxbin, 9223372036854775807)
 
                 binning = SparseRegularBinning(bins, self.bin_width*step, origin=origin, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
 
             flows = [] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)]
             selfmap = self._selfmap(flows, index)
-
-            print("selfmap", selfmap)
 
             return binning, (selfmap,)
 
