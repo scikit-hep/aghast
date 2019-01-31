@@ -1917,8 +1917,8 @@ class RegularBinning(Binning):
             if isiloc:
                 start, stop, step = where.indices(self.num)
             else:
-                start = 0 if where.start is None else int(round((where.start - self.interval.low) / bin_width))
-                stop = self.num if where.stop is None else int(round((where.stop - self.interval.low) / bin_width))
+                start = 0 if where.start is None else int(math.trunc((where.start - self.interval.low) / bin_width))
+                stop = self.num if where.stop is None else int(math.ceil((where.stop - self.interval.low) / bin_width))
                 step = 1 if where.step is None else int(round(where.step / bin_width))
             if step <= 0:
                 raise IndexError("slice step cannot be zero or negative")
@@ -1955,7 +1955,7 @@ class RegularBinning(Binning):
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            i = int(round((where - self.interval.low) / bin_width))
+            i = int(math.trunc((where - self.interval.low) / bin_width))
             if not 0 <= i < self.num:
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
@@ -2870,8 +2870,8 @@ class SparseRegularBinning(Binning, BinLocation):
                     raise IndexError("slice step cannot be zero or negative")
                 lowest  = (int(self.bins.min()) // step) * step
                 highest = int(self.bins.max()) + 1
-                exactstart = lowest if where.start is None else int(round((where.start - self.origin) / self.bin_width))
-                exactstop = highest if where.stop is None else int(round((where.stop - self.origin) / self.bin_width))
+                exactstart = lowest if where.start is None else int(math.trunc((where.start - self.origin) / self.bin_width))
+                exactstop = highest if where.stop is None else int(math.ceil((where.stop - self.origin) / self.bin_width))
                 start = max(exactstart, lowest)
                 stop = min(exactstop, highest)
 
@@ -2885,12 +2885,14 @@ class SparseRegularBinning(Binning, BinLocation):
                 above = (bins >= length)
                 good = numpy.logical_not(below | above)
                 bins = bins[good]
-                if len(bins) <= 0:
-                    raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+                if len(bins) == 0:
+                    bins = numpy.array([0], dtype=bins.dtype)
+                    origin = exactstart*self.bin_width + self.origin
 
                 overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, below.any(), above.any(), len(bins))
 
-                index = numpy.empty(len(self.bins), dtype=numpy.int64)
+                index = numpy.full(len(self.bins), -1, dtype=numpy.int64)
                 if pos_underflow is not None:
                     index[below] = pos_underflow
                 index[good] = numpy.arange(len(bins))
@@ -2912,7 +2914,7 @@ class SparseRegularBinning(Binning, BinLocation):
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            i = int(round((where - self.origin) / self.bin_width))
+            i = int(math.trunc((where - self.origin) / self.bin_width))
             if not self.minbin <= i <= self.maxbin:
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(False, slice(where, where))
