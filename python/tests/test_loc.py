@@ -305,3 +305,33 @@ class Test(unittest.TestCase):
         aloc = a.loc[["four", "two", "three"]]
         assert aloc.axis[0].binning.loc_overflow == CategoryBinning.above1
         assert aloc.counts.counts.array.tolist() == [4, 2, 3, 106]
+
+    def test_loc_SparseRegularBinning(self):
+        a = Histogram([Axis(SparseRegularBinning([5, 3, -2, 8, -5], 10.0))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([1, 2, 3, 4, 5]))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
+        aloc = a.iloc[2:]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert aloc.counts.counts.array.tolist() == [3, 4, 5]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
+        aloc = a.loc[30:]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[80, 90)", "(-inf, 30)"]
+        assert aloc.counts.counts.array.tolist() == [1, 2, 4, 8]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
+        aloc = a.loc[:30]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[-20, -10)", "[-50, -40)", "[30, +inf)"]
+        assert aloc.counts.counts.array.tolist() == [3, 5, 7]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
+        aloc = a.loc[30::20]
+        assert aloc.axis[0].binning.toCategoryBinning().categories == ["[50, 70)", "[30, 50)", "[70, 90)", "(-inf, 30)"]
+        assert aloc.counts.counts.array.tolist() == [1, 2, 4, 8]
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[50, 60)", "[30, 40)", "[-20, -10)", "[80, 90)", "[-50, -40)"]
+        assert a.counts.counts.array.tolist() == [1, 2, 3, 4, 5]
+
