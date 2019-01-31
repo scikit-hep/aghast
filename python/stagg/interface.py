@@ -1969,10 +1969,11 @@ class RegularBinning(Binning):
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            raise NotImplementedError
+            i = int(round((where - self.interval.low) / bin_width))
+            return self._getloc(True, slice(i, i + 1))
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         else:
             raise IndexError("RegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
@@ -2263,10 +2264,13 @@ class EdgesBinning(Binning):
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            raise NotImplementedError
+            i = numpy.searchsorted(self.edges, where, side="left")
+            if self.edges[i] > where:
+                i -= 1
+            return self._getloc(True, slice(i, i + 1))
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         else:
             raise IndexError("EdgesBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
@@ -2459,10 +2463,10 @@ class IrregularBinning(Binning, OverlappingFill):
             return binning, (selfmap,)
                 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            raise NotImplementedError
+            return self._getloc(False, slice(where, where))
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         else:
             where = numpy.array(where, copy=False)
@@ -2591,10 +2595,10 @@ class CategoryBinning(Binning, BinLocation):
             return binning, (selfmap,)
             
         elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+            return self._getloc(True, slice(where, where + 1))
 
         elif not isiloc and isinstance(where, str):
-            raise NotImplementedError
+            return self._getloc(False, [where])
 
         elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             lookup = {x: j for j, x in enumerate(self.categories)}
@@ -2893,10 +2897,11 @@ class SparseRegularBinning(Binning, BinLocation):
             return binning, (selfmap,)
 
         elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
-            raise NotImplementedError
+            i = int(round((where - self.origin) / self.bin_width))
+            return self._getloc(True, slice(i, i + 1))
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         else:
             where = numpy.array(where, copy=False)
@@ -3018,10 +3023,7 @@ class FractionBinning(Binning):
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif isinstance(where, slice):
-            raise NotImplementedError
-
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isinstance(where, (bool, numpy.bool_, numpy.bool)):
             raise NotImplementedError
 
         else:
@@ -3087,10 +3089,10 @@ class PredicateBinning(Binning, OverlappingFill):
         if where is None:
             return None, (slice(None),)
 
-        elif iloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif iloc and isinstance(where, slice):
+        elif isiloc and isinstance(where, slice):
             start, stop, step = where.indices(len(self.predicates))
             if step <= 0:
                 raise IndexError("slice step cannot be zero or negative")
@@ -3111,11 +3113,11 @@ class PredicateBinning(Binning, OverlappingFill):
 
             return binning, (index,)
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         elif not isiloc and isinstance(where, str):
-            raise NotImplementedError
+            return self._getloc(False, [where])
 
         elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             lookup = {x: j for j, x in enumerate(self.predicates)}
@@ -3299,10 +3301,10 @@ class VariationBinning(Binning):
         if where is None:
             return None, (slice(None),)
 
-        elif iloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif iloc and isinstance(where, slice):
+        elif isiloc and isinstance(where, slice):
             start, stop, step = where.indices(len(self.variations))
             if step <= 0:
                 raise IndexError("slice step cannot be zero or negative")
@@ -3323,8 +3325,8 @@ class VariationBinning(Binning):
 
             return binning, (index,)
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
+        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+            return self._getloc(True, slice(where, where + 1))
 
         else:
             where = numpy.array(where, copy=False)
