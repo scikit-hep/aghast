@@ -2558,7 +2558,7 @@ class CategoryBinning(Binning, BinLocation):
         if where is None:
             return None, (slice(None),)
 
-        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
         elif isiloc and isinstance(where, slice):
@@ -3087,10 +3087,10 @@ class PredicateBinning(Binning, OverlappingFill):
         if where is None:
             return None, (slice(None),)
 
-        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif iloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif isinstance(where, slice):
+        elif iloc and isinstance(where, slice):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
@@ -3271,10 +3271,10 @@ class VariationBinning(Binning):
         if where is None:
             return None, (slice(None),)
 
-        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif iloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif isinstance(where, slice):
+        elif iloc and isinstance(where, slice):
             raise NotImplementedError
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
