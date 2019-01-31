@@ -2861,7 +2861,7 @@ class SparseRegularBinning(Binning, BinLocation):
                 stop = start + step*length
 
                 origin = self.bin_width*start + self.origin
-                bins, mods = numpy.divmod(self.bins - start, step)
+                bins = (self.bins - start) // step
                 below = (bins < 0)
                 above = (bins >= length)
                 good = numpy.logical_not(below | above)
