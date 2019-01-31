@@ -1978,7 +1978,12 @@ class RegularBinning(Binning):
             raise IndexError("RegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
 
     def _restructure(self, other):
-        assert isinstance(other, RegularBinning) and self.num == other.num and self.interval == other.interval
+        assert isinstance(other, RegularBinning)
+        if self.num != other.num:
+            raise ValueError("cannot add RegularBinnings because they have different nums: {0} vs {1}".format(self.num, other.num))
+        if self.interval != other.interval:
+            raise ValueError("cannot add RegularBinnings because they have different intervals: {0} vs {1}".format(self.interval, other.interval))
+
         circular = self.circular and other.circular
 
         if self.overflow == other.overflow:
@@ -2267,7 +2272,14 @@ class EdgesBinning(Binning):
             raise IndexError("EdgesBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
 
     def _restructure(self, other):
-        assert isinstance(other, EdgesBinning) and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive   # and _sameedges(self.edges, other.edges)
+        assert isinstance(other, EdgesBinning)
+        if not _sameedges(self.edges, other.edges):
+            raise ValueError("cannot add EdgesBinnings because they have different edges: {0} vs {1}".format(self.edges, other.edges))
+        if self.low_inclusive != other.low_inclusive:
+            raise ValueError("cannot add EdgesBinnings because they have different low_inclusives: {0} vs {1}".format(self.low_inclusive, other.low_inclusive))
+        if self.high_inclusive != other.high_inclusive:
+            raise ValueError("cannot add EdgesBinnings because they have different high_inclusives: {0} vs {1}".format(self.high_inclusive, other.high_inclusive))
+
         circular = self.circular and other.circular
 
         if self.overflow == other.overflow:
@@ -2744,6 +2756,14 @@ class SparseRegularBinning(Binning, BinLocation):
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddMaxbin(builder, self.maxbin)
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
+    def originto(self, origin):
+        numbins = int(round((origin - self.origin) / self.bin_width))
+        origin = numbins*self.bin_width + self.origin
+        bins = self.bins + numbins
+        minbin = max(self.minbin + numbins, -9223372036854775808)
+        maxbin = min(self.maxbin + numbins, 9223372036854775807)
+        return SparseRegularBinning(bins, self.bin_width, origin, overflow=self.overflow.detached(), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
+
     def toIrregularBinning(self):
         if self.low_inclusive and self.high_inclusive:
             raise ValueError("SparseRegularBinning.interval.low_inclusive and SparseRegularBinning.interval.high_inclusive cannot both be True")
@@ -2890,7 +2910,18 @@ class SparseRegularBinning(Binning, BinLocation):
                 raise IndexError("SparseRegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows floating point numbers")
 
     def _restructure(self, other):
-        assert isinstance(other, SparseRegularBinning) and self.bin_width == other.bin_width and self.origin == other.origin and self.low_inclusive == other.low_inclusive and self.high_inclusive == other.high_inclusive
+        assert isinstance(other, SparseRegularBinning)
+        if self.bin_width != other.bin_width:
+            raise ValueError("cannot add SparseRegularBinnings because they have different bin_widths: {0} vs {1}".format(self.bin_width, other.bin_width))
+        if self.origin != other.origin:
+            original = other.origin
+            other = other.originto(self.origin)
+            if self.origin != other.origin:
+                raise ValueError("cannot add SparseRegularBinnings because they have different origins: {0} vs {1}".format(self.origin, original))
+        if self.low_inclusive != other.low_inclusive:
+            raise ValueError("cannot add SparseRegularBinnings because they have different low_inclusives: {0} vs {1}".format(self.low_inclusive, other.low_inclusive))
+        if self.high_inclusive != other.high_inclusive:
+            raise ValueError("cannot add SparseRegularBinnings because they have different high_inclusives: {0} vs {1}".format(self.high_inclusive, other.high_inclusive))
 
         bins = numpy.concatenate((self.bins, other.bins[~numpy.isin(other.bins, self.bins, assume_unique=True)]))
         minbin = max(self.minbin, other.minbin)
