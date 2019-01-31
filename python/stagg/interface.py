@@ -3091,7 +3091,25 @@ class PredicateBinning(Binning, OverlappingFill):
             return self, (slice(None),)
 
         elif iloc and isinstance(where, slice):
-            raise NotImplementedError
+            start, stop, step = where.indices(len(self.predicates))
+            if step <= 0:
+                raise IndexError("slice step cannot be zero or negative")
+            start = max(start, 0)
+            stop = min(stop, len(self.predicates))
+            d, m = divmod(stop - start, step)
+            length = d + (1 if m != 0 else 0)
+            stop = start + step*length
+
+            if length == 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+            predicates = self.predicates[start:stop:step]
+            index = numpy.full(len(self.predicates), -1, dtype=numpy.int64)
+            index[start:stop:step] = numpy.arange(length)
+
+            binning = PredicateBinning(predicates, overlapping_fill=self.overlapping_fill)
+
+            return binning, (index,)
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
             raise NotImplementedError
@@ -3100,7 +3118,17 @@ class PredicateBinning(Binning, OverlappingFill):
             raise NotImplementedError
 
         elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
-            raise NotImplementedError
+            lookup = {x: j for j, x in enumerate(self.predicates)}
+            index = numpy.full(len(lookup), -1, dtype=numpy.int64)
+            for i, x in enumerate(where):
+                j = lookup.get(x, None)
+                if j is None:
+                    raise IndexError("PredicateBinning does not have predicate {0}".format(repr(x)))
+                index[j] = i
+
+            binning = PredicateBinning(where, overlapping_fill=self.overlapping_fill)
+
+            return binning, (index,)
 
         else:
             where = numpy.array(where, copy=False)
@@ -3275,15 +3303,27 @@ class VariationBinning(Binning):
             return self, (slice(None),)
 
         elif iloc and isinstance(where, slice):
-            raise NotImplementedError
+            start, stop, step = where.indices(len(self.variations))
+            if step <= 0:
+                raise IndexError("slice step cannot be zero or negative")
+            start = max(start, 0)
+            stop = min(stop, len(self.variations))
+            d, m = divmod(stop - start, step)
+            length = d + (1 if m != 0 else 0)
+            stop = start + step*length
+
+            if length == 0:
+                raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
+
+            variations = self.variations[start:stop:step]
+            index = numpy.full(len(self.variations), -1, dtype=numpy.int64)
+            index[start:stop:step] = numpy.arange(length)
+
+            binning = VariationBinning([x.detached() for x in variations])
+
+            return binning, (index,)
 
         elif isinstance(where, (numbers.Integral, numpy.integer)):
-            raise NotImplementedError
-
-        elif not isiloc and isinstance(where, str):
-            raise NotImplementedError
-
-        elif not isiloc and isinstance(where, Iterable) and all(isinstance(x, str) for x in where):
             raise NotImplementedError
 
         else:
@@ -3295,7 +3335,7 @@ class VariationBinning(Binning):
                 raise NotImplementedError
 
             else:
-                raise IndexError("VariationBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
+                raise IndexError("VariationBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index")
 
     def _restructure(self, other):
         assert isinstance(other, VariationBinning)
