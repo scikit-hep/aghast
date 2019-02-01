@@ -1544,6 +1544,44 @@ class IntegerBinning(Binning, BinLocation):
             pos_overflow = None
         return loc_underflow, pos_underflow, loc_overflow, pos_overflow
 
+    # def _getval(self, where):
+    #     if where is None:
+    #         return None, (slice(None),)
+
+    #     elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+    #         return self._binshape(), (slice(None),)
+
+    #     elif isinstance(where, slice):
+    #         start, stop, step = where.indices(1 + self.max - self.min)
+    #         if step == 0:
+    #             raise ValueError("slice step cannot be zero")
+    #         start = max(start, 0)
+    #         stop = min(stop, 1 + self.max - self.min)
+    #         return self._getval(numpy.arange(start, stop, step))
+
+    #     elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Real, numpy.floating)) and not numpy.isfinite(where):
+    #         return self._getval([where])
+
+    #     elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
+    #         i = where
+    #         if i < 0:
+    #             i += 1 + self.max - self.min
+    #         if not 0 <= i < 1 + self.max - self.min:
+    #             raise IndexError("index {0} is out of bounds".format(where))
+    #         return self._getval([i])
+
+    #     else:
+    #         where = numpy.array(where, copy=False)
+    #         index = numpy.full(self._binshape(), -1, dtype=numpy.int64)
+    #         if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.floating):
+    #             flows = [(self.loc_underflow, -numpy.inf), (self.loc_overflow, numpy.inf)]
+    #             pos = 0
+    #             for loc, tag in enumerate(BinLocation._belows(flows)):
+    #                 whereindexes, = numpy.nonzero(where == tag)
+    #                 index[pos] = whereindexes
+    #                 pos += 1
+    #             where - pos
+
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
@@ -1564,7 +1602,7 @@ class IntegerBinning(Binning, BinLocation):
             if step != 1:
                 raise IndexError("IntegerBinning slice step can only be 1 or None")
             start = max(start, 0)
-            stop  = min(stop, 1 + self.max - self.min)
+            stop = min(stop, 1 + self.max - self.min)
 
             if stop - start <= 0:
                 raise IndexError("slice {0}:{1} would result in no bins".format(where.start, where.stop))
@@ -2518,7 +2556,9 @@ class IrregularBinning(Binning, OverlappingFill):
                 index = self.full(len(self.intervals), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(intervals))
                 binning = IrregularBinning(intervals, overflow=overflow, overlapping_fill=self.overlapping_fill)
-                return binning, (index,)
+                flows = [] if self.overflow is None else [(self.overflow.loc_underflow, -1), (self.overflow.loc_overflow, -1), (self.overflow.loc_nanflow, -1)]
+                selfmap = self._selfmap(flows, index)
+                return binning, (selfmap,)
 
         if isiloc:
             raise TypeError("IrregularBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
@@ -2681,7 +2721,8 @@ class CategoryBinning(Binning, BinLocation):
                 index = self.full(len(self.categories), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(categories))
                 binning = CategoryBinning(categories, loc_overflow=self.loc_overflow)
-                return binning, (index,)
+                selfmap = self._selfmap([(self.loc_overflow, -1)], index)
+                return binning, (selfmap,)
 
         if isiloc:
             raise TypeError("CategoryBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
@@ -2977,7 +3018,9 @@ class SparseRegularBinning(Binning, BinLocation):
                 index = self.full(len(self.bins), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(bins))
                 binning = SparseRegularBinning(bins, self.bin_width, origin=self.origin, overflow=self.overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=self.minbin, maxbin=self.maxbin)
-                return binning, (index,)
+                flows = [] if self.overflow is None else [(self.overflow.loc_underflow, -1), (self.overflow.loc_overflow, -1), (self.overflow.loc_nanflow, -1)]
+                selfmap = self._selfmap(flows, index)
+                return binning, (selfmap,)
 
         if isiloc:
             raise TypeError("SparseRegularbinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
