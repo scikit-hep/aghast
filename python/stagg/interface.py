@@ -1700,7 +1700,7 @@ class IntegerBinning(Binning, BinLocation):
                 flows = [(self.loc_underflow,), (self.loc_overflow,)]
                 shiftbelow = len(BinLocation._belows(flows))
                 shiftabove = len(BinLocation._aboves(flows))
-                if shiftbelow + shiftabove != 0:
+                if shiftbelow + shiftabove == 0:
                     return (where,)
                 else:
                     belowmask = numpy.zeros(shiftbelow, dtype=where.dtype)

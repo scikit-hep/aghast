@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
         assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "[6, +inf)"]
         assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
 
-        assert a.counts[None] == 1054
+        assert a.counts[None] == 55 + 999
         assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
         assert a.counts[5:numpy.inf].tolist() == [5, 6, 7, 8, 9, 10, 999]
@@ -70,4 +70,60 @@ class Test(unittest.TestCase):
         assert a.counts[numpy.inf] == 999
         assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
         assert a.counts[[7, 4, 7, numpy.inf, 5, -1]].tolist() == [7, 4, 7, 999, 5, 10]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5, loc_overflow=IntegerBinning.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray([999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[6, +inf)", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == [999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        assert a.counts[None] == 55 + 999
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
+        assert a.counts[5:numpy.inf].tolist() == [5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[5] == 5
+        assert a.counts[numpy.inf] == 999
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -1]].tolist() == [7, 4, 7, 999, 5, 10]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5, loc_underflow=IntegerBinning.below2, loc_overflow=IntegerBinning.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray([123, 999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["(-inf, -6]", "[6, +inf)", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
+        assert a.counts.counts.array.tolist() == [123, 999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        assert a.counts[None] == 55 + 123 + 999
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
+        assert a.counts[5:numpy.inf].tolist() == [5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[-numpy.inf:5].tolist() == [123, 0, 1, 2, 3, 4]
+        assert a.counts[-numpy.inf:numpy.inf].tolist() == [123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[:numpy.inf].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[-numpy.inf:].tolist() == [123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5] == 5
+        assert a.counts[-numpy.inf] == 123
+        assert a.counts[numpy.inf] == 999
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -1]].tolist() == [7, 4, 7, 999, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 4, 7, 999, 5, 123, 10]
+        assert a.counts[[7, -numpy.inf, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 123, 4, 7, 999, 5, 123, 10]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5, loc_underflow=IntegerBinning.above1, loc_overflow=IntegerBinning.below1))], UnweightedCounts(InterpretedInlineBuffer.fromarray([999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 123])))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[6, +inf)", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "(-inf, -6]"]
+        assert a.counts.counts.array.tolist() == [999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 123]
+
+        assert a.counts[None] == 55 + 123 + 999
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
+        assert a.counts[5:numpy.inf].tolist() == [5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[-numpy.inf:5].tolist() == [123, 0, 1, 2, 3, 4]
+        assert a.counts[-numpy.inf:numpy.inf].tolist() == [123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[:numpy.inf].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[-numpy.inf:].tolist() == [123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5] == 5
+        assert a.counts[-numpy.inf] == 123
+        assert a.counts[numpy.inf] == 999
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -1]].tolist() == [7, 4, 7, 999, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 4, 7, 999, 5, 123, 10]
+        assert a.counts[[7, -numpy.inf, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 123, 4, 7, 999, 5, 123, 10]
         assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
