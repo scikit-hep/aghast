@@ -1578,7 +1578,7 @@ class IntegerBinning(Binning, BinLocation):
 
             return binning, (selfmap,)
 
-        elif isinstance(where, (numbers.Integral, numpy.integer)):
+        elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += 1 + self.max - self.min
@@ -1586,15 +1586,15 @@ class IntegerBinning(Binning, BinLocation):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(isiloc, slice(i, i))
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 return self.toCategoryBinning()._getloc(True, where)
 
-            elif isiloc:
-                raise TypeError("IntegerBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
-            else:
-                raise TypeError("IntegerBinning.loc accepts an integer, an integer slice (`:`), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
+        if isiloc:
+            raise TypeError("IntegerBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("IntegerBinning.loc accepts an integer, an integer slice (`:`), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, IntegerBinning)
@@ -1961,13 +1961,13 @@ class RegularBinning(Binning):
 
             return binning, (selfmap,)
 
-        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Real, numpy.integer, numpy.floating)):
             i = int(math.trunc((where - self.interval.low) / bin_width))
             if not 0 <= i < self.num:
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += self.num
@@ -1975,15 +1975,15 @@ class RegularBinning(Binning):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 return self.toIrregularBinning()._getloc(True, where)
 
-            elif isiloc:
-                raise TypeError("RegularBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), ")   # HERE HERE HERE HERE HERE HERE HERE HERE HERE HERE
-            else:
-                raise IndexError("RegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), or projection (`None`) as an index; .loc additionally allows floating point numbers")
+        if isiloc:
+            raise TypeError("RegularBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("RegularBinning.loc accepts a number, a real-valued slice (`:`), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, RegularBinning)
@@ -2119,11 +2119,25 @@ class HexagonalBinning(Binning):
         elif isinstance(where1, slice) and where1.start is None and where1.stop is None and where1.step is None and isinstance(where2, slice) and where2.start is None and where2.stop is None and where2.step is None:
             return self, (slice(None), slice(None))
 
-        elif isinstance(where1, slice) and isinstance(where1, slice):
+        elif isinstance(where1, slice) and isinstance(where2, slice):
             raise NotImplementedError
 
+        elif not isiloc and not isinstance(where1, (bool, numpy.bool, numpy.bool_)) and not isinstance(where2, (bool, numpy.bool, numpy.bool_)) and isinstance(where1, (numbers.Real, numpy.integer, numpy.floating)) and isinstance(where2, (numbers.Real, numpy.integer, numpy.floating)):
+            raise NotImplementedError
+
+        elif isiloc and not isinstance(where1, (bool, numpy.bool, numpy.bool_)) and not isinstance(where2, (bool, numpy.bool, numpy.bool_)) and isinstance(where1, (numbers.Integral, numpy.integer)) and isinstance(where2, (numbers.Integral, numpy.integer)):
+            raise NotImplementedError
+
+        elif isiloc:
+            where1 = numpy.array(where1, copy=False)
+            where2 = numpy.array(where2, copy=False)
+            if len(where1.shape) == 1 and len(where2.shape) == 1 and issubclass(where1.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)) and issubclass(where2.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+                raise NotImplementedError
+
+        if isiloc:
+            raise TypeError("HexagonalBinning.iloc accepts two integers, two integer slices (`:`), ellipsis (`...`), two projections (`None`), or two arrays of integers/booleans, not {0} and {1}".format(repr(where1), repr(where2)))
         else:
-            raise IndexError("HexagonalBinning.loc and .iloc only allow two slices (`:, :`), an ellipsis (`...`), or two projections (`None, None`) as index")
+            raise TypeError("HexagonalBinning.loc accepts two numbers, two real-valued slices (`:`), ellipsis (`...`), or two projections (`None`), not {0} and {1}".format(repr(where1), repr(where2)))
 
     def _restructure(self, other):
         assert isinstance(other, HexagonalBinning)
@@ -2270,7 +2284,7 @@ class EdgesBinning(Binning):
 
             return binning, (selfmap,)
 
-        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Real, numpy.integer, numpy.floating)):
             i = numpy.searchsorted(self.edges, where, side="left")
             if self.edges[i] > where:
                 i -= 1
@@ -2278,7 +2292,7 @@ class EdgesBinning(Binning):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.edges)
@@ -2476,7 +2490,7 @@ class IrregularBinning(Binning, OverlappingFill):
 
             return binning, (selfmap,)
                 
-        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Real, numpy.integer, numpy.floating)):
             for interval in self.intervals:
                 if interval.low <= where <= interval.high:
                     break
@@ -2484,7 +2498,7 @@ class IrregularBinning(Binning, OverlappingFill):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(False, slice(where, where))
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.intervals)
@@ -2492,9 +2506,9 @@ class IrregularBinning(Binning, OverlappingFill):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 intervals = numpy.array(self.intervals, dtype=numpy.object)[where]
                 if len(intervals) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
@@ -2503,8 +2517,10 @@ class IrregularBinning(Binning, OverlappingFill):
                 binning = IrregularBinning(intervals, overflow=overflow, overlapping_fill=self.overlapping_fill)
                 return binning, (index,)
 
-            else:
-                raise IndexError("IrregularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows floating point numbers")
+        if isiloc:
+            raise TypeError("IrregularBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("IrregularBinning.loc accepts a number, a real-valued slice (`:`), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, IrregularBinning)
@@ -2589,7 +2605,7 @@ class CategoryBinning(Binning, BinLocation):
         if where is None:
             return None, (slice(None),)
 
-        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
         elif isiloc and isinstance(where, slice):
@@ -2621,7 +2637,7 @@ class CategoryBinning(Binning, BinLocation):
 
             return binning, (selfmap,)
             
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.categories)
@@ -2653,9 +2669,9 @@ class CategoryBinning(Binning, BinLocation):
 
             return binning, (selfmap,)
             
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 categories = numpy.array(self.categories, dtype=numpy.object)[where]
                 if len(categories) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
@@ -2664,8 +2680,10 @@ class CategoryBinning(Binning, BinLocation):
                 binning = CategoryBinning(categories, loc_overflow=self.loc_overflow)
                 return binning, (index,)
 
-            else:
-                raise IndexError("CategoryBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
+        if isiloc:
+            raise TypeError("CategoryBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("CategoryBinning.loc accepts a string, an iterable of strings, an empty slice (`:` only), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, CategoryBinning)
@@ -2933,13 +2951,13 @@ class SparseRegularBinning(Binning, BinLocation):
 
             return binning, (selfmap,)
 
-        elif not isiloc and isinstance(where, (numbers.Number, numpy.integer, numpy.floating)):
+        elif not isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Real, numpy.integer, numpy.floating)):
             i = int(math.trunc((where - self.origin) / self.bin_width))
             if not self.minbin <= i <= self.maxbin:
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(False, slice(where, where))
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.bins)
@@ -2947,9 +2965,9 @@ class SparseRegularBinning(Binning, BinLocation):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 bins = self.bins[where]
                 if len(bins) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
@@ -2958,8 +2976,10 @@ class SparseRegularBinning(Binning, BinLocation):
                 binning = SparseRegularBinning(bins, self.bin_width, origin=self.origin, overflow=self.overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=self.minbin, maxbin=self.maxbin)
                 return binning, (index,)
 
-            else:
-                raise IndexError("SparseRegularBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows floating point numbers")
+        if isiloc:
+            raise TypeError("SparseRegularbinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("SparseRegularbinning.loc accepts a number, a real-valued slice (`:`), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, SparseRegularBinning)
@@ -3070,11 +3090,13 @@ class FractionBinning(Binning):
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
-        elif isinstance(where, (bool, numpy.bool_, numpy.bool)):
+        elif not isiloc and isinstance(where, (bool, numpy.bool_, numpy.bool)):
             raise NotImplementedError
 
+        if isiloc:
+            raise TypeError("FractionBinning.iloc accepts an empty slice (`:` only), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
         else:
-            raise IndexError("FractionBinning only allows an ellipsis (`...`) or projection (`None`) as an index")
+            raise TypeError("FractionBinning.loc accepts a boolean, an empty slice (`:` only), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, FractionBinning)
@@ -3136,7 +3158,7 @@ class PredicateBinning(Binning, OverlappingFill):
         if where is None:
             return None, (slice(None),)
 
-        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
         elif isiloc and isinstance(where, slice):
@@ -3160,7 +3182,7 @@ class PredicateBinning(Binning, OverlappingFill):
 
             return binning, (index,)
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.predicates)
@@ -3184,9 +3206,9 @@ class PredicateBinning(Binning, OverlappingFill):
 
             return binning, (index,)
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 predicates = numpy.array(self.predicates, dtype=numpy.object)[where]
                 if len(predicates) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
@@ -3195,8 +3217,10 @@ class PredicateBinning(Binning, OverlappingFill):
                 binning = PredicateBinning(predicates, overlapping_fill=self.overlapping_fill)
                 return binning, (index,)
 
-            else:
-                raise IndexError("PredicateBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index; .loc additionally allows a string and an iterable of strings")
+        if isiloc:
+            raise TypeError("PredicateBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("PredicateBinning.loc accepts a string, an iterable of strings, an empty slice (`:` only), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, PredicateBinning)
@@ -3356,7 +3380,7 @@ class VariationBinning(Binning):
         if where is None:
             return None, (slice(None),)
 
-        elif isiloc and isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
             return self, (slice(None),)
 
         elif isiloc and isinstance(where, slice):
@@ -3380,7 +3404,7 @@ class VariationBinning(Binning):
 
             return binning, (index,)
 
-        elif isiloc and isinstance(where, (numbers.Integral, numpy.integer)):
+        elif isiloc and not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
                 i += len(self.variations)
@@ -3388,9 +3412,9 @@ class VariationBinning(Binning):
                 raise IndexError("index {0} is out of bounds".format(where))
             return self._getloc(True, slice(i, i))
 
-        else:
+        elif isiloc:
             where = numpy.array(where, copy=False)
-            if isiloc and len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
+            if len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.integer, numpy.bool, numpy.bool_)):
                 variations = numpy.array(self.variations, dtype=numpy.object)[where]
                 if len(variations) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
@@ -3399,8 +3423,10 @@ class VariationBinning(Binning):
                 binning = VariationBinning([x.detached() for x in variations])
                 return binning, (index,)
 
-            else:
-                raise IndexError("VariationBinning.loc and .iloc only allow an integer, slice (`:`), ellipsis (`...`), projection (`None`), or 1-dimensional array of integers/booleans as an index")
+        if isiloc:
+            raise TypeError("VariationBinning.iloc accepts an integer, an integer slice (`:`), ellipsis (`...`), projection (`None`), or an array of integers/booleans, not {0}".format(repr(where)))
+        else:
+            raise TypeError("VariationBinning.loc accepts an empty slice (`:` only), ellipsis (`...`), or projection (`None`), not {0}".format(repr(where)))
 
     def _restructure(self, other):
         assert isinstance(other, VariationBinning)
@@ -4413,7 +4439,7 @@ class ColumnChunk(Stagg):
     def numentries(self, pageid=None):
         if pageid is None:
             return self.page_offsets[-1]
-        elif isinstance(pageid, (numbers.Integral, numpy.integer)):
+        elif not isinstance(pageid, (bool, numpy.bool, numpy.bool_)) and isinstance(pageid, (numbers.Integral, numpy.integer)):
             original_pageid = pageid
             if pageid < 0:
                 pageid += len(self.page_offsets) - 1
@@ -4667,7 +4693,7 @@ class NtupleInstance(Stagg):
         else:
             if chunkid is None:
                 return self.chunk_offsets[-1]
-            elif isinstance(chunkid, (numbers.Integral, numpy.integer)):
+            elif not isinstance(chunkid, (bool, numpy.bool, numpy.bool_)) and isinstance(chunkid, (numbers.Integral, numpy.integer)):
                 original_chunkid = chunkid
                 if chunkid < 0:
                     chunkid += len(self.chunk_offsets) - 1
