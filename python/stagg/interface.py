@@ -655,6 +655,24 @@ class InterpretedBuffer(Interpretation):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
+    def _reindex(self, oldshape, indexes):
+        order = "c" if self.dimension_order == self.c_order else "f"
+        dtype = self.numpy_dtype
+
+        buf = self.flatarray.reshape(oldshape, order=order)
+
+        for i, index in reversed(enumerate(indexes)):
+            if index is None:
+                buf = buf.sum(axis=i)
+            elif isinstance(index, numpy.array) and issubclass(index.dtype.type, (numpy.bool, numpy.bool_)):
+                buf = numpy.compress(index, buf, axis=i)
+            elif isinstance(index, numpy.array) and issubclass(index.dtype.type, numpy.integer):
+                buf = numpy.take(buf, index, axis=i)
+            else:
+                buf = buf[(Ellipsis, index) + (slice(None),)*(len(indexes) - 1 - i)]
+
+        return buf
+
     def _rebin(self, oldshape, pairs):
         order = "c" if self.dimension_order == self.c_order else "f"
         dtype = self.numpy_dtype
@@ -670,10 +688,7 @@ class InterpretedBuffer(Interpretation):
             if binning is None:
                 buf = buf.sum(axis=i)
             else:
-                if isinstance(binning, tuple):
-                    newshape = binning + newshape
-                else:
-                    newshape = binning._binshape() + newshape
+                newshape = binning._binshape() + newshape
                 newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
                 for j in range(len(selfmap)):
                     if isinstance(selfmap[j], numpy.ndarray):
@@ -1586,15 +1601,20 @@ class IntegerBinning(Binning, BinLocation):
             if not include_underflow and not include_overflow:
                 return (slice(start + shift, stop + shift, step),)
             else:
-                nonflow = numpy.arange(start + shift, stop + shift, step)
-                index = numpy.empty(len(nonflow) + int(include_underflow) + int(include_overflow), dtype=numpy.int64)
-                under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
                 if step > 0:
                     underspot, overspot = 0, -1
                     indexshift = int(include_underflow)
+                    start = max(start, 0)
+                    stop = min(stop, 1 + self.max - self.min)
                 else:
                     underspot, overspot = -1, 0
                     indexshift = int(include_overflow)
+                    start = min(start, 1 + self.max - self.min - 1)
+                    stop = max(stop, -1)
+
+                nonflow = numpy.arange(start + shift, stop + shift, step)
+                index = numpy.empty(len(nonflow) + int(include_underflow) + int(include_overflow), dtype=numpy.int64)
+                under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
 
                 if include_underflow:
                     if under is None:
@@ -3776,9 +3796,9 @@ class Counts(Stagg):
         where = self._parent._expand_ellipsis(where, len(oldshape))
 
         i = 0
-        indexes = []
+        indexes = ()
         for binning in binnings:
-            indexes.append(binning._getindex(*where[i : i + binning.dimensions]))
+            indexes = indexes + binning._getindex(*where[i : i + binning.dimensions])
             i += binning.dimensions
 
         return self._reindex(oldshape, indexes)
