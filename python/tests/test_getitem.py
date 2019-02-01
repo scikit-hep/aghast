@@ -57,8 +57,12 @@ class Test(unittest.TestCase):
         assert a.counts[None, [True, False, True]].tolist() == [100, 10000]
         assert a.counts[[False, True, True, False], None].tolist() == [2220, 3330]
 
-        # assert a.counts[:, :].tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
-
+        assert a.counts[:, :].tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+        assert a.counts[1:, :].tolist() == [[20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+        assert a.counts[:, 1:].tolist() == [[100, 1000], [200, 2000], [300, 3000], [400, 4000]]
+        assert a.counts[2:, 1:].tolist() == [[300, 3000], [400, 4000]]
+        assert a.counts[:, 1].tolist() == [100, 200, 300, 400]
+        assert a.counts[1, :].tolist() == [20, 200, 2000]
 
 
     def test_getitem_IntegerBinning(self):

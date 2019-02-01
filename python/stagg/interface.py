@@ -664,15 +664,17 @@ class InterpretedBuffer(Interpretation):
         for i, index in list(enumerate(indexes))[::-1]:
             if index is None:
                 buf = buf.sum(axis=i)
+            if not isinstance(index, (bool, numpy.bool, numpy.bool_)) and isinstance(index, (numbers.Integral, numpy.integer)):
+                buf = buf[(slice(None),)*i + (index,)]
 
-        indexes = [x for x in indexes if x is not None]
+        indexes = [x for x in indexes if isinstance(x, (numpy.ndarray, slice))]
         for i, index in enumerate(indexes):
             if isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, (numpy.bool, numpy.bool_)):
                 buf = numpy.compress(index, buf, axis=i)
             elif isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, numpy.integer):
                 buf = numpy.take(buf, index, axis=i)
             else:
-                buf = buf[(slice(None),)*max(0, i - 1) + (index, Ellipsis)]
+                buf = buf[(slice(None),)*i + (index,)]
 
         return buf
 
