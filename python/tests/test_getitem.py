@@ -38,11 +38,28 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    # def test_getitem_twodim(self):
-    #     a = Histogram([Axis(IntegerBinning(5, 9)), Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(55, dtype=int)*10)))
-    #     assert a.axis[0].binning.toCategoryBinning().categories == ["5", "6", "7", "8", "9"]
-    #     assert a.axis[1].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-    #     assert a.counts.counts.array.tolist() == (numpy.ones(55, dtype=int)*10).reshape((5, 11)).tolist()
+    def test_getitem_twodim(self):
+        a = Histogram([Axis(IntegerBinning(0, 3)), Axis(IntegerBinning(0, 2))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]))))
+        a.checkvalid()
+        assert a.axis[0].binning.toCategoryBinning().categories == ["0", "1", "2", "3"]
+        assert a.axis[1].binning.toCategoryBinning().categories == ["0", "1", "2"]
+        assert a.counts.counts.array.tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+
+        assert a.counts[None, None] == sum([10, 100, 1000, 20, 200, 2000, 30, 300, 3000, 40, 400, 4000])
+        assert a.counts[None, :].tolist() == [100, 1000, 10000]
+        assert a.counts[:, None].tolist() == [1110, 2220, 3330, 4440]
+        assert a.counts[None, 1] == 1000
+        assert a.counts[1, None] == 2220
+        assert a.counts[None, 1:].tolist() == [1000, 10000]
+        assert a.counts[1:, None].tolist() == [2220, 3330, 4440]
+        assert a.counts[None, [2, 1, 1, 0]].tolist() == [10000, 1000, 1000, 100]
+        assert a.counts[[3, 2, 2, 0], None].tolist() == [4440, 3330, 3330, 1110]
+        assert a.counts[None, [True, False, True]].tolist() == [100, 10000]
+        assert a.counts[[False, True, True, False], None].tolist() == [2220, 3330]
+
+        # assert a.counts[:, :].tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+
+
 
     def test_getitem_IntegerBinning(self):
         a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11, dtype=int))))
