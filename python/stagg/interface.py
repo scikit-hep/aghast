@@ -661,12 +661,12 @@ class InterpretedBuffer(Interpretation):
 
         buf = self.flatarray.reshape(oldshape, order=order)
 
-        for i, index in reversed(enumerate(indexes)):
+        for i, index in list(enumerate(indexes))[::-1]:
             if index is None:
                 buf = buf.sum(axis=i)
-            elif isinstance(index, numpy.array) and issubclass(index.dtype.type, (numpy.bool, numpy.bool_)):
+            elif isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, (numpy.bool, numpy.bool_)):
                 buf = numpy.compress(index, buf, axis=i)
-            elif isinstance(index, numpy.array) and issubclass(index.dtype.type, numpy.integer):
+            elif isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, numpy.integer):
                 buf = numpy.take(buf, index, axis=i)
             else:
                 buf = buf[(slice(None),)*max(0, i - 1) + (index,) + (slice(None),)*(len(indexes) - 1 - i)]
@@ -1576,7 +1576,9 @@ class IntegerBinning(Binning, BinLocation):
             return (None,)
 
         elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
-            return (slice(None),)
+            start, stop, step = where.indices(1 + self.max - self.min)
+            shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
+            return (slice(start + shift, stop + shift, step),)
 
         elif isinstance(where, slice):
             include_underflow, include_overflow = False, False
@@ -1627,13 +1629,13 @@ class IntegerBinning(Binning, BinLocation):
                 index[indexshift : indexshift + len(nonflow)] = nonflow
                 return (index,)
 
-        elif where == -numpy.inf:
+        elif isinstance(where, (numbers.Real, numpy.floating)) and where == -numpy.inf:
             under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
             if under is None:
                 raise IndexError("index -inf requested but this {0} has no underflow".format(type(self).__name__))
             return (under,)
 
-        elif where == numpy.inf:
+        elif isinstance(where, (numbers.Real, numpy.floating)) and where == numpy.inf:
             under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
             if over is None:
                 raise IndexError("index +inf requested but this {0} has no overflow".format(type(self).__name__))
@@ -1683,12 +1685,14 @@ class IntegerBinning(Binning, BinLocation):
                 if not okay.all():
                     raise IndexError("forbidden indexes for this {0}: {1}".format(type(self).__name__, ", ".join(set(repr(x) for x in where[~okay]))))
                 mask = numpy.isfinite(where)
-                index[mask] = where[mask].astype(numpy.int64) + shift
+                where = where[mask].astype(numpy.int64)
+                index[mask] = numpy.where(where < 0, where + 1 + self.max - self.min, where) + shift
                 return (index,)
 
             elif len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
                 shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
-                return (where + shift,)
+                index = numpy.where(where < 0, where + 1 + self.max - self.min, where) + shift
+                return (index,)
 
             elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
                 if len(where) != 1 + self.max - self.min:
@@ -1701,7 +1705,7 @@ class IntegerBinning(Binning, BinLocation):
                 else:
                     belowmask = numpy.zeros(shiftbelow, dtype=where.dtype)
                     abovemask = numpy.zeros(shiftabove, dtype=where.dtype)
-                    return (numpy.concatentate([belowmask, where, abovemask]),)
+                    return (numpy.concatenate([belowmask, where, abovemask]),)
 
             else:
                 raise TypeError("{0} accepts an integer, -inf/inf/nan, an integer/-inf/inf/nan slice (`:`), ellipsis (`...`), projection (`None`), an array of integers/-inf/inf/nan, or an array of booleans, not {1}".format(type(self).__name__, repr(where)))
@@ -3834,7 +3838,7 @@ class UnweightedCounts(Counts):
         return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
 
     def _reindex(self, oldshape, indexes):
-        return self.counts._reindex(oldshape, indexes).array
+        return self.counts._reindex(oldshape, indexes)
 
     def _rebin(self, oldshape, pairs):
         return UnweightedCounts(self.counts._rebin(oldshape, pairs))
@@ -3896,9 +3900,9 @@ class WeightedCounts(Counts):
         return stagg.stagg_generated.WeightedCounts.WeightedCountsEnd(builder)
 
     def _reindex(self, oldshape, indexes):
-        out = {"sumw": self.sumw._reindex(oldshape, indexes).array}
+        out = {"sumw": self.sumw._reindex(oldshape, indexes)}
         if self.sumw2 is not None:
-            out["sumw2"] = self.sumw2._reindex(oldshape, indexes).array
+            out["sumw2"] = self.sumw2._reindex(oldshape, indexes)
         if self.unweighted is not None:
             out["unweighted"] = self.unweighted._reindex(oldshape, indexes)
         return out
@@ -4481,11 +4485,12 @@ class Histogram(Object):
         return stagg.checktype.Vector(out)
 
     def _expand_ellipsis(self, where, numdims):
-        ellipsiscount = where.count(Ellipsis)
+        where2 = [None if isinstance(x, numpy.ndarray) else x for x in where]
+        ellipsiscount = where2.count(Ellipsis)
         if ellipsiscount > 1:
             raise IndexError("an index can only have a single ellipsis ('...')")
         elif ellipsiscount == 1:
-            ellipsisindex = where.index(Ellipsis)
+            ellipsisindex = where2.index(Ellipsis)
             before = where[: ellipsisindex]
             after  = where[ellipsisindex + 1 :]
             num = max(0, numdims - len(before) - len(after))

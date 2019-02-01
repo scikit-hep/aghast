@@ -45,6 +45,29 @@ class Test(unittest.TestCase):
     #     assert a.counts.counts.array.tolist() == (numpy.ones(55, dtype=int)*10).reshape((5, 11)).tolist()
 
     def test_getitem_IntegerBinning(self):
-        a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.ones(11, dtype=int)*10)))
+        a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11, dtype=int))))
         assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]
-        assert a.counts.counts.array.tolist() == [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        assert a.counts[None] == 55
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
+        assert a.counts[5] == 5
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[numpy.array([7, 4, 7, 5, -1])].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
+        assert a.counts[numpy.array([True, False, True, False, True, False, True, False, True, False, True])].tolist() == [0, 2, 4, 6, 8, 10]
+
+        a = Histogram([Axis(IntegerBinning(-5, 5, loc_overflow=IntegerBinning.above1))], UnweightedCounts(InterpretedInlineBuffer.fromarray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999])))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "[6, +inf)"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 999]
+
+        assert a.counts[None] == 1054
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9, 10]
+        assert a.counts[5:numpy.inf].tolist() == [5, 6, 7, 8, 9, 10, 999]
+        assert a.counts[5] == 5
+        assert a.counts[numpy.inf] == 999
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 10]
+        assert a.counts[[7, 4, 7, numpy.inf, 5, -1]].tolist() == [7, 4, 7, 999, 5, 10]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
