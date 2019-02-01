@@ -1039,7 +1039,7 @@ class StatisticFilter(Stagg):
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
-    def __init__(self, min=float("-inf"), max=float("inf"), excludes_minf=False, excludes_pinf=False, excludes_nan=False):
+    def __init__(self, min=-numpy.inf, max=numpy.inf, excludes_minf=False, excludes_pinf=False, excludes_nan=False):
         self.min = min
         self.max = max
         self.excludes_minf = excludes_minf
@@ -1052,9 +1052,9 @@ class StatisticFilter(Stagg):
 
     def _toflatbuffers(self, builder):
         stagg.stagg_generated.StatisticFilter.StatisticFilterStart(builder)
-        if self.min != float("-inf"):
+        if self.min != -numpy.inf:
             stagg.stagg_generated.StatisticFilter.StatisticFilterAddMin(builder, self.min)
-        if self.max != float("inf"):
+        if self.max != numpy.inf:
             stagg.stagg_generated.StatisticFilter.StatisticFilterAddMax(builder, self.max)
         if self.excludes_minf is not False:
             stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesMinf(builder, self.excludes_minf)
@@ -1544,6 +1544,24 @@ class IntegerBinning(Binning, BinLocation):
             pos_overflow = None
         return loc_underflow, pos_underflow, loc_overflow, pos_overflow
 
+    # def _getindex(self, where):
+    #     if where is None:
+    #         return (None,)
+
+    #     elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+    #         return (slice(None),)
+
+    #     elif isinstance(where, slice):
+    #         if where.step is None or where.step > 0:
+    #             include_underflow = (where.start == HERE)
+
+
+
+    #         start, stop, step = where.indices(1 + self.max - self.min)
+            
+
+
+
     # def _getval(self, where):
     #     if where is None:
     #         return None, (slice(None),)
@@ -1981,9 +1999,9 @@ class RegularBinning(Binning):
             yes_underflow = (start != 0)
             yes_overflow = (stop != self.num)
             overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, yes_underflow, yes_overflow, length)
-            if yes_underflow and self.interval.low == float("-inf") and self.interval.low_inclusive:
+            if yes_underflow and self.interval.low == -numpy.inf and self.interval.low_inclusive:
                 overflow.minf_mapping = RealOverflow.in_underflow
-            if yes_overflow and self.interval.high == float("inf") and self.interval.high_inclusive:
+            if yes_overflow and self.interval.high == numpy.inf and self.interval.high_inclusive:
                 overflow.pinf_mapping = RealOverflow.in_overflow
 
             interval = RealInterval(self.interval.low + start*bin_width,
@@ -2308,9 +2326,9 @@ class EdgesBinning(Binning):
             yes_underflow = (start != 0)
             yes_overflow  = (stop != len(self.edges) - 1)
             overflow, loc_underflow, pos_underflow, loc_overflow, pos_overflow, loc_nanflow, pos_nanflow = RealOverflow._getloc(self.overflow, yes_underflow, yes_overflow, length)
-            if yes_underflow and self.edges[0] == float("-inf") and self.low_inclusive:
+            if yes_underflow and self.edges[0] == -numpy.inf and self.low_inclusive:
                 overflow.minf_mapping = RealOverflow.in_underflow
-            if yes_overflow and self.edges[-1] == float("inf") and self.high_inclusive:
+            if yes_overflow and self.edges[-1] == numpy.inf and self.high_inclusive:
                 overflow.pinf_mapping = RealOverflow.in_overflow
 
             circular = self.circular and not yes_underflow and not yes_overflow
@@ -2874,10 +2892,10 @@ class SparseRegularBinning(Binning, BinLocation):
         overflow = None if self.overflow is None else self.overflow.detached()
         if overflow is not None:
             if overflow.loc_underflow != BinLocation.nonexistent:
-                intervals.append(RealInterval(float("-inf"), self.bin_width*(self.minbin) + self.origin, low_inclusive=(overflow.minf_mapping == RealOverflow.in_underflow), high_inclusive=(not self.low_inclusive)))
+                intervals.append(RealInterval(-numpy.inf, self.bin_width*(self.minbin) + self.origin, low_inclusive=(overflow.minf_mapping == RealOverflow.in_underflow), high_inclusive=(not self.low_inclusive)))
                 overflow.loc_underflow = BinLocation.nonexistent
             if overflow.loc_overflow != BinLocation.nonexistent:
-                intervals.append(RealInterval(self.bin_width*(self.maxbin + 1) + self.origin, float("inf"), low_inclusive=(not self.high_inclusive), high_inclusive=(overflow.pinf_mapping == RealOverflow.in_overflow)))
+                intervals.append(RealInterval(self.bin_width*(self.maxbin + 1) + self.origin, numpy.inf, low_inclusive=(not self.high_inclusive), high_inclusive=(overflow.pinf_mapping == RealOverflow.in_overflow)))
                 overflow.loc_overflow = BinLocation.nonexistent
         return IrregularBinning(intervals, overflow=overflow)
 
@@ -4295,6 +4313,23 @@ class Histogram(Object):
             out = list(node.axis) + out
         return stagg.checktype.Vector(out)
 
+    def _expand_ellipsis(self, where, numdims):
+        ellipsiscount = where.count(Ellipsis)
+        if ellipsiscount > 1:
+            raise IndexError("an index can only have a single ellipsis ('...')")
+        elif ellipsiscount == 1:
+            ellipsisindex = where.index(Ellipsis)
+            before = where[: ellipsisindex]
+            after  = where[ellipsisindex + 1 :]
+            num = max(0, numdims - len(before) - len(after))
+            where = before + num*(slice(None),) + after
+
+        where = where + max(0, numdims - len(where))*(slice(None),)
+        if len(where) != numdims:
+            raise IndexError("too many indices for histogram")
+
+        return where
+
     def __getitem__(self, where):
         if not isinstance(where, tuple):
             where = (where,)
@@ -4304,41 +4339,28 @@ class Histogram(Object):
         while hasattr(node, "_parent"):
             node = node._parent
             binnings = tuple(x.binning for x in node.axis) + binnings
-
-        pairs, newcounts = self._getcounts(True, False, where, binnings)
-        return newcounts
-
-    def _getcounts(self, isiloc, isgetloc, where, binnings):
         binnings = binnings + tuple(x.binning for x in self.axis)
         oldshape = sum((x._binshape() for x in binnings), ())
+        where = self._expand_ellipsis(where, len(oldshape))
 
-        ellipsiscount = where.count(Ellipsis)
-        if ellipsiscount > 1:
-            raise IndexError("an index can only have a single ellipsis ('...')")
-        elif ellipsiscount == 1:
-            ellipsisindex = where.index(Ellipsis)
-            before = where[: ellipsisindex]
-            after  = where[ellipsisindex + 1 :]
-            num = max(0, len(oldshape) - len(before) - len(after))
-            where = before + num*(slice(None),) + after
+        i = 0
+        indexes = []
+        for binning in binnings:
+            indexes.append(binning._getindex(*where[i : i + binning.dimensions]))
+            i += binning.dimensions
 
-        where = where + max(0, len(oldshape) - len(where))*(slice(None),)
-        if len(where) != len(oldshape):
-            raise IndexError("too many indices for histogram")
+        return self.counts._reindex(oldshape, indexes)
+
+    def _getloc(self, isiloc, where, binnings):
+        binnings = binnings + tuple(x.binning for x in self.axis)
+        oldshape = sum((x._binshape() for x in binnings), ())
+        where = self._expand_ellipsis(where, len(oldshape))
 
         i = 0
         pairs = []
         for binning in binnings:
-            if isgetloc:
-                pairs.append(binning._getloc(isiloc, *where[i : i + binning.dimensions]))
-            else:
-                pairs.append(binning._getval(*where[i : i + binning.dimensions]))
+            pairs.append(binning._getloc(isiloc, *where[i : i + binning.dimensions]))
             i += binning.dimensions
-
-        return pairs, self.counts._rebin(oldshape, pairs)
-
-    def _getloc(self, isiloc, where, binnings):
-        pairs, newcounts = self._getcounts(isiloc, True, where, binnings)
 
         out = self.detached(exceptions=("axis", "counts"))
         newaxis = []
@@ -4351,7 +4373,7 @@ class Histogram(Object):
         else:
             out.axis = newaxis
 
-        out.counts = newcounts
+        out.counts = self.counts._rebin(oldshape, pairs)
         return out
 
     def _add(self, other, pairs, triples, noclobber):
