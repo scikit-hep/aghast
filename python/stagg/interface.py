@@ -670,7 +670,10 @@ class InterpretedBuffer(Interpretation):
             if binning is None:
                 buf = buf.sum(axis=i)
             else:
-                newshape = binning._binshape() + newshape
+                if isinstance(binning, tuple):
+                    newshape = binning + newshape
+                else:
+                    newshape = binning._binshape() + newshape
                 newbuf = numpy.zeros(oldshape[:i] + newshape, dtype=dtype, order=order)
                 for j in range(len(selfmap)):
                     if isinstance(selfmap[j], numpy.ndarray):
@@ -1577,7 +1580,7 @@ class IntegerBinning(Binning, BinLocation):
             selfmap = self._selfmap([(self.loc_underflow, pos_underflow), (self.loc_overflow, pos_overflow)], index)
 
             return binning, (selfmap,)
-
+                
         elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
             i = where
             if i < 0:
@@ -4249,7 +4252,20 @@ class Histogram(Object):
             out = list(node.axis) + out
         return stagg.checktype.Vector(out)
 
-    def _getloc(self, isiloc, where, binnings):
+    def __getitem__(self, where):
+        if not isinstance(where, tuple):
+            where = (where,)
+
+        node = self
+        binnings = ()
+        while hasattr(node, "_parent"):
+            node = node._parent
+            binnings = tuple(x.binning for x in node.axis) + binnings
+
+        pairs, newcounts = self._getcounts(True, False, where, binnings)
+        return newcounts
+
+    def _getcounts(self, isiloc, isgetloc, where, binnings):
         binnings = binnings + tuple(x.binning for x in self.axis)
         oldshape = sum((x._binshape() for x in binnings), ())
 
@@ -4270,8 +4286,16 @@ class Histogram(Object):
         i = 0
         pairs = []
         for binning in binnings:
-            pairs.append(binning._getloc(isiloc, *where[i : i + binning.dimensions]))
+            if isgetloc:
+                pairs.append(binning._getloc(isiloc, *where[i : i + binning.dimensions]))
+            else:
+                pairs.append(binning._getval(*where[i : i + binning.dimensions]))
             i += binning.dimensions
+
+        return pairs, self.counts._rebin(oldshape, pairs)
+
+    def _getloc(self, isiloc, where, binnings):
+        pairs, newcounts = self._getcounts(isiloc, True, where, binnings)
 
         out = self.detached(exceptions=("axis", "counts"))
         newaxis = []
@@ -4283,7 +4307,8 @@ class Histogram(Object):
             out.axis = [Axis()]
         else:
             out.axis = newaxis
-        out.counts = self.counts._rebin(oldshape, pairs)
+
+        out.counts = newcounts
         return out
 
     def _add(self, other, pairs, triples, noclobber):
