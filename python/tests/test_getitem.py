@@ -47,6 +47,7 @@ class Test(unittest.TestCase):
 
         assert a.counts[None, None] == sum([10, 100, 1000, 20, 200, 2000, 30, 300, 3000, 40, 400, 4000])
         assert a.counts[None, :].tolist() == [100, 1000, 10000]
+        assert a.counts[None].tolist() == [100, 1000, 10000]
         assert a.counts[:, None].tolist() == [1110, 2220, 3330, 4440]
         assert a.counts[None, 1] == 1000
         assert a.counts[1, None] == 2220
@@ -58,12 +59,38 @@ class Test(unittest.TestCase):
         assert a.counts[[False, True, True, False], None].tolist() == [2220, 3330]
 
         assert a.counts[:, :].tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+        assert a.counts[:].tolist() == [[10, 100, 1000], [20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
         assert a.counts[1:, :].tolist() == [[20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
+        assert a.counts[1:].tolist() == [[20, 200, 2000], [30, 300, 3000], [40, 400, 4000]]
         assert a.counts[:, 1:].tolist() == [[100, 1000], [200, 2000], [300, 3000], [400, 4000]]
         assert a.counts[2:, 1:].tolist() == [[300, 3000], [400, 4000]]
         assert a.counts[:, 1].tolist() == [100, 200, 300, 400]
         assert a.counts[1, :].tolist() == [20, 200, 2000]
+        assert a.counts[1].tolist() == [20, 200, 2000]
+        assert a.counts[2:, 1].tolist() == [300, 400]
+        assert a.counts[1, 2:].tolist() == [2000]
+        assert a.counts[:, [2, 0]].tolist() == [[1000, 10], [2000, 20], [3000, 30], [4000, 40]]
+        assert a.counts[[2, 0], :].tolist() == [[30, 300, 3000], [10, 100, 1000]]
+        assert a.counts[1:, [2, 0]].tolist() == [[2000, 20], [3000, 30], [4000, 40]]
+        assert a.counts[[2, 0], 1:].tolist() == [[300, 3000], [100, 1000]]
+        assert a.counts[:, [True, False, True]].tolist() == [[10, 1000], [20, 2000], [30, 3000], [40, 4000]]
+        assert a.counts[[False, True, True, False], :].tolist() == [[20, 200, 2000], [30, 300, 3000]]
+        assert a.counts[1:, [True, False, True]].tolist() == [[20, 2000], [30, 3000], [40, 4000]]
+        assert a.counts[[False, True, True, False], 1:].tolist() == [[200, 2000], [300, 3000]]
 
+        assert a.counts[1, 2] == 2000
+        assert a.counts[1, [2, 2, 0]].tolist() == [2000, 2000, 20]
+        assert a.counts[[2, 2, 0], 1].tolist() == [300, 300, 100]
+        assert a.counts[1, [True, False, True]].tolist() == [20, 2000]
+        assert a.counts[[False, True, True, False], 1].tolist() == [200, 300]
+
+        assert a.counts[[1, 2], [2, 0]].tolist() == [[2000, 20], [3000, 30]]
+        assert a.counts[[False, True, True, False], [2, 0]].tolist() == [[2000, 20], [3000, 30]]
+        assert a.counts[[False, True, True, False], [True, False, True]].tolist() == [[20, 2000], [30, 3000]]
+
+        assert a.counts[[2, 0], [2, 2, 0]].tolist() == [[3000, 3000, 30], [1000, 1000, 10]]
+        assert a.counts[[2, 0], [True, False, True]].tolist() == [[30, 3000], [10, 1000]]
+        assert a.counts[[True, False, True, False], [True, False, True]].tolist() == [[10, 1000], [30, 3000]]
 
     def test_getitem_IntegerBinning(self):
         a = Histogram([Axis(IntegerBinning(-5, 5))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(11, dtype=int))))
