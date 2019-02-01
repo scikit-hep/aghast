@@ -175,3 +175,17 @@ class Test(unittest.TestCase):
         assert a.counts[[7, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 4, 7, 999, 5, 123, 10]
         assert a.counts[[7, -numpy.inf, 4, 7, numpy.inf, 5, -numpy.inf, -1]].tolist() == [7, 123, 4, 7, 999, 5, 123, 10]
         assert a.counts[[True, False, True, False, True, False, True, False, True, False, True]].tolist() == [0, 2, 4, 6, 8, 10]
+
+    def test_getitem_RegularBinning(self):
+        a = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10, dtype=int))))
+        assert a.axis[0].binning.toCategoryBinning().categories == ["[-5, -4)", "[-4, -3)", "[-3, -2)", "[-2, -1)", "[-1, 0)", "[0, 1)", "[1, 2)", "[2, 3)", "[3, 4)", "[4, 5)"]
+        assert a.counts.counts.array.tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        assert a.counts[None] == sum([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        assert a.counts[:].tolist() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert a.counts[5:].tolist() == [5, 6, 7, 8, 9]
+        assert a.counts[5] == 5
+        assert a.counts[[7, 4, 7, 5, -1]].tolist() == [7, 4, 7, 5, 9]
+        assert a.counts[numpy.array([7, 4, 7, 5, -1])].tolist() == [7, 4, 7, 5, 9]
+        assert a.counts[[True, False, True, False, True, False, True, False, True, False]].tolist() == [0, 2, 4, 6, 8]
+        assert a.counts[numpy.array([True, False, True, False, True, False, True, False, True, False])].tolist() == [0, 2, 4, 6, 8]

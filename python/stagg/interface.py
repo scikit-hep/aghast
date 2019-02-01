@@ -1441,7 +1441,146 @@ class Binning(Stagg):
             selfmap[i] = pos
             i += 1
         return selfmap
-        
+
+    def _getindex_general(self, where, length, loc_underflow, loc_overflow, loc_nanflow):
+        if where is None:
+            return (None,)
+
+        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
+            start, stop, step = where.indices(length)
+            shift = len(BinLocation._belows([(loc_underflow,), (loc_overflow,), (loc_nanflow,)]))
+            return (slice(start + shift, stop + shift, step),)
+
+        elif isinstance(where, slice):
+            include_underflow, include_overflow = False, False
+            if where.step is None or where.step > 0:
+                if where.start == -numpy.inf:
+                    include_underflow = True
+                    where = slice(None, where.stop, where.step)
+                if where.stop == numpy.inf:
+                    include_overflow = True
+                    where = slice(where.start, None, where.step)
+            else:
+                if where.start == numpy.inf:
+                    include_overflow = True
+                    where = slice(None, where.stop, where.step)
+                if where.stop == -numpy.inf:
+                    include_underflow = True
+                    where = slice(where.start, None, where.step)
+
+            start, stop, step = where.indices(length)
+            shift = len(BinLocation._belows([(loc_underflow,), (loc_overflow,), (loc_nanflow,)]))
+
+            if not include_underflow and not include_overflow:
+                return (slice(start + shift, stop + shift, step),)
+            else:
+                if step > 0:
+                    underspot, overspot = 0, -1
+                    indexshift = int(include_underflow)
+                    start = max(start, 0)
+                    stop = min(stop, length)
+                else:
+                    underspot, overspot = -1, 0
+                    indexshift = int(include_overflow)
+                    start = min(start, length - 1)
+                    stop = max(stop, -1)
+
+                values = numpy.arange(start + shift, stop + shift, step)
+                index = numpy.empty(len(values) + int(include_underflow) + int(include_overflow), dtype=numpy.int64)
+                under, over, nan = BinLocation._positions(loc_underflow, loc_overflow, loc_nanflow, length)
+
+                if include_underflow:
+                    if under is None:
+                        raise IndexError("index -inf requested but this {0} has no underflow".format(type(self).__name__))
+                    index[underspot] = under
+                if include_overflow:
+                    if over is None:
+                        raise IndexError("index +inf requested but this {0} has no overflow".format(type(self).__name__))
+                    index[overspot] = over
+                index[indexshift : indexshift + len(values)] = values
+                return (index,)
+
+        elif isinstance(where, (numbers.Real, numpy.floating)) and where == -numpy.inf:
+            under, over, nan = BinLocation._positions(loc_underflow, loc_overflow, loc_nanflow, length)
+            if under is None:
+                raise IndexError("index -inf requested but this {0} has no underflow".format(type(self).__name__))
+            return (under,)
+
+        elif isinstance(where, (numbers.Real, numpy.floating)) and where == numpy.inf:
+            under, over, nan = BinLocation._positions(loc_underflow, loc_overflow, loc_nanflow, length)
+            if over is None:
+                raise IndexError("index +inf requested but this {0} has no overflow".format(type(self).__name__))
+            return (over,)
+
+        elif isinstance(where, (numbers.Real, numpy.floating)) and numpy.isnan(where):
+            under, over, nan = BinLocation._positions(loc_underflow, loc_overflow, loc_nanflow, length)
+            if nan is None:
+                raise IndexError("index nan requested but this {0} has no nanflow".format(type(self).__name__))
+            return (nan,)
+
+        elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
+            i = where
+            if i < 0:
+                i += length
+            if not 0 <= i < length:
+                raise IndexError("index out of bounds for {0}: {1}".format(type(self).__name__, where))
+            shift = len(BinLocation._belows([(loc_underflow,), (loc_overflow,), (loc_nanflow,)]))
+            return (i + shift,)
+
+        else:
+            where = numpy.array(where, copy=False)
+
+            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.floating):
+                flows = [(loc_underflow, -numpy.inf), (loc_overflow, numpy.inf), (loc_nanflow, numpy.nan)]
+                index = numpy.empty(where.shape, dtype=numpy.int64)
+                okay = numpy.isfinite(where)
+                pos = 0
+                for loc, tag in BinLocation._belows(flows):
+                    if numpy.isnan(tag):
+                        this = numpy.isnan(where)
+                    else:
+                        this = (where == tag)
+                    index[this] = pos
+                    okay[this] = True
+                    pos += 1
+                shift = pos
+                pos += length
+                for loc, tag in BinLocation._aboves(flows):
+                    if numpy.isnan(tag):
+                        this = numpy.isnan(where)
+                    else:
+                        this = (where == tag)
+                    index[this] = pos
+                    okay[this] = True
+                    pos += 1
+                if not okay.all():
+                    raise IndexError("forbidden indexes for this {0}: {1}".format(type(self).__name__, ", ".join(set(repr(x) for x in where[~okay]))))
+                mask = numpy.isfinite(where)
+                where = where[mask].astype(numpy.int64)
+                index[mask] = numpy.where(where < 0, where + length, where) + shift
+                return (index,)
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
+                shift = len(BinLocation._belows([(loc_underflow,), (loc_overflow,), (loc_nanflow,)]))
+                index = numpy.where(where < 0, where + length, where) + shift
+                return (index,)
+
+            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
+                if len(where) != length:
+                    raise IndexError("boolean index of length {0} does not match this {1} of length {2}".format(len(where), type(self).__name__, length))
+                flows = [(loc_underflow,), (loc_overflow,), (loc_nanflow,)]
+                shiftbelow = len(BinLocation._belows(flows))
+                shiftabove = len(BinLocation._aboves(flows))
+                if shiftbelow + shiftabove == 0:
+                    return (where,)
+                else:
+                    belowmask = numpy.zeros(shiftbelow, dtype=where.dtype)
+                    abovemask = numpy.zeros(shiftabove, dtype=where.dtype)
+                    return (numpy.concatenate([belowmask, where, abovemask]),)
+
+            else:
+                raise TypeError("{0} accepts an integer, -inf/inf/nan, an integer/-inf/inf/nan slice (`:`), ellipsis (`...`), projection (`None`), an array of integers/-inf/inf/nan, or an array of booleans, not {1}".format(type(self).__name__, repr(where)))
+
 ################################################# BinLocation
 
 class BinLocationEnum(Enum):
@@ -1463,13 +1602,13 @@ class BinLocation(object):
 
     @classmethod
     def _belows(cls, tuples):
-        out = [x for x in tuples if x[0].value < cls.nonexistent.value]
+        out = [x for x in tuples if x[0] is not None and x[0].value < cls.nonexistent.value]
         out.sort(key=lambda x: x[0].value)
         return out
 
     @classmethod
     def _aboves(cls, tuples):
-        out = [x for x in tuples if x[0].value > cls.nonexistent.value]
+        out = [x for x in tuples if x[0] is not None and x[0].value > cls.nonexistent.value]
         out.sort(key=lambda x: x[0].value)
         return out
 
@@ -1577,143 +1716,7 @@ class IntegerBinning(Binning, BinLocation):
         return self.toRegularBinning().toSparseRegularBinning()
 
     def _getindex(self, where):
-        if where is None:
-            return (None,)
-
-        elif isinstance(where, slice) and where.start is None and where.stop is None and where.step is None:
-            start, stop, step = where.indices(1 + self.max - self.min)
-            shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
-            return (slice(start + shift, stop + shift, step),)
-
-        elif isinstance(where, slice):
-            include_underflow, include_overflow = False, False
-            if where.step is None or where.step > 0:
-                if where.start == -numpy.inf:
-                    include_underflow = True
-                    where = slice(None, where.stop, where.step)
-                if where.stop == numpy.inf:
-                    include_overflow = True
-                    where = slice(where.start, None, where.step)
-            else:
-                if where.start == numpy.inf:
-                    include_overflow = True
-                    where = slice(None, where.stop, where.step)
-                if where.stop == -numpy.inf:
-                    include_underflow = True
-                    where = slice(where.start, None, where.step)
-
-            start, stop, step = where.indices(1 + self.max - self.min)
-            shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
-
-            if not include_underflow and not include_overflow:
-                return (slice(start + shift, stop + shift, step),)
-            else:
-                if step > 0:
-                    underspot, overspot = 0, -1
-                    indexshift = int(include_underflow)
-                    start = max(start, 0)
-                    stop = min(stop, 1 + self.max - self.min)
-                else:
-                    underspot, overspot = -1, 0
-                    indexshift = int(include_overflow)
-                    start = min(start, 1 + self.max - self.min - 1)
-                    stop = max(stop, -1)
-
-                nonflow = numpy.arange(start + shift, stop + shift, step)
-                index = numpy.empty(len(nonflow) + int(include_underflow) + int(include_overflow), dtype=numpy.int64)
-                under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
-
-                if include_underflow:
-                    if under is None:
-                        raise IndexError("index -inf requested but this {0} has no underflow".format(type(self).__name__))
-                    index[underspot] = under
-                if include_overflow:
-                    if over is None:
-                        raise IndexError("index +inf requested but this {0} has no overflow".format(type(self).__name__))
-                    index[overspot] = over
-                index[indexshift : indexshift + len(nonflow)] = nonflow
-                return (index,)
-
-        elif isinstance(where, (numbers.Real, numpy.floating)) and where == -numpy.inf:
-            under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
-            if under is None:
-                raise IndexError("index -inf requested but this {0} has no underflow".format(type(self).__name__))
-            return (under,)
-
-        elif isinstance(where, (numbers.Real, numpy.floating)) and where == numpy.inf:
-            under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
-            if over is None:
-                raise IndexError("index +inf requested but this {0} has no overflow".format(type(self).__name__))
-            return (over,)
-
-        elif isinstance(where, (numbers.Real, numpy.floating)) and numpy.isnan(where):
-            under, over, nan = BinLocation._positions(self.loc_underflow, self.loc_overflow, None, 1 + self.max - self.min)
-            if nan is None:
-                raise IndexError("index nan requested but this {0} has no nanflow".format(type(self).__name__))
-            return (nan,)
-
-        elif not isinstance(where, (bool, numpy.bool, numpy.bool_)) and isinstance(where, (numbers.Integral, numpy.integer)):
-            i = where
-            if i < 0:
-                i += 1 + self.max - self.min
-            if not 0 <= i < 1 + self.max - self.min:
-                raise IndexError("index out of bounds for {0}: {1}".format(type(self).__name__, where))
-            shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
-            return (i + shift,)
-
-        else:
-            where = numpy.array(where, copy=False)
-
-            if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.floating):
-                flows = [(self.loc_underflow, -numpy.inf), (self.loc_overflow, numpy.inf)]
-                index = numpy.empty(where.shape, dtype=numpy.int64)
-                okay = numpy.isfinite(where)
-                pos = 0
-                for loc, tag in BinLocation._belows(flows):
-                    if numpy.isnan(tag):
-                        this = numpy.isnan(where)
-                    else:
-                        this = (where == tag)
-                    index[this] = pos
-                    okay[this] = True
-                    pos += 1
-                shift = pos
-                pos += 1 + self.max - self.min
-                for loc, tag in BinLocation._aboves(flows):
-                    if numpy.isnan(tag):
-                        this = numpy.isnan(where)
-                    else:
-                        this = (where == tag)
-                    index[this] = pos
-                    okay[this] = True
-                    pos += 1
-                if not okay.all():
-                    raise IndexError("forbidden indexes for this {0}: {1}".format(type(self).__name__, ", ".join(set(repr(x) for x in where[~okay]))))
-                mask = numpy.isfinite(where)
-                where = where[mask].astype(numpy.int64)
-                index[mask] = numpy.where(where < 0, where + 1 + self.max - self.min, where) + shift
-                return (index,)
-
-            elif len(where.shape) == 1 and issubclass(where.dtype.type, numpy.integer):
-                shift = len(BinLocation._belows([(self.loc_underflow,), (self.loc_overflow,)]))
-                index = numpy.where(where < 0, where + 1 + self.max - self.min, where) + shift
-                return (index,)
-
-            elif len(where.shape) == 1 and issubclass(where.dtype.type, (numpy.bool, numpy.bool_)):
-                if len(where) != 1 + self.max - self.min:
-                    raise IndexError("boolean index of length {0} does not match this {1} of length {2}".format(len(where), type(self).__name__, 1 + self.max - self.min))
-                flows = [(self.loc_underflow,), (self.loc_overflow,)]
-                shiftbelow = len(BinLocation._belows(flows))
-                shiftabove = len(BinLocation._aboves(flows))
-                if shiftbelow + shiftabove == 0:
-                    return (where,)
-                else:
-                    belowmask = numpy.zeros(shiftbelow, dtype=where.dtype)
-                    abovemask = numpy.zeros(shiftabove, dtype=where.dtype)
-                    return (numpy.concatenate([belowmask, where, abovemask]),)
-
-            else:
-                raise TypeError("{0} accepts an integer, -inf/inf/nan, an integer/-inf/inf/nan slice (`:`), ellipsis (`...`), projection (`None`), an array of integers/-inf/inf/nan, or an array of booleans, not {1}".format(type(self).__name__, repr(where)))
+        return self._getindex_general(where, 1 + self.max - self.min, self.loc_underflow, self.loc_overflow, None)
 
     def _getloc_flows(self, length, start, stop):
         loc = 0
@@ -2106,6 +2109,12 @@ class RegularBinning(Binning):
         bins = range(lowindex, lowindex + self.num)
         overflow = None if self.overflow is None else self.overflow.detached()
         return SparseRegularBinning(bins, bin_width, origin=origin, overflow=overflow, low_inclusive=self.interval.low_inclusive, high_inclusive=self.interval.high_inclusive)
+
+    def _getindex(self, where):
+        loc_underflow = None if self.overflow is None else self.overflow.loc_underflow
+        loc_overflow = None if self.overflow is None else self.overflow.loc_overflow
+        loc_nanflow = None if self.overflow is None else self.overflow.loc_nanflow
+        return self._getindex_general(where, self.num, loc_underflow, loc_overflow, loc_nanflow)
 
     def _getloc(self, isiloc, where):
         if where is None:
