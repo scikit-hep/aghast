@@ -669,7 +669,7 @@ class InterpretedBuffer(Interpretation):
             elif isinstance(index, numpy.array) and issubclass(index.dtype.type, numpy.integer):
                 buf = numpy.take(buf, index, axis=i)
             else:
-                buf = buf[(Ellipsis, index) + (slice(None),)*(len(indexes) - 1 - i)]
+                buf = buf[(slice(None),)*max(0, i - 1) + (index,) + (slice(None),)*(len(indexes) - 1 - i)]
 
         return buf
 
