@@ -2316,6 +2316,9 @@ class HexagonalBinning(Binning):
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, self.roverflow._toflatbuffers(builder))
         return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
+    def _getindex(self, where1, where2):
+        raise NotImplementedError
+
     def _getloc(self, isiloc, where1, where2):
         if where1 is None and where2 is None:
             return None, (slice(None), slice(None))
@@ -2438,6 +2441,12 @@ class EdgesBinning(Binning):
 
     def toCategoryBinning(self, format="%g"):
         return self.toIrregularBinning().toCategoryBinning(format=format)
+
+    def _getindex(self, where):
+        loc_underflow = None if self.overflow is None else self.overflow.loc_underflow
+        loc_overflow = None if self.overflow is None else self.overflow.loc_overflow
+        loc_nanflow = None if self.overflow is None else self.overflow.loc_nanflow
+        return self._getindex_general(where, len(self.edges) - 1, loc_underflow, loc_overflow, loc_nanflow)
 
     def _getloc(self, isiloc, where):
         if where is None:
@@ -2637,6 +2646,12 @@ class IrregularBinning(Binning, OverlappingFill):
 
         return CategoryBinning(cats)
 
+    def _getindex(self, where):
+        loc_underflow = None if self.overflow is None else self.overflow.loc_underflow
+        loc_overflow = None if self.overflow is None else self.overflow.loc_overflow
+        loc_nanflow = None if self.overflow is None else self.overflow.loc_nanflow
+        return self._getindex_general(where, len(self.intervals), loc_underflow, loc_overflow, loc_nanflow)
+
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
@@ -2806,6 +2821,9 @@ class CategoryBinning(Binning, BinLocation):
         if self.loc_overflow != self.nonexistent:
             stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
+
+    def _getindex(self, where):
+        return self._getindex_general(where, len(self.categories), None, self.loc_overflow, None)
 
     def _getloc(self, isiloc, where):
         if where is None:
@@ -3089,6 +3107,12 @@ class SparseRegularBinning(Binning, BinLocation):
 
         return CategoryBinning(cats)
 
+    def _getindex(self, where):
+        loc_underflow = None if self.overflow is None else self.overflow.loc_underflow
+        loc_overflow = None if self.overflow is None else self.overflow.loc_overflow
+        loc_nanflow = None if self.overflow is None else self.overflow.loc_nanflow
+        return self._getindex_general(where, len(self.bins), loc_underflow, loc_overflow, loc_nanflow)
+
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
@@ -3292,6 +3316,9 @@ class FractionBinning(Binning):
             stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
         return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
 
+    def _getindex(self, where):
+        return self._getindex_general(where, 2, None, None, None)
+
     def _getloc(self, isiloc, where):
         if where is None:
             return None, (slice(None),)
@@ -3362,6 +3389,9 @@ class PredicateBinning(Binning, OverlappingFill):
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
+
+    def _getindex(self, where):
+        return self._getindex_general(where, len(self.predicates), None, None, None)
 
     def _getloc(self, isiloc, where):
         if where is None:
@@ -3584,6 +3614,9 @@ class VariationBinning(Binning):
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
+
+    def _getindex(self, where):
+        return self._getindex_general(where, len(self.variations), None, None, None)
 
     def _getloc(self, isiloc, where):
         if where is None:
