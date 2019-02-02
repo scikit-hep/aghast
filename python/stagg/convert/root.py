@@ -51,40 +51,38 @@ def tostagg(obj, collection=False):
             raise NotImplementedError
 
         if not isinstance(obj, (ROOT.TH2, ROOT.TH3):
+            if isinstance(obj, ROOT.TH1C):
+                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int8)
+            elif isinstance(obj, ROOT.TH1S):
+                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int16)
+            elif isinstance(obj, ROOT.TH1I):
+                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int32)
+            elif isinstance(obj, ROOT.TH1F):
+                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float32)
+            elif isinstance(obj, ROOT.TH1D):
+                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float64)
+            else:
+                raise AssertionError("unrecognized type: {0}".format(type(obj)))
 
-# >>> numpy.frombuffer(h.fArray, count=102, dtype=numpy.float32)
-# array([0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0.],
-#       dtype=float32)
-# >>> h.GetNbinsX()
+            if h.GetSumw2N() != 0:
+                sumw2obj = h.GetSumw2()
+                sumw2array = numpy.frombuffer(sumw2obj.fArray, count=sumw2obj.fN, dtype=numpy.float64)
+                counts = WeightedCounts(
+                    sumw=InterpretedInlineBuffer.fromarray(sumwarray),
+                    sumw2=InterpretedInlineBuffer.fromarray(sumw2array))
+            else:
+                counts = UnweightedCounts(
+                    counts=InterpretedInlineBuffer.fromarray(sumwarray))
+
+            "yay" if obj.GetXaxis().GetLabels() else "nay"
+            list(obj.GetXaxis().GetLabels())
+            obj.GetXaxis().IsVariableBinSize()
+            obj.GetXaxis().GetXmin(), obj.GetXaxis().GetXmax()
+            obj.GetXaxis().GetTitle()
+            obj.GetXaxis().GetBinLowEdge(1)
+            obj.GetXaxis().GetBinUpEdge(1)
 
 # h = Histogram([Axis(RegularBinning(10, RealInterval(0.1, 10.1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
-
-
-            if isinstance(obj, ROOT.TH1C):
-                array = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int8)
-
-            elif isinstance(obj, ROOT.TH1S):
-                array = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int16)
-
-            elif isinstance(obj, ROOT.TH1I):
-                array = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int32)
-
-            elif isinstance(obj, ROOT.TH1F):
-                array = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float32)
-
-            elif isinstance(obj, ROOT.TH1D):
-                array = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float64)
-
-# h.GetSumw2N()
-# sumw2 = h.GetSumw2()
-# numpy.frombuffer(sumw2.fArray, count=sumw2.fN, dtype=numpy.float64)
-
-
 
         elif isinstance(obj, ROOT.TH2):
             if isinstance(obj, ROOT.TH2C):
