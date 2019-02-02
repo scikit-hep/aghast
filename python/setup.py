@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2018, DIANA-HEP
+# Copyright (c) 2019, IRIS-HEP
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,10 +45,10 @@ setup(name = "stagg",
       data_files = ["README.rst"],
       description = "Statistical Aggregates: collections of histograms, profiles, and ntuples as Flatbuffers.",
       long_description = "",
-      author = "Jim Pivarski (DIANA-HEP)",
-      author_email = "pivarski@fnal.gov",
-      maintainer = "Jim Pivarski (DIANA-HEP)",
-      maintainer_email = "pivarski@fnal.gov",
+      author = "Jim Pivarski (IRIS-HEP)",
+      author_email = "pivarski@princeton.edu",
+      maintainer = "Jim Pivarski (IRIS-HEP)",
+      maintainer_email = "pivarski@princeton.edu",
       url = "https://github.com/diana-hep/stagg",
       download_url = "https://github.com/diana-hep/stagg/releases",
       license = "BSD 3-clause",
@@ -58,8 +58,8 @@ setup(name = "stagg",
       tests_require = ["pytest"],
       classifiers = [
           # "Development Status :: 1 - Planning",
-          "Development Status :: 2 - Pre-Alpha",
-          # "Development Status :: 3 - Alpha",
+          # "Development Status :: 2 - Pre-Alpha",
+          "Development Status :: 3 - Alpha",
           # "Development Status :: 4 - Beta",
           # "Development Status :: 5 - Production/Stable",
           # "Development Status :: 6 - Mature",
