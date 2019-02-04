@@ -480,7 +480,7 @@ def _dumpline(obj, args, indent, width, end):
         return preamble + linear + ")"
 
 def _dumplist(objs, indent, width, end):
-    out = ("," + end + indent + "  ").join(objs)
+    out = ("," + end + indent + "    ").join(objs)
     if len(objs) > 0 or objs[0].counts("\n") > 0:
         return out + end + indent + "  "
     return out
@@ -491,6 +491,13 @@ def _dumpeq(data, indent, end):
     else:
         return data
 
+def _dumparray(obj, indent, end):
+    asarray = str(obj)
+    if asarray.count("\n") > 0:
+        return end + indent + "  " + asarray.replace("\n", end + indent + "  ")
+    else:
+        return "[" + " ".join("%g" % x for x in obj) + "]"
+    
 ################################################# Metadata
 
 class MetadataLanguageEnum(Enum):
@@ -1014,7 +1021,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(repr(self.flatarray).replace("\n", end + indent + "  "))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
         if len(self.filters) != 0:
             args.append("filters=[{0}]".format(", ".format(repr(x) for x in self.filters)))
         if self.postfilter_slice is not None:
@@ -1098,7 +1105,7 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
         return stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(repr(self.flatarray).replace("\n", end + indent + "  "))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# InterpretedInlineFloat64Buffer
@@ -1170,7 +1177,7 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
         return stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(repr(self.flatarray).replace("\n", end + indent + "  "))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# InterpretedExternalBuffer
@@ -2795,7 +2802,7 @@ class EdgesBinning(Binning):
         return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["edges={0}".format(repr(self.edges).replace("\n", end + indent + "  "))]
+        args = ["edges={0}".format(_dumparray(self.edges, indent, end))]
         if self.overflow is not None:
             args.append("overflow={0}".format(_dumpeq(self.overflow._dump(indent + "    ", width, end), indent, end)))
         if self.low_inclusive is not True:
@@ -3429,7 +3436,7 @@ class SparseRegularBinning(Binning, BinLocation):
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["bins={0}".format(repr(self.bins).replace("\n", end + indent + "  ")), "bin_width={0}".format(repr(self.bin_width))]
+        args = ["bins={0}".format(_dumparray(self.bins, indent, end)), "bin_width={0}".format(repr(self.bin_width))]
         if self.origin != 0.0:
             args.append("origin={0}".format(repr(self.origin)))
         if self.low_inclusive is not True:
@@ -5047,7 +5054,7 @@ class Histogram(Object):
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["axis=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.axis], indent, width, end), indent, end) + "],", "counts={0}".format(_dumpeq(self.counts._dump(indent + "    ", width, end), indent, end))]
+        args = ["axis=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.axis], indent, width, end), indent, end) + "]", "counts={0}".format(_dumpeq(self.counts._dump(indent + "    ", width, end), indent, end))]
         if len(self.profile) != 0:
             args.append("profile=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.profile], indent, width, end), indent, end)))
         if len(self.axis_covariances) != 0:
@@ -5363,7 +5370,7 @@ class ColumnChunk(Stagg):
         return stagg.stagg_generated.ColumnChunk.ColumnChunkEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["pages=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.pages], indent, width, end), indent, end) + "]", "page_offsets={0}".format(repr(self.page_offsets).replace("\n", end + indent + "  "))]
+        args = ["pages=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.pages], indent, width, end), indent, end) + "]", "page_offsets={0}".format(_dumparray(self.page_offsets, indent, end))]
         if len(self.page_min) != 0:
             args.append("page_min=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.page_min], indent, width, end), indent, end)))
         if len(self.page_max) != 0:
@@ -5613,7 +5620,7 @@ class NtupleInstance(Stagg):
     def _dump(self, indent, width, end):
         args = ["chunks=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.chunks], indent, width, end), indent, end) + "]"]
         if len(self.chunk_offsets) != 0:
-            args.append("chunk_offsets={0}".format(repr(self.chunk_offsets).replace("\n", end + indent + "  ")))
+            args.append("chunk_offsets={0}".format(_dumparray(self.chunk_offsets, indent, end)))
         return _dumpline(self, args, indent, width, end)
 
 ################################################# Ntuple
