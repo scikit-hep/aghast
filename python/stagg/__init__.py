@@ -41,6 +41,8 @@ from stagg.interface import InterpretedBuffer
 from stagg.interface import RawInlineBuffer
 from stagg.interface import RawExternalBuffer
 from stagg.interface import InterpretedInlineBuffer
+from stagg.interface import InterpretedInlineInt64Buffer
+from stagg.interface import InterpretedInlineFloat64Buffer
 from stagg.interface import InterpretedExternalBuffer
 from stagg.interface import StatisticFilter
 from stagg.interface import Moments

@@ -57,6 +57,8 @@ import stagg.stagg_generated.ExternalSource
 import stagg.stagg_generated.RawInlineBuffer
 import stagg.stagg_generated.RawExternalBuffer
 import stagg.stagg_generated.InterpretedInlineBuffer
+import stagg.stagg_generated.InterpretedInlineInt64Buffer
+import stagg.stagg_generated.InterpretedInlineFloat64Buffer
 import stagg.stagg_generated.InterpretedExternalBuffer
 import stagg.stagg_generated.RawBuffer
 import stagg.stagg_generated.InterpretedBuffer
@@ -296,9 +298,6 @@ class Stagg(object):
                         stagg.checktype.setparent(out, x)
                         setattr(out, private, x)
             return out
-
-    def _add(self, other, pairs, triples, noclobber):
-        raise NotImplementedError(type(self))
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -709,12 +708,19 @@ class InterpretedBuffer(Interpretation):
         if len(buf.shape) == 0:
             buf = buf.reshape(1)
 
-        return InterpretedInlineBuffer(buf.view(numpy.uint8),
-                                       filters=None,
-                                       postfilter_slice=None,
-                                       dtype=self.dtype,
-                                       endianness=self.endianness,
-                                       dimension_order=self.dimension_order)
+        if self.dtype == InterpretedBuffer.int64 and self.endianness == InterpretedBuffer.little_endian and self.dimension_order == self.dimension_order == InterpretedBuffer.c_order:
+            return InterpretedInlineInt64Buffer(buf.view(numpy.uint8))
+
+        elif self.dtype == InterpretedBuffer.float64 and self.endianness == InterpretedBuffer.little_endian and self.dimension_order == self.dimension_order == InterpretedBuffer.c_order:
+            return InterpretedInlineFloat64Buffer(buf.view(numpy.uint8))
+
+        else:
+            return InterpretedInlineBuffer(buf.view(numpy.uint8),
+                                           filters=None,
+                                           postfilter_slice=None,
+                                           dtype=self.dtype,
+                                           endianness=self.endianness,
+                                           dimension_order=self.dimension_order)
 
     def _remap(self, newshape, selfmap):
         order = "c" if self.dimension_order == self.c_order else "f"
@@ -730,12 +736,42 @@ class InterpretedBuffer(Interpretation):
                 newbuf[i*(slice(None),) + (selfmap[i],)] = buf.reshape((-1, len(selfmap[i])) + newshape[i + 1 :], order=order)
                 buf = newbuf
 
-        return InterpretedInlineBuffer(buf.view(numpy.uint8),
-                                       filters=None,
-                                       postfilter_slice=None,
-                                       dtype=self.dtype,
-                                       endianness=self.endianness,
-                                       dimension_order=self.dimension_order)
+        if self.dtype == InterpretedBuffer.int64 and self.endianness == InterpretedBuffer.little_endian and self.dimension_order == self.dimension_order == InterpretedBuffer.c_order:
+            return InterpretedInlineInt64Buffer(buf.view(numpy.uint8))
+
+        elif self.dtype == InterpretedBuffer.float64 and self.endianness == InterpretedBuffer.little_endian and self.dimension_order == self.dimension_order == InterpretedBuffer.c_order:
+            return InterpretedInlineFloat64Buffer(buf.view(numpy.uint8))
+
+        else:
+            return InterpretedInlineBuffer(buf.view(numpy.uint8),
+                                           filters=None,
+                                           postfilter_slice=None,
+                                           dtype=self.dtype,
+                                           endianness=self.endianness,
+                                           dimension_order=self.dimension_order)
+
+    def _add(self, other, noclobber):
+        if noclobber:
+            if isinstance(self, InterpretedInlineBuffer) or isinstance(other, InterpretedInlineBuffer):
+                return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
+                                               filters=self.filters,
+                                               postfilter_slice=self.postfilter_slice,
+                                               dtype=self.dtype,
+                                               endianness=self.endianness,
+                                               dimension_order=self.dimension_order)
+
+            elif isinstance(self, InterpretedInlineFloat64Buffer) or isinstance(other, InterpretedInlineFloat64Buffer):
+                return InterpretedInlineFloat64Buffer((self.flatarray + other.flatarray).view(numpy.uint8))
+
+            elif isinstance(self, InterpretedInlineInt64Buffer) or isinstance(other, InterpretedInlineInt64Buffer):
+                return InterpretedInlineInt64Buffer((self.flatarray + other.flatarray).view(numpy.uint8))
+
+            else:
+                raise AssertionError((type(self), type(other)))
+
+        else:
+            self.flatarray += other.flatarray
+            return self
 
 ################################################# RawInlineBuffer
 
@@ -803,7 +839,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
         return stagg.stagg_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
 
-################################################# InlineBuffer
+################################################# InterpretedInlineBuffer
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
@@ -841,7 +877,12 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
             array = numpy.array(array)
         dtype, endianness = Interpretation.from_numpy_dtype(array.dtype)
         order = InterpretedBuffer.fortran_order if numpy.isfortran(array) else InterpretedBuffer.c_order
-        return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
+        if dtype == InterpretedBuffer.int64 and endianness == InterpretedBuffer.little_endian and order == InterpretedBuffer.c_order:
+            return InterpretedInlineInt64Buffer(array)
+        elif dtype == InterpretedBuffer.float64 and endianness == InterpretedBuffer.little_endian and order == InterpretedBuffer.c_order:
+            return InterpretedInlineFloat64Buffer(array)
+        else:
+            return cls(array, dtype=dtype, endianness=endianness, dimension_order=order)
 
     @property
     def flatarray(self):
@@ -890,10 +931,10 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         return out
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, len(self.buffer))
-        builder.head = builder.head - len(self.buffer)
-        builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
-        buffer = builder.EndVector(len(self.buffer))
+        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, self.buffer.nbytes)
+        builder.head = builder.head - self.buffer.nbytes
+        builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
+        buffer = builder.EndVector(self.buffer.nbytes)
 
         if len(self.filters) == 0:
             filters = None
@@ -916,20 +957,144 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         if self.dimension_order != self.c_order:
             stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
         return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
+ 
+################################################# InterpretedInlineInt64Buffer
 
-    def _add(self, other, noclobber):
-        if noclobber:
-            return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
-                                           filters=self.filters,
-                                           postfilter_slice=self.postfilter_slice,
-                                           dtype=self.dtype,
-                                           endianness=self.endianness,
-                                           dimension_order=self.dimension_order)
-        else:
-            self.flatarray += other.flatarray
-            return self
+class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
+    _params = {
+        "buffer": stagg.checktype.CheckBuffer("InterpretedInlineInt64Buffer", "buffer", required=True),
+        }
 
-################################################# ExternalBuffer
+    buffer = typedproperty(_params["buffer"])
+
+    def __init__(self, buffer):
+        self.buffer = buffer
+
+    @property
+    def flatarray(self):
+        try:
+            return self.buffer.reshape(-1).view(self.numpy_dtype)
+        except ValueError:
+            raise ValueError("InterpretedInlineInt64Buffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
+
+    @property
+    def array(self):
+        array = self.flatarray
+        shape = self._shape((), ())
+        if len(array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedInlineInt64Buffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
+        return array.reshape(shape, order=self.dimension_order.dimension_order)
+
+    @property
+    def filters(self):
+        return None
+
+    @property
+    def postfilter_slice(self):
+        return None
+
+    @property
+    def dtype(self):
+        return InterpretedBuffer.int64
+
+    @property
+    def numpy_dtype(self):
+        return numpy.dtype(numpy.int64)
+
+    @property
+    def endianness(self):
+        return InterpretedBuffer.little_endian
+
+    @property
+    def dimension_order(self):
+        return InterpretedBuffer.c_order
+
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Buffer = fb.BufferAsNumpy
+        return out
+
+    def _toflatbuffers(self, builder):
+        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStartBufferVector(builder, self.buffer.nbytes)
+        builder.head = builder.head - self.buffer.nbytes
+        builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
+        buffer = builder.EndVector(self.buffer.nbytes)
+
+        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStart(builder)
+        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferAddBuffer(builder, buffer)
+        return stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
+
+################################################# InterpretedInlineFloat64Buffer
+
+class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
+    _params = {
+        "buffer": stagg.checktype.CheckBuffer("InterpretedInlineFloat64Buffer", "buffer", required=True),
+        }
+
+    buffer = typedproperty(_params["buffer"])
+
+    def __init__(self, buffer):
+        self.buffer = buffer
+
+    @property
+    def flatarray(self):
+        try:
+            return self.buffer.reshape(-1).view(self.numpy_dtype)
+        except ValueError:
+            raise ValueError("InterpretedInlineFloat64Buffer.buffer raw length is {0} bytes but this does not fit an itemsize of {1} bytes".format(len(array), self.numpy_dtype.itemsize))
+
+    @property
+    def array(self):
+        array = self.flatarray
+        shape = self._shape((), ())
+        if len(array) != functools.reduce(operator.mul, shape, 1):
+            raise ValueError("InterpretedInlineFloat64Buffer.buffer length as {0} is {1} but multiplicity at this position in the hierarchy is {2}".format(self.numpy_dtype, len(array), functools.reduce(operator.mul, shape, 1)))
+        return array.reshape(shape, order=self.dimension_order.dimension_order)
+
+    @property
+    def filters(self):
+        return None
+
+    @property
+    def postfilter_slice(self):
+        return None
+
+    @property
+    def dtype(self):
+        return InterpretedBuffer.float64
+
+    @property
+    def numpy_dtype(self):
+        return numpy.dtype(numpy.float64)
+
+    @property
+    def endianness(self):
+        return InterpretedBuffer.little_endian
+
+    @property
+    def dimension_order(self):
+        return InterpretedBuffer.c_order
+
+    @classmethod
+    def _fromflatbuffers(cls, fb):
+        out = cls.__new__(cls)
+        out._flatbuffers = _MockFlatbuffers()
+        out._flatbuffers.Buffer = fb.BufferAsNumpy
+        return out
+
+    def _toflatbuffers(self, builder):
+        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStartBufferVector(builder, self.buffer.nbytes)
+        builder.head = builder.head - self.buffer.nbytes
+        builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
+        buffer = builder.EndVector(self.buffer.nbytes)
+
+        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStart(builder)
+        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferAddBuffer(builder, buffer)
+        return stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
+
+################################################# InterpretedExternalBuffer
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
@@ -1032,12 +1197,8 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
 
     def _add(self, other, noclobber):
         if noclobber or self.external_source != self.memory or len(self.filters) != 0:
-            return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
-                                           filters=self.filters,
-                                           postfilter_slice=self.postfilter_slice,
-                                           dtype=self.dtype,
-                                           endianness=self.endianness,
-                                           dimension_order=self.dimension_order)
+            return super(InterpretedExternalBuffer, self)._add(other, noclobber)
+
         else:
             self.flatarray += other.flatarray
             return self
@@ -5319,6 +5480,8 @@ _RawBuffer_invlookup = {x[0]: n for n, x in _RawBuffer_lookup.items()}
 
 _InterpretedBuffer_lookup = {
     stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
+    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineInt64Buffer: (InterpretedInlineInt64Buffer, stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64Buffer),
+    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineFloat64Buffer: (InterpretedInlineFloat64Buffer, stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64Buffer),
     stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
     }
 _InterpretedBuffer_invlookup = {x[0]: n for n, x in _InterpretedBuffer_lookup.items()}

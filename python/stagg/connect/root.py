@@ -104,12 +104,12 @@ def tostagg(obj, collection=False):
 
             stats = numpy.zeros(4, numpy.float64)
             h.GetStats(stats)
-            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([h.GetEntries()], dtype=numpy.int64)), 0, weighted=False)
-            
+            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([h.GetEntries()], dtype=numpy.int64)), n=0, weightpower=0)
+            sum2 = Moments(InterpretedInlineBuffer.fromarray(HERE), n=0, weightpower=0)
 
 
             
-            statistics = Statistics(moments=[entries, sumw, sumw2])
+            statistics = Statistics(moments=[entries, sumw, sumw2, sumwx, sumwx2])
 
             title = xaxis.GetTitle()
             if title == "":
