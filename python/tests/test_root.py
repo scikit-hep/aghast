@@ -47,4 +47,5 @@ class Test(unittest.TestCase):
     def test_root_basic1d(self):
         h = ROOT.TH1C("th1c", "title", 5, -2, 2)
         for x in data: h.Fill(x)
-        connect_root.tostagg(h)
+        print()
+        connect_root.tostagg(h).dump()
