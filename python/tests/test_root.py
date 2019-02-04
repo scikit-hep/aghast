@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         pass
 
     def test_root_basic1d(self):
-        before = ROOT.TH1C("th1c", "title", 5, -2, 2)
+        before = ROOT.TH1C("before-1", "title", 5, -2, 2)
         for x in data: before.Fill(x)
         connect_root.tostagg(before).dump()
-        after = connect_root.toroot(connect_root.tostagg(before))
+        after = connect_root.toroot(connect_root.tostagg(before), "after-1")

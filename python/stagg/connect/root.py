@@ -41,42 +41,42 @@ def toroot(obj, name):
         raise NotImplementedError
 
     elif isinstance(obj, Histogram):
-        axis = []
+        axissummary = []
         slc = []
         for axis in obj.axis:
             if axis.binning is None:
-                axis.append((RegularBinning, 1, 0.0, 1.0))
+                axissummary.append((RegularBinning, 1, 0.0, 1.0))
                 slc.append(slice(-numpy.inf, numpy.inf))
-            elif isinstance(axis, IntegerBinning):
-                axis.append((RegularBinning, 1 + axis.max - axis.min, axis.min - 0.5, axis.max + 0.5))
+            elif isinstance(axis.binning, IntegerBinning):
+                axissummary.append((RegularBinning, 1 + axis.max - axis.min, axis.min - 0.5, axis.max + 0.5))
                 slc.append(slice(-numpy.inf, numpy.inf))
-            elif isinstance(axis, RegularBinning):
-                axis.append((RegularBinning, axis.num, axis.interval.low, axis.interval.high))
+            elif isinstance(axis.binning, RegularBinning):
+                axissummary.append((RegularBinning, axis.num, axis.interval.low, axis.interval.high))
                 slc.append(slice(-numpy.inf, numpy.inf))
-            elif isinstance(axis, HexagonalBinning):
+            elif isinstance(axis.binning, HexagonalBinning):
                 raise TypeError("no ROOT equivalent for HexagonalBinning")
-            elif isinstance(axis, EdgesBinning):
-                axis.append((EdgesBinning, numpy.array(axis.edges, dtype=numpy.float64, copy=False)))
+            elif isinstance(axis.binning, EdgesBinning):
+                axissummary.append((EdgesBinning, numpy.array(axis.edges, dtype=numpy.float64, copy=False)))
                 slc.append(slice(-numpy.inf, numpy.inf))
-            elif isinstance(axis, IrregularBinning):
-                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+            elif isinstance(axis.binning, IrregularBinning):
+                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
                 slc.append(slice(None))
-            elif isinstance(axis, SparseRegularBinning):
-                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+            elif isinstance(axis.binning, SparseRegularBinning):
+                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
                 slc.append(slice(None))
-            elif isinstance(axis, FractionBinning):
-                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+            elif isinstance(axis.binning, FractionBinning):
+                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
                 slc.append(slice(None))
-            elif isinstance(axis, PredicateBinning):
-                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+            elif isinstance(axis.binning, PredicateBinning):
+                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
                 slc.append(slice(None))
-            elif isinstance(axis, VariationBinning):
-                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+            elif isinstance(axis.binning, VariationBinning):
+                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
                 slc.append(slice(None))
             else:
                 raise AssertionError(type(axis.binning))
                 
-        if isinstance(axis[0].binning, FractionBinning):
+        if isinstance(obj.axis[0].binning, FractionBinning):
             raise NotImplementedError
 
         sumw = obj.counts[tuple(slc)]
@@ -107,26 +107,26 @@ def toroot(obj, name):
 
         title = "" if obj.title is None else obj.title
 
-        if len(axis) == 1:
-            if axis[0] is RegularBinning:
-                num, low, high = axis[1:]
+        if len(axissummary) == 1:
+            if axissummary[0] is RegularBinning:
+                num, low, high = axissummary[1:]
                 out = cls(name, title, num, low, high)
                 xaxis = out.GetXaxis()
                 
-            elif axis[0] is EdgesBinning:
-                edges = axis[1]
+            elif axissummary[0] is EdgesBinning:
+                edges = axissummary[1]
                 out = cls(name, title, num, edges)
                 xaxis = out.GetXaxis()
 
-            elif axis[0] is CategoryBinning:
-                categories = axis[1]
+            elif axissummary[0] is CategoryBinning:
+                categories = axissummary[1]
                 out = cls(name, title, len(categories), 0.5, len(categories) + 0.5)
                 xaxis = out.GetXaxis()
                 for i, x in enumerate(categories):
                     xaxis.SetBinLabel(i + 1, x)
 
             else:
-                raise AssertionError(axis[0])
+                raise AssertionError(axissummary[0])
 
             assert len(sumw.shape) == 1
             if sumw2 is not None:
