@@ -605,7 +605,7 @@ class Interpretation(object):
             endianness = cls.little_endian if sys.byteorder == "little" else cls.big_endian
         elif dtype.byteorder == ">":
             endianness = cls.big_endian
-        elif dtype.byteorder == "<":
+        elif dtype.byteorder == "<" or dtype.byteorder == "|":
             endianness = cls.little_endian
 
         if dtype.kind == "b":
@@ -1239,7 +1239,7 @@ class StatisticFilter(Stagg):
 class Moments(Stagg):
     _params = {
         "sumwxn":      stagg.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
-        "n":           stagg.checktype.CheckInteger("Moments", "n", required=True, min=0),
+        "n":           stagg.checktype.CheckInteger("Moments", "n", required=True, min=-128, max=127),
         "weightpower": stagg.checktype.CheckInteger("Moments", "weightpower", required=False, min=-128, max=127),
         "filter":      stagg.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }

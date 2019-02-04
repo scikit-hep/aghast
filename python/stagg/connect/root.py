@@ -50,17 +50,20 @@ def tostagg(obj, collection=False):
         elif isinstance(obj, ROOT.TProfile3D):
             raise NotImplementedError
 
-        if not isinstance(obj, (ROOT.TH2, ROOT.TH3):
+        if not isinstance(obj, (ROOT.TH2, ROOT.TH3)):
+            fArray = obj.fArray
+            if isinstance(fArray, str):
+                fArray = fArray.encode("latin-1")
             if isinstance(obj, ROOT.TH1C):
-                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int8)
+                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int8)
             elif isinstance(obj, ROOT.TH1S):
-                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int16)
+                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int16)
             elif isinstance(obj, ROOT.TH1I):
-                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.int32)
+                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int32)
             elif isinstance(obj, ROOT.TH1F):
-                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float32)
+                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.float32)
             elif isinstance(obj, ROOT.TH1D):
-                sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=numpy.float64)
+                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.float64)
             else:
                 raise AssertionError("unrecognized type: {0}".format(type(obj)))
 
@@ -71,9 +74,12 @@ def tostagg(obj, collection=False):
             else:
                 categories = None
 
-            if h.GetSumw2N() != 0:
+            if obj.GetSumw2N() != 0:
                 sumw2obj = h.GetSumw2()
-                sumw2array = numpy.frombuffer(sumw2obj.fArray, count=sumw2obj.fN, dtype=numpy.float64)
+                fArray = sumw2obj.fArray
+                if isinstance(fArray, str):
+                    fArray = fArray.encode("latin-1")
+                sumw2array = numpy.frombuffer(fArray, count=sumw2obj.fN, dtype=numpy.float64)
                 if categories is not None:
                     sumwarray = sumwarray[1 : len(categories) + 1]
                     sumw2array = sumw2array[1 : len(categories) + 1]
@@ -103,12 +109,12 @@ def tostagg(obj, collection=False):
                 binning = RegularBinning(num, RealInterval(low, high), overflow=RealOverflow(loc_underflow=BinLocation.below1, loc_overflow=BinLocation.above1))
 
             stats = numpy.zeros(4, numpy.float64)
-            h.GetStats(stats)
-            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([h.GetEntries()], dtype=numpy.int64)), n=0, weightpower=0)
-            sum2 = Moments(InterpretedInlineBuffer.fromarray(HERE), n=0, weightpower=0)
-
-
-            
+            obj.GetStats(stats)
+            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([obj.GetEntries()], dtype=numpy.int64)), n=0, weightpower=0)
+            sumw = Moments(InterpretedInlineBuffer.fromarray(stats[0:1]), n=0, weightpower=1)
+            sumw2 = Moments(InterpretedInlineBuffer.fromarray(stats[1:2]), n=0, weightpower=2)
+            sumwx = Moments(InterpretedInlineBuffer.fromarray(stats[2:3]), n=1, weightpower=1)
+            sumwx2 = Moments(InterpretedInlineBuffer.fromarray(stats[3:4]), n=2, weightpower=1)
             statistics = Statistics(moments=[entries, sumw, sumw2, sumwx, sumwx2])
 
             title = xaxis.GetTitle()
@@ -119,10 +125,7 @@ def tostagg(obj, collection=False):
             title = obj.GetTitle()
             if title == "":
                 title = None
-            out = Histogram([axis], counts, title=title)
-
-            
-# h = Histogram([Axis(RegularBinning(10, RealInterval(0.1, 10.1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+            return Histogram([axis], counts, title=title)
 
         elif isinstance(obj, ROOT.TH2):
             if isinstance(obj, ROOT.TH2C):
