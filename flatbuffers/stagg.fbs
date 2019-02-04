@@ -97,6 +97,14 @@ table InterpretedInlineBuffer {
   dimension_order: DimensionOrder = c_order;
 }
 
+table InterpretedInlineInt64Buffer {
+  buffer: [ubyte] (required);
+}
+
+table InterpretedInlineFloat64Buffer {
+  buffer: [ubyte] (required);
+}
+
 table InterpretedExternalBuffer {
   pointer: ulong;
   numbytes: ulong;
@@ -116,12 +124,14 @@ union RawBuffer {
 
 union InterpretedBuffer {
   InterpretedInlineBuffer,
+  InterpretedInlineInt64Buffer,
+  InterpretedInlineFloat64Buffer,
   InterpretedExternalBuffer
 }
 
 ///////////////////////////////////////////////// descriptive statistics
 
-table StatisticFilter {
+struct StatisticFilter {
   min: double = "-Inf";
   max: double = "+Inf";
   excludes_minf: bool = false;
@@ -131,8 +141,8 @@ table StatisticFilter {
 
 table Moments {
   sumwxn: InterpretedBuffer (required);
-  n: int;
-  weighted: bool = true;
+  n: int8;
+  weightpower: int8 = 1;
   filter: StatisticFilter;
 }
 
@@ -144,7 +154,7 @@ table Extremes {
 table Quantiles {
   values: InterpretedBuffer (required);
   p: double = 0.5;    // 0.0 <= p <= 1.0
-  weighted: bool = true;
+  weightpower: int8 = 1;
   filter: StatisticFilter;
 }
 
@@ -165,7 +175,7 @@ table Covariance {
   xindex: int;
   yindex: int;
   sumwxy: InterpretedBuffer (required);   // one of the N*(N-1) elements
-  weighted: bool = true;
+  weightpower: int8 = 1;
   filter: StatisticFilter;
 }
 
