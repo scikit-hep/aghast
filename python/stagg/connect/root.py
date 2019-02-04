@@ -36,8 +36,144 @@ except ImportError:
 
 from stagg import *
 
-def toroot(obj):
-    pass
+def toroot(obj, name):
+    if isinstance(obj, Collection):
+        raise NotImplementedError
+
+    elif isinstance(obj, Histogram):
+        axis = []
+        slc = []
+        for axis in obj.axis:
+            if axis.binning is None:
+                axis.append((RegularBinning, 1, 0.0, 1.0))
+                slc.append(slice(-numpy.inf, numpy.inf))
+            elif isinstance(axis, IntegerBinning):
+                axis.append((RegularBinning, 1 + axis.max - axis.min, axis.min - 0.5, axis.max + 0.5))
+                slc.append(slice(-numpy.inf, numpy.inf))
+            elif isinstance(axis, RegularBinning):
+                axis.append((RegularBinning, axis.num, axis.interval.low, axis.interval.high))
+                slc.append(slice(-numpy.inf, numpy.inf))
+            elif isinstance(axis, HexagonalBinning):
+                raise TypeError("no ROOT equivalent for HexagonalBinning")
+            elif isinstance(axis, EdgesBinning):
+                axis.append((EdgesBinning, numpy.array(axis.edges, dtype=numpy.float64, copy=False)))
+                slc.append(slice(-numpy.inf, numpy.inf))
+            elif isinstance(axis, IrregularBinning):
+                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+                slc.append(slice(None))
+            elif isinstance(axis, SparseRegularBinning):
+                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+                slc.append(slice(None))
+            elif isinstance(axis, FractionBinning):
+                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+                slc.append(slice(None))
+            elif isinstance(axis, PredicateBinning):
+                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+                slc.append(slice(None))
+            elif isinstance(axis, VariationBinning):
+                axis.append((CategoryBinning, axis.toCategoryBinning().categories))
+                slc.append(slice(None))
+            else:
+                raise AssertionError(type(axis.binning))
+                
+        if isinstance(axis[0].binning, FractionBinning):
+            raise NotImplementedError
+
+        sumw = obj.counts[tuple(slc)]
+        if isinstance(sumw, dict):
+            sumw, sumw2 = sumw["sumw"], sumw["sumw2"]
+            sumw2 = numpy.array(sumw2, dtype=numpy.float64, copy=False)
+        else:
+            sumw2 = None
+
+        if len(self.profile) != 0:
+            raise NotImplementedError
+
+        if issubclass(sumw.dtype.type, numpy.int8):
+            cls = ROOT.TH1C
+            sumw = numpy.array(sumw, dtype=numpy.int8, copy=False)
+        elif issubclass(sumw.dtype.type, (numpy.uint8, numpy.int16)):
+            cls = ROOT.TH1S
+            sumw = numpy.array(sumw, dtype=numpy.int16, copy=False)
+        elif issubclass(sumw.dtype.type, (numpy.uint16, numpy.int32)):
+            cls = ROOT.TH1I
+            sumw = numpy.array(sumw, dtype=numpy.int32, copy=False)
+        elif issubclass(sumw.dtype.type, numpy.float32):
+            cls = ROOT.TH1F
+            sumw = numpy.array(sumw, dtype=numpy.float32, copy=False)
+        else:
+            cls = ROOT.TH1D
+            sumw = numpy.array(sumw, dtype=numpy.float64, copy=False)
+
+        title = "" if obj.title is None else obj.title
+
+        if len(axis) == 1:
+            if axis[0] is RegularBinning:
+                num, low, high = axis[1:]
+                out = cls(name, title, num, low, high)
+                xaxis = out.GetXaxis()
+                
+            elif axis[0] is EdgesBinning:
+                edges = axis[1]
+                out = cls(name, title, num, edges)
+                xaxis = out.GetXaxis()
+
+            elif axis[0] is CategoryBinning:
+                categories = axis[1]
+                out = cls(name, title, len(categories), 0.5, len(categories) + 0.5)
+                xaxis = out.GetXaxis()
+                for i, x in enumerate(categories):
+                    xaxis.SetBinLabel(i + 1, x)
+
+            else:
+                raise AssertionError(axis[0])
+
+            assert len(sumw.shape) == 1
+            if sumw2 is not None:
+                assert sumw.shape == sumw2.shape
+
+            if len(sumw) == out.GetNbinsX():
+                sumw = numpy.concatenate([numpy.array([0], dtype=sumw.dtype), sumw, numpy.array([0], dtype=sumw.dtype)])
+                if sumw2 is not None:
+                    sumw2 = numpy.concatenate([numpy.array([0], dtype=sumw2.dtype), sumw2, numpy.array([0], dtype=sumw2.dtype)])
+            elif len(sumw) == out.GetNbinsX() + 1 and obj.axis[0].loc_underflow == BinLocation.nonexistent:
+                sumw = numpy.concatenate([numpy.array([0], dtype=sumw.dtype), sumw])
+                if sumw2 is not None:
+                    sumw2 = numpy.concatenate([numpy.array([0], dtype=sumw2.dtype), sumw2])
+            elif len(sumw) == out.GetNbinsX() + 1:
+                sumw = numpy.concatenate([sumw, numpy.array([0], dtype=sumw.dtype)])
+                if sumw2 is not None:
+                    sumw2 = numpy.concatenate([sumw2, numpy.array([0], dtype=sumw2.dtype)])
+            elif len(sumw) != out.GetNbinsX() + 2:
+                raise AssertionError((len(sumw), out.GetNbinsX() + 2))
+
+            sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=sumw.dtype)
+            sumwarray[:] = sumw
+
+            if sumw2 is not None:
+                obj.Sumw2()
+                sumw2obj = obj.GetSumw2()
+                sumw2array = numpy.frombuffer(sumw2obj.fArray, count=sumw2obj.fN, dtype=numpy.float64)
+                sumw2array[:] = sumw2
+            
+            xaxis.SetTitle("" if obj.axis[0].title is None else obj.axis[0].title)
+
+            return out
+
+        elif len(axis) == 2:
+            raise NotImplementedError
+
+        elif len(axis) == 3:
+            raise NotImplementedError
+
+        else:
+            raise NotImplementedError
+
+    elif isinstance(obj, Ntuple):
+        raise NotImplementedError
+
+    else:
+        raise TypeError("cannot convert {0}".format(type(obj)))
 
 def tostagg(obj, collection=False):
     if isinstance(obj, ROOT.TH1):
@@ -125,7 +261,12 @@ def tostagg(obj, collection=False):
             title = obj.GetTitle()
             if title == "":
                 title = None
-            return Histogram([axis], counts, title=title)
+            out = Histogram([axis], counts, title=title)
+
+            if collection:
+                raise NotImplementedError
+            else:
+                return out
 
         elif isinstance(obj, ROOT.TH2):
             if isinstance(obj, ROOT.TH2C):
