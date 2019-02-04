@@ -308,6 +308,11 @@ class Stagg(object):
     def _toflatbuffers(self, builder):
         raise NotImplementedError("missing _toflatbuffers implementation in {0}".format(type(self)))
 
+    def dump(self, indent="", end="\n", file=sys.stdout, flush=False):
+        file.write(self._dump(indent, end))
+        if flush:
+            file.flush()
+
     def __eq__(self, other):
         if self is other:
             return True
@@ -459,6 +464,12 @@ def fromfile(file, mode="r+", checkvalid=False):
     offset, = struct.unpack("<Q", file[-12:-4])
     return frombuffer(file[offset:-12], checkvalid=checkvalid)
 
+def _dumpstring(obj):
+    if obj.count("\n") > 0:
+        return "''" + repr(obj).replace("\\n", end) + "''"
+    else:
+        return repr(obj)
+
 ################################################# Metadata
 
 class MetadataLanguageEnum(Enum):
@@ -488,6 +499,12 @@ class Metadata(Stagg):
         if self.language != self.unspecified:
             stagg.stagg_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
         return stagg.stagg_generated.Metadata.MetadataEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [_dumpstring(self.data)]
+        if self.language != self.unspecified:
+            args.append("language={0}".format(repr(self.language)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Decoration
 
@@ -520,6 +537,12 @@ class Decoration(Stagg):
         if self.language != self.unspecified:
             stagg.stagg_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
         return stagg.stagg_generated.Decoration.DecorationEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [_dumpstring(self.data)]
+        if self.language != self.unspecified:
+            args.append("language={0}".format(repr(self.language)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Buffers
 
@@ -810,6 +833,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
         stagg.stagg_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
         return stagg.stagg_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.buffer.tostring())]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# RawExternalBuffer
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
@@ -836,8 +863,15 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
         stagg.stagg_generated.RawExternalBuffer.RawExternalBufferStart(builder)
         stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
         stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
-        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
+        if self.external_source != ExternalBuffer.memory:
+            stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
         return stagg.stagg_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.pointer), repr(self.numbytes)]
+        if self.external_source != ExternalBuffer.memory:
+            args.append("external_source={0}".format(repr(self.external_source)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# InterpretedInlineBuffer
 
@@ -957,6 +991,22 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
         if self.dimension_order != self.c_order:
             stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
         return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.flatarray).replace("\n", end + indent + "    ")]
+        if len(self.filters) != 0:
+            args.append("filters=[{0}]".format(", ".format(repr(x) for x in self.filters)))
+        if self.postfilter_slice is not None:
+            args.append("postfilter_slice=slice({0}, {1}, {2})".format(self.postfilter_slice.start if self.postfilter_slice.hasStart else "None",
+                                                                       self.postfilter_slice.stop if self.postfilter_slice.hasStop else "None",
+                                                                       self.postfilter_slice.step if self.postfilter_slice.hasStep else "None"))
+        if self.dtype != InterpretedBuffer.none:
+            args.append("dtype={0}".format(repr(self.dtype)))
+        if self.endianness != InterpretedBuffer.little_endian:
+            args.append("endianness={0}".format(repr(self.endianness)))
+        if self.dimension_order != InterpretedBuffer.c_order:
+            args.append("dimension_order={0}".format(repr(self.dimension_order)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
  
 ################################################# InterpretedInlineInt64Buffer
 
@@ -1026,6 +1076,10 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
         stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferAddBuffer(builder, buffer)
         return stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.flatarray).replace("\n", end + indent + "    ")]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# InterpretedInlineFloat64Buffer
 
 class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
@@ -1093,6 +1147,10 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
         stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStart(builder)
         stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferAddBuffer(builder, buffer)
         return stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.flatarray).replace("\n", end + indent + "    ")]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# InterpretedExternalBuffer
 
@@ -1195,6 +1253,26 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
             stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
         return stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.pointer), repr(self.numbytes)]
+        if self.external_source != ExternalBuffer.memory:
+            args.append("external_source={0}".format(repr(self.external_source)))
+        if len(self.filters) != 0:
+            args.append("filters=[{0}]".format(", ".format(repr(x) for x in self.filters)))
+        if self.postfilter_slice is not None:
+            args.append("postfilter_slice=slice({0}, {1}, {2})".format(self.postfilter_slice.start if self.postfilter_slice.hasStart else "None",
+                                                                       self.postfilter_slice.stop if self.postfilter_slice.hasStop else "None",
+                                                                       self.postfilter_slice.step if self.postfilter_slice.hasStep else "None"))
+        if self.dtype != InterpretedBuffer.none:
+            args.append("dtype={0}".format(repr(self.dtype)))
+        if self.endianness != InterpretedBuffer.little_endian:
+            args.append("endianness={0}".format(repr(self.endianness)))
+        if self.dimension_order != InterpretedBuffer.c_order:
+            args.append("dimension_order={0}".format(repr(self.dimension_order)))
+        if self.location is not None:
+            args.append("location={0}".format(_dumpstring(self.location)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _add(self, other, noclobber):
         if noclobber or self.external_source != self.memory or len(self.filters) != 0:
             return super(InterpretedExternalBuffer, self)._add(other, noclobber)
@@ -1233,6 +1311,20 @@ class StatisticFilter(Stagg):
 
     def _toflatbuffers(self, builder):
         return stagg.stagg_generated.StatisticFilter.CreateStatisticFilter(builder, self.min, self.max, self.excludes_minf, self.excludes_pinf, self.excludes_nan)
+
+    def _dump(self, indent, end):
+        args = []
+        if self.min != -numpy.inf:
+            args.append("min={0}".format(self.min))
+        if self.max != numpy.inf:
+            args.append("max={0}".format(self.max))
+        if self.excludes_minf is not False:
+            args.append("excludes_minf={0}".format(self.excludes_minf))
+        if self.excludes_pinf is not False:
+            args.append("excludes_pinf={0}".format(self.excludes_pinf))
+        if self.excludes_nan is not False:
+            args.append("excludes_nan={0}".format(self.excludes_nan))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Moments
 
@@ -1283,6 +1375,14 @@ class Moments(Stagg):
             stagg.stagg_generated.Moments.MomentsAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Moments.MomentsEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [self.sumwxn._dump(indent + "    ", end), repr(n)]
+        if self.weightpower != -1:
+            args.append("weightpower={0}".format(self.weightpower))
+        if self.filter is not None:
+            args.append("filter={0}".format(self.filter._dump(indent + "    ", end, flie, flush)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Extremes
 
 class Extremes(Stagg):
@@ -1320,6 +1420,12 @@ class Extremes(Stagg):
         if self.filter is not None:
             stagg.stagg_generated.Extremes.ExtremesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Extremes.ExtremesEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [self.values._dump(indent + "    ", end)]
+        if self.filter is not None:
+            args.append("filter={0}".format(self.filter._dump(indent + "    ", end, flie, flush)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Quantiles
 
@@ -1370,6 +1476,14 @@ class Quantiles(Stagg):
             stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Quantiles.QuantilesEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [self.values._dump(indent + "    ", end), repr(p)]
+        if self.weightpower != -1:
+            args.append("weightpower={0}".format(self.weightpower))
+        if self.filter is not None:
+            args.append("filter={0}".format(self.filter._dump(indent + "    ", end, flie, flush)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Modes
 
 class Modes(Stagg):
@@ -1407,6 +1521,12 @@ class Modes(Stagg):
         if self.filter is not None:
             stagg.stagg_generated.Modes.ModesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Modes.ModesEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [self.values._dump(indent + "    ", end)]
+        if self.filter is not None:
+            args.append("filter={0}".format(self.filter._dump(indent + "    ", end, flie, flush)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Statistics
 
@@ -1476,6 +1596,20 @@ class Statistics(Stagg):
             stagg.stagg_generated.Statistics.StatisticsAddMax(builder, max)
         return stagg.stagg_generated.Statistics.StatisticsEnd(builder)
 
+    def _dump(self, indent, end):
+        args = []
+        if len(self.moments) != 0:
+            args.append("moments=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.moments)))
+        if len(self.quantiles) != 0:
+            args.append("quantiles=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.quantiles)))
+        if self.mode is not None:
+            args.append("mode={0}".format(self.mode._dump(indent + "    ", end)))
+        if self.min is not None:
+            args.append("min={0}".format(self.min._dump(indent + "    ", end)))
+        if self.max is not None:
+            args.append("max={0}".format(self.max._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Covariance
 
 class Covariance(Stagg):
@@ -1539,6 +1673,14 @@ class Covariance(Stagg):
         if self.filter is not None:
             stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Covariance.CovarianceEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.xindex), repr(self.yindex), self.sumwxy._dump(indent + "    ", end)]
+        if self.weightpower != -1:
+            args.append("weightpower={0}".format(self.weightpower))
+        if self.filter is not None:
+            args.append("filter={0}".format(self.filter._dump(indent + "    ", end, flie, flush)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Binning
 
@@ -1834,6 +1976,14 @@ class IntegerBinning(Binning, BinLocation):
             stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.IntegerBinning.IntegerBinningEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.min), repr(self.max)]
+        if self.loc_underflow != BinLocation.nonexistent:
+            args.append("loc_underflow={0}".format(self.loc_underflow))
+        if self.loc_overflow != BinLocation.nonexistent:
+            args.append("loc_overflow={0}".format(self.loc_overflow))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def toRegularBinning(self):
         if self.loc_underflow == self.nonexistent and self.loc_overflow == self.nonexistent:
             overflow = None
@@ -2007,6 +2157,14 @@ class RealInterval(Stagg):
     def _toflatbuffers(self, builder):
         return stagg.stagg_generated.RealInterval.CreateRealInterval(builder, self.low, self.high, self.low_inclusive, self.high_inclusive)
 
+    def _dump(self, indent, end):
+        args = [repr(self.low), repr(self.high)]
+        if self.low_inclusive is not True:
+            args.append("low_inclusive={0}".format(self.low_inclusive))
+        if self.high_inclusive is not True:
+            args.append("high_inclusive={0}".format(self.high_inclusive))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def __hash__(self):
         return hash((RealInterval, self.low, self.high, self.low_inclusive, self.high_inclusive))
 
@@ -2063,6 +2221,22 @@ class RealOverflow(Stagg, BinLocation):
 
     def _toflatbuffers(self, builder):
         return stagg.stagg_generated.RealOverflow.CreateRealOverflow(builder, self.loc_underflow.value, self.loc_overflow.value, self.loc_nanflow.value, self.minf_mapping.value, self.pinf_mapping.value, self.nan_mapping.value)
+
+    def _dump(self, indent, end):
+        args = []
+        if self.loc_underflow != BinLocation.nonexistent:
+            args.append("loc_underflow={0}".format(self.loc_underflow))
+        if self.loc_overflow != BinLocation.nonexistent:
+            args.append("loc_overflow={0}".format(self.loc_overflow))
+        if self.loc_nanflow != BinLocation.nonexistent:
+            args.append("loc_nanflow={0}".format(self.loc_nanflow))
+        if self.minf_mapping != RealOverflow.in_underflow:
+            args.append("minf_mapping={0}".format(self.minf_mapping))
+        if self.pinf_mapping != RealOverflow.in_overflow:
+            args.append("pinf_mapping={0}".format(self.pinf_mapping))
+        if self.nan_mapping != RealOverflow.in_nanflow:
+            args.append("nan_mapping={0}".format(self.nan_mapping))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     @staticmethod
     def _getloc(overflow, yes_underflow, yes_overflow, length):
@@ -2232,6 +2406,14 @@ class RegularBinning(Binning):
         if self.circular is not False:
             stagg.stagg_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.RegularBinning.RegularBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.num), self.interval._dump(indent + "    ", end)]
+        if self.overflow is not None:
+            args.append("overflow={0}".format(self.overflow._dump(indent + "    ", end)))
+        if self.circular is not False:
+            args.append("circular={0}".format(self.circular))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def toEdgesBinning(self):
         edges = numpy.linspace(self.interval.low, self.interval.high, self.num + 1).tolist()
@@ -2461,6 +2643,22 @@ class HexagonalBinning(Binning):
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, self.roverflow._toflatbuffers(builder))
         return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.qmin), repr(self.qmax), repr(self.rmin), repr(self.rmax)]
+        if self.coordinates != HexagonalBinning.offset:
+            args.append("coordinates={0}".format(repr(self.coordinates)))
+        if self.xorigin != 0.0:
+            args.append("xorigin={0}".format(repr(self.xorigin)))
+        if self.yorigin != 0.0:
+            args.append("yorigin={0}".format(repr(self.yorigin)))
+        if self.qangle != 0.0:
+            args.append("qangle={0}".format(repr(self.qangle)))
+        if self.qoverflow is not None:
+            args.append("qoverflow={0}".format(self.qoverflow._dump(indent + "    ", end)))
+        if self.roverflow is not None:
+            args.append("roverflow={0}".format(self.roverflow._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _getindex(self, where1, where2):
         raise NotImplementedError
 
@@ -2574,6 +2772,18 @@ class EdgesBinning(Binning):
         if self.circular is not False:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddCircular(builder, self.circular)
         return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.edges).replace("\n", end + indent + "    ")]
+        if self.overflow is not None:
+            args.append("overflow={0}".format(self.overflow._dump(indent + "    ", end)))
+        if self.low_inclusive is not True:
+            args.append("low_inclusive={0}".format(repr(self.low_inclusive)))
+        if self.high_inclusive is not False:
+            args.append("high_inclusive={0}".format(repr(self.high_inclusive)))
+        if self.circular is not False:
+            args.append("circular={0}".format(repr(self.circular)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def toIrregularBinning(self):
         if self.low_inclusive and self.high_inclusive:
@@ -2754,6 +2964,14 @@ class IrregularBinning(Binning, OverlappingFill):
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.intervals) + "]"]
+        if self.overflow is not None:
+            args.append("overflow={0}".format(self.overflow._dump(indent + "    ", end)))
+        if self.overlapping_fill is not True:
+            args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def toCategoryBinning(self, format="%g"):
         flows = []
@@ -2966,6 +3184,12 @@ class CategoryBinning(Binning, BinLocation):
         if self.loc_overflow != self.nonexistent:
             stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
         return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ", ".join(repr(x) for x in self.categories) + "]"]
+        if self.loc_overflow != BinLocation.nonexistent:
+            args.append("loc_overflow={0}".format(repr(self.loc_overflow)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def _getindex(self, where):
         return self._getindex_general(where, len(self.categories), None, self.loc_overflow, None)
@@ -3182,6 +3406,20 @@ class SparseRegularBinning(Binning, BinLocation):
         if self.maxbin != 9223372036854775807:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddMaxbin(builder, self.maxbin)
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.bins).replace("\n", end + indent + "    "), repr(self.bin_width)]
+        if self.origin != 0.0:
+            args.append("origin={0}".format(repr(self.origin)))
+        if self.low_inclusive is not True:
+            args.append("low_inclusive={0}".format(repr(self.low_inclusive)))
+        if self.high_inclusive is not True:
+            args.append("high_inclusive={0}".format(repr(self.high_inclusive)))
+        if self.minbin != -9223372036854775808:
+            args.append("minbin={0}".format(repr(self.minbin)))
+        if self.maxbin != 9223372036854775807:
+            args.append("maxbin={0}".format(repr(self.maxbin)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def originto(self, origin):
         numbins = int(round((origin - self.origin) / self.bin_width))
@@ -3461,6 +3699,16 @@ class FractionBinning(Binning):
             stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
         return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
 
+    def _dump(self, indent, end):
+        args = []
+        if self.layout != self.passall:
+            args.append("layout={0}".format(repr(self.layout)))
+        if self.layout_reversed is not False:
+            args.append("layout_reversed={0}".format(repr(self.layout_reversed)))
+        if self.error_method != self.undefined:
+            args.append("error_method={0}".format(repr(self.error_method)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _getindex(self, where):
         return self._getindex_general(where, 2, None, None, None)
 
@@ -3534,6 +3782,12 @@ class PredicateBinning(Binning, OverlappingFill):
         if self.overlapping_fill != self.undefined:
             stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ", ".join(repr(x) for x in self.predicates) + "]"]
+        if self.overlapping_fill != OverlappingFill.undefined:
+            args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def _getindex(self, where):
         return self._getindex_general(where, len(self.predicates), None, None, None)
@@ -3658,6 +3912,10 @@ class Assignment(Stagg):
         stagg.stagg_generated.Assignment.AssignmentAddExpression(builder, expression)
         return stagg.stagg_generated.Assignment.AssignmentEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [repr(self.identifier), self.expression._dump(indent + "    ", end)]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Variation
 
 class Variation(Stagg):
@@ -3725,6 +3983,14 @@ class Variation(Stagg):
             stagg.stagg_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
         return stagg.stagg_generated.Variation.VariationEnd(builder)
 
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.assignments) + "]"]
+        if self.systematic is not None:
+            args.append("systematic=[{0}]".format(", ".join(repr(x) for x in self.systematic)))
+        if self.category_systematic is not None:
+            args.append("category_systematic=[{0}]".format(", ".join(repr(x) for x in self.category_systematic)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# VariationBinning
 
 class VariationBinning(Binning):
@@ -3759,6 +4025,10 @@ class VariationBinning(Binning):
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.variations) + "]"]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def _getindex(self, where):
         return self._getindex_general(where, len(self.variations), None, None, None)
@@ -3899,6 +4169,22 @@ class Axis(Stagg):
             stagg.stagg_generated.Axis.AxisAddDecoration(builder, decoration)
         return stagg.stagg_generated.Axis.AxisEnd(builder)
 
+    def _dump(self, indent, end):
+        args = []
+        if self.binning is not None:
+            args.append("binning={0}".format(self.binning._dump(indent + "    ", end)))
+        if self.expression is not None:
+            args.append("expression={0}".format(_dumpstring(self.expression)))
+        if self.statistics is not None:
+            args.append("statistics={0}".format(self.statistics._dump(indent + "    ", end)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Profile
 
 class Profile(Stagg):
@@ -3946,6 +4232,16 @@ class Profile(Stagg):
         if decoration is not None:
             stagg.stagg_generated.Profile.ProfileAddDecoration(builder, decoration)
         return stagg.stagg_generated.Profile.ProfileEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.expression), self.statistics._dump(indent + "    ", end)]
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Counts
 
@@ -4029,6 +4325,10 @@ class UnweightedCounts(Counts):
         stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
         return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [self.counts._dump(indent + "    ", end)]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _reindex(self, oldshape, indexes):
         return self.counts._reindex(oldshape, indexes)
 
@@ -4090,6 +4390,14 @@ class WeightedCounts(Counts):
         if unweighted is not None:
             stagg.stagg_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
         return stagg.stagg_generated.WeightedCounts.WeightedCountsEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [self.sumw._dump(indent + "    ", end)]
+        if self.sumw2 is not None:
+            args.append("sumw2".format(self.sumw2._dump(indent + "    ", end)))
+        if self.unweighted is not None:
+            args.append("unweighted".format(self.unweighted._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def _reindex(self, oldshape, indexes):
         out = {"sumw": self.sumw._reindex(oldshape, indexes)}
@@ -4162,6 +4470,10 @@ class Parameter(Stagg):
         stagg.stagg_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Parameter.ParameterAddValues(builder, values)
         return stagg.stagg_generated.Parameter.ParameterEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [repr(self.parameter), self.values._dump(indent + "    ", end)]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Function
 
@@ -4292,6 +4604,20 @@ class ParameterizedFunction(Function, FunctionObject):
                 stagg.stagg_generated.Object.ObjectAddScript(builder, script)
             return stagg.stagg_generated.Object.ObjectEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [_dumpstring(self.expression)]
+        if len(self.parameters) != 0:
+            args.append("parameters=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.parameters)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _add(self, other, pairs, triples, noclobber):
         raise NotImplementedError
 
@@ -4384,6 +4710,22 @@ class EvaluatedFunction(Function):
         if script is not None:
             stagg.stagg_generated.Function.FunctionAddScript(builder, script)
         return stagg.stagg_generated.Function.FunctionEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [self.values._dump(indent + "    ", end)]
+        if self.derivatives is not None:
+            args.append("derivatives={0}".format(self.derivatives._dump(indent + "    ", end)))
+        if len(self.errors) != 0:
+            args.append("errors=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.quantiles)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# BinnedEvaluatedFunction
 
@@ -4504,6 +4846,22 @@ class BinnedEvaluatedFunction(FunctionObject):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent).join(x._dump(indent + "    ", end) for x in self.axis) + "]", self.values._dump(indent + "    ", end)]
+        if self.derivatives is not None:
+            args.append("derivatives={0}".format(self.derivatives._dump(indent + "    ", end)))
+        if len(self.errors) != 0:
+            args.append("errors=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.errors)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     def _add(self, other, pairs, triples, noclobber):
         raise NotImplementedError
@@ -4667,6 +5025,26 @@ class Histogram(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent).join(x._dump(indent + "    ", end) for x in self.axis) + "]", self.counts._dump(indent + "    ", end)]
+        if len(self.profile) != 0:
+            args.append("profile=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.profile)))
+        if len(self.axis_covariances) != 0:
+            args.append("axis_covariances=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.axis_covariances)))
+        if len(self.profile_covariances) != 0:
+            args.append("profile_covariances=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.profile_covariances)))
+        if len(self.functions) != 0:
+            args.append("functions=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.functions)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     @property
     def allaxis(self):
         out = list(self.axis)
@@ -4828,14 +5206,18 @@ class Page(Stagg):
         stagg.stagg_generated.Page.PageAddBuffer(builder, buffer)
         return stagg.stagg_generated.Page.PageEnd(builder)
 
+    def _dump(self, indent, end):
+        args = [self.buffer._dump(indent + "    ", end)]
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# ColumnChunk
 
 class ColumnChunk(Stagg):
     _params = {
         "pages":        stagg.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
         "page_offsets": stagg.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_min":  stagg.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
-        "page_max":  stagg.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
+        "page_min":     stagg.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
+        "page_max":     stagg.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
         }
 
     pages        = typedproperty(_params["pages"])
@@ -4958,6 +5340,14 @@ class ColumnChunk(Stagg):
         if page_max is not None:
             stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
         return stagg.stagg_generated.ColumnChunk.ColumnChunkEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.pages) + "]", repr(self.page_offsets).replace("\n", end + indent + "    ")]
+        if len(self.page_min) != 0:
+            args.append("page_min=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.page_min)))
+        if len(self.page_max) != 0:
+            args.append("page_max=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.page_max)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
         
 ################################################# Chunk
 
@@ -5009,6 +5399,12 @@ class Chunk(Stagg):
         if metadata is not None:
             stagg.stagg_generated.Chunk.ChunkAddMetadata(builder, metadata)
         return stagg.stagg_generated.Chunk.ChunkEnd(builder)
+
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.column_chunks) + "]"]
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# Column
 
@@ -5080,6 +5476,26 @@ class Column(Stagg, Interpretation):
         if decoration is not None:
             stagg.stagg_generated.Column.ColumnAddDecoration(builder, decoration)
         return stagg.stagg_generated.Column.ColumnEnd(builder)
+
+    def _dump(self, indent, end):
+        args = [_dumpstring(self.identifier), repr(self.dtype)]
+        if self.endianness != InterpretedBuffer.little_endian:
+            args.append("endianness={0}".format(repr(self.endianness)))
+        if self.dimension_order != InterpretedBuffer.c_order:
+            args.append("dimension_order={0}".format(repr(self.dimension_order)))
+        if len(self.filters) != 0:
+            args.append("filters=[{0}]".format(", ".join(repr(x) for x in self.filters)))
+        if self.postfilter_slice is not None:
+            args.append("postfilter_slice=slice({0}, {1}, {2})".format(self.postfilter_slice.start if self.postfilter_slice.hasStart else "None",
+                                                                       self.postfilter_slice.stop if self.postfilter_slice.hasStop else "None",
+                                                                       self.postfilter_slice.step if self.postfilter_slice.hasStep else "None"))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
 ################################################# NtupleInstance
 
@@ -5173,6 +5589,12 @@ class NtupleInstance(Stagg):
             stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
         return stagg.stagg_generated.NtupleInstance.NtupleInstanceEnd(builder)
 
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.chunks) + "]"]
+        if len(self.chunk_offsets) != 0:
+            args.append("chunk_offsets={0}".format(repr(self.chunk_offsets).replace("\n", end + indent + "    ")))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
 ################################################# Ntuple
 
 class Ntuple(Object):
@@ -5188,15 +5610,15 @@ class Ntuple(Object):
         "script":             stagg.checktype.CheckString("Ntuple", "script", required=False),
         }
 
-    columns             = typedproperty(_params["columns"])
-    instances           = typedproperty(_params["instances"])
-    column_statistics   = typedproperty(_params["column_statistics"])
+    columns            = typedproperty(_params["columns"])
+    instances          = typedproperty(_params["instances"])
+    column_statistics  = typedproperty(_params["column_statistics"])
     column_covariances = typedproperty(_params["column_covariances"])
-    functions           = typedproperty(_params["functions"])
-    title               = typedproperty(_params["title"])
-    metadata            = typedproperty(_params["metadata"])
-    decoration          = typedproperty(_params["decoration"])
-    script              = typedproperty(_params["script"])
+    functions          = typedproperty(_params["functions"])
+    title              = typedproperty(_params["title"])
+    metadata           = typedproperty(_params["metadata"])
+    decoration         = typedproperty(_params["decoration"])
+    script             = typedproperty(_params["script"])
 
     def __init__(self, columns, instances, column_statistics=None, column_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.columns = columns
@@ -5318,6 +5740,24 @@ class Ntuple(Object):
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
 
+    def _dump(self, indent, end):
+        args = ["[" + ("," + end + indent).join(x._dump(indent + "    ", end) for x in self.columns) + "]", "[" + ("," + end + indent).join(x._dump(indent + "    ", end) for x in self.instances) + "]"]
+        if len(self.column_statistics) != 0:
+            args.append("column_statistics=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.column_statistics)))
+        if len(self.column_covariances) != 0:
+            args.append("column_covariances=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.column_covariances)))
+        if len(self.functions) != 0:
+            args.append("functions=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.functions)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
+
     def _add(self, other, pairs, triples, noclobber):
         raise NotImplementedError
 
@@ -5425,6 +5865,22 @@ class Collection(Object):
         if script is not None:
             stagg.stagg_generated.Object.ObjectAddScript(builder, script)
         return stagg.stagg_generated.Object.ObjectEnd(builder)
+
+    def _dump(self, indent, end):
+        args = []
+        if len(self.objects) != 0:
+            args.append("objects=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.objects)))
+        if len(self.axis) != 0:
+            args.append("axis=[{0}]".format(("," + end + indent + "    ").join(x._dump(indent + "    ", end) for x in self.axis)))
+        if self.title is not None:
+            args.append("title={0}".format(_dumpstring(self.title)))
+        if self.metadata is not None:
+            args.append("metadata={0}".format(self.metadata._dump(indent + "    ", end)))
+        if self.decoration is not None:
+            args.append("decoration={0}".format(self.decoration._dump(indent + "    ", end)))
+        if self.script is not None:
+            args.append("script={0}".format(_dumpstring(self.script)))
+        return indent + "{0}({1})".format(type(self).__name__, ("," + end + indent + "    ").join(args))
 
     @staticmethod
     def _pairs_triples(one, two):
