@@ -52,7 +52,7 @@ def tostagg(obj, collection=False):
 
         if not isinstance(obj, (ROOT.TH2, ROOT.TH3)):
             fArray = obj.fArray
-            if isinstance(fArray, str):
+            if not isinstance(fArray, bytes):
                 fArray = fArray.encode("latin-1")
             if isinstance(obj, ROOT.TH1C):
                 sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int8)
@@ -77,7 +77,7 @@ def tostagg(obj, collection=False):
             if obj.GetSumw2N() != 0:
                 sumw2obj = h.GetSumw2()
                 fArray = sumw2obj.fArray
-                if isinstance(fArray, str):
+                if not isinstance(fArray, bytes):
                     fArray = fArray.encode("latin-1")
                 sumw2array = numpy.frombuffer(fArray, count=sumw2obj.fN, dtype=numpy.float64)
                 if categories is not None:
