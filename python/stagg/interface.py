@@ -1071,38 +1071,27 @@ class StatisticFilter(Stagg):
             raise ValueError("StatisticFilter.min ({0}) must be strictly less than StatisticFilter.max ({1})".format(self.min, self.max))
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.StatisticFilter.StatisticFilterStart(builder)
-        if self.min != -numpy.inf:
-            stagg.stagg_generated.StatisticFilter.StatisticFilterAddMin(builder, self.min)
-        if self.max != numpy.inf:
-            stagg.stagg_generated.StatisticFilter.StatisticFilterAddMax(builder, self.max)
-        if self.excludes_minf is not False:
-            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesMinf(builder, self.excludes_minf)
-        if self.excludes_pinf is not False:
-            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesPinf(builder, self.excludes_pinf)
-        if self.excludes_nan is not False:
-            stagg.stagg_generated.StatisticFilter.StatisticFilterAddExcludesNan(builder, self.excludes_nan)
-        return stagg.stagg_generated.StatisticFilter.StatisticFilterEnd(builder)
+        return stagg.stagg_generated.StatisticFilter.CreateStatisticFilter(builder, self.min, self.max, self.excludes_minf, self.excludes_pinf, self.excludes_nan)
 
 ################################################# Moments
 
 class Moments(Stagg):
     _params = {
-        "sumwxn":   stagg.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
-        "n":        stagg.checktype.CheckInteger("Moments", "n", required=True, min=0),
-        "weighted": stagg.checktype.CheckBool("Moments", "weighted", required=False),
-        "filter": stagg.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
+        "sumwxn":      stagg.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
+        "n":           stagg.checktype.CheckInteger("Moments", "n", required=True, min=0),
+        "weightpower": stagg.checktype.CheckInteger("Moments", "weightpower", required=False, min=-128, max=127),
+        "filter":      stagg.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }
 
-    sumwxn   = typedproperty(_params["sumwxn"])
-    n        = typedproperty(_params["n"])
-    weighted = typedproperty(_params["weighted"])
-    filter   = typedproperty(_params["filter"])
+    sumwxn      = typedproperty(_params["sumwxn"])
+    n           = typedproperty(_params["n"])
+    weightpower = typedproperty(_params["weightpower"])
+    filter      = typedproperty(_params["filter"])
 
-    def __init__(self, sumwxn, n, weighted=True, filter=None):
+    def __init__(self, sumwxn, n, weightpower=1, filter=None):
         self.sumwxn = sumwxn
         self.n = n
-        self.weighted = weighted
+        self.weightpower = weightpower
         self.filter = filter
 
     def _valid(self, seen, recursive):
@@ -1116,22 +1105,21 @@ class Moments(Stagg):
         out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.SumwxnByTag = _MockFlatbuffers._ByTag(fb.Sumwxn, fb.SumwxnType, _InterpretedBuffer_lookup)
         out._flatbuffers.N = fb.N
-        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Weightpower = fb.Weightpower
         out._flatbuffers.Filter = fb.Filter
         return out
 
     def _toflatbuffers(self, builder):
         sumwxn = self.sumwxn._toflatbuffers(builder)
-        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
         stagg.stagg_generated.Moments.MomentsStart(builder)
         stagg.stagg_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
         stagg.stagg_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
         stagg.stagg_generated.Moments.MomentsAddN(builder, self.n)
-        if self.weighted is not True:
-            stagg.stagg_generated.Moments.MomentsAddWeighted(builder, self.weighted)
-        if filter is not None:
-            stagg.stagg_generated.Moments.MomentsAddFilter(builder, filter)
+        if self.weightpower != 1:
+            stagg.stagg_generated.Moments.MomentsAddWeightpower(builder, self.weightpower)
+        if self.filter is not None:
+            stagg.stagg_generated.Moments.MomentsAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Moments.MomentsEnd(builder)
 
 ################################################# Extremes
@@ -1164,34 +1152,33 @@ class Extremes(Stagg):
 
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
-        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
         stagg.stagg_generated.Extremes.ExtremesStart(builder)
         stagg.stagg_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Extremes.ExtremesAddValues(builder, values)
-        if filter is not None:
-            stagg.stagg_generated.Extremes.ExtremesAddFilter(builder, filter)
+        if self.filter is not None:
+            stagg.stagg_generated.Extremes.ExtremesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Extremes.ExtremesEnd(builder)
 
 ################################################# Quantiles
 
 class Quantiles(Stagg):
     _params = {
-        "values": stagg.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
-        "p":      stagg.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
-        "weighted": stagg.checktype.CheckBool("Quantiles", "weighted", required=False),
-        "filter": stagg.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
+        "values":      stagg.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
+        "p":           stagg.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "weightpower": stagg.checktype.CheckInteger("Quantiles", "weightpower", required=False, min=-128, max=127),
+        "filter":      stagg.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
-    values   = typedproperty(_params["values"])
-    p        = typedproperty(_params["p"])
-    weighted = typedproperty(_params["weighted"])
-    filter   = typedproperty(_params["filter"])
+    values      = typedproperty(_params["values"])
+    p           = typedproperty(_params["p"])
+    weightpower = typedproperty(_params["weightpower"])
+    filter      = typedproperty(_params["filter"])
 
-    def __init__(self, values, p=0.5, weighted=True, filter=None):
+    def __init__(self, values, p=0.5, weightpower=1, filter=None):
         self.values = values
         self.p = p
-        self.weighted = weighted
+        self.weightpower = weightpower
         self.filter = filter
 
     def _valid(self, seen, recursive):
@@ -1205,22 +1192,21 @@ class Quantiles(Stagg):
         out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
         out._flatbuffers.P = fb.P
-        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Weightpower = fb.Weightpower
         out._flatbuffers.Filter = fb.Filter
         return out
 
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
-        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
         stagg.stagg_generated.Quantiles.QuantilesStart(builder)
         stagg.stagg_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Quantiles.QuantilesAddValues(builder, values)
         stagg.stagg_generated.Quantiles.QuantilesAddP(builder, self.p)
-        if self.weighted is not True:
-            stagg.stagg_generated.Quantiles.QuantilesAddWeighted(builder, self.weighted)
-        if filter is not None:
-            stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, filter)
+        if self.weightpower != 1:
+            stagg.stagg_generated.Quantiles.QuantilesAddWeightpower(builder, self.weightpower)
+        if self.filter is not None:
+            stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Quantiles.QuantilesEnd(builder)
 
 ################################################# Modes
@@ -1231,8 +1217,8 @@ class Modes(Stagg):
         "filter": stagg.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
-    values   = typedproperty(_params["values"])
-    filter   = typedproperty(_params["filter"])
+    values = typedproperty(_params["values"])
+    filter = typedproperty(_params["filter"])
 
     def __init__(self, values, filter=None):
         self.values = values
@@ -1253,13 +1239,12 @@ class Modes(Stagg):
 
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
-        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
         stagg.stagg_generated.Modes.ModesStart(builder)
         stagg.stagg_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Modes.ModesAddValues(builder, values)
-        if filter is not None:
-            stagg.stagg_generated.Modes.ModesAddFilter(builder, filter)
+        if self.filter is not None:
+            stagg.stagg_generated.Modes.ModesAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Modes.ModesEnd(builder)
 
 ################################################# Statistics
@@ -1287,10 +1272,10 @@ class Statistics(Stagg):
         self.max = max
 
     def _valid(self, seen, recursive):
-        if len(set((x.n, x.weighted) for x in self.moments)) != len(self.moments):
-            raise ValueError("Statistics.moments must have unique (n, weighted)")
-        if len(set((x.p, x.weighted) for x in self.quantiles)) != len(self.quantiles):
-            raise ValueError("Statistics.quantiles must have unique (p, weighted)")
+        if len(set((x.n, x.weightpower) for x in self.moments)) != len(self.moments):
+            raise ValueError("Statistics.moments must have unique (n, weightpower)")
+        if len(set((x.p, x.weightpower) for x in self.quantiles)) != len(self.quantiles):
+            raise ValueError("Statistics.quantiles must have unique (p, weightpower)")
         if recursive:
             _valid(self.moments, seen, recursive)
             _valid(self.quantiles, seen, recursive)
@@ -1334,24 +1319,24 @@ class Statistics(Stagg):
 
 class Covariance(Stagg):
     _params = {
-        "xindex": stagg.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
-        "yindex": stagg.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
-        "sumwxy": stagg.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
-        "weighted": stagg.checktype.CheckBool("Covariance", "weighted", required=False),
-        "filter": stagg.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
+        "xindex":      stagg.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
+        "yindex":      stagg.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
+        "sumwxy":      stagg.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
+        "weightpower": stagg.checktype.CheckInteger("Covariance", "weightpower", required=False, min=-128, max=127),
+        "filter":      stagg.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
         }
 
-    xindex   = typedproperty(_params["xindex"])
-    yindex   = typedproperty(_params["yindex"])
-    sumwxy   = typedproperty(_params["sumwxy"])
-    weighted = typedproperty(_params["weighted"])
-    filter   = typedproperty(_params["filter"])
+    xindex      = typedproperty(_params["xindex"])
+    yindex      = typedproperty(_params["yindex"])
+    sumwxy      = typedproperty(_params["sumwxy"])
+    weightpower = typedproperty(_params["weightpower"])
+    filter      = typedproperty(_params["filter"])
 
-    def __init__(self, xindex, yindex, sumwxy, weighted=True, filter=None):
+    def __init__(self, xindex, yindex, sumwxy, weightpower=1, filter=None):
         self.xindex = xindex
         self.yindex = yindex
         self.sumwxy = sumwxy
-        self.weighted = weighted
+        self.weightpower = weightpower
         self.filter = filter
 
     def _valid(self, seen, recursive):
@@ -1361,9 +1346,9 @@ class Covariance(Stagg):
 
     @staticmethod
     def _validindexes(covariances, numvars):
-        pairs = [(x.xindex, x.yindex, x.weighted) for x in covariances]
-        if len(set(pairs)) != len(pairs):
-            raise ValueError("Covariance.xindex, yindex pairs must be unique")
+        triples = [(x.xindex, x.yindex, x.weightpower) for x in covariances]
+        if len(set(triples)) != len(triples):
+            raise ValueError("Covariance.xindex, yindex, weightpower triples must be unique")
         if any(x.xindex >= numvars for x in covariances):
             raise ValueError("Covariance.xindex must all be less than the number of axis or column variables {}".format(numvars))
         if any(x.yindex >= numvars for x in covariances):
@@ -1376,23 +1361,22 @@ class Covariance(Stagg):
         out._flatbuffers.Xindex = fb.Xindex
         out._flatbuffers.Yindex = fb.Yindex
         out._flatbuffers.SumwxyByTag = _MockFlatbuffers._ByTag(fb.Sumwxy, fb.SumwxyType, _InterpretedBuffer_lookup)
-        out._flatbuffers.Weighted = fb.Weighted
+        out._flatbuffers.Weightpower = fb.Weightpower
         out._flatbuffers.Filter = fb.Filter
         return out
 
     def _toflatbuffers(self, builder):
         sumwxy = self.sumwxy._toflatbuffers(builder)
-        filter = None if self.filter is None else self.filter._toflatbuffers(builder)
 
         stagg.stagg_generated.Covariance.CovarianceStart(builder)
         stagg.stagg_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
         stagg.stagg_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
         stagg.stagg_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
         stagg.stagg_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
-        if self.weighted is not True:
-            stagg.stagg_generated.Covariance.CovarianceAddWeighted(builder, self.weighted)
-        if filter is not None:
-            stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, filter)
+        if self.weightpower != 1:
+            stagg.stagg_generated.Covariance.CovarianceAddWeightpower(builder, self.weightpower)
+        if self.filter is not None:
+            stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, self.filter._toflatbuffers(builder))
         return stagg.stagg_generated.Covariance.CovarianceEnd(builder)
 
 ################################################# Binning

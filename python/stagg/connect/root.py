@@ -64,24 +64,64 @@ def tostagg(obj, collection=False):
             else:
                 raise AssertionError("unrecognized type: {0}".format(type(obj)))
 
+            xaxis = obj.GetXaxis()
+            labels = xaxis.GetLabels()
+            if labels:
+                categories = list(labels)
+            else:
+                categories = None
+
             if h.GetSumw2N() != 0:
                 sumw2obj = h.GetSumw2()
                 sumw2array = numpy.frombuffer(sumw2obj.fArray, count=sumw2obj.fN, dtype=numpy.float64)
+                if categories is not None:
+                    sumwarray = sumwarray[1 : len(categories) + 1]
+                    sumw2array = sumw2array[1 : len(categories) + 1]
                 counts = WeightedCounts(
                     sumw=InterpretedInlineBuffer.fromarray(sumwarray),
                     sumw2=InterpretedInlineBuffer.fromarray(sumw2array))
             else:
+                if categories is not None:
+                    sumwarray = sumwarray[1 : len(categories) + 1]
                 counts = UnweightedCounts(
                     counts=InterpretedInlineBuffer.fromarray(sumwarray))
 
-            "yay" if obj.GetXaxis().GetLabels() else "nay"
-            list(obj.GetXaxis().GetLabels())
-            obj.GetXaxis().IsVariableBinSize()
-            obj.GetXaxis().GetXmin(), obj.GetXaxis().GetXmax()
-            obj.GetXaxis().GetTitle()
-            obj.GetXaxis().GetBinLowEdge(1)
-            obj.GetXaxis().GetBinUpEdge(1)
+            if categories is not None:
+                binning = CategoryBinning(categories)
 
+            elif xaxis.IsVariableBinSize():
+                num = obj.GetNbinsX()
+                edges = numpy.empty(num + 1, dtype=numpy.float64)
+                xaxis.GetLowEdge(edges)
+                edges[-1] = xaxis.GetBinUpEdge(num)
+                binning = EdgesBinning(edges, overflow=RealOverflow(loc_underflow=BinLocation.below1, loc_overflow=BinLocation.above1))
+
+            else:
+                num = obj.GetNbinsX()
+                low = xaxis.GetBinLowEdge(1)
+                high = xaxis.GetBinUpEdge(num)
+                binning = RegularBinning(num, RealInterval(low, high), overflow=RealOverflow(loc_underflow=BinLocation.below1, loc_overflow=BinLocation.above1))
+
+            stats = numpy.zeros(4, numpy.float64)
+            h.GetStats(stats)
+            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([h.GetEntries()], dtype=numpy.int64)), 0, weighted=False)
+            
+
+
+            
+            statistics = Statistics(moments=[entries, sumw, sumw2])
+
+            title = xaxis.GetTitle()
+            if title == "":
+                title = None
+            axis = Axis(binning, statistics=statistics, title=title)
+
+            title = obj.GetTitle()
+            if title == "":
+                title = None
+            out = Histogram([axis], counts, title=title)
+
+            
 # h = Histogram([Axis(RegularBinning(10, RealInterval(0.1, 10.1)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
 
         elif isinstance(obj, ROOT.TH2):

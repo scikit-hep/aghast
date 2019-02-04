@@ -191,7 +191,7 @@ class Test(unittest.TestCase):
     def test_serialization_Moments(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=False), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=0), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Extremes(self):
@@ -203,7 +203,7 @@ class Test(unittest.TestCase):
     def test_serialization_Quantiles(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=False), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weighted=True)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=0), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Modes(self):
@@ -225,7 +225,7 @@ class Test(unittest.TestCase):
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
         h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
-        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=True), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weighted=False)])
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=1), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=0)])
         assert h == frombuffer(h.tobuffer(), checkvalid=True)
 
     def test_serialization_Profile(self):
