@@ -4412,7 +4412,15 @@ class UnweightedCounts(Counts):
         assert isinstance(other, UnweightedCounts)
         self.counts = self.counts._add(other.counts, noclobber)
         return self
-        
+
+    @property
+    def flatarray(self):
+        return self.counts.flatarray
+
+    @property
+    def array(self):
+        return self.counts.array
+
 ################################################# WeightedCounts
 
 class WeightedCounts(Counts):
@@ -4503,6 +4511,24 @@ class WeightedCounts(Counts):
             self.unweighted = None
 
         return self
+
+    @property
+    def flatarray(self):
+        out = {"sumw": self.sumw.flatarray}
+        if self.sumw2 is not None:
+            out["sumw2"] = self.sumw2.flatarray
+        if self.unweighted is not None:
+            out["unweighted"] = self.unweighted.flatarray
+        return out
+
+    @property
+    def array(self):
+        out = {"sumw": self.sumw.array}
+        if self.sumw2 is not None:
+            out["sumw2"] = self.sumw2.array
+        if self.unweighted is not None:
+            out["unweighted"] = self.unweighted.array
+        return out
 
 ################################################# Parameter
 

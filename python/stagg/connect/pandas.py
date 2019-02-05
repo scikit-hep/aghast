@@ -141,9 +141,85 @@ def topandas(obj):
         for axis in obj.axis:
             index = binning2index(axis.binning)
 
+            target = None
+            for i in range(len(indexes)):
+                if target is None:
+                    target = len(indexes[i])
+                else:
+                    assert target == len(indexes[i])
+                indexes[i] = indexes[i].repeat(len(index))
 
-        obj.counts
-        obj.profile
+            target = 1 if target is None else target
+
+            # why doesn't pandas have an Index.tile function?
+            x = index
+            tiles = 1
+            for j in range(int(numpy.floor(numpy.log2(target)))):
+                x = x.append(x)
+                tiles *= 2
+            while tiles < target:
+                x = x.append(index)
+                tiles += 1
+
+            assert len(x) == target * len(index)
+            indexes.append(x)
+
+            if axis.title is not None:
+                names.append(axis.title)
+            elif axis.expression is not None:
+                names.append(axis.expression)
+            else:
+                names.append(None)
+
+        assert len(indexes) == len(names)
+        assert len(indexes) != 0
+        if len(indexes) == 1:
+            index = indexes[0]
+        else:
+            index = pandas.MultiIndex.from_arrays(indexes, names=names)
+
+        if isinstance(obj.counts, UnweightedCounts):
+            data = [obj.counts.flatarray]
+            columns = ["unweighted"]
+        elif isinstance(obj.counts, WeightedCounts):
+            data = [obj.counts.sumw.flatarray]
+            columns = ["sumw"]
+            if obj.counts.sumw2 is not None:
+                data.append(obj.counts.sumw2.flatarray)
+                columns.append("sumw2")
+            if obj.counts.unweighted is not None:
+                data.append(obj.counts.unweighted.flatarray)
+                columns.append("unweighted")
+
+        if len(obj.profile) != 0:
+            for i in range(len(columns)):
+                columns[i] = ("counts", columns[i])
+
+        for profile in obj.profile:
+            title = profile.expression if profile.title is None else profile.title
+
+            for moment in profile.statistics.moments:
+                data.append(moment.sumwxn.flatarray)
+                columns.append((title, "sum" + ("w" + repr(moment.weightpower) if moment.weightpower != 0 else "") + ("x" + repr(moment.n))))
+
+            for quantile in profile.statistics.quantiles:
+                data.append(quantile.values.flatarray)
+                columns.append((title, ("p=" + repr(quantile.p)) + (" (w" + repr(quantile.weightpower) + ")" if moment.weightpower != 0 else "")))
+
+            if profile.statistics.mode is not None:
+                data.append(profile.statistics.mode.values.flatarray)
+                columns.append((title, "mode"))
+
+            if profile.statistics.min is not None:
+                data.append(profile.statistics.mode.values.flatarray)
+                columns.append((title, "min"))
+
+            if profile.statistics.max is not None:
+                data.append(profile.statistics.mode.values.flatarray)
+                columns.append((title, "max"))
+
+
+
 
         raise NotImplementedError
 
