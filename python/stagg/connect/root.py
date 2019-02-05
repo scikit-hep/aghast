@@ -36,6 +36,77 @@ except ImportError:
 
 from stagg import *
 
+def getbincontents(obj):
+    if isinstance(obj, (ROOT.TH1C, ROOT.TH2C, ROOT.TH3C)):
+        out = numpy.empty(obj.GetNcells(), dtype=numpy.int8)
+        arraytype = "char"
+    elif isinstance(obj, (ROOT.TH1S, ROOT.TH2S, ROOT.TH3S)):
+        out = numpy.empty(obj.GetNcells(), dtype=numpy.int16)
+        arraytype = "short"
+    elif isinstance(obj, (ROOT.TH1I, ROOT.TH2I, ROOT.TH3I)):
+        out = numpy.empty(obj.GetNcells(), dtype=numpy.int32)
+        arraytype = "int"
+    elif isinstance(obj, (ROOT.TH1F, ROOT.TH2F, ROOT.TH3F)):
+        out = numpy.empty(obj.GetNcells(), dtype=numpy.float32)
+        arraytype = "float"
+    elif isinstance(obj, (ROOT.TH1D, ROOT.TH2D, ROOT.TH3D)):
+        out = numpy.empty(obj.GetNcells(), dtype=numpy.float64)
+        arraytype = "double"
+    else:
+        raise AssertionError(type(obj))
+
+    name = "_getbincontents_{0}".format(type(obj).__name__)
+    if name not in getbincontents.run:
+        ROOT.gInterpreter.Declare("""
+        void %s(%s* hist, %s* array) {
+            int n = hist->GetNcells();
+            for (int i = 0;  i < n;  i++) {
+                array[i] = hist->GetBinContent(i);
+            }
+        }""" % (name, type(obj).__name__, arraytype))
+        getbincontents.run[name] = getattr(ROOT, name)
+
+    getbincontents.run[name](obj, out)
+    return out
+
+getbincontents.run = {}
+
+def setbincontents(obj, array):
+    if isinstance(obj, (ROOT.TH1C, ROOT.TH2C, ROOT.TH3C)):
+        array = numpy.array(array, dtype=numpy.int8, copy=False)
+        arraytype = "char"
+    elif isinstance(obj, (ROOT.TH1S, ROOT.TH2S, ROOT.TH3S)):
+        array = numpy.array(array, dtype=numpy.int16, copy=False)
+        arraytype = "short"
+    elif isinstance(obj, (ROOT.TH1I, ROOT.TH2I, ROOT.TH3I)):
+        array = numpy.array(array, dtype=numpy.int32, copy=False)
+        arraytype = "int"
+    elif isinstance(obj, (ROOT.TH1F, ROOT.TH2F, ROOT.TH3F)):
+        array = numpy.array(array, dtype=numpy.float32, copy=False)
+        arraytype = "float"
+    elif isinstance(obj, (ROOT.TH1D, ROOT.TH2D, ROOT.TH3D)):
+        array = numpy.array(array, dtype=numpy.float64, copy=False)
+        arraytype = "double"
+    else:
+        raise AssertionError(type(obj))
+
+    assert array.shape == (obj.GetNcells(),)
+
+    name = "_setbincontents_{0}".format(type(obj).__name__)
+    if name not in setbincontents.run:
+        ROOT.gInterpreter.Declare("""
+        void %s(%s* hist, %s* array) {
+            int n = hist->GetNcells();
+            for (int i = 0;  i < n;  i++) {
+                hist->SetBinContent(i, array[i]);
+            }
+        }""" % (name, type(obj).__name__, arraytype))
+        setbincontents.run[name] = getattr(ROOT, name)
+
+    setbincontents.run[name](obj, array)
+
+setbincontents.run = {}
+
 def toroot(obj, name):
     if isinstance(obj, Collection):
         raise NotImplementedError
@@ -48,30 +119,30 @@ def toroot(obj, name):
                 axissummary.append((RegularBinning, 1, 0.0, 1.0))
                 slc.append(slice(-numpy.inf, numpy.inf))
             elif isinstance(axis.binning, IntegerBinning):
-                axissummary.append((RegularBinning, 1 + axis.max - axis.min, axis.min - 0.5, axis.max + 0.5))
+                axissummary.append((RegularBinning, 1 + axis.binning.max - axis.binning.min, axis.binning.min - 0.5, axis.binning.max + 0.5))
                 slc.append(slice(-numpy.inf, numpy.inf))
             elif isinstance(axis.binning, RegularBinning):
-                axissummary.append((RegularBinning, axis.num, axis.interval.low, axis.interval.high))
+                axissummary.append((RegularBinning, axis.binning.num, axis.binning.interval.low, axis.binning.interval.high))
                 slc.append(slice(-numpy.inf, numpy.inf))
             elif isinstance(axis.binning, HexagonalBinning):
                 raise TypeError("no ROOT equivalent for HexagonalBinning")
             elif isinstance(axis.binning, EdgesBinning):
-                axissummary.append((EdgesBinning, numpy.array(axis.edges, dtype=numpy.float64, copy=False)))
+                axissummary.append((EdgesBinning, numpy.array(axis.binning.edges, dtype=numpy.float64, copy=False)))
                 slc.append(slice(-numpy.inf, numpy.inf))
             elif isinstance(axis.binning, IrregularBinning):
-                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
+                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
             elif isinstance(axis.binning, SparseRegularBinning):
-                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
+                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
             elif isinstance(axis.binning, FractionBinning):
-                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
+                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
             elif isinstance(axis.binning, PredicateBinning):
-                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
+                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
             elif isinstance(axis.binning, VariationBinning):
-                axissummary.append((CategoryBinning, axis.toCategoryBinning().categories))
+                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
             else:
                 raise AssertionError(type(axis.binning))
@@ -86,7 +157,7 @@ def toroot(obj, name):
         else:
             sumw2 = None
 
-        if len(self.profile) != 0:
+        if len(obj.profile) != 0:
             raise NotImplementedError
 
         if issubclass(sumw.dtype.type, numpy.int8):
@@ -108,25 +179,25 @@ def toroot(obj, name):
         title = "" if obj.title is None else obj.title
 
         if len(axissummary) == 1:
-            if axissummary[0] is RegularBinning:
-                num, low, high = axissummary[1:]
+            if axissummary[0][0] is RegularBinning:
+                num, low, high = axissummary[0][1:]
                 out = cls(name, title, num, low, high)
                 xaxis = out.GetXaxis()
                 
-            elif axissummary[0] is EdgesBinning:
-                edges = axissummary[1]
+            elif axissummary[0][0] is EdgesBinning:
+                edges = axissummary[0][1]
                 out = cls(name, title, num, edges)
                 xaxis = out.GetXaxis()
 
-            elif axissummary[0] is CategoryBinning:
-                categories = axissummary[1]
+            elif axissummary[0][0] is CategoryBinning:
+                categories = axissummary[0][1]
                 out = cls(name, title, len(categories), 0.5, len(categories) + 0.5)
                 xaxis = out.GetXaxis()
                 for i, x in enumerate(categories):
                     xaxis.SetBinLabel(i + 1, x)
 
             else:
-                raise AssertionError(axissummary[0])
+                raise AssertionError(axissummary[0][0])
 
             assert len(sumw.shape) == 1
             if sumw2 is not None:
@@ -147,23 +218,46 @@ def toroot(obj, name):
             elif len(sumw) != out.GetNbinsX() + 2:
                 raise AssertionError((len(sumw), out.GetNbinsX() + 2))
 
-            sumwarray = numpy.frombuffer(obj.fArray, count=obj.fN, dtype=sumw.dtype)
-            sumwarray[:] = sumw
+            setbincontents(out, sumw)
 
             if sumw2 is not None:
-                obj.Sumw2()
-                sumw2obj = obj.GetSumw2()
-                sumw2array = numpy.frombuffer(sumw2obj.fArray, count=sumw2obj.fN, dtype=numpy.float64)
-                sumw2array[:] = sumw2
-            
+                out.Sumw2()
+                sumw2obj = out.GetSumw2()
+                setbincontents(sumw2obj, sumw2)
+
+            numentries = None
+            stats0 = None
+            stats1 = None
+            stats2 = None
+            stats3 = None
+            if obj.axis[0].statistics is not None:
+                for moment in obj.axis[0].statistics.moments:
+                    sumwxn = moment.sumwxn.flatarray
+                    if moment.n == 0 and moment.weightpower == 0 and len(sumwxn) == 1:
+                        numentries, = sumwxn
+                    if moment.n == 0 and moment.weightpower == 1 and len(sumwxn) == 1:
+                        stats0, = sumwxn
+                    if moment.n == 0 and moment.weightpower == 2 and len(sumwxn) == 1:
+                        stats1, = sumwxn
+                    if moment.n == 1 and moment.weightpower == 1 and len(sumwxn) == 1:
+                        stats2, = sumwxn
+                    if moment.n == 2 and moment.weightpower == 1 and len(sumwxn) == 1:
+                        stats3, = sumwxn
+
+            if numentries is not None:
+                out.SetEntries(numentries)
+            if stats0 is not None and stats1 is not None and stats2 is not None and stats3 is not None:
+                stats = numpy.array([stats0, stats1, stats2, stats3], dtype=numpy.float64)
+                out.PutStats(stats)
+
             xaxis.SetTitle("" if obj.axis[0].title is None else obj.axis[0].title)
 
             return out
 
-        elif len(axis) == 2:
+        elif len(axissummary) == 2:
             raise NotImplementedError
 
-        elif len(axis) == 3:
+        elif len(axissummary) == 3:
             raise NotImplementedError
 
         else:
@@ -187,21 +281,7 @@ def tostagg(obj, collection=False):
             raise NotImplementedError
 
         if not isinstance(obj, (ROOT.TH2, ROOT.TH3)):
-            fArray = obj.fArray
-            if not isinstance(fArray, bytes):
-                fArray = fArray.encode("latin-1")
-            if isinstance(obj, ROOT.TH1C):
-                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int8)
-            elif isinstance(obj, ROOT.TH1S):
-                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int16)
-            elif isinstance(obj, ROOT.TH1I):
-                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.int32)
-            elif isinstance(obj, ROOT.TH1F):
-                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.float32)
-            elif isinstance(obj, ROOT.TH1D):
-                sumwarray = numpy.frombuffer(fArray, count=obj.fN, dtype=numpy.float64)
-            else:
-                raise AssertionError("unrecognized type: {0}".format(type(obj)))
+            sumwarray = getbincontents(obj)
 
             xaxis = obj.GetXaxis()
             labels = xaxis.GetLabels()
@@ -212,10 +292,7 @@ def tostagg(obj, collection=False):
 
             if obj.GetSumw2N() != 0:
                 sumw2obj = h.GetSumw2()
-                fArray = sumw2obj.fArray
-                if not isinstance(fArray, bytes):
-                    fArray = fArray.encode("latin-1")
-                sumw2array = numpy.frombuffer(fArray, count=sumw2obj.fN, dtype=numpy.float64)
+                sumw2array = getbincontents(sumw2obj)
                 if categories is not None:
                     sumwarray = sumwarray[1 : len(categories) + 1]
                     sumw2array = sumw2array[1 : len(categories) + 1]
