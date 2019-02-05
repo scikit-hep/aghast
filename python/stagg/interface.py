@@ -3004,13 +3004,25 @@ class IrregularBinning(Binning, OverlappingFill):
     def toCategoryBinning(self, format="%g"):
         flows = []
         if self.overflow is not None:
+            low = numpy.inf
+            low_inclusive = False
+            high = -numpy.inf
+            high_inclusive = False
+            for interval in self.intervals:
+                if interval.low <= low:
+                    low = interval.low
+                    low_inclusive = interval.low_inclusive
+                if interval.high >= high:
+                    high = interval.high
+                    high_inclusive = interval.high_inclusive
+
             flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format(
                 "[" if self.overflow.minf_mapping == self.overflow.in_underflow else "(",
-                format % self.intervals[0].low,
-                ")" if self.intervals[0].low_inclusive else "]")))
+                format % low,
+                ")" if low_inclusive else "]")))
             flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format(
-                "(" if self.intervals[-1].high_inclusive else "[",
-                format % self.intervals[-1].high,
+                "(" if high_inclusive else "[",
+                format % high,
                 "]" if self.overflow.pinf_mapping == self.overflow.in_overflow else ")")))
             nanflow = []
             if self.overflow.minf_mapping == self.overflow.in_nanflow:
@@ -3460,15 +3472,23 @@ class SparseRegularBinning(Binning, BinLocation):
     def toIrregularBinning(self):
         if self.low_inclusive and self.high_inclusive:
             raise ValueError("SparseRegularBinning.interval.low_inclusive and SparseRegularBinning.interval.high_inclusive cannot both be True")
-        intervals = []
-        for x in self.bins:
-            intervals.append(RealInterval(self.bin_width*(x) + self.origin, self.bin_width*(x + 1) + self.origin))
         overflow = None if self.overflow is None else self.overflow.detached()
-        if overflow is not None:
-            if overflow.loc_underflow != BinLocation.nonexistent:
+        flows = [] if overflow is None else [(overflow.loc_underflow, -numpy.inf), (overflow.loc_overflow, numpy.inf), (overflow.loc_nanflow, numpy.nan)]
+        intervals = []
+        for loc, val in BinLocation._belows(flows):
+            if val == -numpy.inf:
                 intervals.append(RealInterval(-numpy.inf, self.bin_width*(self.minbin) + self.origin, low_inclusive=(overflow.minf_mapping == RealOverflow.in_underflow), high_inclusive=(not self.low_inclusive)))
                 overflow.loc_underflow = BinLocation.nonexistent
-            if overflow.loc_overflow != BinLocation.nonexistent:
+            if val == numpy.inf:
+                intervals.append(RealInterval(self.bin_width*(self.maxbin + 1) + self.origin, numpy.inf, low_inclusive=(not self.high_inclusive), high_inclusive=(overflow.pinf_mapping == RealOverflow.in_overflow)))
+                overflow.loc_overflow = BinLocation.nonexistent
+        for x in self.bins:
+            intervals.append(RealInterval(self.bin_width*(x) + self.origin, self.bin_width*(x + 1) + self.origin))
+        for loc, val in BinLocation._aboves(flows):
+            if val == -numpy.inf:
+                intervals.append(RealInterval(-numpy.inf, self.bin_width*(self.minbin) + self.origin, low_inclusive=(overflow.minf_mapping == RealOverflow.in_underflow), high_inclusive=(not self.low_inclusive)))
+                overflow.loc_underflow = BinLocation.nonexistent
+            if val == numpy.inf:
                 intervals.append(RealInterval(self.bin_width*(self.maxbin + 1) + self.origin, numpy.inf, low_inclusive=(not self.high_inclusive), high_inclusive=(overflow.pinf_mapping == RealOverflow.in_overflow)))
                 overflow.loc_overflow = BinLocation.nonexistent
         return IrregularBinning(intervals, overflow=overflow)
@@ -3737,6 +3757,19 @@ class FractionBinning(Binning):
             args.append("error_method={0}".format(repr(self.error_method)))
         return _dumpline(self, args, indent, width, end)
 
+    def toCategoryBinning(self, format="%g"):
+        if self.layout == self.passall:
+            categories = ["pass", "all"]
+        elif self.layout == self.failall:
+            categories = ["fail", "all"]
+        elif self.layout == self.passfail:
+            categories = ["pass", "fail"]
+        else:
+            raise AssertionError(self.layout)
+        if self.layout_reversed:
+            categories = categories[::-1]
+        return CategoryBinning(categories)
+
     def _getindex(self, where):
         return self._getindex_general(where, 2, None, None, None)
 
@@ -3816,6 +3849,9 @@ class PredicateBinning(Binning, OverlappingFill):
         if self.overlapping_fill != OverlappingFill.undefined:
             args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
         return _dumpline(self, args, indent, width, end)
+
+    def toCategoryBinning(self, format="%g"):
+        return CategoryBinning(self.predicates)
 
     def _getindex(self, where):
         return self._getindex_general(where, len(self.predicates), None, None, None)
@@ -4057,6 +4093,12 @@ class VariationBinning(Binning):
     def _dump(self, indent, width, end):
         args = ["variations=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.variations], indent, width, end), indent, end) + "]"]
         return _dumpline(self, args, indent, width, end)
+
+    def toCategoryBinning(self, format="%g"):
+        categories = []
+        for variation in self.variations:
+            categories.append("; ".join("{0} := {1}".format(x.identifier, x.expression) for x in variation.assignments))
+        return CategoryBinning(categories)
 
     def _getindex(self, where):
         return self._getindex_general(where, len(self.variations), None, None, None)
