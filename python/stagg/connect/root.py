@@ -132,6 +132,9 @@ def toroot(obj, name):
             elif isinstance(axis.binning, IrregularBinning):
                 axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
+            elif isinstance(axis.binning, CategoryBinning):
+                axissummary.append((CategoryBinning, axis.binning.categories))
+                slc.append(slice(None))
             elif isinstance(axis.binning, SparseRegularBinning):
                 axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
@@ -186,15 +189,12 @@ def toroot(obj, name):
                 
             elif axissummary[0][0] is EdgesBinning:
                 edges = axissummary[0][1]
-                out = cls(name, title, num, edges)
+                out = cls(name, title, len(edges) - 1, edges)
                 xaxis = out.GetXaxis()
 
             elif axissummary[0][0] is CategoryBinning:
                 categories = axissummary[0][1]
                 out = cls(name, title, len(categories), 0.5, len(categories) + 0.5)
-                xaxis = out.GetXaxis()
-                for i, x in enumerate(categories):
-                    xaxis.SetBinLabel(i + 1, x)
 
             else:
                 raise AssertionError(axissummary[0][0])
@@ -224,6 +224,11 @@ def toroot(obj, name):
                 out.Sumw2()
                 sumw2obj = out.GetSumw2()
                 setbincontents(sumw2obj, sumw2)
+
+            if axissummary[0][0] is CategoryBinning:
+                xaxis = out.GetXaxis()
+                for i, x in enumerate(categories):
+                    xaxis.SetBinLabel(i + 1, x)
 
             numentries = None
             stats0 = None
@@ -286,7 +291,7 @@ def tostagg(obj, collection=False):
             xaxis = obj.GetXaxis()
             labels = xaxis.GetLabels()
             if labels:
-                categories = list(labels)
+                categories = [str(x) for x in labels]
             else:
                 categories = None
 

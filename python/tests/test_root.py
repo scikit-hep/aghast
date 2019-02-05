@@ -70,7 +70,7 @@ class Test(unittest.TestCase):
             assert before.GetXaxis().GetBinLowEdge(1) == after.GetXaxis().GetBinLowEdge(1)
             assert before.GetXaxis().GetBinUpEdge(before.GetNbinsX()) == after.GetXaxis().GetBinUpEdge(after.GetNbinsX())
 
-    def test_root_basic1d(self):
+    def test_root_TH1C(self):
         before = ROOT.TH1C("before-1", "title", 5, -2.0, 2.0)
         before.GetXaxis().SetTitle("title2")
         after = connect_root.toroot(connect_root.tostagg(before), "after-1")
@@ -80,4 +80,32 @@ class Test(unittest.TestCase):
         before.GetXaxis().SetTitle("title2")
         for x in data: before.Fill(x)
         after = connect_root.toroot(connect_root.tostagg(before), "after-2")
+        self.check1d(before, after)
+
+        before = ROOT.TH1C("before-3", "title", 5, -2.0, 2.0)
+        before.GetXaxis().SetTitle("title2")
+        for i, x in enumerate(["one", "two", "three", "four", "five"]):
+            before.GetXaxis().SetBinLabel(i + 1, x)
+        after = connect_root.toroot(connect_root.tostagg(before), "after-3")
+        self.check1d(before, after)
+
+        before = ROOT.TH1C("before-4", "title", 5, -5.0, 5.0)
+        before.GetXaxis().SetTitle("title2")
+        for i, x in enumerate(["one", "two", "three", "four", "five"]):
+            before.GetXaxis().SetBinLabel(i + 1, x)
+        for x in data: before.Fill(x)
+        after = connect_root.toroot(connect_root.tostagg(before), "after-4")
+        self.check1d(before, after)
+
+        edges = numpy.array([-5.0, -3.0, 0.0, 5.0, 10.0, 100.0], dtype=numpy.float64)
+        before = ROOT.TH1C("before-5", "title", 5, edges)
+        before.GetXaxis().SetTitle("title2")
+        after = connect_root.toroot(connect_root.tostagg(before), "after-5")
+        self.check1d(before, after)
+
+        edges = numpy.array([-5.0, -3.0, 0.0, 5.0, 10.0, 100.0], dtype=numpy.float64)
+        before = ROOT.TH1C("before-6", "title", 5, edges)
+        before.GetXaxis().SetTitle("title2")
+        for x in data: before.Fill(x)
+        after = connect_root.toroot(connect_root.tostagg(before), "after-6")
         self.check1d(before, after)
