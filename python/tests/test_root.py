@@ -44,9 +44,40 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def check1d(self, before, after):
+        assert before.GetNbinsX() == after.GetNbinsX()
+        for i in range(before.GetNbinsX() + 2):
+            assert before.GetBinContent(i) == after.GetBinContent(i)
+            assert before.GetBinError(i) == after.GetBinError(i)
+        assert before.GetEntries() == after.GetEntries()
+        assert before.GetMean() == after.GetMean()
+        assert before.GetStdDev() == after.GetStdDev()
+        assert before.GetTitle() == after.GetTitle()
+        assert before.GetXaxis().GetTitle() == after.GetXaxis().GetTitle()
+        assert bool(before.GetXaxis().GetLabels()) == bool(after.GetXaxis().GetLabels())
+        assert before.GetXaxis().IsVariableBinSize() == after.GetXaxis().IsVariableBinSize()
+        if before.GetXaxis().GetLabels():
+            assert list(before.GetXaxis().GetLabels()) == list(after.GetXaxis().GetLabels())
+        elif before.GetXaxis().IsVariableBinSize():
+            beforeedges = numpy.full(before.GetNbinsX() + 1, 999, dtype=numpy.float64)
+            before.GetXaxis().GetLowEdge(beforeedges)
+            beforeedges[-1] = before.GetXaxis().GetBinUpEdge(before.GetNbinsX())
+            afteredges = numpy.full(after.GetNbinsX() + 1, 123, dtype=numpy.float64)
+            after.GetXaxis().GetLowEdge(afteredges)
+            afteredges[-1] = after.GetXaxis().GetBinUpEdge(after.GetNbinsX())
+            assert numpy.array_equal(before, after)
+        else:
+            assert before.GetXaxis().GetBinLowEdge(1) == after.GetXaxis().GetBinLowEdge(1)
+            assert before.GetXaxis().GetBinUpEdge(before.GetNbinsX()) == after.GetXaxis().GetBinUpEdge(after.GetNbinsX())
+
     def test_root_basic1d(self):
         before = ROOT.TH1C("before-1", "title", 5, -2.0, 2.0)
-        for x in data: before.Fill(x)
-        connect_root.tostagg(before).dump()
+        before.GetXaxis().SetTitle("title2")
         after = connect_root.toroot(connect_root.tostagg(before), "after-1")
-        connect_root.tostagg(after).dump()
+        self.check1d(before, after)
+
+        before = ROOT.TH1C("before-2", "title", 5, -2.0, 2.0)
+        before.GetXaxis().SetTitle("title2")
+        for x in data: before.Fill(x)
+        after = connect_root.toroot(connect_root.tostagg(before), "after-2")
+        self.check1d(before, after)

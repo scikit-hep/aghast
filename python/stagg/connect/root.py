@@ -346,39 +346,16 @@ def tostagg(obj, collection=False):
                 return out
 
         elif isinstance(obj, ROOT.TH2):
-            if isinstance(obj, ROOT.TH2C):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH2S):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH2I):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH2F):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH2D):
-                raise NotImplementedError
+            raise NotImplementedError
 
         elif isinstance(obj, ROOT.TH3):
-            if isinstance(obj, ROOT.TH3C):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH3S):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH3I):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH3F):
-                raise NotImplementedError
-
-            elif isinstance(obj, ROOT.TH3D):
-                raise NotImplementedError
+            raise NotImplementedError
 
         else:
             raise TypeError("cannot convert {0}".format(type(obj).__name__))
+
+    elif isinstance(obj, ROOT.TEfficiency):
+        raise NotImplementedError
 
     elif isinstance(obj, ROOT.TTree):
         raise NotImplementedError
