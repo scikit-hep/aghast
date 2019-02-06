@@ -105,7 +105,7 @@ epilogue = """
 """
 
 def formatted(cls, end="\n"):
-    out = ["=== {0}{1}".format(cls.__name__, end)]
+    out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
@@ -169,7 +169,7 @@ def formatted(cls, end="\n"):
                 raise AssertionError(type(check))
 
             if hasdefault:
-                defaultstring = " _(default: {0})_".format("+[]+" if islist and param.default is None else "+" + repr(param.default) + "+")
+                defaultstring = " (default: {0})".format("+[]+" if islist and param.default is None else "+" + repr(param.default) + "+")
             else:
                 defaultstring = ""
 
