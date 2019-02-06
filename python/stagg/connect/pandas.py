@@ -28,7 +28,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import collections
+import functools
+import operator
 import re
 
 import numpy
@@ -286,30 +287,53 @@ column2statistic.moment = re.compile(r"sum(w([+-]?\d+)?)?(x([+-]?\d+)?)?")
 column2statistic.quantile = re.compile(r"p=([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)( \(w(\d*)\))?")
 
 def tostagg(obj):
-    unweighted, sumw, sumw2 = None, None, None
-    if isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns:
-        if "unweighted" in obj["counts"].columns:
-            unweighted = obj["counts"]["unweighted"].values
-        if "sumw" in obj["counts"].columns:
-            sumw = obj["counts"]["sumw"].values
-        if "sumw2" in obj["counts"].columns:
-            sumw2 = obj["counts"]["sumw2"].values
-    else:
-        if "unweighted" in obj.columns:
-            unweighted = obj["unweighted"].values
-        if "sumw" in obj.columns:
-            sumw = obj["sumw"].values
-        if "sumw2" in obj.columns:
-            sumw2 = obj["sumw2"].values
+    if ((isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns) and ("unweighted" in obj["counts"].columns or "sumw" in obj["counts"].columns or "sumw2" in obj["counts"].columns)) or ("unweighted" in obj.columns or "sumw" in obj.columns or "sumw2" in obj.columns):
+        # this is a histogram; make the data dense in the Cartesian grid
+        unstacked = obj.unstack()
+        unstacked = unstacked.reindex(sorted(unstacked.columns), axis=1)
+        if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2:
+            for expression, statexpr in obj.columns:
+                if statexpr == "min":
+                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(numpy.inf)
+                elif statexpr == "max":
+                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(-numpy.inf)
+        unstacked.fillna(0, inplace=True)
+        obj = unstacked.stack()
 
-    if unweighted is not None or sumw is not None or sumw2 is not None:
-        handle_axis
+        index = obj.index
+        if not isinstance(index, pandas.MultiIndex):
+            index = pandas.MultiIndex.from_arrays([index])
+
+        levelsize = [len(x) for x in index.levels]
+        assert functools.reduce(operator.mul, levelsize, 1) == len(obj)
+
+        for leveli in range(len(index.levels)):
+            level = index.get_level_values(leveli)
+            sizeafter = functools.reduce(operator.mul, levelsize[leveli + 1 :], 1)
+            level = level[::sizeafter][:levelsize[leveli]]
 
 
 
 
-        statistics = collections.OrderedDict()
-        if isinstance(obj.columns, pandas.MultiIndex):
+
+        unweighted, sumw, sumw2 = None, None, None
+        if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2 and "counts" in obj.columns:
+            if "unweighted" in obj["counts"].columns:
+                unweighted = obj["counts"]["unweighted"].values
+            if "sumw" in obj["counts"].columns:
+                sumw = obj["counts"]["sumw"].values
+            if "sumw2" in obj["counts"].columns:
+                sumw2 = obj["counts"]["sumw2"].values
+        else:
+            if "unweighted" in obj.columns:
+                unweighted = obj["unweighted"].values
+            if "sumw" in obj.columns:
+                sumw = obj["sumw"].values
+            if "sumw2" in obj.columns:
+                sumw2 = obj["sumw2"].values
+
+        statistics = {}
+        if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2:
             for expression, statexpr in obj.columns:
                 if expression != "counts":
                     array = obj[expression][statexpr].values
@@ -325,9 +349,9 @@ def tostagg(obj):
                         statistic.quantiles = list(statistic.quantiles) + [data]
                     elif isinstance(data, Modes):
                         statistic.mode = data
-                    elif isinstance(data, Extremes) and statexpr == "min":
+                    elif statexpr == "min":
                         statistic.min = data
-                    elif isinstance(data, Extremes) and statexpr == "max":
+                    elif statexpr == "max":
                         statistic.max = data
 
         else:
@@ -340,3 +364,6 @@ def tostagg(obj):
         for expression, statistic in statistics.items():
             if len(statistic.moments) == 0 and len(statistic.quantiles) == 0 and statistic.mode is None and statistic.min is None and statistic.max is None:
                 profiles.append(Profile(expression, statistic))
+
+    else:
+        raise TypeError("DataFrame not recognized as a histogram")
