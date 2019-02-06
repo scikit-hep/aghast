@@ -130,7 +130,7 @@ def formatted(cls, end="\n"):
                     check.max,
                     ")" if check.max == float("inf") else "]")
             elif isinstance(check, stagg.checktype.CheckEnum):
-                typestring = "one of {" + ", ".join(str(x) for x in check.choices) + "}"
+                typestring = "one of {" + ", ".join("`+" + str(x) + "+`" for x in check.choices) + "}"
             elif isinstance(check, stagg.checktype.CheckClass):
                 if check.type in unions:
                     typestring = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
@@ -147,7 +147,7 @@ def formatted(cls, end="\n"):
                 elif check.type is float:
                     subtype = "float"
                 elif isinstance(check.type, list):
-                    subtype = "{" + ", ".join(str(x) for x in check.type) + "}"
+                    subtype = "{" + ", ".join("`+" + str(x) + "+`" for x in check.type) + "}"
                 else:
                     if check.type in unions:
                         subtype = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
