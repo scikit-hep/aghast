@@ -307,30 +307,73 @@ def tostagg(obj):
         levelsize = [len(x) for x in index.levels]
         assert functools.reduce(operator.mul, levelsize, 1) == len(obj)
 
+        axis = []
         for leveli in range(len(index.levels)):
             level = index.get_level_values(leveli)
             sizeafter = functools.reduce(operator.mul, levelsize[leveli + 1 :], 1)
             level = level[::sizeafter][:levelsize[leveli]]
 
+            if isinstance(level, pandas.IntervalIndex):
+                ordered = (level.left[:-1] < level.left[1:]).all() and (level.right[:-1] < level.right[1:]).all()
+                abutting = (level.left[1:] == level.right[:-1]).all()
+                fixedwidth = len(numpy.unique(level.right - level.left)) == 1
+                if level.closed == "left":
+                    low_inclusive, high_inclusive = True, False
+                elif level.closed == "right":
+                    low_inclusive, high_inclusive = False, True
+                elif level.closed == "both":
+                    low_inclusive, high_inclusive = True, True
+                elif level.closed == "neither":
+                    low_inclusive, high_inclusive = False, False
 
+                if ordered and abutting and fixedwidth and low_inclusive is not high_inclusive:
+                    binning = RegularBinning(len(level), RealInterval(level.left[0], level.right[-1], low_inclusive=low_inclusive, high_inclusive=high_inclusive))
 
+                elif ordered and abutting and not fixedwidth and low_inclusive is not high_inclusive:
+                    edges = numpy.empty(len(level) + 1, dtype=numpy.int64)
+                    edges[:len(level)] = level.left
+                    edges[-1] = leve.right[-1]
+                    binning = EdgesBinning(edges, low_inclusive=low_inclusive, high_inclusive=high_inclusive)
 
+                elif not abutting and fixedwidth and low_inclusive is not high_inclusive:
+                    bin_width = level.right[0] - level.left[0]
+                    origin = level.left.min()
+                    bins = numpy.trunc((level.left - origin) / bin_width)
+                    binning = SparseRegularBinning(bins, bin_width, origin=origin, low_inclusive=low_inclusive, high_inclusive=high_inclusive)
 
+                else:
+                    binning = IrregularBinning([RealInterval(x.left, x.right, low_inclusive=low_inclusive, high_inclusive=high_inclusive) for x in level])
+                    
+            elif isinstance(level, (pandas.Int64Index, pandas.UInt64Index)) and len(level) == 1 + level.max() - level.min():
+                binning = IntegerBinning(level.min(), level.max())
+
+            else:
+                binning = CategoryBinning([str(x) for x in level])
+
+            axis.append(Axis(binning=binning, expression=level.name))
+        
         unweighted, sumw, sumw2 = None, None, None
         if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2 and "counts" in obj.columns:
             if "unweighted" in obj["counts"].columns:
-                unweighted = obj["counts"]["unweighted"].values
+                unweighted = InterpretedInlineBuffer.fromarray(obj["counts"]["unweighted"].values)
             if "sumw" in obj["counts"].columns:
-                sumw = obj["counts"]["sumw"].values
+                sumw = InterpretedInlineBuffer.fromarray(obj["counts"]["sumw"].values)
             if "sumw2" in obj["counts"].columns:
-                sumw2 = obj["counts"]["sumw2"].values
+                sumw2 = InterpretedInlineBuffer.fromarray(obj["counts"]["sumw2"].values)
         else:
             if "unweighted" in obj.columns:
-                unweighted = obj["unweighted"].values
+                unweighted = InterpretedInlineBuffer.fromarray(obj["unweighted"].values)
             if "sumw" in obj.columns:
-                sumw = obj["sumw"].values
+                sumw = InterpretedInlineBuffer.fromarray(obj["sumw"].values)
             if "sumw2" in obj.columns:
-                sumw2 = obj["sumw2"].values
+                sumw2 = InterpretedInlineBuffer.fromarray(obj["sumw2"].values)
+
+        if unweighted is not None and sumw is None and sumw2 is None:
+            counts = UnweightedCounts(unweighted)
+        elif sumw is not None:
+            counts = WeightedCounts(sumw, sumw2, None if unweighted is None else UnweightedCounts(unweighted))
+        else:
+            raise ValueError("unrecognized combination of counts: ".format(", ".join(s for s, x in [("unweighted", unweighted), ("sumw", sumw), ("sumw2", sumw2)] if x is not None)))
 
         statistics = {}
         if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2:
