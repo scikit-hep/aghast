@@ -5525,7 +5525,7 @@ class Column(Stagg, Interpretation):
     metadata         = typedproperty(_params["metadata"])
     decoration       = typedproperty(_params["decoration"])
 
-    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, filters=None, postfilter_slice=None, title=None, metadata=None, decoration=None):
+    def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, filters=None, postfilter_slice=None, title=None, metadata=None, decoration=None):
         self.identifier = identifier
         self.dtype = dtype
         self.endianness = endianness

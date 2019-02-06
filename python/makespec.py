@@ -38,8 +38,65 @@ except ImportError:
 
 import stagg
 import stagg.checktype
+import stagg.interface
 
-classes = [stagg.Histogram]
+classes = [
+    stagg.Collection,
+    stagg.Histogram,
+    stagg.Axis,
+    stagg.IntegerBinning,
+    stagg.RegularBinning,
+    stagg.RealInterval,
+    stagg.RealOverflow,
+    stagg.HexagonalBinning,
+    stagg.EdgesBinning,
+    stagg.IrregularBinning,
+    stagg.CategoryBinning,
+    stagg.SparseRegularBinning,
+    stagg.FractionBinning,
+    stagg.PredicateBinning,
+    stagg.VariationBinning,
+    stagg.Variation,
+    stagg.Assignment,
+    stagg.UnweightedCounts,
+    stagg.WeightedCounts,
+    stagg.InterpretedInlineBuffer,
+    stagg.InterpretedInlineInt64Buffer,
+    stagg.InterpretedInlineFloat64Buffer,
+    stagg.InterpretedExternalBuffer,
+    stagg.Profile,
+    stagg.Statistics,
+    stagg.Moments,
+    stagg.Quantiles,
+    stagg.Modes,
+    stagg.Extremes,
+    stagg.StatisticFilter,
+    stagg.Covariance,
+    stagg.ParameterizedFunction,
+    stagg.Parameter,
+    stagg.EvaluatedFunction,
+    stagg.BinnedEvaluatedFunction,
+    stagg.Ntuple,
+    stagg.Column,
+    stagg.NtupleInstance,
+    stagg.Chunk,
+    stagg.ColumnChunk,
+    stagg.Page,
+    stagg.RawInlineBuffer,
+    stagg.RawExternalBuffer,
+    stagg.Metadata,
+    stagg.Decoration,
+    ]
+
+unions = {
+    stagg.interface.RawBuffer: [stagg.RawInlineBuffer, stagg.RawExternalBuffer],
+    stagg.interface.InterpretedBuffer: [stagg.InterpretedInlineBuffer, stagg.InterpretedInlineInt64Buffer, stagg.InterpretedInlineFloat64Buffer, stagg.InterpretedExternalBuffer],
+    stagg.interface.Binning: [stagg.IntegerBinning, stagg.RegularBinning, stagg.HexagonalBinning, stagg.EdgesBinning, stagg.IrregularBinning, stagg.CategoryBinning, stagg.SparseRegularBinning, stagg.FractionBinning, stagg.PredicateBinning, stagg.VariationBinning],
+    stagg.interface.Counts: [stagg.UnweightedCounts, stagg.WeightedCounts],
+    stagg.interface.Function: [stagg.ParameterizedFunction, stagg.EvaluatedFunction],
+    stagg.interface.FunctionObject: [stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction],
+    stagg.interface.Object: [stagg.Histogram, stagg.Ntuple, stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction, stagg.Collection],
+    }
 
 prelude = """
 """
@@ -49,7 +106,7 @@ epilogue = """
 
 def formatted(cls, end="\n"):
     out = ["=== {0}{1}".format(cls.__name__, end)]
-    
+
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
             check = cls._params[name]
@@ -61,13 +118,13 @@ def formatted(cls, end="\n"):
             elif isinstance(check, stagg.checktype.CheckString):
                 typestring = "str"
             elif isinstance(check, stagg.checktype.CheckNumber):
-                typestring = "float in {0}{1}, {2}{3}".format(
+                typestring = "float in _{0}{1}, {2}{3}_".format(
                     "[" if check.min_inclusive else "(",
                     check.min,
                     check.max,
                     "]" if check.max_inclusive else ")")
             elif isinstance(check, stagg.checktype.CheckInteger):
-                typestring = "int in {0}{1}, {2}{3}".format(
+                typestring = "int in _{0}{1}, {2}{3}_".format(
                     "(" if check.min == float("-inf") else "[",
                     check.min,
                     check.max,
@@ -75,7 +132,10 @@ def formatted(cls, end="\n"):
             elif isinstance(check, stagg.checktype.CheckEnum):
                 typestring = "one of " + check.choices[0].base + ".{" + ", ".join(str(x) for x in check.choices) + "}"
             elif isinstance(check, stagg.checktype.CheckClass):
-                typestring = check.type.__name__
+                if check.type in unions:
+                    typestring = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
+                else:
+                    typestring = "<<{0}>>".format(check.type.__name__)
             elif isinstance(check, stagg.checktype.CheckKey) and check.type is str:
                 typestring = "unique str"
             elif isinstance(check, (stagg.checktype.CheckVector, stagg.checktype.CheckLookup)):
@@ -86,12 +146,15 @@ def formatted(cls, end="\n"):
                     subtype = "int"
                 elif check.type is float:
                     subtype = "float"
-                elif check.type is list:
+                elif isinstance(check.type, list):
                     subtype = check.type[0].base + ".{" + ", ".join(str(x) for x in check.type) + "}"
                 else:
-                    subtype = check.type.__name__
+                    if check.type in unions:
+                        subtype = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
+                    else:
+                        subtype = "<<{0}>>".format(check.type.__name__)
                 if check.minlen != 0 or check.maxlen != float("inf"):
-                    withlength = " with length in [{0}, {1}{2}".format(
+                    withlength = " with length in _[{0}, {1}{2}_".format(
                         check.minlen,
                         check.maxlen,
                         ")" if check.maxlen == float("inf") else "]")
@@ -106,7 +169,7 @@ def formatted(cls, end="\n"):
                 raise AssertionError(type(check))
 
             if hasdefault:
-                defaultstring = " _(default: {0})_".format("[]" if islist and param.default is None else repr(param.default))
+                defaultstring = " _(default: {0})_".format("+[]+" if islist and param.default is None else "+" + repr(param.default) + "+")
             else:
                 defaultstring = ""
 
