@@ -4472,9 +4472,9 @@ class WeightedCounts(Counts):
     def _dump(self, indent, width, end):
         args = ["sumw={0}".format(_dumpeq(self.sumw._dump(indent + "    ", width, end), indent, end))]
         if self.sumw2 is not None:
-            args.append("sumw2".format(_dumpeq(self.sumw2._dump(indent + "    ", width, end), indent, end)))
+            args.append("sumw2={0}".format(_dumpeq(self.sumw2._dump(indent + "    ", width, end), indent, end)))
         if self.unweighted is not None:
-            args.append("unweighted".format(_dumpeq(self.unweighted._dump(indent + "    ", width, end), indent, end)))
+            args.append("unweighted={0}".format(_dumpeq(self.unweighted._dump(indent + "    ", width, end), indent, end)))
         return _dumpline(self, args, indent, width, end)
 
     def _reindex(self, oldshape, indexes):

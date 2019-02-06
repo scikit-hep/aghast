@@ -403,10 +403,12 @@ def tostagg(obj):
                     array = obj[expression].values
                     statistics[expression] = Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(array), n=1, weightpower=(0 if sumw2 is None else 1))])
 
-        profiles = []
+        profile = []
         for expression, statistic in statistics.items():
-            if len(statistic.moments) == 0 and len(statistic.quantiles) == 0 and statistic.mode is None and statistic.min is None and statistic.max is None:
-                profiles.append(Profile(expression, statistic))
+            if len(statistic.moments) != 0 or len(statistic.quantiles) != 0 or statistic.mode is not None or statistic.min is not None or statistic.max is not None:
+                profile.append(Profile(expression, statistic))
+
+        return Histogram(axis, counts, profile=profile)
 
     else:
         raise TypeError("DataFrame not recognized as a histogram")
