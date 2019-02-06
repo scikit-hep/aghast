@@ -28,6 +28,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import collections
+import re
+
 import numpy
 try:
     import pandas
@@ -138,7 +141,7 @@ def topandas(obj):
         indexes = []
         names = []
 
-        for axis in obj.axis:
+        for axis in obj.allaxis:
             index = binning2index(axis.binning)
 
             target = None
@@ -196,27 +199,25 @@ def topandas(obj):
                 columns[i] = ("counts", columns[i])
 
         for profile in obj.profile:
-            title = profile.expression if profile.title is None else profile.title
-
             for moment in profile.statistics.moments:
                 data.append(moment.sumwxn.flatarray)
-                columns.append((title, "sum" + ("w" + (repr(moment.weightpower) if moment.weightpower != 1 else "") if moment.weightpower != 0 else "") + ("x" + (repr(moment.n) if moment.n != 1 else "") if moment.n != 0 else "")))
+                columns.append((profile.expression, "sum" + ("w" + (repr(moment.weightpower) if moment.weightpower != 1 else "") if moment.weightpower != 0 else "") + ("x" + (repr(moment.n) if moment.n != 1 else "") if moment.n != 0 else "")))
 
             for quantile in profile.statistics.quantiles:
                 data.append(quantile.values.flatarray)
-                columns.append((title, ("p=" + ("%g" % quantile.p)) + (" (w" + (repr(quantile.weightpower) if quantile.weightpower != 1 else "") + ")" if quantile.weightpower != 0 else "")))
+                columns.append((profile.expression, ("p=" + ("%g" % quantile.p)) + (" (w" + (repr(quantile.weightpower) if quantile.weightpower != 1 else "") + ")" if quantile.weightpower != 0 else "")))
 
             if profile.statistics.mode is not None:
                 data.append(profile.statistics.mode.values.flatarray)
-                columns.append((title, "mode"))
+                columns.append((profile.expression, "mode"))
 
             if profile.statistics.min is not None:
                 data.append(profile.statistics.mode.values.flatarray)
-                columns.append((title, "min"))
+                columns.append((profile.expression, "min"))
 
             if profile.statistics.max is not None:
                 data.append(profile.statistics.mode.values.flatarray)
-                columns.append((title, "max"))
+                columns.append((profile.expression, "max"))
 
         data = dict(zip(columns, data))
 
@@ -237,5 +238,105 @@ def topandas(obj):
     else:
         raise TypeError("{0} has no pandas equivalent".format(type(obj).__name__))
 
+def column2statistic(array, statexpr):
+    m = column2statistic.moment.match(statexpr)
+    if m is not None:
+        if m.group(1) is None:
+            weightpower = 0
+        else:
+            weightpower = m.group(2)
+            if weightpower is None:
+                weightpower = 1
+            else:
+                weightpower = int(weightpower)
+        if m.group(3) is None:
+            n = 0
+        else:
+            n = m.group(4)
+            if n is None:
+                n = 1
+            else:
+                n = int(n)
+        return Moments(InterpretedInlineBuffer.fromarray(array), n=n, weightpower=weightpower)
+
+    m = column2statistic.quantile.match(statexpr)
+    if m is not None:
+        p = float(m.group(1))
+        weightpower = m.group(6)
+        if weightpower is None:
+            weightpower = 0
+        elif weightpower == "":
+            weightpower = 1
+        else:
+            weightpower = int(weightpower)
+        return Quantiles(InterpretedInlineBuffer.fromarray(array), p=p, weightpower=weightpower)
+
+    if statexpr == "mode":
+        return Modes(InterpretedInlineBuffer.fromarray(array))
+
+    if statexpr == "min":
+        return Extremes(InterpretedInlineBuffer.fromarray(array))
+
+    if statexpr == "max":
+        return Extremes(InterpretedInlineBuffer.fromarray(array))
+
+    return None
+
+column2statistic.moment = re.compile(r"sum(w([+-]?\d+)?)?(x([+-]?\d+)?)?")
+column2statistic.quantile = re.compile(r"p=([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)( \(w(\d*)\))?")
+
 def tostagg(obj):
-    raise NotImplementedError
+    unweighted, sumw, sumw2 = None, None, None
+    if isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns:
+        if "unweighted" in obj["counts"].columns:
+            unweighted = obj["counts"]["unweighted"].values
+        if "sumw" in obj["counts"].columns:
+            sumw = obj["counts"]["sumw"].values
+        if "sumw2" in obj["counts"].columns:
+            sumw2 = obj["counts"]["sumw2"].values
+    else:
+        if "unweighted" in obj.columns:
+            unweighted = obj["unweighted"].values
+        if "sumw" in obj.columns:
+            sumw = obj["sumw"].values
+        if "sumw2" in obj.columns:
+            sumw2 = obj["sumw2"].values
+
+    if unweighted is not None or sumw is not None or sumw2 is not None:
+        handle_axis
+
+
+
+
+        statistics = collections.OrderedDict()
+        if isinstance(obj.columns, pandas.MultiIndex):
+            for expression, statexpr in obj.columns:
+                if expression != "counts":
+                    array = obj[expression][statexpr].values
+
+                    statistic = statistics.get(expression, None)
+                    if statistic is None:
+                        statistic = statistics[expression] = Statistics()
+
+                    data = column2statistic(array, statexpr)
+                    if isinstance(data, Moments):
+                        statistic.moments = list(statistic.moments) + [data]
+                    elif isinstance(data, Quantiles):
+                        statistic.quantiles = list(statistic.quantiles) + [data]
+                    elif isinstance(data, Modes):
+                        statistic.mode = data
+                    elif isinstance(data, Extremes) and statexpr == "min":
+                        statistic.min = data
+                    elif isinstance(data, Extremes) and statexpr == "max":
+                        statistic.max = data
+
+        else:
+            for expression in obj.columns:
+                if expression != "unweighted" and expression != "sumw" and expression != "sumw2":
+                    array = obj[expression].values
+                    statistics[expression] = Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(array), n=1, weightpower=(0 if sumw2 is None else 1))])
+
+        profiles = []
+        for expression, statistic in statistics.items():
+            if len(statistic.moments) == 0 and len(statistic.quantiles) == 0 and statistic.mode is None and statistic.min is None and statistic.max is None:
+                profiles.append(Profile(expression, statistic))
