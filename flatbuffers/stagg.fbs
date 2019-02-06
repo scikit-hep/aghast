@@ -142,7 +142,7 @@ struct StatisticFilter {
 table Moments {
   sumwxn: InterpretedBuffer (required);
   n: int8;
-  weightpower: int8 = 1;
+  weightpower: int8 = 0;
   filter: StatisticFilter;
 }
 
@@ -154,7 +154,7 @@ table Extremes {
 table Quantiles {
   values: InterpretedBuffer (required);
   p: double = 0.5;    // 0.0 <= p <= 1.0
-  weightpower: int8 = 1;
+  weightpower: int8 = 0;
   filter: StatisticFilter;
 }
 
@@ -175,7 +175,7 @@ table Covariance {
   xindex: int;
   yindex: int;
   sumwxy: InterpretedBuffer (required);   // one of the N*(N-1) elements
-  weightpower: int8 = 1;
+  weightpower: int8 = 0;
   filter: StatisticFilter;
 }
 

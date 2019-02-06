@@ -200,11 +200,11 @@ def topandas(obj):
 
             for moment in profile.statistics.moments:
                 data.append(moment.sumwxn.flatarray)
-                columns.append((title, "sum" + ("w" + repr(moment.weightpower) if moment.weightpower != 0 else "") + ("x" + repr(moment.n))))
+                columns.append((title, "sum" + ("w" + (repr(moment.weightpower) if moment.weightpower != 1 else "") if moment.weightpower != 0 else "") + ("x" + (repr(moment.n) if moment.n != 1 else "") if moment.n != 0 else "")))
 
             for quantile in profile.statistics.quantiles:
                 data.append(quantile.values.flatarray)
-                columns.append((title, ("p=" + repr(quantile.p)) + (" (w" + repr(quantile.weightpower) + ")" if moment.weightpower != 0 else "")))
+                columns.append((title, ("p=" + ("%g" % quantile.p)) + (" (w" + (repr(quantile.weightpower) if quantile.weightpower != 1 else "") + ")" if quantile.weightpower != 0 else "")))
 
             if profile.statistics.mode is not None:
                 data.append(profile.statistics.mode.values.flatarray)
@@ -218,10 +218,12 @@ def topandas(obj):
                 data.append(profile.statistics.mode.values.flatarray)
                 columns.append((title, "max"))
 
+        data = dict(zip(columns, data))
 
+        if isinstance(columns[0], tuple):
+            columns = pandas.MultiIndex.from_tuples(columns)
 
-
-        raise NotImplementedError
+        return pandas.DataFrame(index=index, columns=columns, data=data)
 
     elif isinstance(obj, Ntuple):
         raise NotImplementedError

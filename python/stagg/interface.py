@@ -1369,7 +1369,7 @@ class Moments(Stagg):
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
 
-    def __init__(self, sumwxn, n, weightpower=1, filter=None):
+    def __init__(self, sumwxn, n, weightpower=0, filter=None):
         self.sumwxn = sumwxn
         self.n = n
         self.weightpower = weightpower
@@ -1397,7 +1397,7 @@ class Moments(Stagg):
         stagg.stagg_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
         stagg.stagg_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
         stagg.stagg_generated.Moments.MomentsAddN(builder, self.n)
-        if self.weightpower != 1:
+        if self.weightpower != 0:
             stagg.stagg_generated.Moments.MomentsAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
             stagg.stagg_generated.Moments.MomentsAddFilter(builder, self.filter._toflatbuffers(builder))
@@ -1405,7 +1405,7 @@ class Moments(Stagg):
 
     def _dump(self, indent, width, end):
         args = ["sumwxn={0}".format(_dumpeq(self.sumwxn._dump(indent + "    ", width, end), indent, end)), "n={0}".format(repr(self.n))]
-        if self.weightpower != -1:
+        if self.weightpower != 0:
             args.append("weightpower={0}".format(self.weightpower))
         if self.filter is not None:
             args.append("filter={0}".format(_dumpeq(self.filter._dump(indent + "  ", end, flie, flush), indent, end)))
@@ -1470,7 +1470,7 @@ class Quantiles(Stagg):
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
 
-    def __init__(self, values, p=0.5, weightpower=1, filter=None):
+    def __init__(self, values, p=0.5, weightpower=0, filter=None):
         self.values = values
         self.p = p
         self.weightpower = weightpower
@@ -1498,7 +1498,7 @@ class Quantiles(Stagg):
         stagg.stagg_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Quantiles.QuantilesAddValues(builder, values)
         stagg.stagg_generated.Quantiles.QuantilesAddP(builder, self.p)
-        if self.weightpower != 1:
+        if self.weightpower != 0:
             stagg.stagg_generated.Quantiles.QuantilesAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
             stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, self.filter._toflatbuffers(builder))
@@ -1506,7 +1506,7 @@ class Quantiles(Stagg):
 
     def _dump(self, indent, width, end):
         args = ["values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end)), "p={0}".format(repr(self.p))]
-        if self.weightpower != -1:
+        if self.weightpower != 0:
             args.append("weightpower={0}".format(self.weightpower))
         if self.filter is not None:
             args.append("filter={0}".format(_dumpeq(self.filter._dump(indent + "  ", end, flie, flush), indent, end)))
@@ -1655,7 +1655,7 @@ class Covariance(Stagg):
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
 
-    def __init__(self, xindex, yindex, sumwxy, weightpower=1, filter=None):
+    def __init__(self, xindex, yindex, sumwxy, weightpower=0, filter=None):
         self.xindex = xindex
         self.yindex = yindex
         self.sumwxy = sumwxy
@@ -1696,7 +1696,7 @@ class Covariance(Stagg):
         stagg.stagg_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
         stagg.stagg_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
         stagg.stagg_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
-        if self.weightpower != 1:
+        if self.weightpower != 0:
             stagg.stagg_generated.Covariance.CovarianceAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
             stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, self.filter._toflatbuffers(builder))
@@ -1704,7 +1704,7 @@ class Covariance(Stagg):
 
     def _dump(self, indent, width, end):
         args = ["xindex={0}".format(repr(self.xindex)), "yindex={0}".format(repr(self.yindex)), "sumwxy={0}".format(_dumpeq(self.sumwxy._dump(indent + "    ", width, end), indent, end))]
-        if self.weightpower != -1:
+        if self.weightpower != 0:
             args.append("weightpower={0}".format(self.weightpower))
         if self.filter is not None:
             args.append("filter={0}".format(_dumpeq(self.filter._dump(indent + "  ", end, flie, flush), indent, end)))
