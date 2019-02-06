@@ -335,8 +335,10 @@ def tostagg(obj):
                     unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(numpy.inf)
                 elif statexpr == "max":
                     unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(-numpy.inf)
-        unstacked.fillna(0, inplace=True)
-        obj = unstacked.stack()
+                elif statexpr.startswith("sum"):
+                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(0)
+
+        obj = unstacked.stack(dropna=False)
 
         index = obj.index
         if not isinstance(index, pandas.MultiIndex):
