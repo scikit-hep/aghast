@@ -220,7 +220,7 @@ def formatted(cls, end="\n"):
             else:
                 defaultstring = ""
 
-            out.append(u"\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+            out.append(u"\u2022{nbsp}" + " {0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     if len(cls.validity_rules) != 0:
         out.append((" +" + end).join(cls.validity_rules))
