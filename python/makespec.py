@@ -48,9 +48,7 @@ prelude = """= Stagg Specification
 
 == Introduction
 
-== Types
-
-== Class definitions
+== Basic Types
 
 """
 
@@ -147,7 +145,7 @@ def num(x):
         return "`+{0}+`".format(repr(x))
 
 def formatted(cls, end="\n"):
-    out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
+    out = ["\n\n== {0}{1}".format(cls.__name__, end)]
 
     out.append("[%hardbreaks]")
     for name, param in signature(cls.__init__).parameters.items():
@@ -224,7 +222,7 @@ def formatted(cls, end="\n"):
 
             out.append(u"\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
-    out.append("{empty} +" + end + cls.description.strip())
+    out.append("{empty} +" + end + "[big]*" + cls.description.strip() + "*")
     if cls.long_description is not None:
         out.append("{empty} +" + end + cls.long_description.strip())
 
