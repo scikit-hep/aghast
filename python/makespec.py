@@ -112,6 +112,8 @@ def formatted(cls, end="\n"):
             check = cls._params[name]
             hasdefault = param.default is not param.empty
 
+            required = "required " if check.required else ""
+
             islist = False
             if isinstance(check, stagg.checktype.CheckBool):
                 typestring = "bool"
@@ -173,7 +175,7 @@ def formatted(cls, end="\n"):
             else:
                 defaultstring = ""
 
-            out.append("* *{0}*: {1}{2}".format(name, typestring, defaultstring))
+            out.append("* {0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     return end.join(out)
 
