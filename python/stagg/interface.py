@@ -3116,11 +3116,14 @@ class IrregularBinning(Binning, OverlappingFill):
     overflow         = typedproperty(_params["overflow"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    description = ""
-    validity_rules = ()
+    description = "Splits a one-dimensional axis into unordered, any-sized real intervals (that may even overlap)."
+    validity_rules = ("The intervals, as defined by their *low*, *high*, *low_inclusive*, *high_inclusive* fields, must be unique.",)
     long_description = """
+This binning is intended for one-dimensional, real-valued data. Unlike <<EdgesBinning>>, the any-sized intervals do not need to be abutting, so this binning can describe a distribution with large gaps.
 
+In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `undefined` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
 
+Irregular bins are usually not directly created by histogramming libraries, but they may come about as a result of merging histograms with different binnings.
 
 *See also:*
 
