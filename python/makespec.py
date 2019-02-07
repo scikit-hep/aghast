@@ -102,11 +102,9 @@ unions = {
     stagg.interface.Object: [stagg.Histogram, stagg.Ntuple, stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction, stagg.Collection],
     }
 
-prelude = """:toc:
+prelude = """= Stagg Specification
 
 == Introduction
-
-toc::[]
 
 == Types
 

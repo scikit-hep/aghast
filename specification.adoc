@@ -1,16 +1,12 @@
-:toc:
+= Stagg Specification
 
 == Introduction
-
-toc::[]
 
 == Types
 
 == Class definitions
 
-++++
-<style>.markdown-body li>p {margin-top: 5px; margin-bottom: 5px;}</style>
-++++
+
 
 === Collection
 
