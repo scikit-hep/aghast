@@ -8,6 +8,8 @@
 
 == Collection
 
+Collection of named objects, possibly with one or more common axis.
+
 [%hardbreaks]
 •{nbsp} *objects*: str → <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
@@ -16,7 +18,6 @@
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== Collection of named objects, possibly with one or more common axis.
 Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
@@ -35,6 +36,8 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 
 == Histogram
 
+
+
 [%hardbreaks]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
 •{nbsp}required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
@@ -46,10 +49,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== 
 
 
 == Axis
+
+
 
 [%hardbreaks]
 •{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
@@ -59,10 +63,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
-=== 
 
 
 == IntegerBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *min*: int in (‒∞, ∞)
@@ -71,30 +76,33 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 (default: `+BinLocation.nonexistent+`)
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-=== 
 
 
 == RegularBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *num*: int in [1, ∞)
 •{nbsp}required  *interval*: <<RealInterval>>
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *circular*: bool (default: false)
-=== 
 
 
 == RealInterval
+
+
 
 [%hardbreaks]
 •{nbsp}required  *low*: float in [‒∞, ∞]
 •{nbsp}required  *high*: float in [‒∞, ∞]
 •{nbsp} *low_inclusive*: bool (default: true)
 •{nbsp} *high_inclusive*: bool (default: false)
-=== 
 
 
 == RealOverflow
+
+
 
 [%hardbreaks]
 •{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -109,10 +117,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 (default: `+RealOverflow.in_overflow+`)
 •{nbsp} *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_nanflow+`)
-=== 
 
 
 == HexagonalBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *qmin*: int in (‒∞, ∞)
@@ -126,10 +135,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *qangle*: float in [‒π/2, π/2] (default: 0.0)
 •{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
 •{nbsp} *roverflow*: <<RealOverflow>> (default: null)
-=== 
 
 
 == EdgesBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *edges*: list of float with length in [1, ∞)
@@ -137,29 +147,32 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *low_inclusive*: bool (default: true)
 •{nbsp} *high_inclusive*: bool (default: false)
 •{nbsp} *circular*: bool (default: false)
-=== 
 
 
 == IrregularBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
-=== 
 
 
 == CategoryBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *categories*: list of str
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-=== 
 
 
 == SparseRegularBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *bins*: list of int
@@ -170,10 +183,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *high_inclusive*: bool (default: false)
 •{nbsp} *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
 •{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
-=== 
 
 
 == FractionBinning
+
+
 
 [%hardbreaks]
 •{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
@@ -181,60 +195,67 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *layout_reversed*: bool (default: false)
 •{nbsp} *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
-=== 
 
 
 == PredicateBinning
+
+
 
 [%hardbreaks]
 •{nbsp}required  *predicates*: list of str with length in [1, ∞)
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
-=== 
 
 
 == VariationBinning
 
+
+
 [%hardbreaks]
 •{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
-=== 
 
 
 == Variation
+
+
 
 [%hardbreaks]
 •{nbsp}required  *assignments*: list of <<Assignment>>
 •{nbsp} *systematic*: list of float (default: null/empty)
 •{nbsp} *category_systematic*: list of str (default: null/empty)
-=== 
 
 
 == Assignment
 
+
+
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *expression*: str
-=== 
 
 
 == UnweightedCounts
 
+
+
 [%hardbreaks]
 •{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-=== 
 
 
 == WeightedCounts
+
+
 
 [%hardbreaks]
 •{nbsp}required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
 •{nbsp} *unweighted*: <<UnweightedCounts>> (default: null)
-=== 
 
 
 == InterpretedInlineBuffer
+
+
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
@@ -247,24 +268,27 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 (default: `+Interpretation.little_endian+`)
 •{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
-=== 
 
 
 == InterpretedInlineInt64Buffer
 
+
+
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
-=== 
 
 
 == InterpretedInlineFloat64Buffer
 
+
+
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
-=== 
 
 
 == InterpretedExternalBuffer
+
+
 
 [%hardbreaks]
 •{nbsp}required  *pointer*: int in [0, ∞)
@@ -281,10 +305,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
 •{nbsp} *location*: str (default: null)
-=== 
 
 
 == Profile
+
+
 
 [%hardbreaks]
 •{nbsp}required  *expression*: str
@@ -292,10 +317,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
-=== 
 
 
 == Statistics
+
+
 
 [%hardbreaks]
 •{nbsp} *moments*: list of <<Moments>> (default: null/empty)
@@ -303,46 +329,51 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *mode*: <<Modes>> (default: null)
 •{nbsp} *min*: <<Extremes>> (default: null)
 •{nbsp} *max*: <<Extremes>> (default: null)
-=== 
 
 
 == Moments
+
+
 
 [%hardbreaks]
 •{nbsp}required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp}required  *n*: int in [‒128, 127]
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-=== 
 
 
 == Quantiles
+
+
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp}required  *p*: float in [0.0, 1.0] (default: 1/2)
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-=== 
 
 
 == Modes
 
+
+
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-=== 
 
 
 == Extremes
 
+
+
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-=== 
 
 
 == StatisticFilter
+
+
 
 [%hardbreaks]
 •{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
@@ -350,10 +381,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *excludes_minf*: bool (default: false)
 •{nbsp} *excludes_pinf*: bool (default: false)
 •{nbsp} *excludes_nan*: bool (default: false)
-=== 
 
 
 == Covariance
+
+
 
 [%hardbreaks]
 •{nbsp}required  *xindex*: int in [0, ∞)
@@ -361,10 +393,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp}required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-=== 
 
 
 == ParameterizedFunction
+
+
 
 [%hardbreaks]
 •{nbsp}required  *expression*: str
@@ -373,18 +406,20 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== 
 
 
 == Parameter
 
+
+
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-=== 
 
 
 == EvaluatedFunction
+
+
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -395,10 +430,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== 
 
 
 == BinnedEvaluatedFunction
+
+
 
 [%hardbreaks]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
@@ -410,10 +446,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== 
 
 
 == Ntuple
+
+
 
 [%hardbreaks]
 •{nbsp}required  *columns*: list of <<Column>> with length in [1, ∞)
@@ -425,10 +462,11 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-=== 
 
 
 == Column
+
+
 
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
@@ -441,72 +479,79 @@ Similarly, regions can be subdivided into subregions, and other binning types ma
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
-=== 
 
 
 == NtupleInstance
 
+
+
 [%hardbreaks]
 •{nbsp}required  *chunks*: list of <<Chunk>>
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
-=== 
 
 
 == Chunk
 
+
+
 [%hardbreaks]
 •{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
 •{nbsp} *metadata*: <<Metadata>> (default: null)
-=== 
 
 
 == ColumnChunk
+
+
 
 [%hardbreaks]
 •{nbsp}required  *pages*: list of <<Page>>
 •{nbsp}required  *page_offsets*: list of int with length in [1, ∞)
 •{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
 •{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
-=== 
 
 
 == Page
 
+
+
 [%hardbreaks]
 •{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
-=== 
 
 
 == RawInlineBuffer
 
+
+
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
-=== 
 
 
 == RawExternalBuffer
+
+
 
 [%hardbreaks]
 •{nbsp}required  *pointer*: int in [0, ∞)
 •{nbsp}required  *numbytes*: int in [0, ∞)
 •{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-=== 
 
 
 == Metadata
 
+
+
 [%hardbreaks]
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
-=== 
 
 
 == Decoration
+
+
 
 [%hardbreaks]
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
-=== 
 
