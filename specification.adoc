@@ -10,401 +10,356 @@
 
 === Collection
 
-.Properties
-*  *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
+    *  *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
-*  *axis*: list of <<Axis>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    *  *axis*: list of <<Axis>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === Histogram
 
-.Properties
-* required  *axis*: list of <<Axis>> with length in [1, ∞)
-* required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
-*  *profile*: list of <<Profile>> (default: null/empty)
-*  *axis_covariances*: list of <<Covariance>> (default: null/empty)
-*  *profile_covariances*: list of <<Covariance>> (default: null/empty)
-*  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    * required  *axis*: list of <<Axis>> with length in [1, ∞)
+    * required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
+    *  *profile*: list of <<Profile>> (default: null/empty)
+    *  *axis_covariances*: list of <<Covariance>> (default: null/empty)
+    *  *profile_covariances*: list of <<Covariance>> (default: null/empty)
+    *  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === Axis
 
-.Properties
-*  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
+    *  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: null)
-*  *expression*: str (default: null)
-*  *statistics*: <<Statistics>> (default: null)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
+    *  *expression*: str (default: null)
+    *  *statistics*: <<Statistics>> (default: null)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
 
 === IntegerBinning
 
-.Properties
-* required  *min*: int in (‒∞, ∞)
-* required  *max*: int in (‒∞, ∞)
-*  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    * required  *min*: int in (‒∞, ∞)
+    * required  *max*: int in (‒∞, ∞)
+    *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-*  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === RegularBinning
 
-.Properties
-* required  *num*: int in [1, ∞)
-* required  *interval*: <<RealInterval>>
-*  *overflow*: <<RealOverflow>> (default: null)
-*  *circular*: bool (default: false)
+    * required  *num*: int in [1, ∞)
+    * required  *interval*: <<RealInterval>>
+    *  *overflow*: <<RealOverflow>> (default: null)
+    *  *circular*: bool (default: false)
 
 === RealInterval
 
-.Properties
-* required  *low*: float in [‒∞, ∞]
-* required  *high*: float in [‒∞, ∞]
-*  *low_inclusive*: bool (default: true)
-*  *high_inclusive*: bool (default: false)
+    * required  *low*: float in [‒∞, ∞]
+    * required  *high*: float in [‒∞, ∞]
+    *  *low_inclusive*: bool (default: true)
+    *  *high_inclusive*: bool (default: false)
 
 === RealOverflow
 
-.Properties
-*  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-*  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-*  *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    *  *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-*  *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+    *  *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_underflow+`)
-*  *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+    *  *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_overflow+`)
-*  *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+    *  *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_nanflow+`)
 
 === HexagonalBinning
 
-.Properties
-* required  *qmin*: int in (‒∞, ∞)
-* required  *qmax*: int in (‒∞, ∞)
-* required  *rmin*: int in (‒∞, ∞)
-* required  *rmax*: int in (‒∞, ∞)
-*  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
+    * required  *qmin*: int in (‒∞, ∞)
+    * required  *qmax*: int in (‒∞, ∞)
+    * required  *rmin*: int in (‒∞, ∞)
+    * required  *rmax*: int in (‒∞, ∞)
+    *  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
 (default: `+HexagonalBinning.offset+`)
-*  *xorigin*: float in (‒∞, ∞) (default: 0.0)
-*  *yorigin*: float in (‒∞, ∞) (default: 0.0)
-*  *qangle*: float in [‒π/2, π/2] (default: 0.0)
-*  *qoverflow*: <<RealOverflow>> (default: null)
-*  *roverflow*: <<RealOverflow>> (default: null)
+    *  *xorigin*: float in (‒∞, ∞) (default: 0.0)
+    *  *yorigin*: float in (‒∞, ∞) (default: 0.0)
+    *  *qangle*: float in [‒π/2, π/2] (default: 0.0)
+    *  *qoverflow*: <<RealOverflow>> (default: null)
+    *  *roverflow*: <<RealOverflow>> (default: null)
 
 === EdgesBinning
 
-.Properties
-* required  *edges*: list of float with length in [1, ∞)
-*  *overflow*: <<RealOverflow>> (default: null)
-*  *low_inclusive*: bool (default: true)
-*  *high_inclusive*: bool (default: false)
-*  *circular*: bool (default: false)
+    * required  *edges*: list of float with length in [1, ∞)
+    *  *overflow*: <<RealOverflow>> (default: null)
+    *  *low_inclusive*: bool (default: true)
+    *  *high_inclusive*: bool (default: false)
+    *  *circular*: bool (default: false)
 
 === IrregularBinning
 
-.Properties
-* required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
-*  *overflow*: <<RealOverflow>> (default: null)
-*  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+    * required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
+    *  *overflow*: <<RealOverflow>> (default: null)
+    *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === CategoryBinning
 
-.Properties
-* required  *categories*: list of str
-*  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+    * required  *categories*: list of str
+    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === SparseRegularBinning
 
-.Properties
-* required  *bins*: list of int
-* required  *bin_width*: float in (0, ∞]
-*  *origin*: float in [‒∞, ∞] (default: 0.0)
-*  *overflow*: <<RealOverflow>> (default: null)
-*  *low_inclusive*: bool (default: true)
-*  *high_inclusive*: bool (default: false)
-*  *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
-*  *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
+    * required  *bins*: list of int
+    * required  *bin_width*: float in (0, ∞]
+    *  *origin*: float in [‒∞, ∞] (default: 0.0)
+    *  *overflow*: <<RealOverflow>> (default: null)
+    *  *low_inclusive*: bool (default: true)
+    *  *high_inclusive*: bool (default: false)
+    *  *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
+    *  *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
 === FractionBinning
 
-.Properties
-*  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
+    *  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
-*  *layout_reversed*: bool (default: false)
-*  *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
+    *  *layout_reversed*: bool (default: false)
+    *  *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
 
 === PredicateBinning
 
-.Properties
-* required  *predicates*: list of str with length in [1, ∞)
-*  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+    * required  *predicates*: list of str with length in [1, ∞)
+    *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === VariationBinning
 
-.Properties
-* required  *variations*: list of <<Variation>> with length in [1, ∞)
+    * required  *variations*: list of <<Variation>> with length in [1, ∞)
 
 === Variation
 
-.Properties
-* required  *assignments*: list of <<Assignment>>
-*  *systematic*: list of float (default: null/empty)
-*  *category_systematic*: list of str (default: null/empty)
+    * required  *assignments*: list of <<Assignment>>
+    *  *systematic*: list of float (default: null/empty)
+    *  *category_systematic*: list of str (default: null/empty)
 
 === Assignment
 
-.Properties
-* required  *identifier*: unique str
-* required  *expression*: str
+    * required  *identifier*: unique str
+    * required  *expression*: str
 
 === UnweightedCounts
 
-.Properties
-* required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    * required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === WeightedCounts
 
-.Properties
-* required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+    * required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-*  *unweighted*: <<UnweightedCounts>> (default: null)
+    *  *unweighted*: <<UnweightedCounts>> (default: null)
 
 === InterpretedInlineBuffer
 
-.Properties
-* required  *buffer*: buffer
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+    * required  *buffer*: buffer
+    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-*  *postfilter_slice*: slice (start:stop:step) (default: null)
-*  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+    *  *postfilter_slice*: slice (start:stop:step) (default: null)
+    *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+    *  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
 
 === InterpretedInlineInt64Buffer
 
-.Properties
-* required  *buffer*: buffer
+    * required  *buffer*: buffer
 
 === InterpretedInlineFloat64Buffer
 
-.Properties
-* required  *buffer*: buffer
+    * required  *buffer*: buffer
 
 === InterpretedExternalBuffer
 
-.Properties
-* required  *pointer*: int in [0, ∞)
-* required  *numbytes*: int in [0, ∞)
-*  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+    * required  *pointer*: int in [0, ∞)
+    * required  *numbytes*: int in [0, ∞)
+    *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-*  *postfilter_slice*: slice (start:stop:step) (default: null)
-*  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+    *  *postfilter_slice*: slice (start:stop:step) (default: null)
+    *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+    *  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
-*  *location*: str (default: null)
+    *  *location*: str (default: null)
 
 === Profile
 
-.Properties
-* required  *expression*: str
-* required  *statistics*: <<Statistics>>
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
+    * required  *expression*: str
+    * required  *statistics*: <<Statistics>>
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
 
 === Statistics
 
-.Properties
-*  *moments*: list of <<Moments>> (default: null/empty)
-*  *quantiles*: list of <<Quantiles>> (default: null/empty)
-*  *mode*: <<Modes>> (default: null)
-*  *min*: <<Extremes>> (default: null)
-*  *max*: <<Extremes>> (default: null)
+    *  *moments*: list of <<Moments>> (default: null/empty)
+    *  *quantiles*: list of <<Quantiles>> (default: null/empty)
+    *  *mode*: <<Modes>> (default: null)
+    *  *min*: <<Extremes>> (default: null)
+    *  *max*: <<Extremes>> (default: null)
 
 === Moments
 
-.Properties
-* required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-* required  *n*: int in [‒128, 127]
-*  *weightpower*: int in [‒128, 127] (default: 0)
-*  *filter*: <<StatisticFilter>> (default: null)
+    * required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    * required  *n*: int in [‒128, 127]
+    *  *weightpower*: int in [‒128, 127] (default: 0)
+    *  *filter*: <<StatisticFilter>> (default: null)
 
 === Quantiles
 
-.Properties
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-* required  *p*: float in [0.0, 1.0] (default: 1/2)
-*  *weightpower*: int in [‒128, 127] (default: 0)
-*  *filter*: <<StatisticFilter>> (default: null)
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    * required  *p*: float in [0.0, 1.0] (default: 1/2)
+    *  *weightpower*: int in [‒128, 127] (default: 0)
+    *  *filter*: <<StatisticFilter>> (default: null)
 
 === Modes
 
-.Properties
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *filter*: <<StatisticFilter>> (default: null)
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *filter*: <<StatisticFilter>> (default: null)
 
 === Extremes
 
-.Properties
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *filter*: <<StatisticFilter>> (default: null)
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *filter*: <<StatisticFilter>> (default: null)
 
 === StatisticFilter
 
-.Properties
-*  *min*: float in [‒∞, ∞] (default: ‒∞)
-*  *max*: float in [‒∞, ∞] (default: ∞)
-*  *excludes_minf*: bool (default: false)
-*  *excludes_pinf*: bool (default: false)
-*  *excludes_nan*: bool (default: false)
+    *  *min*: float in [‒∞, ∞] (default: ‒∞)
+    *  *max*: float in [‒∞, ∞] (default: ∞)
+    *  *excludes_minf*: bool (default: false)
+    *  *excludes_pinf*: bool (default: false)
+    *  *excludes_nan*: bool (default: false)
 
 === Covariance
 
-.Properties
-* required  *xindex*: int in [0, ∞)
-* required  *yindex*: int in [0, ∞)
-* required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *weightpower*: int in [‒128, 127] (default: 0)
-*  *filter*: <<StatisticFilter>> (default: null)
+    * required  *xindex*: int in [0, ∞)
+    * required  *yindex*: int in [0, ∞)
+    * required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *weightpower*: int in [‒128, 127] (default: 0)
+    *  *filter*: <<StatisticFilter>> (default: null)
 
 === ParameterizedFunction
 
-.Properties
-* required  *expression*: str
-*  *parameters*: list of <<Parameter>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    * required  *expression*: str
+    *  *parameters*: list of <<Parameter>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === Parameter
 
-.Properties
-* required  *identifier*: unique str
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    * required  *identifier*: unique str
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === EvaluatedFunction
 
-.Properties
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-*  *errors*: list of <<Quantiles>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    *  *errors*: list of <<Quantiles>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === BinnedEvaluatedFunction
 
-.Properties
-* required  *axis*: list of <<Axis>> with length in [1, ∞)
-* required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+    * required  *axis*: list of <<Axis>> with length in [1, ∞)
+    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+    *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-*  *errors*: list of <<Quantiles>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    *  *errors*: list of <<Quantiles>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === Ntuple
 
-.Properties
-* required  *columns*: list of <<Column>> with length in [1, ∞)
-* required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
-*  *column_statistics*: list of <<Statistics>> (default: null/empty)
-*  *column_covariances*: list of <<Covariance>> (default: null/empty)
-*  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
-*  *script*: str (default: null)
+    * required  *columns*: list of <<Column>> with length in [1, ∞)
+    * required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
+    *  *column_statistics*: list of <<Statistics>> (default: null/empty)
+    *  *column_covariances*: list of <<Covariance>> (default: null/empty)
+    *  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
+    *  *script*: str (default: null)
 
 === Column
 
-.Properties
-* required  *identifier*: unique str
-* required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+    * required  *identifier*: unique str
+    * required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
+    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-*  *postfilter_slice*: slice (start:stop:step) (default: null)
-*  *title*: str (default: null)
-*  *metadata*: <<Metadata>> (default: null)
-*  *decoration*: <<Decoration>> (default: null)
+    *  *postfilter_slice*: slice (start:stop:step) (default: null)
+    *  *title*: str (default: null)
+    *  *metadata*: <<Metadata>> (default: null)
+    *  *decoration*: <<Decoration>> (default: null)
 
 === NtupleInstance
 
-.Properties
-* required  *chunks*: list of <<Chunk>>
-*  *chunk_offsets*: list of int (default: null/empty)
+    * required  *chunks*: list of <<Chunk>>
+    *  *chunk_offsets*: list of int (default: null/empty)
 
 === Chunk
 
-.Properties
-* required  *column_chunks*: list of <<ColumnChunk>>
-*  *metadata*: <<Metadata>> (default: null)
+    * required  *column_chunks*: list of <<ColumnChunk>>
+    *  *metadata*: <<Metadata>> (default: null)
 
 === ColumnChunk
 
-.Properties
-* required  *pages*: list of <<Page>>
-* required  *page_offsets*: list of int with length in [1, ∞)
-*  *page_min*: list of <<Extremes>> (default: null/empty)
-*  *page_max*: list of <<Extremes>> (default: null/empty)
+    * required  *pages*: list of <<Page>>
+    * required  *page_offsets*: list of int with length in [1, ∞)
+    *  *page_min*: list of <<Extremes>> (default: null/empty)
+    *  *page_max*: list of <<Extremes>> (default: null/empty)
 
 === Page
 
-.Properties
-* required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
+    * required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 === RawInlineBuffer
 
-.Properties
-* required  *buffer*: buffer
+    * required  *buffer*: buffer
 
 === RawExternalBuffer
 
-.Properties
-* required  *pointer*: int in [0, ∞)
-* required  *numbytes*: int in [0, ∞)
-*  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+    * required  *pointer*: int in [0, ∞)
+    * required  *numbytes*: int in [0, ∞)
+    *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 
 === Metadata
 
-.Properties
-* required  *data*: str
-* required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
+    * required  *data*: str
+    * required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 === Decoration
 
-.Properties
-* required  *data*: str
-* required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
+    * required  *data*: str
+    * required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
