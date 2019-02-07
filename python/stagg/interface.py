@@ -2520,7 +2520,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, num, interval, overflow=None, circular=False):
@@ -2898,7 +2898,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, edges, overflow=None, low_inclusive=True, high_inclusive=False, circular=False):
@@ -3127,7 +3127,7 @@ class IrregularBinning(Binning, OverlappingFill):
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
@@ -3565,7 +3565,7 @@ class SparseRegularBinning(Binning, BinLocation):
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=MININT64, maxbin=MAXINT64):
