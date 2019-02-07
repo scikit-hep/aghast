@@ -142,7 +142,6 @@ def num(x):
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
-    out.append("[none, item_spacing: 0px]")
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
             check = cls._params[name]
@@ -212,7 +211,7 @@ def formatted(cls, end="\n"):
             else:
                 defaultstring = ""
 
-            out.append("* {0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+            out.append("{0} *{1}*: {2}{3} +".format(required, name, typestring, defaultstring))
 
     return end.join(out)
 
