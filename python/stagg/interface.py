@@ -2734,7 +2734,7 @@ class HexagonalBinning(Binning):
     validity_rules = ("The *qmin* must be strictly less than the *qmax*.",
                       "The *rmin* must be strictly less than the *rmax*.")
     long_description = u"""
-This binning is intended for two-dimensional, real-valued data in a compact region. Hexagons tile a two-dimensional plane, just as rectangles do, but whereas a rectangular tiling can be represented by two <<RealBinning>> axes, hexagonal binning requires a special binning. Some advantages of hexagonal binning are https://www.meccanismocomplesso.org/hexagonal-binning[described here].
+This binning is intended for two-dimensional, real-valued data in a compact region. Hexagons tile a two-dimensional plane, just as rectangles do, but whereas a rectangular tiling can be represented by two <<RegularBinning>> axes, hexagonal binning requires a special binning. Some advantages of hexagonal binning are https://www.meccanismocomplesso.org/hexagonal-binning[described here].
 
 As with any other binning, integer-valued indexes in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values are mapped to values in the data space. However, rather than mapping a single integer slot position to an integer, real interval, or categorical data value, two integers from a rectangular integer grid are mapped to hexagonal tiles. The integers are labeled `q` and `r`, with `q` values between *qmin* and *qmax* (inclusive) and `r` values between *rmin* and *rmax* (inclusive). The total number of bins is `(1 + qmax - qmin)*(1 + rmax - rmin)`. Data coordinates are labeled `x` and `y`.
 
