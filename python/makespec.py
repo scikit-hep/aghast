@@ -44,17 +44,7 @@ import stagg
 import stagg.checktype
 import stagg.interface
 
-prelude = """++++
-<style>
-td {color: red;}
-</style>
-
-<table border="1">
-<tr><td>1</td><td>2</td></tr>
-</table>
-++++
-
-= Stagg Specification
+prelude = """= Stagg Specification
 
 == Introduction
 
@@ -159,6 +149,7 @@ def num(x):
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
+    out.append(".Properties")
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
             check = cls._params[name]
