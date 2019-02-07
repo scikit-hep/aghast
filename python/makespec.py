@@ -171,7 +171,7 @@ def formatted(cls, end="\n"):
                 raise AssertionError(type(check))
 
             if hasdefault:
-                defaultstring = " (default: `+{0}+`)".format("[]" if islist and param.default is None else repr(param.default))
+                defaultstring = " +{0}(default: `+{1}+`)".format(end, "[]" if islist and param.default is None else repr(param.default))
             else:
                 defaultstring = ""
 
