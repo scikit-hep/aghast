@@ -223,7 +223,7 @@ def formatted(cls, end="\n"):
             out.append(u"\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     if cls.long_description is not None:
-        out.append(cls.long_description.strip())
+        out.append(end + cls.long_description.strip())
 
     return end.join(out)
 
