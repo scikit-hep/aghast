@@ -107,7 +107,7 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 
 == IntegerBinning
 
-*Splits an axis into a dense set of integer-sized bins, aligned to integers.*
+*Splits an axis into a contiguous set of integer-sized bins, aligned to integers.*
 
 [%hardbreaks]
 •{nbsp}required  *min*: int in (‒∞, ∞)
@@ -127,17 +127,23 @@ If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots
 
 == RegularBinning
 
-**
+*Splits an axis into an ordered, abutting set of equal-sized real intervals.*
 
 [%hardbreaks]
 •{nbsp}required  *num*: int in [1, ∞)
 •{nbsp}required  *interval*: <<RealInterval>>
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *circular*: bool (default: false)
+The *interval.low* and *interval.high* limits must both be finite. +
+The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true.
 
 *Details:*
 
+This binning is intended for one-dimensional, real-valued data in a compact range. The limits of this range are specified in a single <<RealInterval>>, and the number of subdivisions is *num*.
 
+The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
+
+If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [‒π, π) intervals into [0, π) intervals, for instance.
 
 == RealInterval
 

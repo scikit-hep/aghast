@@ -2053,7 +2053,7 @@ class IntegerBinning(Binning, BinLocation):
     loc_underflow = typedproperty(_params["loc_underflow"])
     loc_overflow  = typedproperty(_params["loc_overflow"])
 
-    description = "Splits an axis into a dense set of integer-sized bins, aligned to integers."
+    description = "Splits an axis into a contiguous set of integer-sized bins, aligned to integers."
     validity_rules = ("The *min* must be strictly less than the *max*.",
                       "The *loc_underflow* and *loc_overflow* must not be equal unless they are `nonexistent`.")
     long_description = """
@@ -2501,9 +2501,15 @@ class RegularBinning(Binning):
     overflow = typedproperty(_params["overflow"])
     circular = typedproperty(_params["circular"])
 
-    description = ""
-    validity_rules = ()
+    description = "Splits an axis into an ordered, abutting set of equal-sized real intervals."
+    validity_rules = ("The *interval.low* and *interval.high* limits must both be finite.",
+                      "The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true.")
     long_description = """
+This binning is intended for one-dimensional, real-valued data in a compact range. The limits of this range are specified in a single <<RealInterval>>, and the number of subdivisions is *num*.
+
+The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
+
+If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [\u2012\u03c0, \u03c0) intervals into [0, \u03c0) intervals, for instance.
 """
 
     def __init__(self, num, interval, overflow=None, circular=False):
