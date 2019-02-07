@@ -2889,6 +2889,8 @@ class EdgesBinning(Binning):
     long_description = """
 This binning is intended for one-dimensional, real-valued data in a compact range. The limits of this range and the size of each bin are defined by *edges*, which are the edges _between_ the bins. Since they are edges between bins, the number of non-overflow bins is `len(edges) - 1`. The degenerate case of exactly one edge is only allowed if there are any underflow, overflow, or nanflow bins.
 
+The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
+
 If *low_inclusive* is true, then all intervals between pairs of edges include the low edge. If *high_inclusive* is true, then all intervals between pairs of edges include the high edge.
 
 If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [\u2012\u03c0, \u03c0) intervals into [0, 2\u03c0) intervals, for instance.
@@ -3120,6 +3122,8 @@ class IrregularBinning(Binning, OverlappingFill):
     validity_rules = ("The intervals, as defined by their *low*, *high*, *low_inclusive*, *high_inclusive* fields, must be unique.",)
     long_description = """
 This binning is intended for one-dimensional, real-valued data. Unlike <<EdgesBinning>>, the any-sized intervals do not need to be abutting, so this binning can describe a distribution with large gaps.
+
+The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
 In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `undefined` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
 
