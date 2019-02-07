@@ -214,12 +214,12 @@ def formatted(cls, end="\n"):
                 raise AssertionError(type(check))
 
             if hasdefault:
-                linebreak = (" +" + end if len(name) + len(typestring) > 75 else "") + u"{nbsp}\u2014{nbsp}"
+                linebreak = " +" + end if len(name) + len(typestring) > 75 else " "
                 defaultstring = "{0}(default: {1})".format(linebreak, num([] if islist and param.default is None else param.default))
             else:
                 defaultstring = ""
 
-            out.append("{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+            out.append(u"{nbsp}\u2014{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     return end.join(out)
 
