@@ -226,6 +226,7 @@ def formatted(cls, end="\n"):
         out.append((" +" + end).join(cls.validity_rules))
 
     if cls.long_description is not None:
+        out.append(end + "*Details:*" + end)
         out.append(cls.long_description.strip())
 
     return end.join(out)
