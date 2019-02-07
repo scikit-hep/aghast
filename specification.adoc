@@ -8,7 +8,7 @@
 
 == Collection
 
-Collection of named objects, possibly with one or more common axis.
+*Collection of named objects, possibly with one or more common axis.*
 
 [%hardbreaks]
 •{nbsp} *objects*: str → <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
@@ -41,7 +41,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Histogram
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
@@ -59,7 +59,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Axis
 
-
+**
 
 [%hardbreaks]
 •{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
@@ -74,7 +74,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == IntegerBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *min*: int in (‒∞, ∞)
@@ -88,7 +88,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == RegularBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *num*: int in [1, ∞)
@@ -100,7 +100,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == RealInterval
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *low*: float in [‒∞, ∞]
@@ -112,7 +112,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == RealOverflow
 
-
+**
 
 [%hardbreaks]
 •{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -132,7 +132,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == HexagonalBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *qmin*: int in (‒∞, ∞)
@@ -151,7 +151,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == EdgesBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *edges*: list of float with length in [1, ∞)
@@ -164,7 +164,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == IrregularBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
@@ -176,7 +176,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == CategoryBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *categories*: list of str
@@ -187,7 +187,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == SparseRegularBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *bins*: list of int
@@ -203,7 +203,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == FractionBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
@@ -216,7 +216,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == PredicateBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *predicates*: list of str with length in [1, ∞)
@@ -227,7 +227,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == VariationBinning
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
@@ -236,7 +236,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Variation
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *assignments*: list of <<Assignment>>
@@ -247,7 +247,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Assignment
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
@@ -257,7 +257,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == UnweightedCounts
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -266,7 +266,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == WeightedCounts
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -278,7 +278,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == InterpretedInlineBuffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
@@ -296,7 +296,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == InterpretedInlineInt64Buffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
@@ -305,7 +305,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == InterpretedInlineFloat64Buffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
@@ -314,7 +314,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == InterpretedExternalBuffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *pointer*: int in [0, ∞)
@@ -336,7 +336,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Profile
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *expression*: str
@@ -349,7 +349,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Statistics
 
-
+**
 
 [%hardbreaks]
 •{nbsp} *moments*: list of <<Moments>> (default: null/empty)
@@ -362,7 +362,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Moments
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -374,7 +374,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Quantiles
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -386,7 +386,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Modes
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -396,7 +396,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Extremes
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -406,7 +406,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == StatisticFilter
 
-
+**
 
 [%hardbreaks]
 •{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
@@ -419,7 +419,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Covariance
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *xindex*: int in [0, ∞)
@@ -432,7 +432,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == ParameterizedFunction
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *expression*: str
@@ -446,7 +446,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Parameter
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
@@ -456,7 +456,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == EvaluatedFunction
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -472,7 +472,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == BinnedEvaluatedFunction
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
@@ -489,7 +489,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Ntuple
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *columns*: list of <<Column>> with length in [1, ∞)
@@ -506,7 +506,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Column
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
@@ -524,7 +524,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == NtupleInstance
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *chunks*: list of <<Chunk>>
@@ -534,7 +534,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Chunk
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
@@ -544,7 +544,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == ColumnChunk
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *pages*: list of <<Page>>
@@ -556,7 +556,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Page
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
@@ -565,7 +565,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == RawInlineBuffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
@@ -574,7 +574,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == RawExternalBuffer
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *pointer*: int in [0, ∞)
@@ -586,7 +586,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Metadata
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *data*: str
@@ -596,7 +596,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Decoration
 
-
+**
 
 [%hardbreaks]
 •{nbsp}required  *data*: str
