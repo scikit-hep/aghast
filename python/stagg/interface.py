@@ -5202,11 +5202,11 @@ Histograms with only *axis* and *counts* are pure distributions, histograms in t
 
 Any *profiles* summarize dependent variables (where the *axis* defines independent variables). For instance, a profile can represent mean and standard deviation `y` values for an axis binned in `x`.
 
-The <<Axis>> and <<Profile>> classes internally define summary statistics, such as mean or median of that axis.
+The <<Axis>> and <<Profile>> classes internally define summary statistics, such as mean or median of that axis. However, those <<Statistics>> objects cannot describe correlations among axes. If this information is available, it can be expressed in *axis_covariances* or *profile_covariances*.
 
+Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object.
 
-
-
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
