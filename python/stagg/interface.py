@@ -6109,16 +6109,16 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 
 This predicate axis (defined by if-then rules when the histograms were filled) is prepended onto the axes defined in each histogram separately. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular. This way, hundreds or thousands of histograms with similar binning can be defined in a contiguous block without repetition of axis definition (good for efficiency and avoiding copy-paste errors).
 
-To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of collections. In the following example, `h1` is not subdivided but `h2` and `h3` are.
+To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of collections. In the following example, `h1` and `h2` are subdivided but `h3` is not.
 
-    Collection({"h1": h1,
-                "cut by region":
+    Collection({"by region":
                     Collection({"h2": h2, "h3": h3},
-                    axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])})
+                    axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))]),
+                "h3": h3})
 
 Similarly, regions can be subdivided into subregions, and other binning types may be used.
 
-The buffers for each object must be the appropriate size to represent all subdivisions. (For example, a counts buffer appropriate for a standalone `h3` would not fit an `h3` with additional axes in a Collection.)
+The buffers for each object must be the appropriate size to represent all subdivisions. (For example, a counts buffer appropriate for a standalone `h1` would not fit an `h1` with additional axes in a Collection.)
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """
