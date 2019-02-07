@@ -44,6 +44,25 @@ import stagg
 import stagg.checktype
 import stagg.interface
 
+prelude = """++++
+<table border="1">
+<tr><td>1</td><td>2</td></tr>
+</table>
+++++
+
+= Stagg Specification
+
+== Introduction
+
+== Types
+
+== Class definitions
+
+"""
+
+epilogue = """
+"""
+
 classes = [
     stagg.Collection,
     stagg.Histogram,
@@ -101,19 +120,6 @@ unions = {
     stagg.interface.FunctionObject: [stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction],
     stagg.interface.Object: [stagg.Histogram, stagg.Ntuple, stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction, stagg.Collection],
     }
-
-prelude = """= Stagg Specification
-
-== Introduction
-
-== Types
-
-== Class definitions
-
-"""
-
-epilogue = """
-"""
 
 def num(x):
     if not isinstance(x, (bool, numpy.bool, numpy.bool)) and isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
