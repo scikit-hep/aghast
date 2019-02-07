@@ -107,7 +107,7 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 
 == IntegerBinning
 
-*Splits an axis into a contiguous set of integer-sized bins, aligned to integers.*
+*Splits an axis into a contiguous set of integer-valued bins.*
 
 [%hardbreaks]
 •{nbsp}required  *min*: int in (‒∞, ∞)
@@ -143,7 +143,7 @@ This binning is intended for one-dimensional, real-valued data in a compact rang
 
 The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
-If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [‒π, π) intervals into [0, π) intervals, for instance.
+If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [‒π, π) intervals into [0, 2π) intervals, for instance.
 
 == RealInterval
 
