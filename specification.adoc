@@ -11,13 +11,13 @@
 *Collection of named objects, possibly with one or more common axis.*
 
 [%hardbreaks]
-•{nbsp}  *objects*: str → <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
+•{nbsp} *objects*: str → <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
-•{nbsp}  *axis*: list of <<Axis>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *axis*: list of <<Axis>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 *Details:*
 
@@ -48,16 +48,16 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 *Histogram of a distribution, defined by a (possibly weighted) count of observations in each bin of an n-dimensional space.*
 
 [%hardbreaks]
-•{nbsp} _required_  *axis*: list of <<Axis>> with length in [1, ∞)
-•{nbsp} _required_  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
-•{nbsp}  *profile*: list of <<Profile>> (default: null/empty)
-•{nbsp}  *axis_covariances*: list of <<Covariance>> (default: null/empty)
-•{nbsp}  *profile_covariances*: list of <<Covariance>> (default: null/empty)
-•{nbsp}  *functions*: str → <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *axis* _(required)_: list of <<Axis>> with length in [1, ∞)
+•{nbsp} *counts* _(required)_: <<UnweightedCounts>> or <<WeightedCounts>>
+•{nbsp} *profile*: list of <<Profile>> (default: null/empty)
+•{nbsp} *axis_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *profile_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *functions*: str → <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs. +
 The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs.
 
@@ -86,13 +86,13 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 *Axis of a histogram or binned function representing one or more binned dimensions.*
 
 [%hardbreaks]
-•{nbsp}  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
+•{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: null)
-•{nbsp}  *expression*: str (default: null)
-•{nbsp}  *statistics*: list of <<Statistics>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
+•{nbsp} *expression*: str (default: null)
+•{nbsp} *statistics*: list of <<Statistics>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 The *statistics* must be empty or have a length equal to the number of dimensions in the *binning* (no binning is one-dimensional).
 
 *Details:*
@@ -110,11 +110,11 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 *Splits a one-dimensional axis into a contiguous set of integer-valued bins.*
 
 [%hardbreaks]
-•{nbsp} _required_  *min*: int in (‒∞, ∞)
-•{nbsp} _required_  *max*: int in (‒∞, ∞)
-•{nbsp}  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *min* _(required)_: int in (‒∞, ∞)
+•{nbsp} *max* _(required)_: int in (‒∞, ∞)
+•{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-•{nbsp}  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 The *min* must be strictly less than the *max*. +
 The *loc_underflow* and *loc_overflow* must not be equal unless they are `nonexistent`.
@@ -130,10 +130,10 @@ If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots
 *Splits a one-dimensional axis into an ordered, abutting set of equal-sized real intervals.*
 
 [%hardbreaks]
-•{nbsp} _required_  *num*: int in [1, ∞)
-•{nbsp} _required_  *interval*: <<RealInterval>>
-•{nbsp}  *overflow*: <<RealOverflow>> (default: null)
-•{nbsp}  *circular*: bool (default: false)
+•{nbsp} *num* _(required)_: int in [1, ∞)
+•{nbsp} *interval* _(required)_: <<RealInterval>>
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *circular*: bool (default: false)
 The *interval.low* and *interval.high* limits must both be finite. +
 The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true. (They can both be false, which allows for infinitesimal gaps between bins.)
 
@@ -157,10 +157,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 *Represents a real interval with inclusive (closed) or exclusive (open) endpoints.*
 
 [%hardbreaks]
-•{nbsp} _required_  *low*: float in [‒∞, ∞]
-•{nbsp} _required_  *high*: float in [‒∞, ∞]
-•{nbsp}  *low_inclusive*: bool (default: true)
-•{nbsp}  *high_inclusive*: bool (default: false)
+•{nbsp} *low* _(required)_: float in [‒∞, ∞]
+•{nbsp} *high* _(required)_: float in [‒∞, ∞]
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
 The *low* limit must be less than or equal to the *high* limit. +
 The *low* limit may only be equal to the *high* limit if at least one endpoint is inclusive (*low_inclusive* or *high_inclusive* is true). Such an interval would represent a single real value.
 
@@ -175,17 +175,17 @@ A single interval defines a <<RegularBinning>> and a set of intervals defines an
 *Underflow, overflow, and nanflow configuration for one-dimensional, real-valued data.*
 
 [%hardbreaks]
-•{nbsp}  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-•{nbsp}  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-•{nbsp}  *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-•{nbsp}  *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_underflow+`)
-•{nbsp}  *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_overflow+`)
-•{nbsp}  *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_nanflow+`)
 The *loc_underflow*, *loc_overflow*, and *loc_nanflow* must not be equal unless they are `nonexistent`. +
 The *minf_mapping* (‒∞ mapping) can only be `missing`, `in_underflow`, or `in_nanflow`, not `in_overflow`. +
@@ -204,17 +204,17 @@ The *minf_mapping* specifies whether ‒∞ values were ignored when the histogr
 *Splits a two-dimensional axis into a tiling of equal-sized hexagons.*
 
 [%hardbreaks]
-•{nbsp} _required_  *qmin*: int in (‒∞, ∞)
-•{nbsp} _required_  *qmax*: int in (‒∞, ∞)
-•{nbsp} _required_  *rmin*: int in (‒∞, ∞)
-•{nbsp} _required_  *rmax*: int in (‒∞, ∞)
-•{nbsp}  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
+•{nbsp} *qmin* _(required)_: int in (‒∞, ∞)
+•{nbsp} *qmax* _(required)_: int in (‒∞, ∞)
+•{nbsp} *rmin* _(required)_: int in (‒∞, ∞)
+•{nbsp} *rmax* _(required)_: int in (‒∞, ∞)
+•{nbsp} *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
 (default: `+HexagonalBinning.offset+`)
-•{nbsp}  *xorigin*: float in (‒∞, ∞) (default: 0.0)
-•{nbsp}  *yorigin*: float in (‒∞, ∞) (default: 0.0)
-•{nbsp}  *qangle*: float in [‒π/2, π/2] (default: 0.0)
-•{nbsp}  *qoverflow*: <<RealOverflow>> (default: null)
-•{nbsp}  *roverflow*: <<RealOverflow>> (default: null)
+•{nbsp} *xorigin*: float in (‒∞, ∞) (default: 0.0)
+•{nbsp} *yorigin*: float in (‒∞, ∞) (default: 0.0)
+•{nbsp} *qangle*: float in [‒π/2, π/2] (default: 0.0)
+•{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
+•{nbsp} *roverflow*: <<RealOverflow>> (default: null)
 The *qmin* must be strictly less than the *qmax*. +
 The *rmin* must be strictly less than the *rmax*.
 
@@ -235,11 +235,11 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
 *Splits a one-dimensional axis into an ordered, abutting set of any-sized real intervals.*
 
 [%hardbreaks]
-•{nbsp} _required_  *edges*: list of float with length in [1, ∞)
-•{nbsp}  *overflow*: <<RealOverflow>> (default: null)
-•{nbsp}  *low_inclusive*: bool (default: true)
-•{nbsp}  *high_inclusive*: bool (default: false)
-•{nbsp}  *circular*: bool (default: false)
+•{nbsp} *edges* _(required)_: list of float with length in [1, ∞)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
+•{nbsp} *circular*: bool (default: false)
 All *edges* must be finite and strictly increasing. +
 An *edges* of length 1 is only allowed if *overflow* is non-null with at least one underflow, overflow, or nanflow bin. +
 The *low_inclusive* and *high_inclusive* cannot both be true. (They can both be false, which allows for infinitesimal gaps between bins.)
@@ -264,9 +264,9 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *intervals*: list of <<RealInterval>> with length in [1, ∞)
-•{nbsp}  *overflow*: <<RealOverflow>> (default: null)
-•{nbsp}  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+•{nbsp} *intervals* _(required)_: list of <<RealInterval>> with length in [1, ∞)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 *Details:*
@@ -283,8 +283,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *categories*: list of str
-•{nbsp}  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *categories* _(required)_: list of str
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 *Details:*
@@ -296,14 +296,14 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *bins*: list of int
-•{nbsp} _required_  *bin_width*: float in (0, ∞]
-•{nbsp}  *origin*: float in [‒∞, ∞] (default: 0.0)
-•{nbsp}  *overflow*: <<RealOverflow>> (default: null)
-•{nbsp}  *low_inclusive*: bool (default: true)
-•{nbsp}  *high_inclusive*: bool (default: false)
-•{nbsp}  *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
-•{nbsp}  *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
+•{nbsp} *bins* _(required)_: list of int
+•{nbsp} *bin_width* _(required)_: float in (0, ∞]
+•{nbsp} *origin*: float in [‒∞, ∞] (default: 0.0)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
+•{nbsp} *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
+•{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
 *Details:*
 
@@ -319,10 +319,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp}  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
+•{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
-•{nbsp}  *layout_reversed*: bool (default: false)
-•{nbsp}  *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
+•{nbsp} *layout_reversed*: bool (default: false)
+•{nbsp} *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
 
 *Details:*
@@ -334,8 +334,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *predicates*: list of str with length in [1, ∞)
-•{nbsp}  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+•{nbsp} *predicates* _(required)_: list of str with length in [1, ∞)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 *Details:*
@@ -347,7 +347,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *variations*: list of <<Variation>> with length in [1, ∞)
+•{nbsp} *variations* _(required)_: list of <<Variation>> with length in [1, ∞)
 
 *Details:*
 
@@ -358,9 +358,9 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *assignments*: list of <<Assignment>>
-•{nbsp}  *systematic*: list of float (default: null/empty)
-•{nbsp}  *category_systematic*: list of str (default: null/empty)
+•{nbsp} *assignments* _(required)_: list of <<Assignment>>
+•{nbsp} *systematic*: list of float (default: null/empty)
+•{nbsp} *category_systematic*: list of str (default: null/empty)
 
 *Details:*
 
@@ -371,8 +371,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *identifier*: unique str
-•{nbsp} _required_  *expression*: str
+•{nbsp} *identifier* _(required)_: unique str
+•{nbsp} *expression* _(required)_: str
 
 *Details:*
 
@@ -383,7 +383,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *counts* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 *Details:*
 
@@ -394,10 +394,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+•{nbsp} *sumw* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-•{nbsp}  *unweighted*: <<UnweightedCounts>> (default: null)
+•{nbsp} *unweighted*: <<UnweightedCounts>> (default: null)
 
 *Details:*
 
@@ -408,15 +408,15 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *buffer*: buffer
-•{nbsp}  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+•{nbsp} *buffer* _(required)_: buffer
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-•{nbsp}  *postfilter_slice*: slice (start:stop:step) (default: null)
-•{nbsp}  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-•{nbsp}  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-•{nbsp}  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+•{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
 
 *Details:*
@@ -428,7 +428,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *buffer*: buffer
+•{nbsp} *buffer* _(required)_: buffer
 
 *Details:*
 
@@ -439,7 +439,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *buffer*: buffer
+•{nbsp} *buffer* _(required)_: buffer
 
 *Details:*
 
@@ -450,20 +450,20 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *pointer*: int in [0, ∞)
-•{nbsp} _required_  *numbytes*: int in [0, ∞)
-•{nbsp}  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+•{nbsp} *pointer* _(required)_: int in [0, ∞)
+•{nbsp} *numbytes* _(required)_: int in [0, ∞)
+•{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-•{nbsp}  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-•{nbsp}  *postfilter_slice*: slice (start:stop:step) (default: null)
-•{nbsp}  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-•{nbsp}  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-•{nbsp}  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+•{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
-•{nbsp}  *location*: str (default: null)
+•{nbsp} *location*: str (default: null)
 
 *Details:*
 
@@ -474,11 +474,11 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *expression*: str
-•{nbsp} _required_  *statistics*: <<Statistics>>
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
+•{nbsp} *expression* _(required)_: str
+•{nbsp} *statistics* _(required)_: <<Statistics>>
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 
 *Details:*
 
@@ -489,11 +489,11 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp}  *moments*: list of <<Moments>> (default: null/empty)
-•{nbsp}  *quantiles*: list of <<Quantiles>> (default: null/empty)
-•{nbsp}  *mode*: <<Modes>> (default: null)
-•{nbsp}  *min*: <<Extremes>> (default: null)
-•{nbsp}  *max*: <<Extremes>> (default: null)
+•{nbsp} *moments*: list of <<Moments>> (default: null/empty)
+•{nbsp} *quantiles*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *mode*: <<Modes>> (default: null)
+•{nbsp} *min*: <<Extremes>> (default: null)
+•{nbsp} *max*: <<Extremes>> (default: null)
 
 *Details:*
 
@@ -504,10 +504,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp} _required_  *n*: int in [‒128, 127]
-•{nbsp}  *weightpower*: int in [‒128, 127] (default: 0)
-•{nbsp}  *filter*: <<StatisticFilter>> (default: null)
+•{nbsp} *sumwxn* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *n* _(required)_: int in [‒128, 127]
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 *Details:*
 
@@ -518,10 +518,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp} _required_  *p*: float in [0.0, 1.0] (default: 1/2)
-•{nbsp}  *weightpower*: int in [‒128, 127] (default: 0)
-•{nbsp}  *filter*: <<StatisticFilter>> (default: null)
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *p* _(required)_: float in [0.0, 1.0] (default: 1/2)
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 *Details:*
 
@@ -532,8 +532,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *filter*: <<StatisticFilter>> (default: null)
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 *Details:*
 
@@ -544,8 +544,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *filter*: <<StatisticFilter>> (default: null)
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 *Details:*
 
@@ -556,11 +556,11 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp}  *min*: float in [‒∞, ∞] (default: ‒∞)
-•{nbsp}  *max*: float in [‒∞, ∞] (default: ∞)
-•{nbsp}  *excludes_minf*: bool (default: false)
-•{nbsp}  *excludes_pinf*: bool (default: false)
-•{nbsp}  *excludes_nan*: bool (default: false)
+•{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
+•{nbsp} *max*: float in [‒∞, ∞] (default: ∞)
+•{nbsp} *excludes_minf*: bool (default: false)
+•{nbsp} *excludes_pinf*: bool (default: false)
+•{nbsp} *excludes_nan*: bool (default: false)
 
 *Details:*
 
@@ -571,11 +571,11 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *xindex*: int in [0, ∞)
-•{nbsp} _required_  *yindex*: int in [0, ∞)
-•{nbsp} _required_  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *weightpower*: int in [‒128, 127] (default: 0)
-•{nbsp}  *filter*: <<StatisticFilter>> (default: null)
+•{nbsp} *xindex* _(required)_: int in [0, ∞)
+•{nbsp} *yindex* _(required)_: int in [0, ∞)
+•{nbsp} *sumwxy* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 *Details:*
 
@@ -586,12 +586,12 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *expression*: str
-•{nbsp}  *parameters*: list of <<Parameter>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *expression* _(required)_: str
+•{nbsp} *parameters*: list of <<Parameter>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 *Details:*
 
@@ -602,8 +602,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *identifier*: unique str
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *identifier* _(required)_: unique str
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 *Details:*
 
@@ -614,14 +614,14 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-•{nbsp}  *errors*: list of <<Quantiles>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *errors*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 *Details:*
 
@@ -632,15 +632,15 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *axis*: list of <<Axis>> with length in [1, ∞)
-•{nbsp} _required_  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-•{nbsp}  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+•{nbsp} *axis* _(required)_: list of <<Axis>> with length in [1, ∞)
+•{nbsp} *values* _(required)_: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-•{nbsp}  *errors*: list of <<Quantiles>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *errors*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 *Details:*
 
@@ -651,15 +651,15 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *columns*: list of <<Column>> with length in [1, ∞)
-•{nbsp} _required_  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
-•{nbsp}  *column_statistics*: list of <<Statistics>> (default: null/empty)
-•{nbsp}  *column_covariances*: list of <<Covariance>> (default: null/empty)
-•{nbsp}  *functions*: str → <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
-•{nbsp}  *script*: str (default: null)
+•{nbsp} *columns* _(required)_: list of <<Column>> with length in [1, ∞)
+•{nbsp} *instances* _(required)_: list of <<NtupleInstance>> with length in [1, ∞)
+•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
+•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *functions*: str → <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 *Details:*
 
@@ -670,16 +670,16 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *identifier*: unique str
-•{nbsp} _required_  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
-•{nbsp}  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+•{nbsp} *identifier* _(required)_: unique str
+•{nbsp} *dtype* _(required)_: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-•{nbsp}  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-•{nbsp}  *postfilter_slice*: slice (start:stop:step) (default: null)
-•{nbsp}  *title*: str (default: null)
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
-•{nbsp}  *decoration*: <<Decoration>> (default: null)
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 
 *Details:*
 
@@ -690,8 +690,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *chunks*: list of <<Chunk>>
-•{nbsp}  *chunk_offsets*: list of int (default: null/empty)
+•{nbsp} *chunks* _(required)_: list of <<Chunk>>
+•{nbsp} *chunk_offsets*: list of int (default: null/empty)
 
 *Details:*
 
@@ -702,8 +702,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *column_chunks*: list of <<ColumnChunk>>
-•{nbsp}  *metadata*: <<Metadata>> (default: null)
+•{nbsp} *column_chunks* _(required)_: list of <<ColumnChunk>>
+•{nbsp} *metadata*: <<Metadata>> (default: null)
 
 *Details:*
 
@@ -714,10 +714,10 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *pages*: list of <<Page>>
-•{nbsp} _required_  *page_offsets*: list of int with length in [1, ∞)
-•{nbsp}  *page_min*: list of <<Extremes>> (default: null/empty)
-•{nbsp}  *page_max*: list of <<Extremes>> (default: null/empty)
+•{nbsp} *pages* _(required)_: list of <<Page>>
+•{nbsp} *page_offsets* _(required)_: list of int with length in [1, ∞)
+•{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
+•{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
 
 *Details:*
 
@@ -728,7 +728,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
+•{nbsp} *buffer* _(required)_: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 *Details:*
 
@@ -739,7 +739,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *buffer*: buffer
+•{nbsp} *buffer* _(required)_: buffer
 
 *Details:*
 
@@ -750,9 +750,9 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *pointer*: int in [0, ∞)
-•{nbsp} _required_  *numbytes*: int in [0, ∞)
-•{nbsp}  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+•{nbsp} *pointer* _(required)_: int in [0, ∞)
+•{nbsp} *numbytes* _(required)_: int in [0, ∞)
+•{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 
 *Details:*
@@ -764,8 +764,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *data*: str
-•{nbsp} _required_  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
+•{nbsp} *data* _(required)_: str
+•{nbsp} *language* _(required)_: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 *Details:*
 
@@ -776,8 +776,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 **
 
 [%hardbreaks]
-•{nbsp} _required_  *data*: str
-•{nbsp} _required_  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
+•{nbsp} *data* _(required)_: str
+•{nbsp} *language* _(required)_: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
 
 *Details:*
