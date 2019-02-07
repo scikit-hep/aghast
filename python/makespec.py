@@ -122,12 +122,22 @@ def num(x):
             return u"\u20122\u2076\u00b3"  # -2**63
         elif x == stagg.interface.MAXINT64:
             return u"2\u2076\u00b3 \u2012 1"  # 2**63 - 1
+        elif x == 0.5:
+            return "1/2"
         elif x < 0:
             return u"\u2012" + repr(abs(x))
         else:
             return repr(abs(x))
+    elif x is None:
+        return "null"
+    elif x is True:
+        return "true"
+    elif x is False:
+        return "false"
+    elif x == []:
+        return "null/empty"
     else:
-        return repr(x)
+        return "`+{0}+`".format(repr(x))
 
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
@@ -145,13 +155,13 @@ def formatted(cls, end="\n"):
             elif isinstance(check, stagg.checktype.CheckString):
                 typestring = "str"
             elif isinstance(check, stagg.checktype.CheckNumber):
-                typestring = "float in _{0}{1}, {2}{3}_".format(
+                typestring = "float in {0}{1}, {2}{3}".format(
                     "[" if check.min_inclusive else "(",
                     num(check.min),
                     num(check.max),
                     "]" if check.max_inclusive else ")")
             elif isinstance(check, stagg.checktype.CheckInteger):
-                typestring = "int in _{0}{1}, {2}{3}_".format(
+                typestring = "int in {0}{1}, {2}{3}".format(
                     "(" if check.min == float("-inf") else "[",
                     num(check.min),
                     num(check.max),
@@ -181,7 +191,7 @@ def formatted(cls, end="\n"):
                     else:
                         subtype = "<<{0}>>".format(check.type.__name__)
                 if check.minlen != 0 or check.maxlen != float("inf"):
-                    withlength = " with length in _[{0}, {1}{2}_".format(
+                    withlength = " with length in [{0}, {1}{2}".format(
                         num(check.minlen),
                         num(check.maxlen),
                         ")" if check.maxlen == float("inf") else "]")
@@ -197,7 +207,7 @@ def formatted(cls, end="\n"):
 
             if hasdefault:
                 linebreak = " +" + end if len(name) + len(typestring) > 100 else " "
-                defaultstring = "{0}(default: `+{1}+`)".format(linebreak, "[]" if islist and param.default is None else num(param.default))
+                defaultstring = "{0}(default: {1})".format(linebreak, num([] if islist and param.default is None else param.default))
             else:
                 defaultstring = ""
 
