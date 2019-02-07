@@ -10,401 +10,401 @@
 
 === Collection
 
-[role="testy"]
-    *  *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
+[role="testy", %hardbreaks]
+•{nbsp} *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
-    *  *axis*: list of <<Axis>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+•{nbsp} *axis*: list of <<Axis>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === Histogram
 
-[role="testy"]
-    * required  *axis*: list of <<Axis>> with length in [1, ∞)
-    * required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
-    *  *profile*: list of <<Profile>> (default: null/empty)
-    *  *axis_covariances*: list of <<Covariance>> (default: null/empty)
-    *  *profile_covariances*: list of <<Covariance>> (default: null/empty)
-    *  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
+•{nbsp}required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
+•{nbsp} *profile*: list of <<Profile>> (default: null/empty)
+•{nbsp} *axis_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *profile_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === Axis
 
-[role="testy"]
-    *  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
+[role="testy", %hardbreaks]
+•{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: null)
-    *  *expression*: str (default: null)
-    *  *statistics*: <<Statistics>> (default: null)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
+•{nbsp} *expression*: str (default: null)
+•{nbsp} *statistics*: <<Statistics>> (default: null)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 
 === IntegerBinning
 
-[role="testy"]
-    * required  *min*: int in (‒∞, ∞)
-    * required  *max*: int in (‒∞, ∞)
-    *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *min*: int in (‒∞, ∞)
+•{nbsp}required  *max*: int in (‒∞, ∞)
+•{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === RegularBinning
 
-[role="testy"]
-    * required  *num*: int in [1, ∞)
-    * required  *interval*: <<RealInterval>>
-    *  *overflow*: <<RealOverflow>> (default: null)
-    *  *circular*: bool (default: false)
+[role="testy", %hardbreaks]
+•{nbsp}required  *num*: int in [1, ∞)
+•{nbsp}required  *interval*: <<RealInterval>>
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *circular*: bool (default: false)
 
 === RealInterval
 
-[role="testy"]
-    * required  *low*: float in [‒∞, ∞]
-    * required  *high*: float in [‒∞, ∞]
-    *  *low_inclusive*: bool (default: true)
-    *  *high_inclusive*: bool (default: false)
+[role="testy", %hardbreaks]
+•{nbsp}required  *low*: float in [‒∞, ∞]
+•{nbsp}required  *high*: float in [‒∞, ∞]
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
 
 === RealOverflow
 
-[role="testy"]
-    *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+[role="testy", %hardbreaks]
+•{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-    *  *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+•{nbsp} *loc_nanflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-    *  *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *minf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_underflow+`)
-    *  *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *pinf_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_overflow+`)
-    *  *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
+•{nbsp} *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_nanflow+`)
 
 === HexagonalBinning
 
-[role="testy"]
-    * required  *qmin*: int in (‒∞, ∞)
-    * required  *qmax*: int in (‒∞, ∞)
-    * required  *rmin*: int in (‒∞, ∞)
-    * required  *rmax*: int in (‒∞, ∞)
-    *  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *qmin*: int in (‒∞, ∞)
+•{nbsp}required  *qmax*: int in (‒∞, ∞)
+•{nbsp}required  *rmin*: int in (‒∞, ∞)
+•{nbsp}required  *rmax*: int in (‒∞, ∞)
+•{nbsp} *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
 (default: `+HexagonalBinning.offset+`)
-    *  *xorigin*: float in (‒∞, ∞) (default: 0.0)
-    *  *yorigin*: float in (‒∞, ∞) (default: 0.0)
-    *  *qangle*: float in [‒π/2, π/2] (default: 0.0)
-    *  *qoverflow*: <<RealOverflow>> (default: null)
-    *  *roverflow*: <<RealOverflow>> (default: null)
+•{nbsp} *xorigin*: float in (‒∞, ∞) (default: 0.0)
+•{nbsp} *yorigin*: float in (‒∞, ∞) (default: 0.0)
+•{nbsp} *qangle*: float in [‒π/2, π/2] (default: 0.0)
+•{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
+•{nbsp} *roverflow*: <<RealOverflow>> (default: null)
 
 === EdgesBinning
 
-[role="testy"]
-    * required  *edges*: list of float with length in [1, ∞)
-    *  *overflow*: <<RealOverflow>> (default: null)
-    *  *low_inclusive*: bool (default: true)
-    *  *high_inclusive*: bool (default: false)
-    *  *circular*: bool (default: false)
+[role="testy", %hardbreaks]
+•{nbsp}required  *edges*: list of float with length in [1, ∞)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
+•{nbsp} *circular*: bool (default: false)
 
 === IrregularBinning
 
-[role="testy"]
-    * required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
-    *  *overflow*: <<RealOverflow>> (default: null)
-    *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === CategoryBinning
 
-[role="testy"]
-    * required  *categories*: list of str
-    *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *categories*: list of str
+•{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === SparseRegularBinning
 
-[role="testy"]
-    * required  *bins*: list of int
-    * required  *bin_width*: float in (0, ∞]
-    *  *origin*: float in [‒∞, ∞] (default: 0.0)
-    *  *overflow*: <<RealOverflow>> (default: null)
-    *  *low_inclusive*: bool (default: true)
-    *  *high_inclusive*: bool (default: false)
-    *  *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
-    *  *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
+[role="testy", %hardbreaks]
+•{nbsp}required  *bins*: list of int
+•{nbsp}required  *bin_width*: float in (0, ∞]
+•{nbsp} *origin*: float in [‒∞, ∞] (default: 0.0)
+•{nbsp} *overflow*: <<RealOverflow>> (default: null)
+•{nbsp} *low_inclusive*: bool (default: true)
+•{nbsp} *high_inclusive*: bool (default: false)
+•{nbsp} *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
+•{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
 === FractionBinning
 
-[role="testy"]
-    *  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
+[role="testy", %hardbreaks]
+•{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
-    *  *layout_reversed*: bool (default: false)
-    *  *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
+•{nbsp} *layout_reversed*: bool (default: false)
+•{nbsp} *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
 
 === PredicateBinning
 
-[role="testy"]
-    * required  *predicates*: list of str with length in [1, ∞)
-    *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *predicates*: list of str with length in [1, ∞)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === VariationBinning
 
-[role="testy"]
-    * required  *variations*: list of <<Variation>> with length in [1, ∞)
+[role="testy", %hardbreaks]
+•{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
 
 === Variation
 
-[role="testy"]
-    * required  *assignments*: list of <<Assignment>>
-    *  *systematic*: list of float (default: null/empty)
-    *  *category_systematic*: list of str (default: null/empty)
+[role="testy", %hardbreaks]
+•{nbsp}required  *assignments*: list of <<Assignment>>
+•{nbsp} *systematic*: list of float (default: null/empty)
+•{nbsp} *category_systematic*: list of str (default: null/empty)
 
 === Assignment
 
-[role="testy"]
-    * required  *identifier*: unique str
-    * required  *expression*: str
+[role="testy", %hardbreaks]
+•{nbsp}required  *identifier*: unique str
+•{nbsp}required  *expression*: str
 
 === UnweightedCounts
 
-[role="testy"]
-    * required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+[role="testy", %hardbreaks]
+•{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === WeightedCounts
 
-[role="testy"]
-    * required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+[role="testy", %hardbreaks]
+•{nbsp}required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-    *  *unweighted*: <<UnweightedCounts>> (default: null)
+•{nbsp} *unweighted*: <<UnweightedCounts>> (default: null)
 
 === InterpretedInlineBuffer
 
-[role="testy"]
-    * required  *buffer*: buffer
-    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *buffer*: buffer
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-    *  *postfilter_slice*: slice (start:stop:step) (default: null)
-    *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-    *  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+•{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
 
 === InterpretedInlineInt64Buffer
 
-[role="testy"]
-    * required  *buffer*: buffer
+[role="testy", %hardbreaks]
+•{nbsp}required  *buffer*: buffer
 
 === InterpretedInlineFloat64Buffer
 
-[role="testy"]
-    * required  *buffer*: buffer
+[role="testy", %hardbreaks]
+•{nbsp}required  *buffer*: buffer
 
 === InterpretedExternalBuffer
 
-[role="testy"]
-    * required  *pointer*: int in [0, ∞)
-    * required  *numbytes*: int in [0, ∞)
-    *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *pointer*: int in [0, ∞)
+•{nbsp}required  *numbytes*: int in [0, ∞)
+•{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-    *  *postfilter_slice*: slice (start:stop:step) (default: null)
-    *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-    *  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+•{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
-    *  *location*: str (default: null)
+•{nbsp} *location*: str (default: null)
 
 === Profile
 
-[role="testy"]
-    * required  *expression*: str
-    * required  *statistics*: <<Statistics>>
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *expression*: str
+•{nbsp}required  *statistics*: <<Statistics>>
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 
 === Statistics
 
-[role="testy"]
-    *  *moments*: list of <<Moments>> (default: null/empty)
-    *  *quantiles*: list of <<Quantiles>> (default: null/empty)
-    *  *mode*: <<Modes>> (default: null)
-    *  *min*: <<Extremes>> (default: null)
-    *  *max*: <<Extremes>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp} *moments*: list of <<Moments>> (default: null/empty)
+•{nbsp} *quantiles*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *mode*: <<Modes>> (default: null)
+•{nbsp} *min*: <<Extremes>> (default: null)
+•{nbsp} *max*: <<Extremes>> (default: null)
 
 === Moments
 
-[role="testy"]
-    * required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    * required  *n*: int in [‒128, 127]
-    *  *weightpower*: int in [‒128, 127] (default: 0)
-    *  *filter*: <<StatisticFilter>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp}required  *n*: int in [‒128, 127]
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === Quantiles
 
-[role="testy"]
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    * required  *p*: float in [0.0, 1.0] (default: 1/2)
-    *  *weightpower*: int in [‒128, 127] (default: 0)
-    *  *filter*: <<StatisticFilter>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp}required  *p*: float in [0.0, 1.0] (default: 1/2)
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === Modes
 
-[role="testy"]
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *filter*: <<StatisticFilter>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === Extremes
 
-[role="testy"]
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *filter*: <<StatisticFilter>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === StatisticFilter
 
-[role="testy"]
-    *  *min*: float in [‒∞, ∞] (default: ‒∞)
-    *  *max*: float in [‒∞, ∞] (default: ∞)
-    *  *excludes_minf*: bool (default: false)
-    *  *excludes_pinf*: bool (default: false)
-    *  *excludes_nan*: bool (default: false)
+[role="testy", %hardbreaks]
+•{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
+•{nbsp} *max*: float in [‒∞, ∞] (default: ∞)
+•{nbsp} *excludes_minf*: bool (default: false)
+•{nbsp} *excludes_pinf*: bool (default: false)
+•{nbsp} *excludes_nan*: bool (default: false)
 
 === Covariance
 
-[role="testy"]
-    * required  *xindex*: int in [0, ∞)
-    * required  *yindex*: int in [0, ∞)
-    * required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *weightpower*: int in [‒128, 127] (default: 0)
-    *  *filter*: <<StatisticFilter>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *xindex*: int in [0, ∞)
+•{nbsp}required  *yindex*: int in [0, ∞)
+•{nbsp}required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
+•{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === ParameterizedFunction
 
-[role="testy"]
-    * required  *expression*: str
-    *  *parameters*: list of <<Parameter>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *expression*: str
+•{nbsp} *parameters*: list of <<Parameter>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === Parameter
 
-[role="testy"]
-    * required  *identifier*: unique str
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+[role="testy", %hardbreaks]
+•{nbsp}required  *identifier*: unique str
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === EvaluatedFunction
 
-[role="testy"]
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+[role="testy", %hardbreaks]
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-    *  *errors*: list of <<Quantiles>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+•{nbsp} *errors*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === BinnedEvaluatedFunction
 
-[role="testy"]
-    * required  *axis*: list of <<Axis>> with length in [1, ∞)
-    * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-    *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+[role="testy", %hardbreaks]
+•{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
+•{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
+•{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
-    *  *errors*: list of <<Quantiles>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+•{nbsp} *errors*: list of <<Quantiles>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === Ntuple
 
-[role="testy"]
-    * required  *columns*: list of <<Column>> with length in [1, ∞)
-    * required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
-    *  *column_statistics*: list of <<Statistics>> (default: null/empty)
-    *  *column_covariances*: list of <<Covariance>> (default: null/empty)
-    *  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
-    *  *script*: str (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *columns*: list of <<Column>> with length in [1, ∞)
+•{nbsp}required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
+•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
+•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
+•{nbsp} *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
+•{nbsp} *script*: str (default: null)
 
 === Column
 
-[role="testy"]
-    * required  *identifier*: unique str
-    * required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
-    *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *identifier*: unique str
+•{nbsp}required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
+•{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
 (default: `+Interpretation.little_endian+`)
-    *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+•{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
-    *  *postfilter_slice*: slice (start:stop:step) (default: null)
-    *  *title*: str (default: null)
-    *  *metadata*: <<Metadata>> (default: null)
-    *  *decoration*: <<Decoration>> (default: null)
+•{nbsp} *postfilter_slice*: slice (start:stop:step) (default: null)
+•{nbsp} *title*: str (default: null)
+•{nbsp} *metadata*: <<Metadata>> (default: null)
+•{nbsp} *decoration*: <<Decoration>> (default: null)
 
 === NtupleInstance
 
-[role="testy"]
-    * required  *chunks*: list of <<Chunk>>
-    *  *chunk_offsets*: list of int (default: null/empty)
+[role="testy", %hardbreaks]
+•{nbsp}required  *chunks*: list of <<Chunk>>
+•{nbsp} *chunk_offsets*: list of int (default: null/empty)
 
 === Chunk
 
-[role="testy"]
-    * required  *column_chunks*: list of <<ColumnChunk>>
-    *  *metadata*: <<Metadata>> (default: null)
+[role="testy", %hardbreaks]
+•{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
+•{nbsp} *metadata*: <<Metadata>> (default: null)
 
 === ColumnChunk
 
-[role="testy"]
-    * required  *pages*: list of <<Page>>
-    * required  *page_offsets*: list of int with length in [1, ∞)
-    *  *page_min*: list of <<Extremes>> (default: null/empty)
-    *  *page_max*: list of <<Extremes>> (default: null/empty)
+[role="testy", %hardbreaks]
+•{nbsp}required  *pages*: list of <<Page>>
+•{nbsp}required  *page_offsets*: list of int with length in [1, ∞)
+•{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
+•{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
 
 === Page
 
-[role="testy"]
-    * required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
+[role="testy", %hardbreaks]
+•{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 === RawInlineBuffer
 
-[role="testy"]
-    * required  *buffer*: buffer
+[role="testy", %hardbreaks]
+•{nbsp}required  *buffer*: buffer
 
 === RawExternalBuffer
 
-[role="testy"]
-    * required  *pointer*: int in [0, ∞)
-    * required  *numbytes*: int in [0, ∞)
-    *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *pointer*: int in [0, ∞)
+•{nbsp}required  *numbytes*: int in [0, ∞)
+•{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 
 === Metadata
 
-[role="testy"]
-    * required  *data*: str
-    * required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
+[role="testy", %hardbreaks]
+•{nbsp}required  *data*: str
+•{nbsp}required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 === Decoration
 
-[role="testy"]
-    * required  *data*: str
-    * required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
+[role="testy", %hardbreaks]
+•{nbsp}required  *data*: str
+•{nbsp}required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
