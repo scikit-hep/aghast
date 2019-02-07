@@ -5191,8 +5191,8 @@ class Histogram(Object):
     script              = typedproperty(_params["script"])
 
     description = "Histogram of a distribution, defined by a (possibly weighted) count of observations in each bin of an n-dimensional space."
-    validity_rules = ("The *xindex* and *yindex* of each Covariance in *axis_covariances* must be unique and in [0, number of *axis*).",
-                      "The *xindex* and *yindex* of each Covariance in *profile_covariances* must be unique and in [0, number of *profile*).")
+    validity_rules = ("The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs.",
+                      "The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs.")
     long_description = """
 The space is subdivided by an n-dimensional *axis*. As described in <<Collection>>, nesting a histogram within a collection prepends the collection's *axis*. The number of <<Axis>> objects is not necessarily the dimensionality of the space; some binnings, such as <<HexagonalBinning>>, define more than one dimension (though most do not).
 
