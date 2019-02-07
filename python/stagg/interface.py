@@ -2053,9 +2053,13 @@ class IntegerBinning(Binning, BinLocation):
     loc_underflow = typedproperty(_params["loc_underflow"])
     loc_overflow  = typedproperty(_params["loc_overflow"])
 
-    description = ""
-    validity_rules = ()
+    description = "Splits an axis into a dense set of integer-sized bins, aligned to integers."
+    validity_rules = ("The *min* must be strictly less than the *max*.",
+                      "The *loc_underflow* and *loc_overflow* must not be equal unless they are both nonexistent.")
     long_description = """
+This binning is intended for one-dimensional, integer-valued data in a compact range. The *min* and *max* values are both inclusive, so the number of bins is `+1 + max - min+`.
+
+If *loc_underflow* and *loc_overflow* are `BinLocation.nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow or overflow. If they are `below`, then their slots precede the normal bins, if `above`, then their slots follow the normal bins, and their order is in sequence: `below3`, `below2`, `below1`, (normal bins), `above1`, `above2`, `above3`.
 """
 
     def __init__(self, min, max, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent):
@@ -5203,13 +5207,13 @@ class Histogram(Object):
     long_description = """
 The space is subdivided by an n-dimensional *axis*. As described in <<Collection>>, nesting a histogram within a collection prepends the collection's *axis*. The number of <<Axis>> objects is not necessarily the dimensionality of the space; some binnings, such as <<HexagonalBinning>>, define more than one dimension (though most do not).
 
-The *counts* are separate from the *axis*, though the buffers providing the counts must be exactly the right size to fit the n-dimensional binning (including axes inherited from a collection).
+The *counts* are separate from the *axis*, though the buffers providing counts must be exactly the right size to fit the n-dimensional binning (including axes inherited from a <<Collection>>).
 
 Histograms with only *axis* and *counts* are pure distributions, histograms in the conventional sense. All other properties provide additional information about the dataset.
 
 Any *profiles* summarize dependent variables (where the *axis* defines independent variables). For instance, a profile can represent mean and standard deviation `y` values for an axis binned in `x`.
 
-The <<Axis>> and <<Profile>> classes internally define summary statistics, such as mean or median of that axis. However, those <<Statistics>> objects cannot describe correlations among axes. If this information is available, it can be expressed in *axis_covariances* or *profile_covariances*.
+The <<Axis>> and <<Profile>> classes internally define summary statistics, such as the mean or median of that axis. However, those <<Statistics>> objects cannot describe correlations among axes. If this information is available, it can be expressed in *axis_covariances* or *profile_covariances*.
 
 Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object with names.
 
