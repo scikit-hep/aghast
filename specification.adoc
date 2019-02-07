@@ -8,7 +8,9 @@ toc::[]
 
 == Class definitions
 
-
+++++
+<style>.markdown-body li>p {margin-top: 5px; margin-bottom: 5px;}</style>
+++++
 
 === Collection
 
