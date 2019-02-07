@@ -5204,7 +5204,7 @@ Any *profiles* summarize dependent variables (where the *axis* defines independe
 
 The <<Axis>> and <<Profile>> classes internally define summary statistics, such as mean or median of that axis. However, those <<Statistics>> objects cannot describe correlations among axes. If this information is available, it can be expressed in *axis_covariances* or *profile_covariances*.
 
-Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object.
+Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object with names.
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """
