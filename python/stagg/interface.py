@@ -116,6 +116,9 @@ import stagg.stagg_generated.Collection
 
 import stagg.checktype
 
+MININT64 = -9223372036854775808
+MAXINT64 = 9223372036854775807
+
 def _sameedges(one, two):
     assert isinstance(one, numpy.ndarray) and isinstance(two, numpy.ndarray)
     if len(one) != len(two):
@@ -3360,8 +3363,8 @@ class SparseRegularBinning(Binning, BinLocation):
         "overflow":       stagg.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
         "low_inclusive":  stagg.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
         "high_inclusive": stagg.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
-        "minbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "minbin", required=False, min=-9223372036854775808, max=9223372036854775807),
-        "maxbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "maxbin", required=False, min=-9223372036854775808, max=9223372036854775807),
+        "minbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "minbin", required=False, min=MININT64, max=MAXINT64),
+        "maxbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "maxbin", required=False, min=MININT64, max=MAXINT64),
         }
 
     bins           = typedproperty(_params["bins"])
@@ -3373,7 +3376,7 @@ class SparseRegularBinning(Binning, BinLocation):
     minbin         = typedproperty(_params["minbin"])
     maxbin         = typedproperty(_params["maxbin"])
 
-    def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=-9223372036854775808, maxbin=9223372036854775807):
+    def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=MININT64, maxbin=MAXINT64):
         self.bins = bins
         self.bin_width = bin_width
         self.origin = origin
@@ -3441,9 +3444,9 @@ class SparseRegularBinning(Binning, BinLocation):
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
-        if self.minbin != -9223372036854775808:
+        if self.minbin != MININT64:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddMinbin(builder, self.minbin)
-        if self.maxbin != 9223372036854775807:
+        if self.maxbin != MAXINT64:
             stagg.stagg_generated.EdgesBinning.EdgesBinningAddMaxbin(builder, self.maxbin)
         return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
@@ -3455,9 +3458,9 @@ class SparseRegularBinning(Binning, BinLocation):
             args.append("low_inclusive={0}".format(repr(self.low_inclusive)))
         if self.high_inclusive is not True:
             args.append("high_inclusive={0}".format(repr(self.high_inclusive)))
-        if self.minbin != -9223372036854775808:
+        if self.minbin != MININT64:
             args.append("minbin={0}".format(repr(self.minbin)))
-        if self.maxbin != 9223372036854775807:
+        if self.maxbin != MAXINT64:
             args.append("maxbin={0}".format(repr(self.maxbin)))
         return _dumpline(self, args, indent, width, end)
 
@@ -3465,8 +3468,8 @@ class SparseRegularBinning(Binning, BinLocation):
         numbins = int(round((origin - self.origin) / self.bin_width))
         origin = numbins*self.bin_width + self.origin
         bins = self.bins + numbins
-        minbin = max(self.minbin + numbins, -9223372036854775808)
-        maxbin = min(self.maxbin + numbins, 9223372036854775807)
+        minbin = max(self.minbin + numbins, MININT64)
+        maxbin = min(self.maxbin + numbins, MAXINT64)
         return SparseRegularBinning(bins, self.bin_width, origin, overflow=self.overflow.detached(), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
 
     def toIrregularBinning(self):
@@ -3497,13 +3500,13 @@ class SparseRegularBinning(Binning, BinLocation):
         flows = []
         if self.overflow is not None:
             if self.overflow.loc_underflow != BinLocation.nonexistent:
-                if self.minbin == -9223372036854775808 and self.overflow.minf_mapping == RealOverflow.in_underflow:
+                if self.minbin == MININT64 and self.overflow.minf_mapping == RealOverflow.in_underflow:
                     flows.append((self.overflow.loc_underflow, "{-inf}"))
                 else:
                     flows.append((self.overflow.loc_underflow, "{0}-inf, {1}{2}".format("[" if self.overflow.minf_mapping == RealOverflow.in_underflow else "(", format % (self.bin_width*(self.minbin) + self.origin), "]" if not self.low_inclusive else ")")))
 
             if self.overflow.loc_overflow != BinLocation.nonexistent:
-                if self.maxbin == 9223372036854775807 and self.overflow.pinf_mapping == RealOverflow.in_overflow:
+                if self.maxbin == MAXINT64 and self.overflow.pinf_mapping == RealOverflow.in_overflow:
                     flows.append((self.overflow.loc_overflow, "{+inf}"))
                 else:
                     flows.append((self.overflow.loc_overflow, "{0}{1}, +inf{2}".format("[" if not self.high_inclusive else ")", format % (self.bin_width*(self.maxbin + 1) + self.origin), "]" if self.overflow.pinf_mapping == RealOverflow.in_overflow else ")")))
@@ -3603,8 +3606,8 @@ class SparseRegularBinning(Binning, BinLocation):
                 maxbin = self.maxbin if where.stop is None else exactstop - 1
                 minbin = (minbin - start) // step
                 maxbin = (maxbin - start) // step
-                minbin = max(minbin, -9223372036854775808)
-                maxbin = min(maxbin, 9223372036854775807)
+                minbin = max(minbin, MININT64)
+                maxbin = min(maxbin, MAXINT64)
 
                 binning = SparseRegularBinning(bins, self.bin_width*step, origin=origin, overflow=overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
 

@@ -13,7 +13,7 @@
 
 === Histogram
 
-* required  *axis*: list of <<Axis>> with length in _[1, inf)_
+* required  *axis*: list of <<Axis>> with length in _[1, ∞)_
 * required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
 *  *profile*: list of <<Profile>> (default: `+[]+`)
 *  *axis_covariances*: list of <<Covariance>> (default: `+[]+`)
@@ -36,8 +36,8 @@
 
 === IntegerBinning
 
-* required  *min*: int in _(-inf, inf)_
-* required  *max*: int in _(-inf, inf)_
+* required  *min*: int in _(‒∞, ∞)_
+* required  *max*: int in _(‒∞, ∞)_
 *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -45,15 +45,15 @@
 
 === RegularBinning
 
-* required  *num*: int in _[1, inf)_
+* required  *num*: int in _[1, ∞)_
 * required  *interval*: <<RealInterval>>
 *  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *circular*: bool (default: `+False+`)
 
 === RealInterval
 
-* required  *low*: float in _[-inf, inf]_
-* required  *high*: float in _[-inf, inf]_
+* required  *low*: float in _[‒∞, ∞]_
+* required  *high*: float in _[‒∞, ∞]_
 *  *low_inclusive*: bool (default: `+True+`)
 *  *high_inclusive*: bool (default: `+False+`)
 
@@ -74,21 +74,21 @@
 
 === HexagonalBinning
 
-* required  *qmin*: int in _(-inf, inf)_
-* required  *qmax*: int in _(-inf, inf)_
-* required  *rmin*: int in _(-inf, inf)_
-* required  *rmax*: int in _(-inf, inf)_
+* required  *qmin*: int in _(‒∞, ∞)_
+* required  *qmax*: int in _(‒∞, ∞)_
+* required  *rmin*: int in _(‒∞, ∞)_
+* required  *rmax*: int in _(‒∞, ∞)_
 *  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
 (default: `+HexagonalBinning.offset+`)
-*  *xorigin*: float in _(-inf, inf)_ (default: `+0.0+`)
-*  *yorigin*: float in _(-inf, inf)_ (default: `+0.0+`)
-*  *qangle*: float in _[-1.5707963267948966, 1.5707963267948966]_ (default: `+0.0+`)
+*  *xorigin*: float in _(‒∞, ∞)_ (default: `+0.0+`)
+*  *yorigin*: float in _(‒∞, ∞)_ (default: `+0.0+`)
+*  *qangle*: float in _[‒π/2, π/2]_ (default: `+0.0+`)
 *  *qoverflow*: <<RealOverflow>> (default: `+None+`)
 *  *roverflow*: <<RealOverflow>> (default: `+None+`)
 
 === EdgesBinning
 
-* required  *edges*: list of float with length in _[1, inf)_
+* required  *edges*: list of float with length in _[1, ∞)_
 *  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *low_inclusive*: bool (default: `+True+`)
 *  *high_inclusive*: bool (default: `+False+`)
@@ -96,7 +96,7 @@
 
 === IrregularBinning
 
-* required  *intervals*: list of <<RealInterval>> with length in _[1, inf)_
+* required  *intervals*: list of <<RealInterval>> with length in _[1, ∞)_
 *  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
@@ -110,13 +110,13 @@
 === SparseRegularBinning
 
 * required  *bins*: list of int
-* required  *bin_width*: float in _(0, inf]_
-*  *origin*: float in _[-inf, inf]_ (default: `+0.0+`)
+* required  *bin_width*: float in _(0, ∞]_
+*  *origin*: float in _[‒∞, ∞]_ (default: `+0.0+`)
 *  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *low_inclusive*: bool (default: `+True+`)
 *  *high_inclusive*: bool (default: `+False+`)
-*  *minbin*: int in _[-9223372036854775808, 9223372036854775807]_ (default: `+-9223372036854775808+`)
-*  *maxbin*: int in _[-9223372036854775808, 9223372036854775807]_ (default: `+9223372036854775807+`)
+*  *minbin*: int in _[‒2⁶³, 2⁶³ ‒ 1]_ (default: `+‒2⁶³+`)
+*  *maxbin*: int in _[‒2⁶³, 2⁶³ ‒ 1]_ (default: `+2⁶³ ‒ 1+`)
 
 === FractionBinning
 
@@ -128,13 +128,13 @@
 
 === PredicateBinning
 
-* required  *predicates*: list of str with length in _[1, inf)_
+* required  *predicates*: list of str with length in _[1, ∞)_
 *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === VariationBinning
 
-* required  *variations*: list of <<Variation>> with length in _[1, inf)_
+* required  *variations*: list of <<Variation>> with length in _[1, ∞)_
 
 === Variation
 
@@ -178,8 +178,8 @@
 
 === InterpretedExternalBuffer
 
-* required  *pointer*: int in _[0, inf)_
-* required  *numbytes*: int in _[0, inf)_
+* required  *pointer*: int in _[0, ∞)_
+* required  *numbytes*: int in _[0, ∞)_
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: `+[]+`)
@@ -209,15 +209,15 @@
 === Moments
 
 * required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-* required  *n*: int in _[-128, 127]_
-*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+* required  *n*: int in _[‒128, 127]_
+*  *weightpower*: int in _[‒128, 127]_ (default: `+0+`)
 *  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === Quantiles
 
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 * required  *p*: float in _[0.0, 1.0]_ (default: `+0.5+`)
-*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+*  *weightpower*: int in _[‒128, 127]_ (default: `+0+`)
 *  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === Modes
@@ -232,18 +232,18 @@
 
 === StatisticFilter
 
-*  *min*: float in _[-inf, inf]_ (default: `+-inf+`)
-*  *max*: float in _[-inf, inf]_ (default: `+inf+`)
+*  *min*: float in _[‒∞, ∞]_ (default: `+‒∞+`)
+*  *max*: float in _[‒∞, ∞]_ (default: `+∞+`)
 *  *excludes_minf*: bool (default: `+False+`)
 *  *excludes_pinf*: bool (default: `+False+`)
 *  *excludes_nan*: bool (default: `+False+`)
 
 === Covariance
 
-* required  *xindex*: int in _[0, inf)_
-* required  *yindex*: int in _[0, inf)_
+* required  *xindex*: int in _[0, ∞)_
+* required  *yindex*: int in _[0, ∞)_
 * required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+*  *weightpower*: int in _[‒128, 127]_ (default: `+0+`)
 *  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === ParameterizedFunction
@@ -273,7 +273,7 @@
 
 === BinnedEvaluatedFunction
 
-* required  *axis*: list of <<Axis>> with length in _[1, inf)_
+* required  *axis*: list of <<Axis>> with length in _[1, ∞)_
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: `+None+`)
@@ -285,8 +285,8 @@
 
 === Ntuple
 
-* required  *columns*: list of <<Column>> with length in _[1, inf)_
-* required  *instances*: list of <<NtupleInstance>> with length in _[1, inf)_
+* required  *columns*: list of <<Column>> with length in _[1, ∞)_
+* required  *instances*: list of <<NtupleInstance>> with length in _[1, ∞)_
 *  *column_statistics*: list of <<Statistics>> (default: `+[]+`)
 *  *column_covariances*: list of <<Covariance>> (default: `+[]+`)
 *  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: `+[]+`)
@@ -319,7 +319,7 @@
 === ColumnChunk
 
 * required  *pages*: list of <<Page>>
-* required  *page_offsets*: list of int with length in _[1, inf)_
+* required  *page_offsets*: list of int with length in _[1, ∞)_
 *  *page_min*: list of <<Extremes>> (default: `+[]+`)
 *  *page_max*: list of <<Extremes>> (default: `+[]+`)
 
@@ -333,8 +333,8 @@
 
 === RawExternalBuffer
 
-* required  *pointer*: int in _[0, inf)_
-* required  *numbytes*: int in _[0, inf)_
+* required  *pointer*: int in _[0, ∞)_
+* required  *numbytes*: int in _[0, ∞)_
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 

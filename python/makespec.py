@@ -28,6 +28,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import math
+import numbers
 try:
     from inspect import signature
 except ImportError:
@@ -35,6 +37,8 @@ except ImportError:
         from funcsigs import signature
     except ImportError:
         raise ImportError("Install funcsigs package with:\n    pip install funcsigs\nor\n    conda install funcsigs\n(or just use Python >= 3.3).")
+
+import numpy
 
 import stagg
 import stagg.checktype
@@ -104,6 +108,27 @@ prelude = """
 epilogue = """
 """
 
+def num(x):
+    if not isinstance(x, (bool, numpy.bool, numpy.bool)) and isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
+        if x == float("-inf"):
+            return u"\u2012\u221e"
+        elif x == float("inf"):
+            return u"\u221e"
+        elif x == -0.5*math.pi:
+            return u"\u2012\u03c0/2"
+        elif x == 0.5*math.pi:
+            return u"\u03c0/2"
+        elif x == stagg.interface.MININT64:
+            return u"\u20122\u2076\u00b3"  # -2**63
+        elif x == stagg.interface.MAXINT64:
+            return u"2\u2076\u00b3 \u2012 1"  # 2**63 - 1
+        elif x < 0:
+            return u"\u2012" + repr(abs(x))
+        else:
+            return repr(abs(x))
+    else:
+        return repr(x)
+
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
@@ -122,14 +147,14 @@ def formatted(cls, end="\n"):
             elif isinstance(check, stagg.checktype.CheckNumber):
                 typestring = "float in _{0}{1}, {2}{3}_".format(
                     "[" if check.min_inclusive else "(",
-                    check.min,
-                    check.max,
+                    num(check.min),
+                    num(check.max),
                     "]" if check.max_inclusive else ")")
             elif isinstance(check, stagg.checktype.CheckInteger):
                 typestring = "int in _{0}{1}, {2}{3}_".format(
                     "(" if check.min == float("-inf") else "[",
-                    check.min,
-                    check.max,
+                    num(check.min),
+                    num(check.max),
                     ")" if check.max == float("inf") else "]")
             elif isinstance(check, stagg.checktype.CheckEnum):
                 typestring = "one of {" + ", ".join("`+" + str(x) + "+`" for x in check.choices) + "}"
@@ -157,8 +182,8 @@ def formatted(cls, end="\n"):
                         subtype = "<<{0}>>".format(check.type.__name__)
                 if check.minlen != 0 or check.maxlen != float("inf"):
                     withlength = " with length in _[{0}, {1}{2}_".format(
-                        check.minlen,
-                        check.maxlen,
+                        num(check.minlen),
+                        num(check.maxlen),
                         ")" if check.maxlen == float("inf") else "]")
                 else:
                     withlength = ""
@@ -172,7 +197,7 @@ def formatted(cls, end="\n"):
 
             if hasdefault:
                 linebreak = " +" + end if len(name) + len(typestring) > 100 else " "
-                defaultstring = "{0}(default: `+{1}+`)".format(linebreak, "[]" if islist and param.default is None else repr(param.default))
+                defaultstring = "{0}(default: `+{1}+`)".format(linebreak, "[]" if islist and param.default is None else num(param.default))
             else:
                 defaultstring = ""
 
