@@ -45,6 +45,10 @@ import stagg.checktype
 import stagg.interface
 
 prelude = """++++
+<style>
+td {color: red;}
+</style>
+
 <table border="1">
 <tr><td>1</td><td>2</td></tr>
 </table>
