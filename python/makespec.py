@@ -102,7 +102,16 @@ unions = {
     stagg.interface.Object: [stagg.Histogram, stagg.Ntuple, stagg.ParameterizedFunction, stagg.BinnedEvaluatedFunction, stagg.Collection],
     }
 
-prelude = """
+prelude = """:toc:
+
+== Introduction
+
+toc::[]
+
+== Types
+
+== Class definitions
+
 """
 
 epilogue = """
@@ -142,7 +151,6 @@ def num(x):
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
-    out.append("[none]")
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
             check = cls._params[name]
