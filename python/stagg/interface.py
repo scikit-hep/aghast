@@ -2055,11 +2055,11 @@ class IntegerBinning(Binning, BinLocation):
 
     description = "Splits an axis into a dense set of integer-sized bins, aligned to integers."
     validity_rules = ("The *min* must be strictly less than the *max*.",
-                      "The *loc_underflow* and *loc_overflow* must not be equal unless they are both nonexistent.")
+                      "The *loc_underflow* and *loc_overflow* must not be equal unless they are `nonexistent`.")
     long_description = """
 This binning is intended for one-dimensional, integer-valued data in a compact range. The *min* and *max* values are both inclusive, so the number of bins is `+1 + max - min+`.
 
-If *loc_underflow* and *loc_overflow* are `BinLocation.nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow or overflow. If they are `below`, then their slots precede the normal bins, if `above`, then their slots follow the normal bins, and their order is in sequence: `below3`, `below2`, `below1`, (normal bins), `above1`, `above2`, `above3`.
+If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow or overflow. If they are `below`, then their slots precede the normal bins, if `above`, then their slots follow the normal bins, and their order is in sequence: `below3`, `below2`, `below1`, (normal bins), `above1`, `above2`, `above3`.
 """
 
     def __init__(self, min, max, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent):
@@ -2316,9 +2316,16 @@ class RealOverflow(Stagg, BinLocation):
     pinf_mapping  = typedproperty(_params["pinf_mapping"])
     nan_mapping   = typedproperty(_params["nan_mapping"])
 
-    description = ""
-    validity_rules = ()
-    long_description = """
+    description = "Underflow, overflow, and nanflow configuration for one-dimensional, real-valued data."
+    validity_rules = ("The *loc_underflow*, *loc_overflow*, and *loc_nanflow* must not be equal unless they are `nonexistent`.",
+                      u"The *minf_mapping* (\u2012\u221e mapping) can only be `missing`, `in_underflow`, or `in_nanflow`, not `in_overflow`.",
+                      u"The *pinf_mapping* (+\u221e mapping) can only be `missing`, `in_overflow`, or `in_nanflow`, not `in_underflow`.")
+    long_description = u"""
+If *loc_underflow*, *loc_overflow*, and *loc_nanflow* are `nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow, overflow, or nanflow. Underflow represents values less than the lower limit of the binning, overflow represents values greater than the upper limit of the binning, and nanflow represents floating-point values that are `nan` (not a number). With the normal bins, underflow, overflow, and nanflow, every possible input value corresponds to some bin.
+
+If any of the *loc_underflow*, *loc_overflow*, and *loc_nanflow* are `below`, then their slots precede the normal bins, if `above`, then their slots follow the normal bins, and their order is in sequence: `below3`, `below2`, `below1`, (normal bins), `above1`, `above2`, `above3`.
+
+The *minf_mapping* specifies whether \u2012\u221e values were ignored when the histogram was filled (`missing`), are in the underflow bin (`in_underflow`) or are in the nanflow bin (`in_nanflow`). The *pinf_mapping* specifies whether +\u221e values were ignored when the histogram was filled (`missing`), are in the overflow bin (`in_overflow`) or are in the nanflow bin (`in_nanflow`). Thus, it would be possible to represent a histogram that was filled with finite underflow/overflow bins and a generic bin for all three non-finite floating point states.
 """
 
     def __init__(self, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent, loc_nanflow=BinLocation.nonexistent, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
@@ -2337,9 +2344,9 @@ class RealOverflow(Stagg, BinLocation):
         if self.loc_overflow != self.nonexistent and self.loc_nanflow != self.nonexistent and self.loc_overflow == self.loc_nanflow:
             raise ValueError("RealOverflow.loc_overflow and RealOverflow.loc_nanflow must not be equal unless they are both nonexistent")
         if self.minf_mapping == self.in_overflow:
-            raise ValueError("RealOverflow.minf_mapping (-inf mapping) can only be in_underflow or in_nanflow, not in_overflow")
+            raise ValueError("RealOverflow.minf_mapping (-inf mapping) can only be missing, in_underflow, or in_nanflow, not in_overflow")
         if self.pinf_mapping == self.in_underflow:
-            raise ValueError("RealOverflow.pinf_mapping (+inf mapping) can only be in_overflow or in_nanflow, not in_underflow")
+            raise ValueError("RealOverflow.pinf_mapping (+inf mapping) can only be missing, in_overflow, or in_nanflow, not in_underflow")
 
     def _numbins(self):
         return int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent) + int(self.loc_nanflow != self.nonexistent)
