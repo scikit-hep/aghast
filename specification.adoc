@@ -5,16 +5,12 @@
 
 *  *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: `+[]+`)
-*  *axis*: list of <<Axis>> +
-(default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *axis*: list of <<Axis>> (default: `+[]+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === Histogram
 
@@ -28,27 +24,21 @@
 (default: `+[]+`)
 *  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> +
 (default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === Axis
 
 *  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: `+None+`)
-*  *expression*: str +
-(default: `+None+`)
+*  *expression*: str (default: `+None+`)
 *  *statistics*: <<Statistics>> +
 (default: `+None+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
 
@@ -67,17 +57,14 @@
 * required  *interval*: <<RealInterval>>
 *  *overflow*: <<RealOverflow>> +
 (default: `+None+`)
-*  *circular*: bool +
-(default: `+False+`)
+*  *circular*: bool (default: `+False+`)
 
 === RealInterval
 
 * required  *low*: float in _[-inf, inf]_
 * required  *high*: float in _[-inf, inf]_
-*  *low_inclusive*: bool +
-(default: `+True+`)
-*  *high_inclusive*: bool +
-(default: `+False+`)
+*  *low_inclusive*: bool (default: `+True+`)
+*  *high_inclusive*: bool (default: `+False+`)
 
 === RealOverflow
 
@@ -118,12 +105,9 @@
 * required  *edges*: list of float with length in _[1, inf)_
 *  *overflow*: <<RealOverflow>> +
 (default: `+None+`)
-*  *low_inclusive*: bool +
-(default: `+True+`)
-*  *high_inclusive*: bool +
-(default: `+False+`)
-*  *circular*: bool +
-(default: `+False+`)
+*  *low_inclusive*: bool (default: `+True+`)
+*  *high_inclusive*: bool (default: `+False+`)
+*  *circular*: bool (default: `+False+`)
 
 === IrregularBinning
 
@@ -147,10 +131,8 @@
 (default: `+0.0+`)
 *  *overflow*: <<RealOverflow>> +
 (default: `+None+`)
-*  *low_inclusive*: bool +
-(default: `+True+`)
-*  *high_inclusive*: bool +
-(default: `+False+`)
+*  *low_inclusive*: bool (default: `+True+`)
+*  *high_inclusive*: bool (default: `+False+`)
 *  *minbin*: int in _[-9223372036854775808, 9223372036854775807]_ +
 (default: `+-9223372036854775808+`)
 *  *maxbin*: int in _[-9223372036854775808, 9223372036854775807]_ +
@@ -160,8 +142,7 @@
 
 *  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
-*  *layout_reversed*: bool +
-(default: `+False+`)
+*  *layout_reversed*: bool (default: `+False+`)
 *  *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
 
@@ -238,17 +219,14 @@
 (default: `+Interpretation.little_endian+`)
 *  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
-*  *location*: str +
-(default: `+None+`)
+*  *location*: str (default: `+None+`)
 
 === Profile
 
 * required  *expression*: str
 * required  *statistics*: <<Statistics>>
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
 
@@ -258,12 +236,9 @@
 (default: `+[]+`)
 *  *quantiles*: list of <<Quantiles>> +
 (default: `+[]+`)
-*  *mode*: <<Modes>> +
-(default: `+None+`)
-*  *min*: <<Extremes>> +
-(default: `+None+`)
-*  *max*: <<Extremes>> +
-(default: `+None+`)
+*  *mode*: <<Modes>> (default: `+None+`)
+*  *min*: <<Extremes>> (default: `+None+`)
+*  *max*: <<Extremes>> (default: `+None+`)
 
 === Moments
 
@@ -302,12 +277,9 @@
 (default: `+-inf+`)
 *  *max*: float in _[-inf, inf]_ +
 (default: `+inf+`)
-*  *excludes_minf*: bool +
-(default: `+False+`)
-*  *excludes_pinf*: bool +
-(default: `+False+`)
-*  *excludes_nan*: bool +
-(default: `+False+`)
+*  *excludes_minf*: bool (default: `+False+`)
+*  *excludes_pinf*: bool (default: `+False+`)
+*  *excludes_nan*: bool (default: `+False+`)
 
 === Covariance
 
@@ -324,14 +296,11 @@
 * required  *expression*: str
 *  *parameters*: list of <<Parameter>> +
 (default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === Parameter
 
@@ -345,14 +314,11 @@
 (default: `+None+`)
 *  *errors*: list of <<Quantiles>> +
 (default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === BinnedEvaluatedFunction
 
@@ -362,14 +328,11 @@
 (default: `+None+`)
 *  *errors*: list of <<Quantiles>> +
 (default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === Ntuple
 
@@ -381,14 +344,11 @@
 (default: `+[]+`)
 *  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> +
 (default: `+[]+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
-*  *script*: str +
-(default: `+None+`)
+*  *script*: str (default: `+None+`)
 
 === Column
 
@@ -400,10 +360,8 @@
 (default: `+[]+`)
 *  *postfilter_slice*: slice (start:stop:step) +
 (default: `+None+`)
-*  *title*: str +
-(default: `+None+`)
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *title*: str (default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 *  *decoration*: <<Decoration>> +
 (default: `+None+`)
 
@@ -416,8 +374,7 @@
 === Chunk
 
 * required  *column_chunks*: list of <<ColumnChunk>>
-*  *metadata*: <<Metadata>> +
-(default: `+None+`)
+*  *metadata*: <<Metadata>> (default: `+None+`)
 
 === ColumnChunk
 
