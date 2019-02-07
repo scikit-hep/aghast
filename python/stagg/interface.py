@@ -4330,9 +4330,16 @@ class Axis(Stagg):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    description = "Axis of a histogram or binned function HERE"
-    validity_rules = ()
+    description = "Axis of a histogram or binned function representing one or more binned dimensions."
+    validity_rules = ("The *statistics* must be empty or have a length equal to the number of dimensions in the *binning* (no binning is one-dimensional).")
     long_description = """
+The dimension or dimensions are subdivided by the *binning* property; all other properties provide additional information.
+
+If the axis represents a computed *expression*, it may be encoded here as a string. The *title* is a human-readable description.
+
+A <<Statistics>> object (one per dimension) summarizes the data separately from the histogram counts. For instance, it may contain the mean and standard deviation of all data along a dimension, which is more accurate than a mean and standard deviation derived from the counts.
+
+The *expression*, *title*, *metadata*, and *decoration* properties have no semantic constraints.
 """
 
     def __init__(self, binning=None, expression=None, statistics=None, title=None, metadata=None, decoration=None):

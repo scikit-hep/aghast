@@ -77,7 +77,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Axis
 
-*Axis of a histogram or binned function HERE*
+*Axis of a histogram or binned function representing one or more binned dimensions.*
 
 [%hardbreaks]
 •{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
@@ -87,8 +87,145 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
+T +
+h +
+e +
+  +
+* +
+s +
+t +
+a +
+t +
+i +
+s +
+t +
+i +
+c +
+s +
+* +
+  +
+m +
+u +
+s +
+t +
+  +
+b +
+e +
+  +
+e +
+m +
+p +
+t +
+y +
+  +
+o +
+r +
+  +
+h +
+a +
+v +
+e +
+  +
+a +
+  +
+l +
+e +
+n +
+g +
+t +
+h +
+  +
+e +
+q +
+u +
+a +
+l +
+  +
+t +
+o +
+  +
+t +
+h +
+e +
+  +
+n +
+u +
+m +
+b +
+e +
+r +
+  +
+o +
+f +
+  +
+d +
+i +
+m +
+e +
+n +
+s +
+i +
+o +
+n +
+s +
+  +
+i +
+n +
+  +
+t +
+h +
+e +
+  +
+* +
+b +
+i +
+n +
+n +
+i +
+n +
+g +
+* +
+  +
+( +
+n +
+o +
+  +
+b +
+i +
+n +
+n +
+i +
+n +
+g +
+  +
+i +
+s +
+  +
+o +
+n +
+e +
+- +
+d +
+i +
+m +
+e +
+n +
+s +
+i +
+o +
+n +
+a +
+l +
+) +
+.
 
+The dimension or dimensions are subdivided by the *binning* property; all other properties provide additional information.
 
+If the axis represents a computed *expression*, it may be encoded here as a string. The *title* is a human-readable description.
+
+A <<Statistics>> object (one per dimension) summarizes the data separately from the histogram counts. For instance, it may contain the mean and standard deviation of all data along a dimension, which is more accurate than a mean and standard deviation derived from the counts.
+
+The *expression*, *title*, *metadata*, and *decoration* properties have no semantic constraints.
 
 == IntegerBinning
 
