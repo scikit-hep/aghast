@@ -224,8 +224,7 @@ def formatted(cls, end="\n"):
 
     if len(cls.validity_rules) != 0:
         out.append("{empty} +")
-    for rule in cls.validity_rules:
-        out.append(rule + " +")
+        out.append((" +" + end).join(cls.validity_rules))
 
     if cls.long_description is not None:
         out.append(end + cls.long_description.strip())
