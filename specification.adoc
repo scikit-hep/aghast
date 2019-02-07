@@ -10,7 +10,7 @@
 
 === Collection
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
 •{nbsp} *axis*: list of <<Axis>> (default: null/empty)
@@ -21,7 +21,7 @@
 
 === Histogram
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
 •{nbsp}required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
 •{nbsp} *profile*: list of <<Profile>> (default: null/empty)
@@ -35,7 +35,7 @@
 
 === Axis
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: null)
 •{nbsp} *expression*: str (default: null)
@@ -46,7 +46,7 @@
 
 === IntegerBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *min*: int in (‒∞, ∞)
 •{nbsp}required  *max*: int in (‒∞, ∞)
 •{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -56,7 +56,7 @@
 
 === RegularBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *num*: int in [1, ∞)
 •{nbsp}required  *interval*: <<RealInterval>>
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
@@ -64,7 +64,7 @@
 
 === RealInterval
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *low*: float in [‒∞, ∞]
 •{nbsp}required  *high*: float in [‒∞, ∞]
 •{nbsp} *low_inclusive*: bool (default: true)
@@ -72,7 +72,7 @@
 
 === RealOverflow
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -88,7 +88,7 @@
 
 === HexagonalBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *qmin*: int in (‒∞, ∞)
 •{nbsp}required  *qmax*: int in (‒∞, ∞)
 •{nbsp}required  *rmin*: int in (‒∞, ∞)
@@ -103,7 +103,7 @@
 
 === EdgesBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *edges*: list of float with length in [1, ∞)
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *low_inclusive*: bool (default: true)
@@ -112,7 +112,7 @@
 
 === IrregularBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
@@ -120,14 +120,14 @@
 
 === CategoryBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *categories*: list of str
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === SparseRegularBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *bins*: list of int
 •{nbsp}required  *bin_width*: float in (0, ∞]
 •{nbsp} *origin*: float in [‒∞, ∞] (default: 0.0)
@@ -139,7 +139,7 @@
 
 === FractionBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
 •{nbsp} *layout_reversed*: bool (default: false)
@@ -148,37 +148,37 @@
 
 === PredicateBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *predicates*: list of str with length in [1, ∞)
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === VariationBinning
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
 
 === Variation
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *assignments*: list of <<Assignment>>
 •{nbsp} *systematic*: list of float (default: null/empty)
 •{nbsp} *category_systematic*: list of str (default: null/empty)
 
 === Assignment
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *expression*: str
 
 === UnweightedCounts
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === WeightedCounts
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
@@ -186,7 +186,7 @@
 
 === InterpretedInlineBuffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *buffer*: buffer
 •{nbsp} *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
@@ -200,17 +200,17 @@
 
 === InterpretedInlineInt64Buffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *buffer*: buffer
 
 === InterpretedInlineFloat64Buffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *buffer*: buffer
 
 === InterpretedExternalBuffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *pointer*: int in [0, ∞)
 •{nbsp}required  *numbytes*: int in [0, ∞)
 •{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
@@ -228,7 +228,7 @@
 
 === Profile
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *expression*: str
 •{nbsp}required  *statistics*: <<Statistics>>
 •{nbsp} *title*: str (default: null)
@@ -237,7 +237,7 @@
 
 === Statistics
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *moments*: list of <<Moments>> (default: null/empty)
 •{nbsp} *quantiles*: list of <<Quantiles>> (default: null/empty)
 •{nbsp} *mode*: <<Modes>> (default: null)
@@ -246,7 +246,7 @@
 
 === Moments
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp}required  *n*: int in [‒128, 127]
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
@@ -254,7 +254,7 @@
 
 === Quantiles
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp}required  *p*: float in [0.0, 1.0] (default: 1/2)
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
@@ -262,19 +262,19 @@
 
 === Modes
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === Extremes
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 === StatisticFilter
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
 •{nbsp} *max*: float in [‒∞, ∞] (default: ∞)
 •{nbsp} *excludes_minf*: bool (default: false)
@@ -283,7 +283,7 @@
 
 === Covariance
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *xindex*: int in [0, ∞)
 •{nbsp}required  *yindex*: int in [0, ∞)
 •{nbsp}required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -292,7 +292,7 @@
 
 === ParameterizedFunction
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *expression*: str
 •{nbsp} *parameters*: list of <<Parameter>> (default: null/empty)
 •{nbsp} *title*: str (default: null)
@@ -302,13 +302,13 @@
 
 === Parameter
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === EvaluatedFunction
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
@@ -320,7 +320,7 @@
 
 === BinnedEvaluatedFunction
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *axis*: list of <<Axis>> with length in [1, ∞)
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -333,7 +333,7 @@
 
 === Ntuple
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *columns*: list of <<Column>> with length in [1, ∞)
 •{nbsp}required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
 •{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
@@ -346,7 +346,7 @@
 
 === Column
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
 •{nbsp} *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
@@ -360,19 +360,19 @@
 
 === NtupleInstance
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *chunks*: list of <<Chunk>>
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
 
 === Chunk
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 
 === ColumnChunk
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *pages*: list of <<Page>>
 •{nbsp}required  *page_offsets*: list of int with length in [1, ∞)
 •{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
@@ -380,17 +380,17 @@
 
 === Page
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 === RawInlineBuffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *buffer*: buffer
 
 === RawExternalBuffer
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *pointer*: int in [0, ∞)
 •{nbsp}required  *numbytes*: int in [0, ∞)
 •{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
@@ -398,13 +398,13 @@
 
 === Metadata
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 === Decoration
 
-[%hardbreaks, role="testy"]
+[%hardbreaks, indented]
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
