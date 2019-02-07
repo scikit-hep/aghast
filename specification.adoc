@@ -73,7 +73,7 @@ Any *profiles* summarize dependent variables (where the *axis* defines independe
 
 The <<Axis>> and <<Profile>> classes internally define summary statistics, such as the mean or median of that axis. However, those <<Statistics>> objects cannot describe correlations among axes. If this information is available, it can be expressed in *axis_covariances* or *profile_covariances*.
 
-Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object with names.
+Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object with names. If an <<EvaluatedFunction>> is included, its binning is derived from the histogram's full *axis* (including any *axis* inherited from a <<Collection>>).
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 
@@ -211,7 +211,15 @@ The *rmin* must be strictly less than the *rmax*.
 
 *Details:*
 
-https://www.meccanismocomplesso.org/hexagonal-binning[described here]
+This binning is intended for two-dimensional, real-valued data in a compact region. Hexagons tile a two-dimensional plane, just as rectangles do, but whereas a rectangular tiling can be represented by two <<RealBinning>> axes, hexagonal binning requires a special binning. Some advantages of hexagonal binning are https://www.meccanismocomplesso.org/hexagonal-binning[described here].
+
+As with any other binning, integer-valued indexes in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values are mapped to values in the data space. However, rather than mapping a single integer slot position to an integer, real interval, or categorical data value, two integers from a rectangular integer grid are mapped to hexagonal tiles. The integers are labeled `q` and `r`, with `q` values between *qmin* and *qmax* (inclusive) and `r` values between *rmin* and *rmax* (inclusive). The total number of bins is `(1 + qmax - qmin)*(1 + rmax - rmin)`. Data coordinates are labeled `x` and `y`.
+
+There are several different schemes for mapping integer rectangles to hexagonal tiles; we use the ones https://www.redblobgames.com/grids/hexagons[defined here]: `offset`, `doubled_offset`, `cube_xy`, `cube_yz`, `cube_xz`, specified by the *coordinates* property. The center of the `q = 0, r = 0` tile is at *xorigin*, *yorigin*.
+
+In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from ‒π/2, if increasing `q` is collinear with decreasing `y`, to π/2, if increasing `q` is collinear with increasing `y`.
+
+A roughly but not exactly rectangular region of `x` and `y` fall within a slot in `q` and `r`. Overflows, underflows, and nanflows, converted to floating-point `q` and `r`, are represented by overflow, underflow, and nanflow bins in *qoverflow* and *roverflow*. Note that the total number of bins is strictly multiplicative (as it would be for a rectangular with two <<RegularBinning>> axes): the total number of bins is the number of normal `q` bins plus any overflows times the number of normal `r` bins plus any overflows. That is, all `r` bins are represented for each `q` bin, even overflow `q` bins.
 
 == EdgesBinning
 
