@@ -3,6 +3,7 @@
 
 === Collection
 
+[none, item_spacing: 0px]
 *  *objects*: list of <<Histogram>> or <<Ntuple>> or <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> or <<Collection>> +
 (default: null/empty)
 *  *axis*: list of <<Axis>> (default: null/empty)
@@ -13,6 +14,7 @@
 
 === Histogram
 
+[none, item_spacing: 0px]
 * required  *axis*: list of <<Axis>> with length in [1, ∞)
 * required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
 *  *profile*: list of <<Profile>> (default: null/empty)
@@ -26,6 +28,7 @@
 
 === Axis
 
+[none, item_spacing: 0px]
 *  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: null)
 *  *expression*: str (default: null)
@@ -36,6 +39,7 @@
 
 === IntegerBinning
 
+[none, item_spacing: 0px]
 * required  *min*: int in (‒∞, ∞)
 * required  *max*: int in (‒∞, ∞)
 *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -45,6 +49,7 @@
 
 === RegularBinning
 
+[none, item_spacing: 0px]
 * required  *num*: int in [1, ∞)
 * required  *interval*: <<RealInterval>>
 *  *overflow*: <<RealOverflow>> (default: null)
@@ -52,6 +57,7 @@
 
 === RealInterval
 
+[none, item_spacing: 0px]
 * required  *low*: float in [‒∞, ∞]
 * required  *high*: float in [‒∞, ∞]
 *  *low_inclusive*: bool (default: true)
@@ -59,6 +65,7 @@
 
 === RealOverflow
 
+[none, item_spacing: 0px]
 *  *loc_underflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
@@ -74,6 +81,7 @@
 
 === HexagonalBinning
 
+[none, item_spacing: 0px]
 * required  *qmin*: int in (‒∞, ∞)
 * required  *qmax*: int in (‒∞, ∞)
 * required  *rmin*: int in (‒∞, ∞)
@@ -88,6 +96,7 @@
 
 === EdgesBinning
 
+[none, item_spacing: 0px]
 * required  *edges*: list of float with length in [1, ∞)
 *  *overflow*: <<RealOverflow>> (default: null)
 *  *low_inclusive*: bool (default: true)
@@ -96,6 +105,7 @@
 
 === IrregularBinning
 
+[none, item_spacing: 0px]
 * required  *intervals*: list of <<RealInterval>> with length in [1, ∞)
 *  *overflow*: <<RealOverflow>> (default: null)
 *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
@@ -103,12 +113,14 @@
 
 === CategoryBinning
 
+[none, item_spacing: 0px]
 * required  *categories*: list of str
 *  *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
 === SparseRegularBinning
 
+[none, item_spacing: 0px]
 * required  *bins*: list of int
 * required  *bin_width*: float in (0, ∞]
 *  *origin*: float in [‒∞, ∞] (default: 0.0)
@@ -120,6 +132,7 @@
 
 === FractionBinning
 
+[none, item_spacing: 0px]
 *  *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
 *  *layout_reversed*: bool (default: false)
@@ -128,31 +141,37 @@
 
 === PredicateBinning
 
+[none, item_spacing: 0px]
 * required  *predicates*: list of str with length in [1, ∞)
 *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
 === VariationBinning
 
+[none, item_spacing: 0px]
 * required  *variations*: list of <<Variation>> with length in [1, ∞)
 
 === Variation
 
+[none, item_spacing: 0px]
 * required  *assignments*: list of <<Assignment>>
 *  *systematic*: list of float (default: null/empty)
 *  *category_systematic*: list of str (default: null/empty)
 
 === Assignment
 
+[none, item_spacing: 0px]
 * required  *identifier*: unique str
 * required  *expression*: str
 
 === UnweightedCounts
 
+[none, item_spacing: 0px]
 * required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === WeightedCounts
 
+[none, item_spacing: 0px]
 * required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
@@ -160,6 +179,7 @@
 
 === InterpretedInlineBuffer
 
+[none, item_spacing: 0px]
 * required  *buffer*: buffer
 *  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
 (default: null/empty)
@@ -173,14 +193,17 @@
 
 === InterpretedInlineInt64Buffer
 
+[none, item_spacing: 0px]
 * required  *buffer*: buffer
 
 === InterpretedInlineFloat64Buffer
 
+[none, item_spacing: 0px]
 * required  *buffer*: buffer
 
 === InterpretedExternalBuffer
 
+[none, item_spacing: 0px]
 * required  *pointer*: int in [0, ∞)
 * required  *numbytes*: int in [0, ∞)
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
@@ -198,6 +221,7 @@
 
 === Profile
 
+[none, item_spacing: 0px]
 * required  *expression*: str
 * required  *statistics*: <<Statistics>>
 *  *title*: str (default: null)
@@ -206,6 +230,7 @@
 
 === Statistics
 
+[none, item_spacing: 0px]
 *  *moments*: list of <<Moments>> (default: null/empty)
 *  *quantiles*: list of <<Quantiles>> (default: null/empty)
 *  *mode*: <<Modes>> (default: null)
@@ -214,6 +239,7 @@
 
 === Moments
 
+[none, item_spacing: 0px]
 * required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 * required  *n*: int in [‒128, 127]
 *  *weightpower*: int in [‒128, 127] (default: 0)
@@ -221,6 +247,7 @@
 
 === Quantiles
 
+[none, item_spacing: 0px]
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 * required  *p*: float in [0.0, 1.0] (default: 1/2)
 *  *weightpower*: int in [‒128, 127] (default: 0)
@@ -228,16 +255,19 @@
 
 === Modes
 
+[none, item_spacing: 0px]
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *filter*: <<StatisticFilter>> (default: null)
 
 === Extremes
 
+[none, item_spacing: 0px]
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *filter*: <<StatisticFilter>> (default: null)
 
 === StatisticFilter
 
+[none, item_spacing: 0px]
 *  *min*: float in [‒∞, ∞] (default: ‒∞)
 *  *max*: float in [‒∞, ∞] (default: ∞)
 *  *excludes_minf*: bool (default: false)
@@ -246,6 +276,7 @@
 
 === Covariance
 
+[none, item_spacing: 0px]
 * required  *xindex*: int in [0, ∞)
 * required  *yindex*: int in [0, ∞)
 * required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
@@ -254,6 +285,7 @@
 
 === ParameterizedFunction
 
+[none, item_spacing: 0px]
 * required  *expression*: str
 *  *parameters*: list of <<Parameter>> (default: null/empty)
 *  *title*: str (default: null)
@@ -263,11 +295,13 @@
 
 === Parameter
 
+[none, item_spacing: 0px]
 * required  *identifier*: unique str
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
 === EvaluatedFunction
 
+[none, item_spacing: 0px]
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
@@ -279,6 +313,7 @@
 
 === BinnedEvaluatedFunction
 
+[none, item_spacing: 0px]
 * required  *axis*: list of <<Axis>> with length in [1, ∞)
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -291,6 +326,7 @@
 
 === Ntuple
 
+[none, item_spacing: 0px]
 * required  *columns*: list of <<Column>> with length in [1, ∞)
 * required  *instances*: list of <<NtupleInstance>> with length in [1, ∞)
 *  *column_statistics*: list of <<Statistics>> (default: null/empty)
@@ -303,6 +339,7 @@
 
 === Column
 
+[none, item_spacing: 0px]
 * required  *identifier*: unique str
 * required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
 *  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
@@ -316,16 +353,19 @@
 
 === NtupleInstance
 
+[none, item_spacing: 0px]
 * required  *chunks*: list of <<Chunk>>
 *  *chunk_offsets*: list of int (default: null/empty)
 
 === Chunk
 
+[none, item_spacing: 0px]
 * required  *column_chunks*: list of <<ColumnChunk>>
 *  *metadata*: <<Metadata>> (default: null)
 
 === ColumnChunk
 
+[none, item_spacing: 0px]
 * required  *pages*: list of <<Page>>
 * required  *page_offsets*: list of int with length in [1, ∞)
 *  *page_min*: list of <<Extremes>> (default: null/empty)
@@ -333,14 +373,17 @@
 
 === Page
 
+[none, item_spacing: 0px]
 * required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 === RawInlineBuffer
 
+[none, item_spacing: 0px]
 * required  *buffer*: buffer
 
 === RawExternalBuffer
 
+[none, item_spacing: 0px]
 * required  *pointer*: int in [0, ∞)
 * required  *numbytes*: int in [0, ∞)
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
@@ -348,11 +391,13 @@
 
 === Metadata
 
+[none, item_spacing: 0px]
 * required  *data*: str
 * required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 === Decoration
 
+[none, item_spacing: 0px]
 * required  *data*: str
 * required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)

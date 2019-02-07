@@ -142,6 +142,7 @@ def num(x):
 def formatted(cls, end="\n"):
     out = ["\n\n=== {0}{1}".format(cls.__name__, end)]
 
+    out.append("[none, item_spacing: 0px]")
     for name, param in signature(cls.__init__).parameters.items():
         if name != "self":
             check = cls._params[name]
