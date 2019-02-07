@@ -71,9 +71,13 @@ Any *functions* associated with the histogram, such as fit results, may be attac
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 
+*See also:*
+
+   * <<BinnedEvaluatedFunction>>: for lookup functions that aren't statistical distributions.
+
 == Axis
 
-**
+*Axis of a histogram or binned function HERE*
 
 [%hardbreaks]
 •{nbsp} *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +

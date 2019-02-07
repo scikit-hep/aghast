@@ -4330,7 +4330,7 @@ class Axis(Stagg):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    description = ""
+    description = "Axis of a histogram or binned function HERE"
     validity_rules = ()
     long_description = """
 """
@@ -5207,6 +5207,10 @@ The <<Axis>> and <<Profile>> classes internally define summary statistics, such 
 Any *functions* associated with the histogram, such as fit results, may be attached directly to the histogram object with names.
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
+
+*See also:*
+
+   * <<BinnedEvaluatedFunction>>: for lookup functions that aren't statistical distributions.
 """
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
