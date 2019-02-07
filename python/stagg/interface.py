@@ -2261,6 +2261,8 @@ class RealInterval(Stagg):
     validity_rules = ("The *low* limit must be less than or equal to the *high* limit.",
                       "The *low* limit may only be equal to the *high* limit if at least one endpoint is inclusive (*low_inclusive* or *high_inclusive* is true). Such an interval would represent a single real value.")
     long_description = """
+The position and size of the real interval is defined by *low* and *high*, and each endpoint is inclusive (closed) if *low_inclusive* or *high_inclusive*, respectively, is true. Otherwise, the endpoint is exclusive (open).
+
 A single interval defines a <<RegularBinning>> and a set of intervals defines an <<IrregularBinning>>.
 """
 
@@ -2505,13 +2507,20 @@ class RegularBinning(Binning):
 
     description = "Splits a one-dimensional axis into an ordered, abutting set of equal-sized real intervals."
     validity_rules = ("The *interval.low* and *interval.high* limits must both be finite.",
-                      "The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true.")
+                      "The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true. (They can both be false, which allows for infinitesimal gaps between bins.)")
     long_description = """
 This binning is intended for one-dimensional, real-valued data in a compact range. The limits of this range are specified in a single <<RealInterval>>, and the number of subdivisions is *num*.
 
 The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
 If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [\u2012\u03c0, \u03c0) intervals into [0, 2\u03c0) intervals, for instance.
+
+*See also:*
+
+   * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
+   * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
+   * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
+   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, num, interval, overflow=None, circular=False):
@@ -2873,9 +2882,23 @@ class EdgesBinning(Binning):
     high_inclusive = typedproperty(_params["high_inclusive"])
     circular       = typedproperty(_params["circular"])
 
-    description = ""
-    validity_rules = ()
+    description = "Splits a one-dimensional axis into an ordered, abutting set of any-sized real intervals."
+    validity_rules = ("All *edges* must be finite and strictly increasing.",
+                      "An *edges* of length 1 is only allowed if *overflow* is non-null with at least one underflow, overflow, or nanflow bin.",
+                      "The *low_inclusive* and *high_inclusive* cannot both be true. (They can both be false, which allows for infinitesimal gaps between bins.)")
     long_description = """
+This binning is intended for one-dimensional, real-valued data in a compact range. The limits of this range and the size of each bin are defined by *edges*, which are the edges _between_ the bins. Since they are edges between bins, the number of non-overflow bins is `len(edges) - 1`. The degenerate case of exactly one edge is only allowed if there are any underflow, overflow, or nanflow bins.
+
+If *low_inclusive* is true, then all intervals between pairs of edges include the low edge. If *high_inclusive* is true, then all intervals between pairs of edges include the high edge.
+
+If the binning is *circular*, then it represents a finite segment in which *interval.low* is topologically identified with *interval.high*. This could be used to convert [\u2012\u03c0, \u03c0) intervals into [0, 2\u03c0) intervals, for instance.
+
+*See also:*
+
+   * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
+   * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
+   * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
+   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, edges, overflow=None, low_inclusive=True, high_inclusive=False, circular=False):
@@ -3096,6 +3119,15 @@ class IrregularBinning(Binning, OverlappingFill):
     description = ""
     validity_rules = ()
     long_description = """
+
+
+
+*See also:*
+
+   * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
+   * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
+   * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
+   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
@@ -3523,6 +3555,17 @@ class SparseRegularBinning(Binning, BinLocation):
     description = ""
     validity_rules = ()
     long_description = """
+
+
+
+
+
+*See also:*
+
+   * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
+   * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
+   * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
+   * <<SparseRegularBinningBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
 """
 
     def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=MININT64, maxbin=MAXINT64):
