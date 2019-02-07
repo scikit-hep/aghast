@@ -3562,10 +3562,12 @@ class SparseRegularBinning(Binning, BinLocation):
     minbin         = typedproperty(_params["minbin"])
     maxbin         = typedproperty(_params["maxbin"])
 
-    description = ""
+    description = "Splits a one-dimensional axis into unordered, equal-sized real intervals aligned to a regular grid, which only need to be defined if the bin content is not zero."
     validity_rules = ()
     long_description = """
+This binning is intended for one-dimensional, real-valued data. Unlike <<RegularBinning>> and <<EdgesBinning>>, the intervals do not need to be abutting. Unlike <<IrregularBinning>>, they must be equal-sized, non-overlapping, and aligned to a grid.
 
+HERE
 
 
 

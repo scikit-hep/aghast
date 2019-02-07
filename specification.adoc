@@ -307,7 +307,7 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
 
 == SparseRegularBinning
 
-**
+*Splits a one-dimensional axis into unordered, equal-sized real intervals aligned to a regular grid, which only need to be defined if the bin content is not zero.*
 
 [%hardbreaks]
 •{nbsp} *bins*: list of int (required)
@@ -320,6 +320,13 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
 •{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
 *Details:*
+
+This binning is intended for one-dimensional, real-valued data. Unlike <<RegularBinning>> and <<EdgesBinning>>, the intervals do not need to be abutting. Unlike <<IrregularBinning>>, they must be equal-sized, non-overlapping, and aligned to a grid.
+
+HERE
+
+
+
 
 *See also:*
 
