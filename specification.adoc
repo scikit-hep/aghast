@@ -18,7 +18,6 @@
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-
 Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `"signal"` and `"control"` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
@@ -56,7 +55,6 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *script*: str (default: null)
 The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs. +
 The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs.
-
 The space is subdivided by an n-dimensional *axis*. As described in <<Collection>>, nesting a histogram within a collection prepends the collection's *axis*. The number of <<Axis>> objects is not necessarily the dimensionality of the space; some binnings, such as <<HexagonalBinning>>, define more than one dimension (though most do not).
 
 The *counts* are separate from the *axis*, though the buffers providing the counts must be exactly the right size to fit the n-dimensional binning (including axes inherited from a collection).
@@ -88,7 +86,6 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 The *statistics* must be empty or have a length equal to the number of dimensions in the *binning* (no binning is one-dimensional).
-
 The dimension or dimensions are subdivided by the *binning* property; all other properties provide additional information.
 
 If the axis represents a computed *expression*, it may be encoded here as a string. The *title* is a human-readable description.
@@ -110,7 +107,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+BinLocation.nonexistent+`)
 
 
-
 == RegularBinning
 
 **
@@ -122,7 +118,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *circular*: bool (default: false)
 
 
-
 == RealInterval
 
 **
@@ -132,7 +127,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *high*: float in [‒∞, ∞]
 •{nbsp} *low_inclusive*: bool (default: true)
 •{nbsp} *high_inclusive*: bool (default: false)
-
 
 
 == RealOverflow
@@ -154,7 +148,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+RealOverflow.in_nanflow+`)
 
 
-
 == HexagonalBinning
 
 **
@@ -173,7 +166,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *roverflow*: <<RealOverflow>> (default: null)
 
 
-
 == EdgesBinning
 
 **
@@ -184,7 +176,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *low_inclusive*: bool (default: true)
 •{nbsp} *high_inclusive*: bool (default: false)
 •{nbsp} *circular*: bool (default: false)
-
 
 
 == IrregularBinning
@@ -198,7 +189,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+IrregularBinning.undefined+`)
 
 
-
 == CategoryBinning
 
 **
@@ -207,7 +197,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *categories*: list of str
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
-
 
 
 == SparseRegularBinning
@@ -225,7 +214,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
 
-
 == FractionBinning
 
 **
@@ -238,7 +226,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+FractionBinning.undefined+`)
 
 
-
 == PredicateBinning
 
 **
@@ -249,14 +236,12 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+IrregularBinning.undefined+`)
 
 
-
 == VariationBinning
 
 **
 
 [%hardbreaks]
 •{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
-
 
 
 == Variation
@@ -269,7 +254,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *category_systematic*: list of str (default: null/empty)
 
 
-
 == Assignment
 
 **
@@ -279,14 +263,12 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *expression*: str
 
 
-
 == UnweightedCounts
 
 **
 
 [%hardbreaks]
 •{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-
 
 
 == WeightedCounts
@@ -298,7 +280,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: null)
 •{nbsp} *unweighted*: <<UnweightedCounts>> (default: null)
-
 
 
 == InterpretedInlineBuffer
@@ -318,7 +299,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+InterpretedBuffer.c_order+`)
 
 
-
 == InterpretedInlineInt64Buffer
 
 **
@@ -327,14 +307,12 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *buffer*: buffer
 
 
-
 == InterpretedInlineFloat64Buffer
 
 **
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
-
 
 
 == InterpretedExternalBuffer
@@ -358,7 +336,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *location*: str (default: null)
 
 
-
 == Profile
 
 **
@@ -369,7 +346,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
-
 
 
 == Statistics
@@ -384,7 +360,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *max*: <<Extremes>> (default: null)
 
 
-
 == Moments
 
 **
@@ -394,7 +369,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *n*: int in [‒128, 127]
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-
 
 
 == Quantiles
@@ -408,7 +382,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 
-
 == Modes
 
 **
@@ -418,7 +391,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
 
-
 == Extremes
 
 **
@@ -426,7 +398,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 [%hardbreaks]
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-
 
 
 == StatisticFilter
@@ -441,7 +412,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *excludes_nan*: bool (default: false)
 
 
-
 == Covariance
 
 **
@@ -452,7 +422,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
-
 
 
 == ParameterizedFunction
@@ -468,7 +437,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *script*: str (default: null)
 
 
-
 == Parameter
 
 **
@@ -476,7 +444,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 [%hardbreaks]
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-
 
 
 == EvaluatedFunction
@@ -492,7 +459,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-
 
 
 == BinnedEvaluatedFunction
@@ -511,7 +477,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *script*: str (default: null)
 
 
-
 == Ntuple
 
 **
@@ -526,7 +491,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-
 
 
 == Column
@@ -546,7 +510,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 
 
-
 == NtupleInstance
 
 **
@@ -556,7 +519,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
 
 
-
 == Chunk
 
 **
@@ -564,7 +526,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 [%hardbreaks]
 •{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
 •{nbsp} *metadata*: <<Metadata>> (default: null)
-
 
 
 == ColumnChunk
@@ -578,7 +539,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
 
 
-
 == Page
 
 **
@@ -587,14 +547,12 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
 
-
 == RawInlineBuffer
 
 **
 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
-
 
 
 == RawExternalBuffer
@@ -608,7 +566,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 (default: `+ExternalBuffer.memory+`)
 
 
-
 == Metadata
 
 **
@@ -616,7 +573,6 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 [%hardbreaks]
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
-
 
 
 == Decoration
@@ -627,5 +583,4 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
-
 
