@@ -235,8 +235,8 @@ def toroot(obj, name):
             stats1 = None
             stats2 = None
             stats3 = None
-            if obj.axis[0].statistics is not None:
-                for moment in obj.axis[0].statistics.moments:
+            if len(obj.axis[0].statistics) != 0:
+                for moment in obj.axis[0].statistics[0].moments:
                     sumwxn = moment.sumwxn.flatarray
                     if moment.n == 0 and moment.weightpower == 0 and len(sumwxn) == 1:
                         numentries, = sumwxn
@@ -333,7 +333,7 @@ def tostagg(obj, collection=False):
             sumw2 = Moments(InterpretedInlineBuffer.fromarray(stats[1:2]), n=0, weightpower=2)
             sumwx = Moments(InterpretedInlineBuffer.fromarray(stats[2:3]), n=1, weightpower=1)
             sumwx2 = Moments(InterpretedInlineBuffer.fromarray(stats[3:4]), n=2, weightpower=1)
-            statistics = Statistics(moments=[entries, sumw, sumw2, sumwx, sumwx2])
+            statistics = [Statistics(moments=[entries, sumw, sumw2, sumwx, sumwx2])]
 
             title = xaxis.GetTitle()
             if title == "":

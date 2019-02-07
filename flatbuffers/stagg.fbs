@@ -348,7 +348,7 @@ union Binning {
 table Axis {
   binning: Binning;      // note: it's allowed to have no binning
   expression: string;
-  statistics: Statistics;
+  statistics: [Statistics];
   title: string;
   metadata: Metadata;
   decoration: Decoration;

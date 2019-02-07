@@ -4317,7 +4317,7 @@ class Axis(Stagg):
     _params = {
         "binning":    stagg.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
         "expression": stagg.checktype.CheckString("Axis", "expression", required=False),
-        "statistics": stagg.checktype.CheckClass("Axis", "statistics", required=False, type=Statistics),
+        "statistics": stagg.checktype.CheckVector("Axis", "statistics", required=False, type=Statistics),
         "title":      stagg.checktype.CheckString("Axis", "title", required=False),
         "metadata":   stagg.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
         "decoration": stagg.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
@@ -4344,6 +4344,11 @@ class Axis(Stagg):
         self.decoration = decoration
 
     def _valid(self, seen, recursive):
+        if len(self.statistics) != 0:
+            if self.binning is None and len(self.statistics) != 1:
+                raise ValueError("one-dimensional axis (binning=None) must have 0 or 1 Statistics objects")
+            if self.binning is not None and len(self.statistics) != self.binning.dimensions:
+                raise ValueError("axis with dimension {0} (binning={1}) must have 0 or {0} Statistics objects".format(self.binning.dimensions, type(self.binning).__name__))
         if recursive:
             _valid(self.binning, seen, recursive)
             _valid(self.statistics, seen, recursive)
@@ -4363,15 +4368,23 @@ class Axis(Stagg):
         out._flatbuffers.BinningByTag = _MockFlatbuffers._ByTag(fb.Binning, fb.BinningType, _Binning_lookup)
         out._flatbuffers.Expression = fb.Expression
         out._flatbuffers.Statistics = fb.Statistics
+        out._flatbuffers.StatisticsLength = fb.StatisticsLength
         out._flatbuffers.Title = fb.Title
         out._flatbuffers.Metadata = fb.Metadata
         out._flatbuffers.Decoration = fb.Decoration
         return out
 
     def _toflatbuffers(self, builder):
+        statistics = None if len(self.statistics) == 0 else [x._toflatbuffers(builder) for x in self.statistics]
+
+        if statistics is not None:
+            stagg.stagg_generated.Axis.AxisStartStatisticsVector(builder, len(statistics))
+            for x in statistics[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            statistics = builder.EndVector(len(statistics))
+
         binning = None if self.binning is None else self.binning._toflatbuffers(builder)
         expression = None if self.expression is None else builder.CreateString(self.expression.encode("utf-8"))
-        statistics = None if self.statistics is None else self.statistics._toflatbuffers(builder)
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
@@ -4398,8 +4411,8 @@ class Axis(Stagg):
             args.append("binning={0}".format(_dumpeq(self.binning._dump(indent + "    ", width, end), indent, end)))
         if self.expression is not None:
             args.append("expression={0}".format(_dumpstring(self.expression)))
-        if self.statistics is not None:
-            args.append("statistics={0}".format(_dumpeq(self.statistics._dump(indent + "    ", width, end), indent, end)))
+        if len(self.statistics) != 0:
+            args.append("statistics=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.statistics], indent, width, end), indent, end)))
         if self.title is not None:
             args.append("title={0}".format(_dumpstring(self.title)))
         if self.metadata is not None:
@@ -5177,9 +5190,23 @@ class Histogram(Object):
     decoration          = typedproperty(_params["decoration"])
     script              = typedproperty(_params["script"])
 
-    description = ""
-    validity_rules = ()
+    description = "Histogram of a distribution, defined by a (possibly weighted) count of observations in each bin of an n-dimensional space."
+    validity_rules = ("The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*).",
+                      "The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*).")
     long_description = """
+The space is subdivided by an n-dimensional *axis*. As described in <<Collection>>, nesting a histogram within a collection prepends the collection's *axis*. The number of <<Axis>> objects is not necessarily the dimensionality of the space; some binnings, such as <<HexagonalBinning>>, define more than one dimension (though most do not).
+
+The *counts* are separate from the *axis*, though the buffers providing the counts must be exactly the right size to fit the n-dimensional binning (including axes inherited from a collection).
+
+Histograms with only *axis* and *counts* are pure distributions, histograms in the conventional sense. All other properties provide additional information about the dataset.
+
+Any *profiles* summarize dependent variables (where the *axis* defines independent variables). For instance, a profile can represent mean and standard deviation `y` values for an axis binned in `x`.
+
+The <<Axis>> and <<Profile>> classes internally define summary statistics, such as mean or median of that axis.
+
+
+
+
 """
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
@@ -6107,9 +6134,9 @@ Can be used to gather objects into a convenient package or to avoid duplication 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
 
-This predicate axis (defined by if-then rules when the histograms were filled) is prepended onto the axes defined in each histogram separately. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular. This way, hundreds or thousands of histograms with similar binning can be defined in a contiguous block without repetition of axis definition (good for efficiency and avoiding copy-paste errors).
+This predicate axis (defined by if-then rules when the histograms were filled) is prepended onto the axes defined in each histogram separately. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this collection has two axes: predicate, then regular, and the `"h2"` in this collection has three axes: predicate, then irregular, then irregular. This way, hundreds or thousands of histograms with similar binning can be defined in a contiguous block without repetition of axis definition (good for efficiency and avoiding copy-paste errors).
 
-To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of Collections. In the following example, `h1` and `h2` are subdivided but `h3` is not.
+To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put collections inside of collections. In the following example, `h1` and `h2` are subdivided but `h3` is not.
 
     Collection({"by region":
                     Collection({"h1": h1, "h2": h2},
@@ -6118,7 +6145,7 @@ To subdivide one set of objects and not another, or to subdivide two sets of obj
 
 Similarly, regions can be subdivided into subregions, and other binning types may be used.
 
-The buffers for each object must be the appropriate size to represent all of its axes, including any inherited from Collections. (For example, a counts buffer appropriate for a standalone `h1` would not fit an `"h1"` with prepended axes due to being in a Collection.)
+The buffers for each object must be the appropriate size to represent all of its axes, including any inherited from collections. (For example, a counts buffer appropriate for a standalone `h1` would not fit an `"h1"` with prepended axes due to being in a collection.)
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """

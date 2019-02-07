@@ -229,33 +229,33 @@ class Test(unittest.TestCase):
         h.checkvalid()
 
     def test_validity_StatisticFilter(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1, filter=StatisticFilter(excludes_nan=False))]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1, filter=StatisticFilter(excludes_nan=False))])])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
 
     def test_validity_Moments(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=0), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=0), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0, weightpower=1)])])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
 
     def test_validity_Extremes(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(min=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), max=Extremes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
 
     def test_validity_Quantiles(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.25), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 0.75)])])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=0), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=1)]))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=0), Quantiles(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), weightpower=1)])])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
 
     def test_validity_Modes(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics(mode=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0])))))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics(mode=Modes(InterpretedInlineBuffer.fromarray(numpy.array([0.0]))))])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))))
         h.checkvalid()
 
     def test_validity_Statistics(self):
-        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics()), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=Statistics())], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics()]), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics()])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
         h.checkvalid()
         h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
         h.checkvalid()
