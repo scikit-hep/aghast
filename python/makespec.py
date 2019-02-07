@@ -212,15 +212,15 @@ def formatted(cls, end="\n"):
             else:
                 raise AssertionError(type(check))
 
+            linebreak = " +" + end if len(name) + len(typestring) > 75 else " "
             if check.required:
-                defaultstring = " _(required)_"
+                defaultstring = "_(required)_"
             elif hasdefault:
-                linebreak = " +" + end if len(name) + len(typestring) > 75 else " "
-                defaultstring = " _(default: {0})_".format(num([] if islist and param.default is None else param.default))
+                defaultstring = "_(default: {0})_".format(num([] if islist and param.default is None else param.default))
             else:
-                defaultstring = ""
+                raise AssertionError
 
-            out.append(u"\u2022{nbsp}" + " *{0}*{1}: {2}".format(name, defaultstring, typestring))
+            out.append(u"\u2022{nbsp}" + " *{0}*: {1}{2}{3}".format(name, typestring, linebreak, defaultstring))
 
     if len(cls.validity_rules) != 0:
         out.append((" +" + end).join(cls.validity_rules))
