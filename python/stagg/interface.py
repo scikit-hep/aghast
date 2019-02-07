@@ -3373,9 +3373,12 @@ class CategoryBinning(Binning, BinLocation):
     categories = typedproperty(_params["categories"])
     loc_overflow = typedproperty(_params["loc_overflow"])
 
-    description = ""
-    validity_rules = ()
+    description = "Associates categories from a categorical dataset with bins."
+    validity_rules = ("The *categories* must be unique.",)
     long_description = """
+This binning is intended for string-valued categorical data (or values that can be converted to strings without losing uniqueness). Each named category in *categories* corresponds to one bin.
+
+If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the filling procedure. Otherwise, the overflow bin corresponds to unspecified strings, and it can be `below` or `above` the normal bins. Unlike <<RealOverflow>>, which has up to three overflow bins (underflow, overflow, and nanflow), no distinction is made among `below3`, `below2`, `below1` or `above1`, `above2`, `above3`.
 """
 
     def __init__(self, categories, loc_overflow=BinLocation.nonexistent):

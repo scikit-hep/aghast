@@ -291,16 +291,19 @@ Irregular bins are usually not directly created by histogramming libraries, but 
 
 == CategoryBinning
 
-**
+*Associates categories from a categorical dataset with bins.*
 
 [%hardbreaks]
 •{nbsp} *categories*: list of str (required)
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
+The *categories* must be unique.
 
 *Details:*
 
+This binning is intended for string-valued categorical data (or values that can be converted to strings without losing uniqueness). Each named category in *categories* corresponds to one bin.
 
+If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the filling procedure. Otherwise, the overflow bin corresponds to unspecified strings, and it can be `below` or `above` the normal bins. Unlike <<RealOverflow>>, which has up to three overflow bins (underflow, overflow, and nanflow), no distinction is made among `below3`, `below2`, `below1` or `above1`, `above2`, `above3`.
 
 == SparseRegularBinning
 
