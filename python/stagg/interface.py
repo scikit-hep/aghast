@@ -4331,7 +4331,7 @@ class Axis(Stagg):
     decoration = typedproperty(_params["decoration"])
 
     description = "Axis of a histogram or binned function representing one or more binned dimensions."
-    validity_rules = ("The *statistics* must be empty or have a length equal to the number of dimensions in the *binning* (no binning is one-dimensional).")
+    validity_rules = ("The *statistics* must be empty or have a length equal to the number of dimensions in the *binning* (no binning is one-dimensional).",)
     long_description = """
 The dimension or dimensions are subdivided by the *binning* property; all other properties provide additional information.
 
