@@ -8,26 +8,20 @@
 *  *axis*: list of <<Axis>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === Histogram
 
 * required  *axis*: list of <<Axis>> with length in _[1, inf)_
 * required  *counts*: <<UnweightedCounts>> or <<WeightedCounts>>
-*  *profile*: list of <<Profile>> +
-(default: `+[]+`)
-*  *axis_covariances*: list of <<Covariance>> +
-(default: `+[]+`)
-*  *profile_covariances*: list of <<Covariance>> +
-(default: `+[]+`)
-*  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> +
-(default: `+[]+`)
+*  *profile*: list of <<Profile>> (default: `+[]+`)
+*  *axis_covariances*: list of <<Covariance>> (default: `+[]+`)
+*  *profile_covariances*: list of <<Covariance>> (default: `+[]+`)
+*  *functions*: list of <<ParameterizedFunction>> or <<EvaluatedFunction>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === Axis
@@ -35,12 +29,10 @@
 *  *binning*: <<IntegerBinning>> or <<RegularBinning>> or <<HexagonalBinning>> or <<EdgesBinning>> or <<IrregularBinning>> or <<CategoryBinning>> or <<SparseRegularBinning>> or <<FractionBinning>> or <<PredicateBinning>> or <<VariationBinning>> +
 (default: `+None+`)
 *  *expression*: str (default: `+None+`)
-*  *statistics*: <<Statistics>> +
-(default: `+None+`)
+*  *statistics*: <<Statistics>> (default: `+None+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 
 === IntegerBinning
 
@@ -55,8 +47,7 @@
 
 * required  *num*: int in _[1, inf)_
 * required  *interval*: <<RealInterval>>
-*  *overflow*: <<RealOverflow>> +
-(default: `+None+`)
+*  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *circular*: bool (default: `+False+`)
 
 === RealInterval
@@ -89,22 +80,16 @@
 * required  *rmax*: int in _(-inf, inf)_
 *  *coordinates*: one of {`+HexagonalBinning.offset+`, `+HexagonalBinning.doubled_offset+`, `+HexagonalBinning.cube_xy+`, `+HexagonalBinning.cube_yz+`, `+HexagonalBinning.cube_xz+`} +
 (default: `+HexagonalBinning.offset+`)
-*  *xorigin*: float in _(-inf, inf)_ +
-(default: `+0.0+`)
-*  *yorigin*: float in _(-inf, inf)_ +
-(default: `+0.0+`)
-*  *qangle*: float in _[-1.5707963267948966, 1.5707963267948966]_ +
-(default: `+0.0+`)
-*  *qoverflow*: <<RealOverflow>> +
-(default: `+None+`)
-*  *roverflow*: <<RealOverflow>> +
-(default: `+None+`)
+*  *xorigin*: float in _(-inf, inf)_ (default: `+0.0+`)
+*  *yorigin*: float in _(-inf, inf)_ (default: `+0.0+`)
+*  *qangle*: float in _[-1.5707963267948966, 1.5707963267948966]_ (default: `+0.0+`)
+*  *qoverflow*: <<RealOverflow>> (default: `+None+`)
+*  *roverflow*: <<RealOverflow>> (default: `+None+`)
 
 === EdgesBinning
 
 * required  *edges*: list of float with length in _[1, inf)_
-*  *overflow*: <<RealOverflow>> +
-(default: `+None+`)
+*  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *low_inclusive*: bool (default: `+True+`)
 *  *high_inclusive*: bool (default: `+False+`)
 *  *circular*: bool (default: `+False+`)
@@ -112,8 +97,7 @@
 === IrregularBinning
 
 * required  *intervals*: list of <<RealInterval>> with length in _[1, inf)_
-*  *overflow*: <<RealOverflow>> +
-(default: `+None+`)
+*  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
@@ -127,16 +111,12 @@
 
 * required  *bins*: list of int
 * required  *bin_width*: float in _(0, inf]_
-*  *origin*: float in _[-inf, inf]_ +
-(default: `+0.0+`)
-*  *overflow*: <<RealOverflow>> +
-(default: `+None+`)
+*  *origin*: float in _[-inf, inf]_ (default: `+0.0+`)
+*  *overflow*: <<RealOverflow>> (default: `+None+`)
 *  *low_inclusive*: bool (default: `+True+`)
 *  *high_inclusive*: bool (default: `+False+`)
-*  *minbin*: int in _[-9223372036854775808, 9223372036854775807]_ +
-(default: `+-9223372036854775808+`)
-*  *maxbin*: int in _[-9223372036854775808, 9223372036854775807]_ +
-(default: `+9223372036854775807+`)
+*  *minbin*: int in _[-9223372036854775808, 9223372036854775807]_ (default: `+-9223372036854775808+`)
+*  *maxbin*: int in _[-9223372036854775808, 9223372036854775807]_ (default: `+9223372036854775807+`)
 
 === FractionBinning
 
@@ -159,10 +139,8 @@
 === Variation
 
 * required  *assignments*: list of <<Assignment>>
-*  *systematic*: list of float +
-(default: `+[]+`)
-*  *category_systematic*: list of str +
-(default: `+[]+`)
+*  *systematic*: list of float (default: `+[]+`)
+*  *category_systematic*: list of str (default: `+[]+`)
 
 === Assignment
 
@@ -178,22 +156,17 @@
 * required  *sumw*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *sumw2*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: `+None+`)
-*  *unweighted*: <<UnweightedCounts>> +
-(default: `+None+`)
+*  *unweighted*: <<UnweightedCounts>> (default: `+None+`)
 
 === InterpretedInlineBuffer
 
 * required  *buffer*: buffer
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
-(default: `+[]+`)
-*  *postfilter_slice*: slice (start:stop:step) +
-(default: `+None+`)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: `+[]+`)
+*  *postfilter_slice*: slice (start:stop:step) (default: `+None+`)
 *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
-(default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
-(default: `+InterpretedBuffer.c_order+`)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
+*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} (default: `+InterpretedBuffer.c_order+`)
 
 === InterpretedInlineInt64Buffer
 
@@ -209,16 +182,12 @@
 * required  *numbytes*: int in _[0, inf)_
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
-(default: `+[]+`)
-*  *postfilter_slice*: slice (start:stop:step) +
-(default: `+None+`)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: `+[]+`)
+*  *postfilter_slice*: slice (start:stop:step) (default: `+None+`)
 *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
-(default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
-(default: `+InterpretedBuffer.c_order+`)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
+*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} (default: `+InterpretedBuffer.c_order+`)
 *  *location*: str (default: `+None+`)
 
 === Profile
@@ -227,15 +196,12 @@
 * required  *statistics*: <<Statistics>>
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 
 === Statistics
 
-*  *moments*: list of <<Moments>> +
-(default: `+[]+`)
-*  *quantiles*: list of <<Quantiles>> +
-(default: `+[]+`)
+*  *moments*: list of <<Moments>> (default: `+[]+`)
+*  *quantiles*: list of <<Quantiles>> (default: `+[]+`)
 *  *mode*: <<Modes>> (default: `+None+`)
 *  *min*: <<Extremes>> (default: `+None+`)
 *  *max*: <<Extremes>> (default: `+None+`)
@@ -244,39 +210,30 @@
 
 * required  *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 * required  *n*: int in _[-128, 127]_
-*  *weightpower*: int in _[-128, 127]_ +
-(default: `+0+`)
-*  *filter*: <<StatisticFilter>> +
-(default: `+None+`)
+*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+*  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === Quantiles
 
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-* required  *p*: float in _[0.0, 1.0]_ +
-(default: `+0.5+`)
-*  *weightpower*: int in _[-128, 127]_ +
-(default: `+0+`)
-*  *filter*: <<StatisticFilter>> +
-(default: `+None+`)
+* required  *p*: float in _[0.0, 1.0]_ (default: `+0.5+`)
+*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+*  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === Modes
 
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *filter*: <<StatisticFilter>> +
-(default: `+None+`)
+*  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === Extremes
 
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *filter*: <<StatisticFilter>> +
-(default: `+None+`)
+*  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === StatisticFilter
 
-*  *min*: float in _[-inf, inf]_ +
-(default: `+-inf+`)
-*  *max*: float in _[-inf, inf]_ +
-(default: `+inf+`)
+*  *min*: float in _[-inf, inf]_ (default: `+-inf+`)
+*  *max*: float in _[-inf, inf]_ (default: `+inf+`)
 *  *excludes_minf*: bool (default: `+False+`)
 *  *excludes_pinf*: bool (default: `+False+`)
 *  *excludes_nan*: bool (default: `+False+`)
@@ -286,20 +243,16 @@
 * required  *xindex*: int in _[0, inf)_
 * required  *yindex*: int in _[0, inf)_
 * required  *sumwxy*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
-*  *weightpower*: int in _[-128, 127]_ +
-(default: `+0+`)
-*  *filter*: <<StatisticFilter>> +
-(default: `+None+`)
+*  *weightpower*: int in _[-128, 127]_ (default: `+0+`)
+*  *filter*: <<StatisticFilter>> (default: `+None+`)
 
 === ParameterizedFunction
 
 * required  *expression*: str
-*  *parameters*: list of <<Parameter>> +
-(default: `+[]+`)
+*  *parameters*: list of <<Parameter>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === Parameter
@@ -312,12 +265,10 @@
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: `+None+`)
-*  *errors*: list of <<Quantiles>> +
-(default: `+[]+`)
+*  *errors*: list of <<Quantiles>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === BinnedEvaluatedFunction
@@ -326,50 +277,39 @@
 * required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 *  *derivatives*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (default: `+None+`)
-*  *errors*: list of <<Quantiles>> +
-(default: `+[]+`)
+*  *errors*: list of <<Quantiles>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === Ntuple
 
 * required  *columns*: list of <<Column>> with length in _[1, inf)_
 * required  *instances*: list of <<NtupleInstance>> with length in _[1, inf)_
-*  *column_statistics*: list of <<Statistics>> +
-(default: `+[]+`)
-*  *column_covariances*: list of <<Covariance>> +
-(default: `+[]+`)
-*  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> +
-(default: `+[]+`)
+*  *column_statistics*: list of <<Statistics>> (default: `+[]+`)
+*  *column_covariances*: list of <<Covariance>> (default: `+[]+`)
+*  *functions*: list of <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: `+[]+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 *  *script*: str (default: `+None+`)
 
 === Column
 
 * required  *identifier*: unique str
 * required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
-(default: `+Interpretation.little_endian+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
-(default: `+[]+`)
-*  *postfilter_slice*: slice (start:stop:step) +
-(default: `+None+`)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: `+[]+`)
+*  *postfilter_slice*: slice (start:stop:step) (default: `+None+`)
 *  *title*: str (default: `+None+`)
 *  *metadata*: <<Metadata>> (default: `+None+`)
-*  *decoration*: <<Decoration>> +
-(default: `+None+`)
+*  *decoration*: <<Decoration>> (default: `+None+`)
 
 === NtupleInstance
 
 * required  *chunks*: list of <<Chunk>>
-*  *chunk_offsets*: list of int +
-(default: `+[]+`)
+*  *chunk_offsets*: list of int (default: `+[]+`)
 
 === Chunk
 
@@ -380,10 +320,8 @@
 
 * required  *pages*: list of <<Page>>
 * required  *page_offsets*: list of int with length in _[1, inf)_
-*  *page_min*: list of <<Extremes>> +
-(default: `+[]+`)
-*  *page_max*: list of <<Extremes>> +
-(default: `+[]+`)
+*  *page_min*: list of <<Extremes>> (default: `+[]+`)
+*  *page_max*: list of <<Extremes>> (default: `+[]+`)
 
 === Page
 
@@ -403,8 +341,7 @@
 === Metadata
 
 * required  *data*: str
-* required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} +
-(default: `+Metadata.unspecified+`)
+* required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
 === Decoration
 
