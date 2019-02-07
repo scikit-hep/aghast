@@ -223,7 +223,6 @@ def formatted(cls, end="\n"):
             out.append(u"\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     if len(cls.validity_rules) != 0:
-        out.append("{empty} +")
         out.append((" +" + end).join(cls.validity_rules))
 
     if cls.long_description is not None:

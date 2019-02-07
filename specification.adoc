@@ -54,7 +54,6 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-{empty} +
 The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*). +
 The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*).
 
