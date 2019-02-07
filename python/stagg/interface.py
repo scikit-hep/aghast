@@ -519,6 +519,10 @@ class Metadata(Stagg):
     data     = typedproperty(_params["data"])
     language = typedproperty(_params["language"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, data, language=unspecified):
         self.data = data
         self.language = language
@@ -556,6 +560,10 @@ class Decoration(Stagg):
 
     data     = typedproperty(_params["data"])
     language = typedproperty(_params["language"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, data, language=unspecified):
         self.data = data
@@ -836,6 +844,10 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, buffer):
         self.buffer = buffer
 
@@ -881,6 +893,10 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     numbytes      = typedproperty(_params["numbytes"])
     external_source = typedproperty(_params["external_source"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory):
         self.pointer = pointer
         self.numbytes = numbytes
@@ -922,6 +938,10 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     dtype            = typedproperty(_params["dtype"])
     endianness       = typedproperty(_params["endianness"])
     dimension_order  = typedproperty(_params["dimension_order"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, buffer, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order):
         self.buffer = buffer
@@ -1048,6 +1068,10 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, buffer):
         self.buffer = buffer
 
@@ -1119,6 +1143,10 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
         }
 
     buffer = typedproperty(_params["buffer"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, buffer):
         self.buffer = buffer
@@ -1207,6 +1235,10 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     endianness       = typedproperty(_params["endianness"])
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=None):
         self.pointer = pointer
@@ -1329,6 +1361,10 @@ class StatisticFilter(Stagg):
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, min=-numpy.inf, max=numpy.inf, excludes_minf=False, excludes_pinf=False, excludes_nan=False):
         self.min = min
         self.max = max
@@ -1371,6 +1407,10 @@ class Moments(Stagg):
     n           = typedproperty(_params["n"])
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, sumwxn, n, weightpower=0, filter=None):
         self.sumwxn = sumwxn
@@ -1425,6 +1465,10 @@ class Extremes(Stagg):
     values = typedproperty(_params["values"])
     filter = typedproperty(_params["filter"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
@@ -1472,6 +1516,10 @@ class Quantiles(Stagg):
     p           = typedproperty(_params["p"])
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, values, p=0.5, weightpower=0, filter=None):
         self.values = values
@@ -1526,6 +1574,10 @@ class Modes(Stagg):
     values = typedproperty(_params["values"])
     filter = typedproperty(_params["filter"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, values, filter=None):
         self.values = values
         self.filter = filter
@@ -1575,6 +1627,10 @@ class Statistics(Stagg):
     mode     = typedproperty(_params["mode"])
     min    = typedproperty(_params["min"])
     max    = typedproperty(_params["max"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, moments=None, quantiles=None, mode=None, min=None, max=None):
         self.moments = moments
@@ -1657,6 +1713,10 @@ class Covariance(Stagg):
     sumwxy      = typedproperty(_params["sumwxy"])
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, xindex, yindex, sumwxy, weightpower=0, filter=None):
         self.xindex = xindex
@@ -1978,6 +2038,10 @@ class IntegerBinning(Binning, BinLocation):
     loc_underflow = typedproperty(_params["loc_underflow"])
     loc_overflow  = typedproperty(_params["loc_overflow"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, min, max, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent):
         self.min = min
         self.max = max
@@ -2173,6 +2237,10 @@ class RealInterval(Stagg):
     low_inclusive  = typedproperty(_params["low_inclusive"])
     high_inclusive = typedproperty(_params["high_inclusive"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
         self.low = low
         self.high = high
@@ -2226,6 +2294,10 @@ class RealOverflow(Stagg, BinLocation):
     minf_mapping  = typedproperty(_params["minf_mapping"])
     pinf_mapping  = typedproperty(_params["pinf_mapping"])
     nan_mapping   = typedproperty(_params["nan_mapping"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, loc_underflow=BinLocation.nonexistent, loc_overflow=BinLocation.nonexistent, loc_nanflow=BinLocation.nonexistent, minf_mapping=in_underflow, pinf_mapping=in_overflow, nan_mapping=in_nanflow):
         self.loc_underflow = loc_underflow
@@ -2399,6 +2471,10 @@ class RegularBinning(Binning):
     interval = typedproperty(_params["interval"])
     overflow = typedproperty(_params["overflow"])
     circular = typedproperty(_params["circular"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, num, interval, overflow=None, circular=False):
         self.num = num
@@ -2616,6 +2692,10 @@ class HexagonalBinning(Binning):
     qoverflow   = typedproperty(_params["qoverflow"])
     roverflow   = typedproperty(_params["roverflow"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, qoverflow=None, roverflow=None):
         self.qmin = qmin
         self.qmax = qmax
@@ -2743,6 +2823,10 @@ class EdgesBinning(Binning):
     low_inclusive  = typedproperty(_params["low_inclusive"])
     high_inclusive = typedproperty(_params["high_inclusive"])
     circular       = typedproperty(_params["circular"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, edges, overflow=None, low_inclusive=True, high_inclusive=False, circular=False):
         self.edges = edges
@@ -2958,6 +3042,10 @@ class IrregularBinning(Binning, OverlappingFill):
     intervals        = typedproperty(_params["intervals"])
     overflow         = typedproperty(_params["overflow"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
         self.intervals = intervals
@@ -3195,6 +3283,10 @@ class CategoryBinning(Binning, BinLocation):
     categories = typedproperty(_params["categories"])
     loc_overflow = typedproperty(_params["loc_overflow"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, categories, loc_overflow=BinLocation.nonexistent):
         self.categories = categories
         self.loc_overflow = loc_overflow
@@ -3375,6 +3467,10 @@ class SparseRegularBinning(Binning, BinLocation):
     high_inclusive = typedproperty(_params["high_inclusive"])
     minbin         = typedproperty(_params["minbin"])
     maxbin         = typedproperty(_params["maxbin"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=MININT64, maxbin=MAXINT64):
         self.bins = bins
@@ -3724,6 +3820,10 @@ class FractionBinning(Binning):
     layout_reversed = typedproperty(_params["layout_reversed"])
     error_method    = typedproperty(_params["error_method"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, layout=passall, layout_reversed=False, error_method=undefined):
         self.layout = layout
         self.layout_reversed = layout_reversed
@@ -3821,6 +3921,10 @@ class PredicateBinning(Binning, OverlappingFill):
 
     predicates       = typedproperty(_params["predicates"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, predicates, overlapping_fill=OverlappingFill.undefined):
         self.predicates = predicates
@@ -3967,6 +4071,10 @@ class Assignment(Stagg):
     identifier = typedproperty(_params["identifier"])
     expression = typedproperty(_params["expression"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, identifier, expression):
         self.identifier = identifier
         self.expression  = expression 
@@ -3995,6 +4103,10 @@ class Variation(Stagg):
     assignments         = typedproperty(_params["assignments"])
     systematic          = typedproperty(_params["systematic"])
     category_systematic = typedproperty(_params["category_systematic"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
         self.assignments = assignments
@@ -4066,6 +4178,10 @@ class VariationBinning(Binning):
         }
 
     variations = typedproperty(_params["variations"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, variations):
         self.variations = variations
@@ -4185,6 +4301,10 @@ class Axis(Stagg):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, binning=None, expression=None, statistics=None, title=None, metadata=None, decoration=None):
         self.binning = binning
         self.expression = expression
@@ -4274,6 +4394,10 @@ class Profile(Stagg):
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, expression, statistics, title=None, metadata=None, decoration=None):
         self.expression = expression
@@ -4377,6 +4501,10 @@ class UnweightedCounts(Counts):
 
     counts = typedproperty(_params["counts"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, counts):
         self.counts = counts
 
@@ -4436,6 +4564,10 @@ class WeightedCounts(Counts):
     sumw       = typedproperty(_params["sumw"])
     sumw2      = typedproperty(_params["sumw2"])
     unweighted = typedproperty(_params["unweighted"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, sumw, sumw2=None, unweighted=None):
         self.sumw = sumw
@@ -4544,6 +4676,10 @@ class Parameter(Stagg):
     identifier = typedproperty(_params["identifier"])
     values     = typedproperty(_params["values"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, identifier, values):
         self.identifier = identifier
         self.values = values
@@ -4620,6 +4756,10 @@ class ParameterizedFunction(Function, FunctionObject):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
     script     = typedproperty(_params["script"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, expression, parameters=None, title=None, metadata=None, decoration=None, script=None):
         self.expression = expression
@@ -4741,6 +4881,10 @@ class EvaluatedFunction(Function):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
         self.values = values
         self.derivatives = derivatives
@@ -4848,6 +4992,10 @@ class BinnedEvaluatedFunction(FunctionObject):
     metadata    = typedproperty(_params["metadata"])
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, axis, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
@@ -4991,6 +5139,10 @@ class Histogram(Object):
     metadata            = typedproperty(_params["metadata"])
     decoration          = typedproperty(_params["decoration"])
     script              = typedproperty(_params["script"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.axis = axis
@@ -5245,6 +5397,10 @@ class Page(Stagg):
 
     buffer = typedproperty(_params["buffer"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, buffer):
         self.buffer = buffer
 
@@ -5323,6 +5479,10 @@ class ColumnChunk(Stagg):
     page_offsets = typedproperty(_params["page_offsets"])
     page_min  = typedproperty(_params["page_min"])
     page_max  = typedproperty(_params["page_max"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, pages, page_offsets, page_min=None, page_max=None):
         self.pages = pages
@@ -5459,6 +5619,10 @@ class Chunk(Stagg):
     column_chunks = typedproperty(_params["column_chunks"])
     metadata      = typedproperty(_params["metadata"])
 
+    description = ""
+    long_description = """
+"""
+
     def __init__(self, column_chunks, metadata=None):
         self.column_chunks = column_chunks
         self.metadata = metadata
@@ -5527,6 +5691,10 @@ class Column(Stagg, Interpretation):
     title            = typedproperty(_params["title"])
     metadata         = typedproperty(_params["metadata"])
     decoration       = typedproperty(_params["decoration"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, filters=None, postfilter_slice=None, title=None, metadata=None, decoration=None):
         self.identifier = identifier
@@ -5606,6 +5774,10 @@ class NtupleInstance(Stagg):
 
     chunks              = typedproperty(_params["chunks"])
     chunk_offsets       = typedproperty(_params["chunk_offsets"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, chunks, chunk_offsets=None):
         self.chunks = chunks
@@ -5718,6 +5890,10 @@ class Ntuple(Object):
     metadata           = typedproperty(_params["metadata"])
     decoration         = typedproperty(_params["decoration"])
     script             = typedproperty(_params["script"])
+
+    description = ""
+    long_description = """
+"""
 
     def __init__(self, columns, instances, column_statistics=None, column_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.columns = columns
@@ -5878,6 +6054,16 @@ class Collection(Object):
     metadata       = typedproperty(_params["metadata"])
     decoration     = typedproperty(_params["decoration"])
     script         = typedproperty(_params["script"])
+
+    description = "Collection of named objects, possibly with one or more common axis."
+    long_description = """
+Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (6 histograms total).
+
+    Collection({"h1": h1, "h2": h2, "h3": h3},
+               axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
+
+
+"""
 
     def __init__(self, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):
         self.objects = objects

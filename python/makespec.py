@@ -205,7 +205,10 @@ def formatted(cls, end="\n"):
                         ")" if check.maxlen == float("inf") else "]")
                 else:
                     withlength = ""
-                typestring = "list of {0}{1}".format(subtype, withlength)
+                if isinstance(check, stagg.checktype.CheckVector):
+                    typestring = "list of {0}{1}".format(subtype, withlength)
+                else:
+                    typestring = u"str \u2192 {0}{1}".format(subtype, withlength)
             elif isinstance(check, stagg.checktype.CheckBuffer):
                 typestring = "buffer"
             elif isinstance(check, stagg.checktype.CheckSlice):
@@ -220,6 +223,10 @@ def formatted(cls, end="\n"):
                 defaultstring = ""
 
             out.append(u"\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+
+    out.append(cls.description.strip())
+    if cls.long_description is not None:
+        out.append(cls.long_description.strip())
 
     return end.join(out)
 
