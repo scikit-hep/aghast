@@ -2257,9 +2257,11 @@ class RealInterval(Stagg):
     low_inclusive  = typedproperty(_params["low_inclusive"])
     high_inclusive = typedproperty(_params["high_inclusive"])
 
-    description = ""
-    validity_rules = ()
+    description = "Represents a real interval with inclusive (closed) or exclusive (open) endpoints."
+    validity_rules = ("The *low* limit must be less than or equal to the *high* limit.",
+                      "The *low* limit may only be equal to the *high* limit if at least one endpoint is inclusive (*low_inclusive* or *high_inclusive* is true). Such an interval would represent a single real value.")
     long_description = """
+A single interval defines a <<RegularBinning>> and a set of intervals defines an <<IrregularBinning>>.
 """
 
     def __init__(self, low, high, low_inclusive=True, high_inclusive=False):
