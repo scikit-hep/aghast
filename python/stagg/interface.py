@@ -2053,7 +2053,7 @@ class IntegerBinning(Binning, BinLocation):
     loc_underflow = typedproperty(_params["loc_underflow"])
     loc_overflow  = typedproperty(_params["loc_overflow"])
 
-    description = "Splits an axis into a contiguous set of integer-valued bins."
+    description = "Splits a one-dimensional axis into a contiguous set of integer-valued bins."
     validity_rules = ("The *min* must be strictly less than the *max*.",
                       "The *loc_underflow* and *loc_overflow* must not be equal unless they are `nonexistent`.")
     long_description = """
@@ -2503,7 +2503,7 @@ class RegularBinning(Binning):
     overflow = typedproperty(_params["overflow"])
     circular = typedproperty(_params["circular"])
 
-    description = "Splits an axis into an ordered, abutting set of equal-sized real intervals."
+    description = "Splits a one-dimensional axis into an ordered, abutting set of equal-sized real intervals."
     validity_rules = ("The *interval.low* and *interval.high* limits must both be finite.",
                       "The *interval.low_inclusive* and *interval.high_inclusive* cannot both be true.")
     long_description = """
@@ -2730,9 +2730,15 @@ class HexagonalBinning(Binning):
     qoverflow   = typedproperty(_params["qoverflow"])
     roverflow   = typedproperty(_params["roverflow"])
 
-    description = ""
-    validity_rules = ()
+    description = "Splits a two-dimensional axis into a tiling of equal-sized hexagons."
+    validity_rules = ("The *qmin* must be strictly less than the *qmax*.",
+                      "The *rmin* must be strictly less than the *rmax*.")
     long_description = """
+
+
+https://www.meccanismocomplesso.org/hexagonal-binning[described here]
+
+
 """
 
     def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, qoverflow=None, roverflow=None):

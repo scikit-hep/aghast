@@ -107,7 +107,7 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 
 == IntegerBinning
 
-*Splits an axis into a contiguous set of integer-valued bins.*
+*Splits a one-dimensional axis into a contiguous set of integer-valued bins.*
 
 [%hardbreaks]
 •{nbsp}required  *min*: int in (‒∞, ∞)
@@ -127,7 +127,7 @@ If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots
 
 == RegularBinning
 
-*Splits an axis into an ordered, abutting set of equal-sized real intervals.*
+*Splits a one-dimensional axis into an ordered, abutting set of equal-sized real intervals.*
 
 [%hardbreaks]
 •{nbsp}required  *num*: int in [1, ∞)
@@ -192,7 +192,7 @@ The *minf_mapping* specifies whether ‒∞ values were ignored when the histogr
 
 == HexagonalBinning
 
-**
+*Splits a two-dimensional axis into a tiling of equal-sized hexagons.*
 
 [%hardbreaks]
 •{nbsp}required  *qmin*: int in (‒∞, ∞)
@@ -206,10 +206,12 @@ The *minf_mapping* specifies whether ‒∞ values were ignored when the histogr
 •{nbsp} *qangle*: float in [‒π/2, π/2] (default: 0.0)
 •{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
 •{nbsp} *roverflow*: <<RealOverflow>> (default: null)
+The *qmin* must be strictly less than the *qmax*. +
+The *rmin* must be strictly less than the *rmax*.
 
 *Details:*
 
-
+https://www.meccanismocomplesso.org/hexagonal-binning[described here]
 
 == EdgesBinning
 
