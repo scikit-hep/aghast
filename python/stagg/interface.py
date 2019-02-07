@@ -6057,12 +6057,21 @@ class Collection(Object):
 
     description = "Collection of named objects, possibly with one or more common axis."
     long_description = """
-Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (6 histograms total).
+Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
 
+This signal/control axis (defined by a predicate when filling: if in signal region, if in control region) is prepended onto each histogram's own axis. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular.
 
+To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of collections. In the following example, `h1` is not subdivided but `h2` and `h3` are.
+
+    Collection({"h1": h1,
+                "cut by region":
+                    Collection({"h2": h2, "h3": h3},
+                    axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])})
+
+Similarly, regions can be subdivided into subregions, and other binning types may be used.
 """
 
     def __init__(self, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):

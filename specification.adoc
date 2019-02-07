@@ -18,11 +18,26 @@
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
+
++
 Collection of named objects, possibly with one or more common axis.
-Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (6 histograms total).
+
++
+Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
+
+This signal/control axis (defined by a predicate when filling: if in signal region, if in control region) is prepended onto each histogram's own axis. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular.
+
+To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of collections. In the following example, `h1` is not subdivided but `h2` and `h3` are.
+
+    Collection({"h1": h1,
+                "cut by region":
+                    Collection({"h2": h2, "h3": h3},
+                    axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])})
+
+Similarly, regions can be subdivided into subregions, and other binning types may be used.
 
 === Histogram
 
@@ -38,6 +53,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 
++
+
+
++
 
 
 === Axis
@@ -51,6 +70,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 
++
+
+
++
 
 
 === IntegerBinning
@@ -63,6 +86,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
++
+
+
++
 
 
 === RegularBinning
@@ -73,6 +100,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
 •{nbsp} *circular*: bool (default: false)
 
++
+
+
++
 
 
 === RealInterval
@@ -83,6 +114,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *low_inclusive*: bool (default: true)
 •{nbsp} *high_inclusive*: bool (default: false)
 
++
+
+
++
 
 
 === RealOverflow
@@ -101,6 +136,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *nan_mapping*: one of {`+RealOverflow.missing+`, `+RealOverflow.in_underflow+`, `+RealOverflow.in_overflow+`, `+RealOverflow.in_nanflow+`} +
 (default: `+RealOverflow.in_nanflow+`)
 
++
+
+
++
 
 
 === HexagonalBinning
@@ -118,6 +157,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
 •{nbsp} *roverflow*: <<RealOverflow>> (default: null)
 
++
+
+
++
 
 
 === EdgesBinning
@@ -129,6 +172,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *high_inclusive*: bool (default: false)
 •{nbsp} *circular*: bool (default: false)
 
++
+
+
++
 
 
 === IrregularBinning
@@ -139,6 +186,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
++
+
+
++
 
 
 === CategoryBinning
@@ -148,6 +199,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *loc_overflow*: one of {`+BinLocation.below3+`, `+BinLocation.below2+`, `+BinLocation.below1+`, `+BinLocation.nonexistent+`, `+BinLocation.above1+`, `+BinLocation.above2+`, `+BinLocation.above3+`} +
 (default: `+BinLocation.nonexistent+`)
 
++
+
+
++
 
 
 === SparseRegularBinning
@@ -162,6 +217,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *minbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: ‒2⁶³)
 •{nbsp} *maxbin*: int in [‒2⁶³, 2⁶³ ‒ 1] (default: 2⁶³ ‒ 1)
 
++
+
+
++
 
 
 === FractionBinning
@@ -173,6 +232,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
 (default: `+FractionBinning.undefined+`)
 
++
+
+
++
 
 
 === PredicateBinning
@@ -182,6 +245,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
 (default: `+IrregularBinning.undefined+`)
 
++
+
+
++
 
 
 === VariationBinning
@@ -189,6 +256,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *variations*: list of <<Variation>> with length in [1, ∞)
 
++
+
+
++
 
 
 === Variation
@@ -198,6 +269,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *systematic*: list of float (default: null/empty)
 •{nbsp} *category_systematic*: list of str (default: null/empty)
 
++
+
+
++
 
 
 === Assignment
@@ -206,6 +281,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *expression*: str
 
++
+
+
++
 
 
 === UnweightedCounts
@@ -213,6 +292,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *counts*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
++
+
+
++
 
 
 === WeightedCounts
@@ -223,6 +306,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 (default: null)
 •{nbsp} *unweighted*: <<UnweightedCounts>> (default: null)
 
++
+
+
++
 
 
 === InterpretedInlineBuffer
@@ -239,6 +326,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
 
++
+
+
++
 
 
 === InterpretedInlineInt64Buffer
@@ -246,6 +337,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
 
++
+
+
++
 
 
 === InterpretedInlineFloat64Buffer
@@ -253,6 +348,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
 
++
+
+
++
 
 
 === InterpretedExternalBuffer
@@ -273,6 +372,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 (default: `+InterpretedBuffer.c_order+`)
 •{nbsp} *location*: str (default: null)
 
++
+
+
++
 
 
 === Profile
@@ -284,6 +387,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 
++
+
+
++
 
 
 === Statistics
@@ -295,6 +402,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *min*: <<Extremes>> (default: null)
 •{nbsp} *max*: <<Extremes>> (default: null)
 
++
+
+
++
 
 
 === Moments
@@ -305,6 +416,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
++
+
+
++
 
 
 === Quantiles
@@ -315,6 +430,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
++
+
+
++
 
 
 === Modes
@@ -323,6 +442,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
++
+
+
++
 
 
 === Extremes
@@ -331,6 +454,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
++
+
+
++
 
 
 === StatisticFilter
@@ -342,6 +469,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *excludes_pinf*: bool (default: false)
 •{nbsp} *excludes_nan*: bool (default: false)
 
++
+
+
++
 
 
 === Covariance
@@ -353,6 +484,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
 
++
+
+
++
 
 
 === ParameterizedFunction
@@ -365,6 +500,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 
++
+
+
++
 
 
 === Parameter
@@ -373,6 +512,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *identifier*: unique str
 •{nbsp}required  *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>>
 
++
+
+
++
 
 
 === EvaluatedFunction
@@ -387,6 +530,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 
++
+
+
++
 
 
 === BinnedEvaluatedFunction
@@ -402,6 +549,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 
++
+
+
++
 
 
 === Ntuple
@@ -417,6 +568,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 
++
+
+
++
 
 
 === Column
@@ -433,6 +588,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 
++
+
+
++
 
 
 === NtupleInstance
@@ -441,6 +600,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *chunks*: list of <<Chunk>>
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
 
++
+
+
++
 
 
 === Chunk
@@ -449,6 +612,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *column_chunks*: list of <<ColumnChunk>>
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 
++
+
+
++
 
 
 === ColumnChunk
@@ -459,6 +626,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
 •{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
 
++
+
+
++
 
 
 === Page
@@ -466,6 +637,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>>
 
++
+
+
++
 
 
 === RawInlineBuffer
@@ -473,6 +648,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 [%hardbreaks]
 •{nbsp}required  *buffer*: buffer
 
++
+
+
++
 
 
 === RawExternalBuffer
@@ -483,6 +662,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp} *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
 
++
+
+
++
 
 
 === Metadata
@@ -491,6 +674,10 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *data*: str
 •{nbsp}required  *language*: one of {`+Metadata.unspecified+`, `+Metadata.json+`} (default: `+Metadata.unspecified+`)
 
++
+
+
++
 
 
 === Decoration
@@ -500,4 +687,8 @@ Can be used to gather objects into a convenient package or to avoid duplication 
 •{nbsp}required  *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
 (default: `+Decoration.unspecified+`)
 
++
+
+
++
 
