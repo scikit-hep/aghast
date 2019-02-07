@@ -161,12 +161,15 @@
 === InterpretedInlineBuffer
 
 * required  *buffer*: buffer
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: null/empty)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+(default: null/empty)
 *  *postfilter_slice*: slice (start:stop:step) (default: null)
 *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} (default: `+InterpretedBuffer.c_order+`)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+(default: `+Interpretation.little_endian+`)
+*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+(default: `+InterpretedBuffer.c_order+`)
 
 === InterpretedInlineInt64Buffer
 
@@ -182,12 +185,15 @@
 * required  *numbytes*: int in [0, ∞)
 *  *external_source*: one of {`+ExternalBuffer.memory+`, `+ExternalBuffer.samefile+`, `+ExternalBuffer.file+`, `+ExternalBuffer.url+`} +
 (default: `+ExternalBuffer.memory+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: null/empty)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+(default: null/empty)
 *  *postfilter_slice*: slice (start:stop:step) (default: null)
 *  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`} +
 (default: `+Interpretation.none+`)
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
-*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} (default: `+InterpretedBuffer.c_order+`)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+(default: `+Interpretation.little_endian+`)
+*  *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
+(default: `+InterpretedBuffer.c_order+`)
 *  *location*: str (default: null)
 
 === Profile
@@ -299,8 +305,10 @@
 
 * required  *identifier*: unique str
 * required  *dtype*: one of {`+Interpretation.none+`, `+Interpretation.bool+`, `+Interpretation.int8+`, `+Interpretation.uint8+`, `+Interpretation.int16+`, `+Interpretation.uint16+`, `+Interpretation.int32+`, `+Interpretation.uint32+`, `+Interpretation.int64+`, `+Interpretation.uint64+`, `+Interpretation.float32+`, `+Interpretation.float64+`}
-*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} (default: `+Interpretation.little_endian+`)
-*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} (default: null/empty)
+*  *endianness*: one of {`+Interpretation.little_endian+`, `+Interpretation.big_endian+`} +
+(default: `+Interpretation.little_endian+`)
+*  *filters*: list of {`+Buffer.none+`, `+Buffer.gzip+`, `+Buffer.lzma+`, `+Buffer.lz4+`} +
+(default: null/empty)
 *  *postfilter_slice*: slice (start:stop:step) (default: null)
 *  *title*: str (default: null)
 *  *metadata*: <<Metadata>> (default: null)

@@ -206,7 +206,7 @@ def formatted(cls, end="\n"):
                 raise AssertionError(type(check))
 
             if hasdefault:
-                linebreak = " +" + end if len(name) + len(typestring) > 100 else " "
+                linebreak = " +" + end if len(name) + len(typestring) > 75 else " "
                 defaultstring = "{0}(default: {1})".format(linebreak, num([] if islist and param.default is None else param.default))
             else:
                 defaultstring = ""
