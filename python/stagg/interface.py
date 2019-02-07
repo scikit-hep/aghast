@@ -6140,7 +6140,9 @@ class Collection(Object):
     description = "Collection of named objects, possibly with one or more common axis."
     validity_rules = ()
     long_description = """
-Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `"signal"` and `"control"` (six histograms total).
+A simple reason for using a collection would be to gather many objects into a convenient package that can be transmitted as a group. For this purpose, *axis* should be empty.
+
+Assigning an *axis* to a collection, rather than individually to all objects it contains, is to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `"signal"` and `"control"` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
