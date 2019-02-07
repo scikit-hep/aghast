@@ -219,7 +219,7 @@ def formatted(cls, end="\n"):
             else:
                 defaultstring = ""
 
-            out.append(u"{nbsp}\u2014{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+            out.append(u"{nbsp}{nbsp}{nbsp}\u2022{nbsp}" + "{0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
 
     return end.join(out)
 
