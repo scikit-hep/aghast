@@ -218,7 +218,7 @@ def formatted(cls, end="\n"):
             else:
                 defaultstring = ""
 
-            out.append("    * {0} *{1}*: {2}{3}".format(required, name, typestring, defaultstring))
+            out.append("{0} *{1}*: {2}{3} +".format(required, name, typestring, defaultstring))
 
     return end.join(out)
 
