@@ -6107,7 +6107,7 @@ Can be used to gather objects into a convenient package or to avoid duplication 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
 
-This signal/control axis (defined by a predicate when filling: if in signal region, if in control region) is prepended onto each histogram's own axis. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular.
+This predicate axis (defined by if-then rules when the histograms were filled) is prepended onto the axes defined in each histogram separately. For instance, if `h1` had one regular axis and `h2` had two irregular axes, the `"h1"` in this Collection has two axes: predicate, then regular, and the `"h2"` in this Collection has three axes: predicate, then irregular, then irregular. This way, hundreds or thousands of histograms with similar binning can be defined in a contiguous block without repetition of axis definition (good for efficiency and avoiding copy-paste errors).
 
 To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of collections. In the following example, `h1` is not subdivided but `h2` and `h3` are.
 
