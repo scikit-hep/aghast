@@ -29,7 +29,7 @@ This predicate axis (defined by if-then rules when the histograms were filled) i
 To subdivide one set of objects and not another, or to subdivide two sets of objects differently, put Collections inside of Collections. In the following example, `h1` and `h2` are subdivided but `h3` is not.
 
     Collection({"by region":
-                    Collection({"h2": h2, "h3": h3},
+                    Collection({"h1": h1, "h2": h2},
                     axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))]),
                 "h3": h3})
 
