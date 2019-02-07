@@ -520,6 +520,7 @@ class Metadata(Stagg):
     language = typedproperty(_params["language"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -562,6 +563,7 @@ class Decoration(Stagg):
     language = typedproperty(_params["language"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -845,6 +847,7 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     buffer = typedproperty(_params["buffer"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -894,6 +897,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     external_source = typedproperty(_params["external_source"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -940,6 +944,7 @@ class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     dimension_order  = typedproperty(_params["dimension_order"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1069,6 +1074,7 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     buffer = typedproperty(_params["buffer"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1145,6 +1151,7 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     buffer = typedproperty(_params["buffer"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1237,6 +1244,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     location         = typedproperty(_params["location"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1362,6 +1370,7 @@ class StatisticFilter(Stagg):
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1409,6 +1418,7 @@ class Moments(Stagg):
     filter      = typedproperty(_params["filter"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1466,6 +1476,7 @@ class Extremes(Stagg):
     filter = typedproperty(_params["filter"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1518,6 +1529,7 @@ class Quantiles(Stagg):
     filter      = typedproperty(_params["filter"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1575,6 +1587,7 @@ class Modes(Stagg):
     filter = typedproperty(_params["filter"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1629,6 +1642,7 @@ class Statistics(Stagg):
     max    = typedproperty(_params["max"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -1715,6 +1729,7 @@ class Covariance(Stagg):
     filter      = typedproperty(_params["filter"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2039,6 +2054,7 @@ class IntegerBinning(Binning, BinLocation):
     loc_overflow  = typedproperty(_params["loc_overflow"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2238,6 +2254,7 @@ class RealInterval(Stagg):
     high_inclusive = typedproperty(_params["high_inclusive"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2296,6 +2313,7 @@ class RealOverflow(Stagg, BinLocation):
     nan_mapping   = typedproperty(_params["nan_mapping"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2473,6 +2491,7 @@ class RegularBinning(Binning):
     circular = typedproperty(_params["circular"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2693,6 +2712,7 @@ class HexagonalBinning(Binning):
     roverflow   = typedproperty(_params["roverflow"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -2825,6 +2845,7 @@ class EdgesBinning(Binning):
     circular       = typedproperty(_params["circular"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -3044,6 +3065,7 @@ class IrregularBinning(Binning, OverlappingFill):
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -3284,6 +3306,7 @@ class CategoryBinning(Binning, BinLocation):
     loc_overflow = typedproperty(_params["loc_overflow"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -3469,6 +3492,7 @@ class SparseRegularBinning(Binning, BinLocation):
     maxbin         = typedproperty(_params["maxbin"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -3821,6 +3845,7 @@ class FractionBinning(Binning):
     error_method    = typedproperty(_params["error_method"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -3923,6 +3948,7 @@ class PredicateBinning(Binning, OverlappingFill):
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4072,6 +4098,7 @@ class Assignment(Stagg):
     expression = typedproperty(_params["expression"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4105,6 +4132,7 @@ class Variation(Stagg):
     category_systematic = typedproperty(_params["category_systematic"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4180,6 +4208,7 @@ class VariationBinning(Binning):
     variations = typedproperty(_params["variations"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4302,6 +4331,7 @@ class Axis(Stagg):
     decoration = typedproperty(_params["decoration"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4396,6 +4426,7 @@ class Profile(Stagg):
     decoration = typedproperty(_params["decoration"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4502,6 +4533,7 @@ class UnweightedCounts(Counts):
     counts = typedproperty(_params["counts"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4566,6 +4598,7 @@ class WeightedCounts(Counts):
     unweighted = typedproperty(_params["unweighted"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4677,6 +4710,7 @@ class Parameter(Stagg):
     values     = typedproperty(_params["values"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4758,6 +4792,7 @@ class ParameterizedFunction(Function, FunctionObject):
     script     = typedproperty(_params["script"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4882,6 +4917,7 @@ class EvaluatedFunction(Function):
     script      = typedproperty(_params["script"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -4994,6 +5030,7 @@ class BinnedEvaluatedFunction(FunctionObject):
     script      = typedproperty(_params["script"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5141,6 +5178,7 @@ class Histogram(Object):
     script              = typedproperty(_params["script"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5398,6 +5436,7 @@ class Page(Stagg):
     buffer = typedproperty(_params["buffer"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5481,6 +5520,7 @@ class ColumnChunk(Stagg):
     page_max  = typedproperty(_params["page_max"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5620,6 +5660,7 @@ class Chunk(Stagg):
     metadata      = typedproperty(_params["metadata"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5693,6 +5734,7 @@ class Column(Stagg, Interpretation):
     decoration       = typedproperty(_params["decoration"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5776,6 +5818,7 @@ class NtupleInstance(Stagg):
     chunk_offsets       = typedproperty(_params["chunk_offsets"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -5892,6 +5935,7 @@ class Ntuple(Object):
     script             = typedproperty(_params["script"])
 
     description = ""
+    validity_rules = ()
     long_description = """
 """
 
@@ -6056,8 +6100,9 @@ class Collection(Object):
     script         = typedproperty(_params["script"])
 
     description = "Collection of named objects, possibly with one or more common axis."
+    validity_rules = ()
     long_description = """
-Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `signal` and `control` (six histograms total).
+Can be used to gather objects into a convenient package or to avoid duplication when defining similarly binned data. As an example of the latter, consider histograms three `h1`, `h2`, `h3` with two sets of cuts applied, `"signal"` and `"control"` (six histograms total).
 
     Collection({"h1": h1, "h2": h2, "h3": h3},
                axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])
@@ -6072,6 +6117,10 @@ To subdivide one set of objects and not another, or to subdivide two sets of obj
                     axis=[Axis(PredicateBinning("signal"), PredicateBinning("control"))])})
 
 Similarly, regions can be subdivided into subregions, and other binning types may be used.
+
+The buffers for each object must be the appropriate size to represent all subdivisions. (For example, a counts buffer appropriate for a standalone `h3` would not fit an `h3` with additional axes in a Collection.)
+
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """
 
     def __init__(self, objects=None, axis=None, title=None, metadata=None, decoration=None, script=None):
