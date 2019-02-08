@@ -4725,9 +4725,20 @@ class Profile(Stagg):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    description = ""
+    description = "Summarizes a dependent variable in a <<Histogram>>, binned by the <<Histogram>> *axis* (independent variables)."
     validity_rules = ()
     long_description = """
+Although a statistician's histogram strictly represents a distribution, it is often useful to store a few more values per bin to estimate average values for an empirical function from a dataset. This practice is common in particle physics, from HPROF in CERNLIB to https://root.cern.ch/doc/master/classTProfile.html[TProfile] in ROOT.
+
+To estimate an unweighted mean and standard deviation of `x`, one needs the *counts* from <<UnweightedCounts>> as well as a sum of `x` and a sum of squares of `x`. For a weighted mean and standard deviation of `x`, one needs the *sumw* (sum of weights) and *sumw2* (sum of squared weights) from <<WeightedCounts>> as well as a sum of weights times `x` and a sum of weights times squares of `x`.
+
+Rather than making profile a separate class from histograms, as is commonly done in particle physics, we can add profiled quantities to a <<Histogram>> object. If we have many profiles with the same binning, this avoids duplication of the *counts* or *sumw* and *sumw2*. We can also generalize from storing only moments (to compute mean and standard deviation) to also storing quantiles (to compute a box-and-whiskers plot, for instance).
+
+If the profile represents a computed *expression* (derived feature), it may be encoded here as a string. The *title* is a human-readable description.
+
+All of the *moments*, *quantiles*, and any *mode*, *min*, or *max* are in the required *statistics* object. See below for a definition of the <<Statistics>> class.
+
+The *title*, *metadata*, and *decoration* properties have no semantic constraints.
 """
 
     def __init__(self, expression, statistics, title=None, metadata=None, decoration=None):
