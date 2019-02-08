@@ -3940,9 +3940,27 @@ class FractionBinning(Binning):
     layout_reversed = typedproperty(_params["layout_reversed"])
     error_method    = typedproperty(_params["error_method"])
 
-    description = ""
+    description = "Splits a boolean (true/false) axis into two bins."
     validity_rules = ()
     long_description = """
+This binning is intended for predicate data, values that can only be true or false. It can be combined with other axis types to compute fractions as a function of some other binned variable, such as efficiency (probability of some condition) versus a real value or categories. For example,
+
+    Histogram([Axis(FractionBinning(), "pass cuts"),
+               Axis(RegularBinning(10, RealInterval(-5, 5)), "x")],
+              UnweightedCounts(InterpretedInlineInt64Buffer(
+                  [[  9,  25,  29,  35,  54,  67,  60,  84,  80,  94],
+                   [ 99, 119, 109, 109,  95, 104, 102, 106, 112, 122]])))
+
+could represent a rising probability of passing cuts versus `"x"`. The first axis has two bins, number passing and total, and the second axis has 10 bins, values of `x`. Fraction binnings are also a good choice for a <<Collection>> axis, because only one set of histograms need to be defined to construct all numerators and denominators.
+
+The *layout* and *layout_reversed* specify what the two bins mean. With a false *layout_reversed*, if *layout* is `passall`, the first bin is the number of inputs that pass a condition (the predicate evaluates to true) and the second is the total number of inputs. If *layout* is `failall`, the first bin is the number of inputs that fail the condition (the predicate evaluates to false). If *layout* is `passfail`, the first bin is the number that pass and the second bin is the number tha fail. These three types of layout can easily be converted to one another, but doing so requires a change to the <<Histogram>> bins or <<BinnedEvaluatedFunction>> values.
+
+If *layout_reversed* is true, the order of the two bins is reversed.
+
+The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `undefined`, leaving that interpretation unspecified; `normal` is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. HERE
+
+
+             
 """
 
     def __init__(self, layout=passall, layout_reversed=False, error_method=undefined):
