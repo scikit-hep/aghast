@@ -2520,7 +2520,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not empty.
 """
 
     def __init__(self, num, interval, overflow=None, circular=False):
@@ -2907,7 +2907,7 @@ If the binning is *circular*, then it represents a finite segment in which *inte
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not empty.
 """
 
     def __init__(self, edges, overflow=None, low_inclusive=True, high_inclusive=False, circular=False):
@@ -3141,7 +3141,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not empty.
 """
 
     def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
@@ -3569,22 +3569,27 @@ class SparseRegularBinning(Binning, BinLocation):
     minbin         = typedproperty(_params["minbin"])
     maxbin         = typedproperty(_params["maxbin"])
 
-    description = "Splits a one-dimensional axis into unordered, equal-sized real intervals aligned to a regular grid, which only need to be defined if the bin content is not zero."
+    description = "Splits a one-dimensional axis into unordered, equal-sized real intervals aligned to a regular grid, which only need to be defined if the bin content is not empty."
     validity_rules = ()
-    long_description = """
+    long_description = u"""
 This binning is intended for one-dimensional, real-valued data. Unlike <<RegularBinning>> and <<EdgesBinning>>, the intervals do not need to be abutting. Unlike <<IrregularBinning>>, they must be equal-sized, non-overlapping, and aligned to a grid.
 
-HERE
+Integer-valued bin indexes `i` are mapped to real intervals using *bin_width* and *origin*: each interval starts at `bin_width*(i) + origin` and stops at `bin_width*(i + 1) + origin`. The *bins* property is an unordered list of bin indexes, with the same length and order as the <<Histogram>> bins or <<BinnedEvaluatedFunction>> values. Unspecified bins are empty: for counts or sums of weights, this means zero; for minima, this means +\u221e; for maxima, this meanss \u2012\u221e; for all other values, `nan` (not a number).
 
+There is a degeneracy between *bins* and *origin*: adding an integer multiple of *bin_width* to *origin* and subtracting that integer from all bins yields an equivalent binning.
 
+If *low_inclusive* is true, then all intervals between pairs of edges include the low edge. If *high_inclusive* is true, then all intervals between pairs of edges include the high edge.
 
+Although this binning can reach a very wide range of values without using much memory, there is a limit. The *bins* array values are 64-bit signed integers, so they are in principle limited to [\u20122\u2076\u00b3, 2\u2076\u00b3 \u2012 1]. Changing the *origin* moves this window, and chaning the *bin_width* widens its coverage of real values at the expense of detail. In some cases, the meaningful range is narrower than this. For instance, if a binning is shifted to a higher *origin* (e.g. to align two histograms to add them), some values below 2\u2076\u00b3 \u2012 1 in the shifted histogram were out of range in the unshifted histogram, so we cannot say that they are in range in the new histogram. For this, the *maxbin* would be less than 2\u2076\u00b3 \u2012 1. By a similar argument, the *minbin* can be greater than \u20122\u2076\u00b3.
+
+Therefore, even though this binning is sparse, it can have underflow and overflow bins for values below *minbin* or above *maxbin*. Since `nan` (not a number) values don't map to any integer, this binning may also need a nanflow. The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
 *See also:*
 
    * <<RegularBinning>>: for ordered, equal-sized, abutting real intervals.
    * <<EdgesBinning>>: for ordered, any-sized, abutting real intervals.
    * <<IrregularBinning>>: for unordered, any-sized real intervals (that may even overlap).
-   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not zero.
+   * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not empty.
 """
 
     def __init__(self, bins, bin_width, origin=0.0, overflow=None, low_inclusive=True, high_inclusive=False, minbin=MININT64, maxbin=MAXINT64):
