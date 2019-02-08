@@ -79,7 +79,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 *See also:*
 
-   * <<BinnedEvaluatedFunction>>: for lookup functions that aren't statistical distributions.
+   * <<EvaluatedFunction>> and <<BinnedEvaluatedFunction>>: for comparison and lookup functions that aren't statistical distributions.
 
 == Axis
 
@@ -844,7 +844,7 @@ A parameter is named by an *identifier* and stores one or two buffers for *value
 
 == EvaluatedFunction
 
-**
+*A function defined by explicit values in each bin of the <<Histogram>> to which it is attached.*
 
 [%hardbreaks]
 •{nbsp} *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -858,6 +858,10 @@ A parameter is named by an *identifier* and stores one or two buffers for *value
 •{nbsp} *script*: str (default: null)
 
 *Details:*
+
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*.
+
+If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
 
 *See also:*
 

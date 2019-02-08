@@ -5350,12 +5350,12 @@ class EvaluatedFunction(Function):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    description = ""
+    description = "A function defined by explicit values in each bin of the <<Histogram>> to which it is attached."
     validity_rules = ()
     long_description = """
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*.
 
-
-
+If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
 
 *See also:*
 
@@ -5648,7 +5648,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 *See also:*
 
-   * <<BinnedEvaluatedFunction>>: for lookup functions that aren't statistical distributions.
+   * <<EvaluatedFunction>> and <<BinnedEvaluatedFunction>>: for comparison and lookup functions that aren't statistical distributions.
 """
 
     def __init__(self, axis, counts, profile=None, axis_covariances=None, profile_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
