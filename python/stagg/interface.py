@@ -5361,7 +5361,7 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>.
 """
 
     def __init__(self, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
@@ -5485,7 +5485,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>.
 """
 
     def __init__(self, axis, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
