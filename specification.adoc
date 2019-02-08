@@ -292,7 +292,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
 
 == CategoryBinning
 
-*Associates categories from a categorical dataset with bins.*
+*Associates disjoint categories from a categorical dataset with bins.*
 
 [%hardbreaks]
 •{nbsp} *categories*: list of str (required)
@@ -305,6 +305,12 @@ The *categories* must be unique.
 This binning is intended for string-valued categorical data (or values that can be converted to strings without losing uniqueness). Each named category in *categories* corresponds to one bin.
 
 If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the filling procedure. Otherwise, the overflow bin corresponds to unspecified strings, and it can be `below` or `above` the normal bins. Unlike <<RealOverflow>>, which has up to three overflow bins (underflow, overflow, and nanflow), no distinction is made among `below3`, `below2`, `below1` or `above1`, `above2`, `above3`.
+
+*See also:*
+
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 
 == SparseRegularBinning
 
@@ -381,7 +387,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
 
 == PredicateBinning
 
-**
+*Associates predicates, boolean functions computed during filling, with bins.*
 
 [%hardbreaks]
 •{nbsp} *predicates*: list of str with length in [1, ∞) (required)
@@ -390,7 +396,17 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
 
 *Details:*
 
+This binning is intended to represent data "`regions,`" such as signal and control regions, defined by boolean functions of some input variables. The details of the predicate function are not captured by this class; they are expressed as strings in the *predicates* property. It is up to the user or application to associate string-valued *predicates* with data regions or predicate functions, as executable code, as keys in a lookup function, or as human-readable titles.
 
+Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`undefined`).
+
+Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string-valued labels computed in the filling procedure, or could produce strings that are not known before filling. Use a <<PredicateBinning>> if the data regions overlap or are identified by a fixed set of predicate functions. There are some cases in which a <<CategoryBinning>> and a <<PredicateBinning>> are both appropriate.
+
+*See also:*
+
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 
 == VariationBinning
 
@@ -401,7 +417,11 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
 
 *Details:*
 
+*See also:*
 
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 
 == Variation
 

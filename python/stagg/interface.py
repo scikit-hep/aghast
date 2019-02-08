@@ -3380,12 +3380,18 @@ class CategoryBinning(Binning, BinLocation):
     categories = typedproperty(_params["categories"])
     loc_overflow = typedproperty(_params["loc_overflow"])
 
-    description = "Associates categories from a categorical dataset with bins."
+    description = "Associates disjoint categories from a categorical dataset with bins."
     validity_rules = ("The *categories* must be unique.",)
     long_description = """
 This binning is intended for string-valued categorical data (or values that can be converted to strings without losing uniqueness). Each named category in *categories* corresponds to one bin.
 
 If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the filling procedure. Otherwise, the overflow bin corresponds to unspecified strings, and it can be `below` or `above` the normal bins. Unlike <<RealOverflow>>, which has up to three overflow bins (underflow, overflow, and nanflow), no distinction is made among `below3`, `below2`, `below1` or `above1`, `above2`, `above3`.
+
+*See also:*
+
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 """
 
     def __init__(self, categories, loc_overflow=BinLocation.nonexistent):
@@ -4067,9 +4073,20 @@ class PredicateBinning(Binning, OverlappingFill):
     predicates       = typedproperty(_params["predicates"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    description = ""
+    description = "Associates predicates, boolean functions computed during filling, with bins."
     validity_rules = ()
     long_description = """
+This binning is intended to represent data "`regions,`" such as signal and control regions, defined by boolean functions of some input variables. The details of the predicate function are not captured by this class; they are expressed as strings in the *predicates* property. It is up to the user or application to associate string-valued *predicates* with data regions or predicate functions, as executable code, as keys in a lookup function, or as human-readable titles.
+
+Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`undefined`).
+
+Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string-valued labels computed in the filling procedure, or could produce strings that are not known before filling. Use a <<PredicateBinning>> if the data regions overlap or are identified by a fixed set of predicate functions. There are some cases in which a <<CategoryBinning>> and a <<PredicateBinning>> are both appropriate.
+
+*See also:*
+
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 """
 
     def __init__(self, predicates, overlapping_fill=OverlappingFill.undefined):
@@ -4330,6 +4347,14 @@ class VariationBinning(Binning):
     description = ""
     validity_rules = ()
     long_description = """
+
+
+
+*See also:*
+
+   * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
+   * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
+   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
 """
 
     def __init__(self, variations):
