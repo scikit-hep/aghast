@@ -1450,7 +1450,7 @@ The statistic to which this filter belongs was calculated from finite values bet
         self.excludes_nan = excludes_nan
 
     def _valid(self, seen, recursive):
-        if self.min is not None and self.max is not None and self.min <= self.max:
+        if self.min > self.max:
             raise ValueError("StatisticFilter.min ({0}) must be less than or equal to StatisticFilter.max ({1})".format(self.min, self.max))
 
     def _toflatbuffers(self, builder):
