@@ -482,13 +482,13 @@ table Column {
 table NtupleInstance {
   chunks: [Chunk] (required);
   chunk_offsets: [ulong];
+  column_statistics: [Statistics];
+  column_covariances: [Covariance];
 }
 
 table Ntuple {
   columns: [Column] (required);
   instances: [NtupleInstance] (required);
-  column_statistics: [Statistics];
-  column_covariances: [Covariance];
   functions_lookup: [string];
   functions: [FunctionObject];
 }

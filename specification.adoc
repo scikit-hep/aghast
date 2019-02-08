@@ -58,8 +58,8 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs. +
-The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs.
+The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs (regardless of order). +
+The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs (regardless of order).
 
 *Details:*
 
@@ -653,7 +653,7 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
 
 == Statistics
 
-*Represents summary statistics for a <<Histogram>> axis or for each bin in a <<Profile>>.*
+*Represents summary statistics for a <<Histogram>> axis or for each bin in a <<Profile>> or for an <<NtupleInstance>>.*
 
 [%hardbreaks]
 •{nbsp} *moments*: list of <<Moments>> (default: null/empty)
@@ -678,7 +678,7 @@ The minimum and maximum of a distribution are special cases of quantiles, but qu
 
 == Moments
 
-*Represents one type of moment; a single value for an <<Axis>> or one per bin for a <<Profile>>.*
+*Represents one type of moment; a single value for an <<Axis>> or one per bin for a <<Profile>> or a single value for an <<NtupleInstance>>.*
 
 [%hardbreaks]
 •{nbsp} *sumwxn*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -701,7 +701,7 @@ If not all of the data were included in the sum, a *filter* describes which valu
 
 == Quantiles
 
-*Represents one type of quantile; a single value for an <<Axis>> or one per bin for a <<Profile>>.*
+*Represents one type of quantile; a single value for an <<Axis>> or one per bin for a <<Profile>> or a single value for an <<NtupleInstance>>.*
 
 [%hardbreaks]
 •{nbsp} *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -724,7 +724,7 @@ If not all of the data were included in the quantile calculation, a *filter* des
 
 == Modes
 
-*Represents the mode of a distribution; a single value for an <<Axis>> or one per bin for a <<Profile>>.*
+*Represents the mode of a distribution; a single value for an <<Axis>> or one per bin for a <<Profile>> or a single value for an <<NtupleInstance>>.*
 
 [%hardbreaks]
 •{nbsp} *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -739,7 +739,7 @@ If not all of the data were included in the mode calculation, a *filter* describ
 
 == Extremes
 
-*Represents the minimum or maximum of a distribution; a single value for an <<Axis>> or one per bin for a <<Profile>>; also used in <<ColumnChunk>> to summarize data in a column of an <<Ntuple>>.*
+*Represents the minimum or maximum of a distribution; a single value for an <<Axis>> or one per bin for a <<Profile>> or a single value for an <<NtupleInstance>>; also used in <<ColumnChunk>> to summarize data in a page of an <<Ntuple>>.*
 
 [%hardbreaks]
 •{nbsp} *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
@@ -770,7 +770,7 @@ The statistic to which this filter belongs was calculated from finite values bet
 
 == Covariance
 
-**
+*Represents one element of a covariance matrix for a pair of <<Axis>> or for all bins in a pair of <<Profile>> in a <<Histogram>> or a pair of columns in an <<NtupleInstance>>.*
 
 [%hardbreaks]
 •{nbsp} *xindex*: int in [0, ∞) (required)
@@ -779,10 +779,17 @@ The statistic to which this filter belongs was calculated from finite values bet
 (required)
 •{nbsp} *weightpower*: int in [‒128, 127] (default: 0)
 •{nbsp} *filter*: <<StatisticFilter>> (default: null)
+The *xindex* must not be equal to the *yindex* (see <<Moments>> for variances).
 
 *Details:*
 
+`N` axes in a <<Histogram>> potentially have `N*(N - 1)/2` covariance matrix elements; an object of this class represents one of them. However, if it is one of the *profile_covariances* in a <<Histogram>>, it represents that element of the covariance matrix for all bins in the <<Histogram>>.
 
+The *sumwxy* buffer holds the raw covariance, the sum of `x` times `y` from the input data. This may be a single sum or an array for all bins in a profile covariance matrix element.
+
+If *weightpower* is not zero, the sum of `x` times `y` was weighted. `weightpower = 1` would be typical of a <<Histogram>> with <<WeightedCounts>>, so that the weighted quantile agrees with an approximate calculation performed on the histogram's distribution.
+
+If not all of the data were included in the quantile calculation, a *filter* describes which values were excluded. This <<StatisticFilter>> is described below.
 
 == ParameterizedFunction
 
@@ -859,8 +866,6 @@ The statistic to which this filter belongs was calculated from finite values bet
 [%hardbreaks]
 •{nbsp} *columns*: list of <<Column>> with length in [1, ∞) (required)
 •{nbsp} *instances*: list of <<NtupleInstance>> with length in [1, ∞) (required)
-•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
-•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
 •{nbsp} *functions*: str → <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
@@ -899,6 +904,8 @@ The statistic to which this filter belongs was calculated from finite values bet
 [%hardbreaks]
 •{nbsp} *chunks*: list of <<Chunk>> (required)
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
+•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
+•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
 
 *Details:*
 
