@@ -613,7 +613,7 @@ class ExternalBuffer(object):
     samefile = ExternalSourceEnum("samefile", stagg.stagg_generated.ExternalSource.ExternalSource.external_samefile)
     file     = ExternalSourceEnum("file", stagg.stagg_generated.ExternalSource.ExternalSource.external_file)
     url      = ExternalSourceEnum("url", stagg.stagg_generated.ExternalSource.ExternalSource.external_url)
-    types = [memory, samefile, file, url]
+    sources = [memory, samefile, file, url]
 
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
@@ -890,7 +890,7 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
         "pointer":         stagg.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
         "numbytes":        stagg.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_source": stagg.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
+        "external_source": stagg.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
         }
 
     pointer       = typedproperty(_params["pointer"])
@@ -1100,13 +1100,16 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     buffer = typedproperty(_params["buffer"])
 
     description = "An integer array in the Flatbuffers hierarchy; used for integer-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
-    validity_rules = ()
+    validity_rules = ("The number of items in the *buffer* must be equal to the number of bins at this level of the hierarchy.",)
     long_description = """
 This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 """
 
     def __init__(self, buffer):
         self.buffer = buffer
+
+    def _valid(self, seen, recursive):
+        self.array
 
     @property
     def flatarray(self):
@@ -1178,13 +1181,16 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     buffer = typedproperty(_params["buffer"])
 
     description = "A floating point array in the Flatbuffers hierarchy; used for real-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
-    validity_rules = ()
+    validity_rules = ("The number of items in the *buffer* must be equal to the number of bins at this level of the hierarchy.",)
     long_description = """
 This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 """
 
     def __init__(self, buffer):
         self.buffer = buffer
+
+    def _valid(self, seen, recursive):
+        self.array
 
     @property
     def flatarray(self):
@@ -1252,7 +1258,7 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
         "pointer":          stagg.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
         "numbytes":         stagg.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
-        "external_source":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.types),
+        "external_source":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
         "filters":          stagg.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
         "postfilter_slice": stagg.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
         "dtype":            stagg.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
@@ -1271,9 +1277,36 @@ class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     dimension_order  = typedproperty(_params["dimension_order"])
     location         = typedproperty(_params["location"])
 
-    description = ""
-    validity_rules = ()
+    description = "A generic array stored outside the Flatbuffers hierarchy; used for any quantity that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
+    validity_rules = ("The *postfilter_slice*'s *step* cannot be zero.",
+                      "The number of items in the *buffer* must be equal to the number of bins at this level of the hierarchy.")
     long_description = """
+This array class is like <<InterpretedInlineBuffer>>, but its contents are outside of the Flatbuffers hierarchy. Instead of a *buffer* property, it has a *pointer* and a *numbytes* to specify the source of bytes.
+
+If the *external_source* is `memory`, then the *pointer* and *numbytes* are interpreted as a raw array in memory. If the *external_source* is `samefile`, then the *pointer* is taken to be a seek position in the same file that stores the Flatbuffer (assuming the Flatbuffer resides in a file). If *external_source* is `file`, then the *location* property is taken to be a file path, and the *pointer* is taken to be a seek position in that file. If *external_source* is `url`, then the *location* property is taken to be a URL and the bytes are requested by HTTP.
+
+Like <<InterpretedInlineBuffer>>, this array class provides its own interpretation in terms of data type and dimension order. It does not specify its own shape, the number of bins in each dimension, because that is given by its position in the hierarchy. If it is the <<UnweightedCounts>> of a <<Histogram>>, for instance, it must be reshapable to fit the number of bins implied by the <<Histogram>> *axis*.
+
+The list of *filters* are applied to convert bytes in the *buffer* into an array. Typically, *filters* are compression algorithms such as `gzip`, `lzma`, and `lz4`, but they may be any predefined transformation (e.g. zigzag deencoding of integers or affine mappings from integers to floating point numbers may be added in the future). If there is more than one filter, the output of each step is provided as input to the next.
+
+The *postfilter_slice*, if provided, selects a subset of the bytes returned by the last filter (or directly in the *buffer* if there are no *filters*). A slice has the following structure:
+
+    struct Slice {
+      start: long;
+      stop: long;
+      step: int;
+      has_start: bool;
+      has_stop: bool;
+      has_step: bool;
+    }
+
+though in Python, a builtin `slice` object should be provided to this class's constructor. The *postfilter_slice* is interpreted according to Python's rules (negative indexes, start-inclusive and stop-exclusive, clipping-not-errors if beyond the range, etc.).
+
+The *dtype* is the numeric type of the array, which includes `bool`, all signed and unsigned integers from 8 bits to 64 bits, and IEEE 754 floating point types with 32 or 64 bits. The `none` interpretation is presumed, if necessary, to be unsigned, 8 bit integers.
+
+The *endianness* may be `little_endian` or `big_endian`; the former is used by most recent architectures.
+
+The *dimension_order* may be `c_order` to follow the C programming language's convention or `fortran` to follow the FORTRAN programming language's convention. The *dimension_order* only has an effect when shaping an array with more than one dimension.
 """
 
     def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory, filters=None, postfilter_slice=None, dtype=InterpretedBuffer.none, endianness=InterpretedBuffer.little_endian, dimension_order=InterpretedBuffer.c_order, location=None):
