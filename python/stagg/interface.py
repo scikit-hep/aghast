@@ -1099,9 +1099,10 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    description = ""
+    description = "An integer array in the Flatbuffers hierarchy; used for integer quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
     validity_rules = ()
     long_description = """
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
 """
 
     def __init__(self, buffer):
@@ -1176,9 +1177,10 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    description = ""
+    description = "A floating point array in the Flatbuffers hierarchy; used for real-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
     validity_rules = ()
     long_description = """
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
 """
 
     def __init__(self, buffer):
@@ -2351,7 +2353,7 @@ class RealOverflow(Stagg, BinLocation):
                       u"The *minf_mapping* (\u2012\u221e mapping) can only be `missing`, `in_underflow`, or `in_nanflow`, not `in_overflow`.",
                       u"The *pinf_mapping* (+\u221e mapping) can only be `missing`, `in_overflow`, or `in_nanflow`, not `in_underflow`.")
     long_description = u"""
-If *loc_underflow*, *loc_overflow*, and *loc_nanflow* are `nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow, overflow, or nanflow. Underflow represents values smaller than the lower limit of the binning, overflow represents values larger than the upper limit of the binning, and nanflow represents floating-point values that are `nan` (not a number). With the normal bins, underflow, overflow, and nanflow, every possible input value corresponds to some bin.
+If *loc_underflow*, *loc_overflow*, and *loc_nanflow* are `nonexistent`, then there are no slots in the <<Histogram>> counts or <<BinnedEvaluatedFunction>> values for underflow, overflow, or nanflow. Underflow represents values smaller than the lower limit of the binning, overflow represents values larger than the upper limit of the binning, and nanflow represents floating point values that are `nan` (not a number). With the normal bins, underflow, overflow, and nanflow, every possible input value corresponds to some bin.
 
 If any of the *loc_underflow*, *loc_overflow*, and *loc_nanflow* are `below`, then their slots precede the normal bins, if `above`, then their slots follow the normal bins, and their order is in sequence: `below3`, `below2`, `below1`, (normal bins), `above1`, `above2`, `above3`. It is possible to represent a histogram counts buffer with the three special bins in any position relative to the normal bins.
 
@@ -2779,7 +2781,7 @@ There are several different schemes for mapping integer rectangles to hexagonal 
 
 In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from \u2012\u03c0/2, if increasing `q` is collinear with decreasing `y`, to \u03c0/2, if increasing `q` is collinear with increasing `y`. The *bin_width* is the shortest distance between adjacent tile centers: the line between tile centers crosses the border between tiles at a right angle.
 
-A roughly but not exactly rectangular region of `x` and `y` fall within a slot in `q` and `r`. Overflows, underflows, and nanflows, converted to floating-point `q` and `r`, are represented by overflow, underflow, and nanflow bins in *qoverflow* and *roverflow*. Note that the total number of bins is strictly multiplicative (as it would be for a rectangular with two <<RegularBinning>> axes): the total number of bins is the number of normal `q` bins plus any overflows times the number of normal `r` bins plus any overflows. That is, all `r` bins are represented for each `q` bin, even overflow `q` bins.
+A roughly but not exactly rectangular region of `x` and `y` fall within a slot in `q` and `r`. Overflows, underflows, and nanflows, converted to floating point `q` and `r`, are represented by overflow, underflow, and nanflow bins in *qoverflow* and *roverflow*. Note that the total number of bins is strictly multiplicative (as it would be for a rectangular with two <<RegularBinning>> axes): the total number of bins is the number of normal `q` bins plus any overflows times the number of normal `r` bins plus any overflows. That is, all `r` bins are represented for each `q` bin, even overflow `q` bins.
 """
 
     def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, bin_width=1.0, qoverflow=None, roverflow=None):
