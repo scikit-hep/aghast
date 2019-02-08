@@ -5081,9 +5081,7 @@ class Parameter(Stagg):
     description = "Sets values in a <<ParameterizedFunction>>."
     validity_rules = ()
     long_description = """
-A parameter is named by an *identifier* and stores one or two buffers for 
-
-
+A parameter is named by an *identifier* and stores one or two buffers for *values* and *errors*. The number of values in each buffer is controlled by the <<ParameterizedFunction>> *paramaxis* and the number of axes at this level of hierarchy.
 """
 
     def __init__(self, identifier, values, errors=None):
@@ -5188,7 +5186,7 @@ The *parameters* may all be fixed for some <<Histogram>> axes and all be variabl
 
 Even if the parameterized function is not attached to a <<Histogram>> but is standalone in a <<Collection>>, the *paramaxis* is still relevant because a <<Collection>> has an *axis*, too.
 
-The <<Parameter>> class, described below, can internally describe errors on each parameter. Covariances between parameters are described by *parameter_covariances*.
+The <<Parameter>> class, described below, can internally describe errors on each parameter. Covariances between parameters are described by *parameter_covariances*. The size of each <<Covariance>> buffer is equal to the size of each <<Parameter>> buffer, controlled by *paramaxis* and the number of axes.
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 
