@@ -825,7 +825,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>.
 
 == Parameter
 
@@ -859,7 +859,7 @@ A parameter is named by an *identifier* and stores one or two buffers for *value
 
 *Details:*
 
-Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*.
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*. (For a standalone function, see <<BinnedEvaluatedFunction>> below.)
 
 If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
 
@@ -867,11 +867,11 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
 
 == BinnedEvaluatedFunction
 
-**
+*A standalone function defined by explicit values in each bin of its axis.*
 
 [%hardbreaks]
 •{nbsp} *axis*: list of <<Axis>> with length in [1, ∞) (required)
@@ -887,11 +887,17 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
 
 *Details:*
 
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. A <<BinnedEvaluatedFunction>> defines an *axis* and a *values* buffer for each bin described by the *axis*. A <<BinnedEvaluatedFunction>> can only be standalone in a <<Collection>> or attached to an <<Ntuple>>.
+
+If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
+
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
+
 *See also:*
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
 
 == Ntuple
 

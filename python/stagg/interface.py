@@ -5194,7 +5194,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>.
 """
 
     def __init__(self, expression, parameters=None, paramaxis=None, parameter_covariances=None, title=None, metadata=None, decoration=None, script=None):
@@ -5353,7 +5353,7 @@ class EvaluatedFunction(Function):
     description = "A function defined by explicit values in each bin of the <<Histogram>> to which it is attached."
     validity_rules = ()
     long_description = """
-Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*.
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. An <<EvaluatedFunction>> can only be attached to a <<Histogram>> and each item in its *values* buffer corresponds to one item in a <<Histogram>>'s *counts*. (For a standalone function, see <<BinnedEvaluatedFunction>> below.)
 
 If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
 
@@ -5361,7 +5361,7 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
 """
 
     def __init__(self, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
@@ -5472,17 +5472,20 @@ class BinnedEvaluatedFunction(FunctionObject):
     decoration  = typedproperty(_params["decoration"])
     script      = typedproperty(_params["script"])
 
-    description = ""
+    description = "A standalone function defined by explicit values in each bin of its axis."
     validity_rules = ()
     long_description = """
+Some functions are difficult, impossible, or undesirable to express in terms of a mathematical expression and parameters, but they can be expressed in terms of their values at a set of points. A <<BinnedEvaluatedFunction>> defines an *axis* and a *values* buffer for each bin described by the *axis*. A <<BinnedEvaluatedFunction>> can only be standalone in a <<Collection>> or attached to an <<Ntuple>>.
 
+If the *derivatives* or the *errors* of the function at each bin are also known, they can be stored as well.
 
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 
 *See also:*
 
    * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
    * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
-   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>> or attached to an <<Ntuple>>..
 """
 
     def __init__(self, axis, values, derivatives=None, errors=None, title=None, metadata=None, decoration=None, script=None):
