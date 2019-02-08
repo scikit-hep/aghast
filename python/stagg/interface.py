@@ -509,7 +509,7 @@ class MetadataLanguageEnum(Enum):
 
 class Metadata(Stagg):
     unspecified = MetadataLanguageEnum("unspecified", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
-    json = MetadataLanguageEnum("json", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_json)
+    json        = MetadataLanguageEnum("json", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
     _params = {
@@ -3109,11 +3109,11 @@ class OverlappingFillStrategyEnum(Enum):
     base = "IrregularBinning"
 
 class OverlappingFill(object):
-    undefined = OverlappingFillStrategyEnum("undefined", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_undefined)
-    all       = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first     = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last      = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
-    overlapping_fill_strategies = [undefined, all, first, last]
+    unspecified = OverlappingFillStrategyEnum("unspecified", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_unspecified)
+    all         = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first       = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last        = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    overlapping_fill_strategies = [unspecified, all, first, last]
 
 class IrregularBinning(Binning, OverlappingFill):
     _params = {
@@ -3133,7 +3133,7 @@ This binning is intended for one-dimensional, real-valued data. Unlike <<EdgesBi
 
 The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
-In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `undefined` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
+In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `unspecified` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
 
 Irregular bins are usually not directly created by histogramming libraries, but they may come about as a result of merging histograms with different binnings.
 
@@ -3145,7 +3145,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
    * <<SparseRegularBinning>>: for unordered, equal-sized real intervals aligned to a regular grid, but only need to be defined if the bin content is not empty.
 """
 
-    def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.undefined):
+    def __init__(self, intervals, overflow=None, overlapping_fill=OverlappingFill.unspecified):
         self.intervals = intervals
         self.overflow = overflow
         self.overlapping_fill = overlapping_fill
@@ -3178,7 +3178,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
         stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
         if self.overflow is not None:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
-        if self.overlapping_fill != self.undefined:
+        if self.overlapping_fill != self.unspecified:
             stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
 
@@ -3341,7 +3341,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
         if self.overlapping_fill == other.overlapping_fill:
             overlapping_fill = self.overlapping_fill
         else:
-            overlapping_fill = self.undefined
+            overlapping_fill = self.unspecified
 
         selfints = list(self.intervals)
         otherints = list(other.intervals)
@@ -3927,7 +3927,7 @@ class FractionBinning(Binning):
     passfail = FractionLayoutEnum("passfail", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passfail)
     layouts = [passall, failall, passfail]
 
-    undefined        = FractionErrorMethodEnum("undefined", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_undefined)
+    unspecified      = FractionErrorMethodEnum("unspecified", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_unspecified)
     normal           = FractionErrorMethodEnum("normal", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
     clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
     wilson           = FractionErrorMethodEnum("wilson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
@@ -3935,7 +3935,7 @@ class FractionBinning(Binning):
     feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
     jeffrey          = FractionErrorMethodEnum("jeffrey", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
     bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
-    error_methods = [undefined, normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
+    error_methods = [unspecified, normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
         "layout": stagg.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
@@ -3962,7 +3962,7 @@ could represent a rising probability of passing cuts versus `"x"`. The first axi
 
 The *layout* and *layout_reversed* specify what the two bins mean. With a false *layout_reversed*, if *layout* is `passall`, the first bin is the number of inputs that pass a condition (the predicate evaluates to true) and the second is the total number of inputs. If *layout* is `failall`, the first bin is the number of inputs that fail the condition (the predicate evaluates to false). If *layout* is `passfail`, the first bin is the number that pass and the second bin is the number tha fail. These three types of layout can easily be converted to one another, but doing so requires a change to the <<Histogram>> bins or <<BinnedEvaluatedFunction>> values. If *layout_reversed* is true, the order of the two bins is reversed. (Thus, six layouts are possible.)
 
-The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `undefined`, leaving that interpretation unspecified. The `normal` method (sometimes called "`Wald`") is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. The `clopper_pearson` method (sometimes called "`exact`") is a common choice, though it fails in some statistical criteria. The computation and meaning of the methods are described in the references below.
+The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `unspecified`, leaving that interpretation unspecified. The `normal` method (sometimes called "`Wald`") is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. The `clopper_pearson` method (sometimes called "`exact`") is a common choice, though it fails in some statistical criteria. The computation and meaning of the methods are described in the references below.
 
 *See also:*
 
@@ -3976,7 +3976,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
    * Wikipedia https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval[Binomial proportion confidence interval]
 """
 
-    def __init__(self, layout=passall, layout_reversed=False, error_method=undefined):
+    def __init__(self, layout=passall, layout_reversed=False, error_method=unspecified):
         self.layout = layout
         self.layout_reversed = layout_reversed
         self.error_method = error_method
@@ -3998,7 +3998,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
             stagg.stagg_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
         if self.layout_reversed is not False:
             stagg.stagg_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
-        if self.error_method != self.undefined:
+        if self.error_method != self.unspecified:
             stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
         return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
 
@@ -4008,7 +4008,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
             args.append("layout={0}".format(repr(self.layout)))
         if self.layout_reversed is not False:
             args.append("layout_reversed={0}".format(repr(self.layout_reversed)))
-        if self.error_method != self.undefined:
+        if self.error_method != self.unspecified:
             args.append("error_method={0}".format(repr(self.error_method)))
         return _dumpline(self, args, indent, width, end)
 
@@ -4049,7 +4049,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
         if self.error_method == other.error_method:
             error_method = self.error_method
         else:
-            error_method = self.undefined
+            error_method = self.unspecified
 
         if self.layout == other.layout and self.reversed == other.reversed:
             if self.error_method == error_method:
@@ -4079,7 +4079,7 @@ class PredicateBinning(Binning, OverlappingFill):
     long_description = """
 This binning is intended to represent data "`regions,`" such as signal and control regions, defined by boolean functions of some input variables. The details of the predicate function are not captured by this class; they are expressed as strings in the *predicates* property. It is up to the user or application to associate string-valued *predicates* with data regions or predicate functions, as executable code, as keys in a lookup function, or as human-readable titles.
 
-Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`undefined`).
+Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`unspecified`).
 
 Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string-valued labels computed in the filling procedure, or could produce strings that are not known before filling. Use a <<PredicateBinning>> if the data regions overlap or are identified by a fixed set of predicate functions. There are some cases in which a <<CategoryBinning>> and a <<PredicateBinning>> are both appropriate.
 
@@ -4090,7 +4090,7 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
    * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
-    def __init__(self, predicates, overlapping_fill=OverlappingFill.undefined):
+    def __init__(self, predicates, overlapping_fill=OverlappingFill.unspecified):
         self.predicates = predicates
         self.overlapping_fill = overlapping_fill
 
@@ -4111,13 +4111,13 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
 
         stagg.stagg_generated.PredicateBinning.PredicateBinningStart(builder)
         stagg.stagg_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
-        if self.overlapping_fill != self.undefined:
+        if self.overlapping_fill != self.unspecified:
             stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["predicates=[" + ", ".join(repr(x) for x in self.predicates) + "]"]
-        if self.overlapping_fill != OverlappingFill.undefined:
+        if self.overlapping_fill != OverlappingFill.unspecified:
             args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
         return _dumpline(self, args, indent, width, end)
 
@@ -4201,7 +4201,7 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
         if self.overlapping_fill == other.overlapping_fill:
             overlapping_fill = self.overlapping_fill
         else:
-            overlapping_fill = self.undefined
+            overlapping_fill = self.unspecified
 
         selfpred = list(self.predicates)
         otherpred = list(other.predicates)
