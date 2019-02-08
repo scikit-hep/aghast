@@ -393,12 +393,14 @@ union Counts {
 
 table Parameter {
   identifier: string (key);
-  values: InterpretedBuffer;
+  values: InterpretedBuffer (required);
+  errors: InterpretedBuffer;
 }
 
 table ParameterizedFunction {
   expression: string (required);
   parameters: [Parameter];
+  paramaxis: [int];
 }
 
 table EvaluatedFunction {

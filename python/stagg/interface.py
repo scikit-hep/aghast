@@ -5071,23 +5071,27 @@ class Parameter(Stagg):
     _params = {
         "identifier": stagg.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
         "values":     stagg.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
+        "errors":     stagg.checktype.CheckClass("Parameter", "errors", required=False, type=InterpretedBuffer),
         }
 
     identifier = typedproperty(_params["identifier"])
     values     = typedproperty(_params["values"])
+    errors     = typedproperty(_params["errors"])
 
     description = ""
     validity_rules = ()
     long_description = """
 """
 
-    def __init__(self, identifier, values):
+    def __init__(self, identifier, values, errors=None):
         self.identifier = identifier
         self.values = values
+        self.errors = errors
 
     def _valid(self, seen, recursive):
         if recursive:
             _valid(self.values, seen, recursive)
+            _valid(self.errors, seen, recursive)
 
     @classmethod
     def _fromflatbuffers(cls, fb):
@@ -5095,20 +5099,27 @@ class Parameter(Stagg):
         out._flatbuffers = _MockFlatbuffers()
         out._flatbuffers.Identifier = fb.Identifier
         out._flatbuffers.ValuesByTag = _MockFlatbuffers._ByTag(fb.Values, fb.ValuesType, _InterpretedBuffer_lookup)
+        out._flatbuffers.ErrorsByTag = _MockFlatbuffers._ByTag(fb.Errors, fb.ErrorsType, _InterpretedBuffer_lookup)
         return out
 
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
+        errors = None if self.errors is None else self.errors._toflatbuffers(builder)
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         
         stagg.stagg_generated.Parameter.ParameterStart(builder)
         stagg.stagg_generated.Parameter.ParameterAddIdentifier(builder, identifier)
         stagg.stagg_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
         stagg.stagg_generated.Parameter.ParameterAddValues(builder, values)
+        if errors is not None:
+            stagg.stagg_generated.Parameter.ParameterAddErrorsType(builder, _InterpretedBuffer_invlookup[type(self.errors)])
+            stagg.stagg_generated.Parameter.ParameterAddErrors(builder, values)
         return stagg.stagg_generated.Parameter.ParameterEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["parameter={0}".format(repr(self.parameter)), "values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
+        if self.errors is not None:
+            args.append("errors={0}".format(_dumpeq(self.errors._dump(indent + "    ", width, end), indent, end)))
         return _dumpline(self, args, indent, width, end)
 
 ################################################# Function
@@ -5145,6 +5156,7 @@ class ParameterizedFunction(Function, FunctionObject):
     _params = {
         "expression": stagg.checktype.CheckString("ParameterizedFunction", "expression", required=True),
         "parameters": stagg.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
+        "paramaxis":  stagg.checktype.CheckVector("ParameterizedFunction", "paramaxis", required=False, type=int),
         "title":      stagg.checktype.CheckString("ParameterizedFunction", "title", required=False),
         "metadata":   stagg.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
         "decoration": stagg.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
@@ -5153,23 +5165,44 @@ class ParameterizedFunction(Function, FunctionObject):
 
     expression = typedproperty(_params["expression"])
     parameters = typedproperty(_params["parameters"])
+    paramaxis  = typedproperty(_params["paramaxis"])
     title      = typedproperty(_params["title"])
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
     script     = typedproperty(_params["script"])
 
-    description = ""
-    validity_rules = ()
+    description = "A function defined by a mathematical expression and a set of parameters, to attach to a <<Histogram>> or include in a <<Collection>>."
+    validity_rules = ("The *identifiers* of all *parameters* must be unique.",
+                      "After converting from negative indexes, *paramaxis* values must be unique.",
+                      "All *paramaxis* values must be in [0, number of axes, including any inherited from a <<Collection>>).")
     long_description = """
+A common application for functions is to attach a fit result to a <<Histogram>>. This class defines a function as a mathematical *expression* with *parameters*. No particular syntax is specified for the *expression*.
+
+The *parameters* may all be fixed for some <<Histogram>> axes and all be variable for some other <<Histogram>> axes. The *paramaxis* set specifies the indexes of axes that are _variable_ in the *parameters*. If *paramaxis* is an empty set, each <<Parameter>> has a buffer of only one value; otherwise, each <<Parameter>> has a buffer of as many values as the product of the number of bins in the selected axes (including overflow bins). Negative indexes are interpreted as in Python: -1 is the last axis, 
+
+Even if the parameterized function is not attached to a <<Histogram>> but is standalone in a <<Collection>>, the *paramaxis* is still relevant because a <<Collection>> has an *axis*, too.
+
+Details about the <<Parameter>> class can be found below.
+
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
+
+*See also:*
+
+   * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
+   * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
 """
 
-    def __init__(self, expression, parameters=None, title=None, metadata=None, decoration=None, script=None):
+    def __init__(self, expression, parameters=None, paramaxis=None, title=None, metadata=None, decoration=None, script=None):
         self.expression = expression
         self.parameters = parameters
+        self.paramaxis = paramaxis
         self.title = title
         self.metadata = metadata
         self.decoration = decoration
         self.script = script
+        if len(self.paramaxis) != 0:
+            raise NotImplementedError("need to restrict paramaxis values to Histogram index values")
 
     def _valid(self, seen, recursive):
         if len(set(x.identifier for x in self.parameters)) != len(self.parameters):
@@ -5186,6 +5219,7 @@ class ParameterizedFunction(Function, FunctionObject):
         out._flatbuffers.Expression = args[-1].Expression
         out._flatbuffers.Parameters = args[-1].Parameters
         out._flatbuffers.ParametersLength = args[-1].ParametersLength
+        out._flatbuffers.Paramaxis = lambda: numpy.empty(0, dtype="<i8") if args[-1].ParamaxisLength() == 0 else args[-1].ParamaxisAsNumpy()
         out._flatbuffers.Title = args[0].Title
         out._flatbuffers.Metadata = args[0].Metadata
         out._flatbuffers.Decoration = args[0].Decoration
@@ -5206,10 +5240,21 @@ class ParameterizedFunction(Function, FunctionObject):
                 builder.PrependUOffsetTRelative(x)
             parameters = builder.EndVector(len(parameters))
 
+        if len(self.paramaxis) == 0:
+            paramaxis = None
+        else:
+            paramaxisbuf = self.paramaxis.tostring()
+            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStartParamaxisVector(builder, len(self.paramaxis))
+            builder.head = builder.head - len(paramaxisbuf)
+            builder.Bytes[builder.head : builder.head + len(paramaxisbuf)] = paramaxisbuf
+            paramaxis = builder.EndVector(len(self.paramaxis))
+
         stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
         stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
         if parameters is not None:
             stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
+        if paramaxis is not None:
+            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddParamaxis(builder, paramaxis)
         parameterized = stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
 
         if isinstance(getattr(self, "_parent", None), Histogram):
@@ -5249,6 +5294,8 @@ class ParameterizedFunction(Function, FunctionObject):
         args = ["expression={0}".format(_dumpstring(self.expression))]
         if len(self.parameters) != 0:
             args.append("parameters=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.parameters], indent, width, end), indent, end)))
+        if len(self.paramaxis) != 0:
+            args.append("paramaxis={0}".format(_dumparray(self.paramaxis, indent, end)))
         if self.title is not None:
             args.append("title={0}".format(_dumpstring(self.title)))
         if self.metadata is not None:

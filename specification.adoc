@@ -793,19 +793,37 @@ If not all of the data were included in the quantile calculation, a *filter* des
 
 == ParameterizedFunction
 
-**
+*A function defined by a mathematical expression and a set of parameters, to attach to a <<Histogram>> or include in a <<Collection>>.*
 
 [%hardbreaks]
 •{nbsp} *expression*: str (required)
 •{nbsp} *parameters*: list of <<Parameter>> (default: null/empty)
+•{nbsp} *paramaxis*: list of int (default: null/empty)
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
+The *identifiers* of all *parameters* must be unique. +
+After converting from negative indexes, *paramaxis* values must be unique. +
+All *paramaxis* values must be in [0, number of axes, including any inherited from a <<Collection>>).
 
 *Details:*
 
+A common application for functions is to attach a fit result to a <<Histogram>>. This class defines a function as a mathematical *expression* with *parameters*. No particular syntax is specified for the *expression*.
 
+The *parameters* may all be fixed for some <<Histogram>> axes and all be variable for some other <<Histogram>> axes. The *paramaxis* set specifies the indexes of axes that are _variable_ in the *parameters*. If *paramaxis* is an empty set, each <<Parameter>> has a buffer of only one value; otherwise, each <<Parameter>> has a buffer of as many values as the product of the number of bins in the selected axes (including overflow bins). Negative indexes are interpreted as in Python: -1 is the last axis, 
+
+Even if the parameterized function is not attached to a <<Histogram>> but is standalone in a <<Collection>>, the *paramaxis* is still relevant because a <<Collection>> has an *axis*, too.
+
+Details about the <<Parameter>> class can be found below.
+
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
+
+*See also:*
+
+   * <<ParameterizedFunction>>: defined by a mathematical expression and parameters; may be attached to a <<Histogram>> or included in a <<Collection>>.
+   * <<EvaluatedFunction>>: defined by a value at each bin of a <<Histogram>>; must be attached to a <<Histogram>>.
+   * <<BinnedEvaluatedFunction>>: defined by a value at each bin of an internally defined <<Axis>>; must be standalone in a <<Collection>>.
 
 == Parameter
 
@@ -815,6 +833,8 @@ If not all of the data were included in the quantile calculation, a *filter* des
 •{nbsp} *identifier*: unique str (required)
 •{nbsp} *values*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
 (required)
+•{nbsp} *errors*: <<InterpretedInlineBuffer>> or <<InterpretedInlineInt64Buffer>> or <<InterpretedInlineFloat64Buffer>> or <<InterpretedExternalBuffer>> +
+(default: null)
 
 *Details:*
 
