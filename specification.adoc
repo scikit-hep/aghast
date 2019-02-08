@@ -508,7 +508,7 @@ To be valid, the length of all of these buffers (in number of items, not number 
 
 == InterpretedInlineBuffer
 
-**
+*A generic array in the Flatbuffers hierarchy; used for any quantity that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins.*
 
 [%hardbreaks]
 •{nbsp} *buffer*: buffer (required)
@@ -521,10 +521,35 @@ To be valid, the length of all of these buffers (in number of items, not number 
 (default: `+Interpretation.little_endian+`)
 •{nbsp} *dimension_order*: one of {`+InterpretedBuffer.c_order+`, `+InterpretedBuffer.fortran+`} +
 (default: `+InterpretedBuffer.c_order+`)
+The *postfilter_slice*'s *step* cannot be zero. +
+The number of items in the *buffer* must be equal to the number of bins at this level of the hierarchy.
 
 *Details:*
 
+This array class provides its own interpretation in terms of data type and dimension order. It does not specify its own shape, the number of bins in each dimension, because that is given by its position in the hierarchy. If it is the <<UnweightedCounts>> of a <<Histogram>>, for instance, it must be reshapable to fit the number of bins implied by the <<Histogram>> *axis*.
 
+The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes with known length.
+
+The list of *filters* are applied to convert the bytes into an array. Typically, *filters* are compression algorithms such as `gzip`, `lzma`, and `lz4`, but they may be any zero-argument transformation (e.g. zigzag deencoding of integers or an affine mapping from integers to floating point numbers). If there is more than one filter, the output of each step is provided as input to the next.
+
+The *postfilter_slice*, if provided, selects a subset of the bytes returned by the last filter (or directly in the *buffer* if there are no *filters*). A slice has the following structure:
+
+    struct Slice {
+      start: long;
+      stop: long;
+      step: int;
+      has_start: bool;
+      has_stop: bool;
+      has_step: bool;
+    }
+
+though in Python, a builtin `slice` object should be used. The *postfilter_slice* is interpreted according to Python's rules (negative indexes, clipping, rather than errors if beyond the range, etc.).
+
+The *dtype* is the numeric type of the array, which includes `bool`, all signed and unsigned integers from 8 bits to 64 bits, and IEEE 754 floating point types with 32 or 64 bits. The `none` interpretation is presumed, if necessary, to be unsigned, 8 bit integers.
+
+The *endianness* may be `little_endian` or `big_endian`; the former is used by most recent architectures.
+
+The *dimension_order* may be `c_order` to follow the C programming language's convention or `fortran` to follow the FORTRAN programming language's convention. The *dimension_order* only has an effect when shaping an array with more than one dimension.
 
 == InterpretedInlineInt64Buffer
 
