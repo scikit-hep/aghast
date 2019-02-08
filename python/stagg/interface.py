@@ -6438,9 +6438,18 @@ class Ntuple(Object):
     decoration = typedproperty(_params["decoration"])
     script     = typedproperty(_params["script"])
 
-    description = ""
-    validity_rules = ()
+    description = "A non-aggregated collection of data; points in an n-dimensional vector space."
+    validity_rules = ("The *identifier* of each of the *columns* must be unique.",
+                      "The number of *instances* must equal the number of <<Collection>> axes at this level of hierarchy.")
     long_description = """
+Unlike <<Histogram>>, which represents aggregated data, an <<Ntuple>> does not represent a sum (or maxima, modes, or quantiles). It may be the result of some filtering or it may be a table returned by a group-by operation, and it could be useful for generating scatter plots, for unbinned fits, or for machine learning.
+
+Ntuples are standalone objects in a <<Collection>>, like histograms, and as such, they are subject to a <<Collection>>'s *axis*.
+
+HERE
+
+
+
 """
 
     def __init__(self, columns, instances, functions=None, title=None, metadata=None, decoration=None, script=None):
