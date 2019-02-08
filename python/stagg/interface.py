@@ -3957,10 +3957,18 @@ The *layout* and *layout_reversed* specify what the two bins mean. With a false 
 
 If *layout_reversed* is true, the order of the two bins is reversed.
 
-The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `undefined`, leaving that interpretation unspecified; `normal` is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. HERE
+The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `undefined`, leaving that interpretation unspecified. The `normal` method (sometimes called "`Wald`") is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. The `clopper_pearson` method (sometimes called "`exact`") is a common choice, though it fails in some statistical criteria.
 
+*See also:*
 
-             
+   * Newcombe, R. "`Two-Sided Confidence Intervals for the Single
+Proportion: Comparison of Seven Methods`" https://doi.org/10.1002/(SICI)1097-0258(19980430)17:8%3C857::AID-SIM777%3E3.0.CO;2-E[doi] http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.408.7107&rep=rep1&type=pdf [pdf]
+   * Dunnigan, K. "`Confidence Interval Calculation for Binomial Proportion`" http://www.mwsug.org/proceedings/2008/pharma/MWSUG-2008-P08.pdf[pdf]
+   * Mayfield, P. "`Understanding Binomial Confidence Intervals`" http://sigmazone.com/binomial-confidence-intervals[pdf]
+   * ATLAS collaboration http://www.pp.rhul.ac.uk/~cowan/atlas/ErrorBars.pdf[efficiency error bar recommendations]
+   * ROOT https://root.cern.ch/doc/master/classTEfficiency.html[TEfficiency class] documentation
+   * R binom package https://cran.r-project.org/web/packages/binom/index.html[CRAN], https://cran.r-project.org/web/packages/binom/binom.pdf[pdf]
+   * Wikipedia https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval[Binomial proportion confidence interval]
 """
 
     def __init__(self, layout=passall, layout_reversed=False, error_method=undefined):
