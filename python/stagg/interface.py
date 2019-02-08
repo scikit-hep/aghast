@@ -1436,9 +1436,10 @@ class StatisticFilter(Stagg):
     excludes_pinf = typedproperty(_params["excludes_pinf"])
     excludes_nan  = typedproperty(_params["excludes_nan"])
 
-    description = ""
-    validity_rules = ()
-    long_description = """
+    description = "Specifies which values were excluded from a statistic, such as <<Moments>>, <<Quantiles>>, <<Modes>>, or <<Extremes>>."
+    validity_rules = ("The *min* must be less than or equal to the *max*.",)
+    long_description = u"""
+The statistic to which this filter belongs was calculated from finite values between *min* and *max* (inclusive on both endpoints), as well as \u2012\u221e if *excludes_minf* is false, +\u221e if *excludes_pinf* is false, and `nan` (not a number) if *excludes_nan* is false.
 """
 
     def __init__(self, min=-numpy.inf, max=numpy.inf, excludes_minf=False, excludes_pinf=False, excludes_nan=False):
@@ -1449,8 +1450,8 @@ class StatisticFilter(Stagg):
         self.excludes_nan = excludes_nan
 
     def _valid(self, seen, recursive):
-        if self.min is not None and self.max is not None and self.min >= self.max:
-            raise ValueError("StatisticFilter.min ({0}) must be strictly less than StatisticFilter.max ({1})".format(self.min, self.max))
+        if self.min is not None and self.max is not None and self.min <= self.max:
+            raise ValueError("StatisticFilter.min ({0}) must be less than or equal to StatisticFilter.max ({1})".format(self.min, self.max))
 
     def _toflatbuffers(self, builder):
         return stagg.stagg_generated.StatisticFilter.CreateStatisticFilter(builder, self.min, self.max, self.excludes_minf, self.excludes_pinf, self.excludes_nan)

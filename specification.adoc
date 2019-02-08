@@ -754,7 +754,7 @@ If not all of the data were included in the min/max calculation, a *filter* desc
 
 == StatisticFilter
 
-**
+*Specifies which values were excluded from a statistic, such as <<Moments>>, <<Quantiles>>, <<Modes>>, or <<Extremes>>.*
 
 [%hardbreaks]
 •{nbsp} *min*: float in [‒∞, ∞] (default: ‒∞)
@@ -762,10 +762,11 @@ If not all of the data were included in the min/max calculation, a *filter* desc
 •{nbsp} *excludes_minf*: bool (default: false)
 •{nbsp} *excludes_pinf*: bool (default: false)
 •{nbsp} *excludes_nan*: bool (default: false)
+The *min* must be less than or equal to the *max*.
 
 *Details:*
 
-
+The statistic to which this filter belongs was calculated from finite values between *min* and *max* (inclusive on both endpoints), as well as ‒∞ if *excludes_minf* is false, +∞ if *excludes_pinf* is false, and `nan` (not a number) if *excludes_nan* is false.
 
 == Covariance
 
