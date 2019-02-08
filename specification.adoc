@@ -269,8 +269,8 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 [%hardbreaks]
 •{nbsp} *intervals*: list of <<RealInterval>> with length in [1, ∞) (required)
 •{nbsp} *overflow*: <<RealOverflow>> (default: null)
-•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
-(default: `+IrregularBinning.undefined+`)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.unspecified+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+(default: `+IrregularBinning.unspecified+`)
 The intervals, as defined by their *low*, *high*, *low_inclusive*, *high_inclusive* fields, must be unique.
 
 *Details:*
@@ -279,7 +279,7 @@ This binning is intended for one-dimensional, real-valued data. Unlike <<EdgesBi
 
 The existence and positions of any underflow, overflow, and nanflow bins, as well as how non-finite values were handled during filling, are contained in the <<RealOverflow>>.
 
-In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `undefined` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
+In fact, the intervals are not even required to be non-overlapping. A data value may correspond to zero, one, or more than one bin. The latter case raises the question of which bin was filled by a value that corresponds to multiple bins: the *overlapping_fill* strategy may be `unspecified` if we don't know, `all` if every corresponding bin was filled, `first` if only the first match was filled, and `last` if only the last match was filled.
 
 Irregular bins are usually not directly created by histogramming libraries, but they may come about as a result of merging histograms with different binnings.
 
@@ -355,8 +355,8 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
 •{nbsp} *layout*: one of {`+FractionBinning.passall+`, `+FractionBinning.failall+`, `+FractionBinning.passfail+`} +
 (default: `+FractionBinning.passall+`)
 •{nbsp} *layout_reversed*: bool (default: false)
-•{nbsp} *error_method*: one of {`+FractionBinning.undefined+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
-(default: `+FractionBinning.undefined+`)
+•{nbsp} *error_method*: one of {`+FractionBinning.unspecified+`, `+FractionBinning.normal+`, `+FractionBinning.clopper_pearson+`, `+FractionBinning.wilson+`, `+FractionBinning.agresti_coull+`, `+FractionBinning.feldman_cousins+`, `+FractionBinning.jeffrey+`, `+FractionBinning.bayesian_uniform+`} +
+(default: `+FractionBinning.unspecified+`)
 
 *Details:*
 
@@ -372,7 +372,7 @@ could represent a rising probability of passing cuts versus `"x"`. The first axi
 
 The *layout* and *layout_reversed* specify what the two bins mean. With a false *layout_reversed*, if *layout* is `passall`, the first bin is the number of inputs that pass a condition (the predicate evaluates to true) and the second is the total number of inputs. If *layout* is `failall`, the first bin is the number of inputs that fail the condition (the predicate evaluates to false). If *layout* is `passfail`, the first bin is the number that pass and the second bin is the number tha fail. These three types of layout can easily be converted to one another, but doing so requires a change to the <<Histogram>> bins or <<BinnedEvaluatedFunction>> values. If *layout_reversed* is true, the order of the two bins is reversed. (Thus, six layouts are possible.)
 
-The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `undefined`, leaving that interpretation unspecified. The `normal` method (sometimes called "`Wald`") is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. The `clopper_pearson` method (sometimes called "`exact`") is a common choice, though it fails in some statistical criteria. The computation and meaning of the methods are described in the references below.
+The *error_method* does not specify how the histograms or functions were filled, but how the fraction should be interpreted statistically. It may be `unspecified`, leaving that interpretation unspecified. The `normal` method (sometimes called "`Wald`") is a naive binomial interpretation, in which zero passing or zero failing values are taken to have zero uncertainty. The `clopper_pearson` method (sometimes called "`exact`") is a common choice, though it fails in some statistical criteria. The computation and meaning of the methods are described in the references below.
 
 *See also:*
 
@@ -391,14 +391,14 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
 
 [%hardbreaks]
 •{nbsp} *predicates*: list of str with length in [1, ∞) (required)
-•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.undefined+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
-(default: `+IrregularBinning.undefined+`)
+•{nbsp} *overlapping_fill*: one of {`+IrregularBinning.unspecified+`, `+IrregularBinning.all+`, `+IrregularBinning.first+`, `+IrregularBinning.last+`} +
+(default: `+IrregularBinning.unspecified+`)
 
 *Details:*
 
 This binning is intended to represent data "`regions,`" such as signal and control regions, defined by boolean functions of some input variables. The details of the predicate function are not captured by this class; they are expressed as strings in the *predicates* property. It is up to the user or application to associate string-valued *predicates* with data regions or predicate functions, as executable code, as keys in a lookup function, or as human-readable titles.
 
-Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`undefined`).
+Unlike <<CategoryBinning>>, this binning has no possibility of an overflow bin and a single input datum could pass multiple predicates. As with <<IrregularBinning>>, there is an *overlapping_fill* property to specify whether such a value is in `all` matching predicates, the `first`, the `last`, or if this is unknown (`unspecified`).
 
 Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string-valued labels computed in the filling procedure, or could produce strings that are not known before filling. Use a <<PredicateBinning>> if the data regions overlap or are identified by a fixed set of predicate functions. There are some cases in which a <<CategoryBinning>> and a <<PredicateBinning>> are both appropriate.
 
@@ -414,6 +414,8 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
 
 [%hardbreaks]
 •{nbsp} *variations*: list of <<Variation>> with length in [1, ∞) (required)
+•{nbsp} *systematic_units*: one of {`+VariationBinning.unspecified+`, `+VariationBinning.confidence+`, `+VariationBinning.sigmas+`} +
+(default: `+VariationBinning.unspecified+`)
 •{nbsp} *systematic_names*: list of str (default: null/empty)
 •{nbsp} *category_systematic_names*: list of str (default: null/empty)
 All *variations* must define the same set of *identifiers* in its *assignments*. +
@@ -424,6 +426,10 @@ All *variations* must have the same lengh *systematic* vector as this binning ha
 This binning is intended to represent systematic variations of the same data. A filling procedure should fill every bin with derived features computed in different ways. In this way, the relevance of a systematic error can be estimated.
 
 Each of the *variations* are <<Variation>> objects, which are defined below.
+
+Variations may be labeled as representing systematic errors. For instance, one bin may be "`one sigma high`" and another "`one sigma low.`" In general, several types of systematic error may be varied at once, and they may be varied by any amount in any direction. Each <<Variation>> therefore describes a point in a vector space: the number of dimensions in this space is the number of types of systematic errors and the basis vectors are variations of each type of systematic error separately.
+
+Some systematic errors are quantitative (e.g. misalignment) and others are categorical (e.g. choice of simulation algorithm). There are therefore two vectors in each <<Variation>>, one real-valued, the other string-valued. The *systematic_units* defines the units of the real-valued systematics vector.
 
 The *systematic_names* labels the dimensions of the <<Variation>> *systematic* vectors; they must all have the same number of dimensions. The *category_systematic_names* labels the dimensions of the <<Variation>> *category_systematic* vectors; they, too, must all have the same number of dimensions.
 
@@ -445,7 +451,11 @@ The *identifier* in each of the *assignments* must be unique.
 
 *Details:*
 
-The *assignments* specify how the derived features were computed when filling this bin as <<Assignment>> objects (see below).
+The *assignments* specify how the derived features were computed when filling this bin. The <<Assignment>> class is defined below.
+
+Variations may be labeled as representing systematic errors. For instance, one bin may be "`one sigma high`" and another "`one sigma low.`" In general, several types of systematic error may be varied at once, and they may be varied by any amount in any direction. Therefore, this object describes a point in a vector space: the number of dimensions in this space is the number of types of systematic errors and the basis vectors are variations of each type of systematic error separately.
+
+Some systematic errors are quantitative (e.g. misalignment) and others are categorical (e.g. choice of simulation algorithm). There are therefore two vectors: *systematic* is real-valued and *category_systematic* is string-valued.
 
 == Assignment
 

@@ -4274,11 +4274,9 @@ class Variation(Stagg):
     long_description = """
 The *assignments* specify how the derived features were computed when filling this bin. The <<Assignment>> class is defined below.
 
-The *systematic* vector expresses the HERE
+Variations may be labeled as representing systematic errors. For instance, one bin may be "`one sigma high`" and another "`one sigma low.`" In general, several types of systematic error may be varied at once, and they may be varied by any amount in any direction. Therefore, this object describes a point in a vector space: the number of dimensions in this space is the number of types of systematic errors and the basis vectors are variations of each type of systematic error separately.
 
-
-
-
+Some systematic errors are quantitative (e.g. misalignment) and others are categorical (e.g. choice of simulation algorithm). There are therefore two vectors: *systematic* is real-valued and *category_systematic* is string-valued.
 """
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
@@ -4373,6 +4371,10 @@ class VariationBinning(Binning):
 This binning is intended to represent systematic variations of the same data. A filling procedure should fill every bin with derived features computed in different ways. In this way, the relevance of a systematic error can be estimated.
 
 Each of the *variations* are <<Variation>> objects, which are defined below.
+
+Variations may be labeled as representing systematic errors. For instance, one bin may be "`one sigma high`" and another "`one sigma low.`" In general, several types of systematic error may be varied at once, and they may be varied by any amount in any direction. Each <<Variation>> therefore describes a point in a vector space: the number of dimensions in this space is the number of types of systematic errors and the basis vectors are variations of each type of systematic error separately.
+
+Some systematic errors are quantitative (e.g. misalignment) and others are categorical (e.g. choice of simulation algorithm). There are therefore two vectors in each <<Variation>>, one real-valued, the other string-valued. The *systematic_units* defines the units of the real-valued systematics vector.
 
 The *systematic_names* labels the dimensions of the <<Variation>> *systematic* vectors; they must all have the same number of dimensions. The *category_systematic_names* labels the dimensions of the <<Variation>> *category_systematic* vectors; they, too, must all have the same number of dimensions.
 
