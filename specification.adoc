@@ -213,6 +213,7 @@ The *minf_mapping* specifies whether ‒∞ values were ignored when the histogr
 •{nbsp} *xorigin*: float in (‒∞, ∞) (default: 0.0)
 •{nbsp} *yorigin*: float in (‒∞, ∞) (default: 0.0)
 •{nbsp} *qangle*: float in [‒π/2, π/2] (default: 0.0)
+•{nbsp} *bin_width*: float in (0.0, ∞) (default: 1.0)
 •{nbsp} *qoverflow*: <<RealOverflow>> (default: null)
 •{nbsp} *roverflow*: <<RealOverflow>> (default: null)
 The *qmin* must be strictly less than the *qmax*. +
@@ -226,7 +227,7 @@ As with any other binning, integer-valued indexes in the <<Histogram>> counts or
 
 There are several different schemes for mapping integer rectangles to hexagonal tiles; we use the ones https://www.redblobgames.com/grids/hexagons[defined here]: `offset`, `doubled_offset`, `cube_xy`, `cube_yz`, `cube_xz`, specified by the *coordinates* property. The center of the `q = 0, r = 0` tile is at *xorigin*, *yorigin*.
 
-In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from ‒π/2, if increasing `q` is collinear with decreasing `y`, to π/2, if increasing `q` is collinear with increasing `y`.
+In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from ‒π/2, if increasing `q` is collinear with decreasing `y`, to π/2, if increasing `q` is collinear with increasing `y`. The *bin_width* is the shortest distance between adjacent tile centers: the line between tile centers crosses the border between tiles at a right angle.
 
 A roughly but not exactly rectangular region of `x` and `y` fall within a slot in `q` and `r`. Overflows, underflows, and nanflows, converted to floating-point `q` and `r`, are represented by overflow, underflow, and nanflow bins in *qoverflow* and *roverflow*. Note that the total number of bins is strictly multiplicative (as it would be for a rectangular with two <<RegularBinning>> axes): the total number of bins is the number of normal `q` bins plus any overflows times the number of normal `r` bins plus any overflows. That is, all `r` bins are represented for each `q` bin, even overflow `q` bins.
 

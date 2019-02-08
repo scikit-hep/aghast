@@ -2723,6 +2723,7 @@ class HexagonalBinning(Binning):
         "coordinates": stagg.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
         "xorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
         "yorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "bin_width":   stagg.checktype.CheckNumber("HexagonalBinning", "bin_width", required=False, min=0.0, min_inclusive=False, max_inclusive=False),
         "qangle":      stagg.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
         "qoverflow":   stagg.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
         "roverflow":   stagg.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
@@ -2735,6 +2736,7 @@ class HexagonalBinning(Binning):
     coordinates = typedproperty(_params["coordinates"])
     xorigin     = typedproperty(_params["xorigin"])
     yorigin     = typedproperty(_params["yorigin"])
+    bin_width   = typedproperty(_params["bin_width"])
     qangle      = typedproperty(_params["qangle"])
     qoverflow   = typedproperty(_params["qoverflow"])
     roverflow   = typedproperty(_params["roverflow"])
@@ -2749,12 +2751,12 @@ As with any other binning, integer-valued indexes in the <<Histogram>> counts or
 
 There are several different schemes for mapping integer rectangles to hexagonal tiles; we use the ones https://www.redblobgames.com/grids/hexagons[defined here]: `offset`, `doubled_offset`, `cube_xy`, `cube_yz`, `cube_xz`, specified by the *coordinates* property. The center of the `q = 0, r = 0` tile is at *xorigin*, *yorigin*.
 
-In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from \u2012\u03c0/2, if increasing `q` is collinear with decreasing `y`, to \u03c0/2, if increasing `q` is collinear with increasing `y`.
+In "`pointy topped`" coordinates, *qangle* is zero if increasing `q` is collinear with increasing `x`, and this angle ranges from \u2012\u03c0/2, if increasing `q` is collinear with decreasing `y`, to \u03c0/2, if increasing `q` is collinear with increasing `y`. The *bin_width* is the shortest distance between adjacent tile centers: the line between tile centers crosses the border between tiles at a right angle.
 
 A roughly but not exactly rectangular region of `x` and `y` fall within a slot in `q` and `r`. Overflows, underflows, and nanflows, converted to floating-point `q` and `r`, are represented by overflow, underflow, and nanflow bins in *qoverflow* and *roverflow*. Note that the total number of bins is strictly multiplicative (as it would be for a rectangular with two <<RegularBinning>> axes): the total number of bins is the number of normal `q` bins plus any overflows times the number of normal `r` bins plus any overflows. That is, all `r` bins are represented for each `q` bin, even overflow `q` bins.
 """
 
-    def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, qoverflow=None, roverflow=None):
+    def __init__(self, qmin, qmax, rmin, rmax, coordinates=offset, xorigin=0.0, yorigin=0.0, qangle=0.0, bin_width=1.0, qoverflow=None, roverflow=None):
         self.qmin = qmin
         self.qmax = qmax
         self.rmin = rmin
@@ -2763,6 +2765,7 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
         self.xorigin = xorigin
         self.yorigin = yorigin
         self.qangle = qangle
+        self.bin_width = bin_width
         self.qoverflow = qoverflow
         self.roverflow = roverflow
 
@@ -2806,6 +2809,8 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
         if self.qangle != 0.0:
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
+        if self.bin_width != 1.0:
+            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddBinWidth(builder, self.bin_width)
         if self.qoverflow is not None:
             stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, self.qoverflow._toflatbuffers(builder))
         if self.roverflow is not None:
@@ -2822,6 +2827,8 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
             args.append("yorigin={0}".format(repr(self.yorigin)))
         if self.qangle != 0.0:
             args.append("qangle={0}".format(repr(self.qangle)))
+        if self.bin_width != 1.0:
+            args.append("bin_width={0}".format(repr(self.bin_width)))
         if self.qoverflow is not None:
             args.append("qoverflow={0}".format(_dumpeq(self.qoverflow._dump(indent + "    ", width, end), indent, end)))
         if self.roverflow is not None:
