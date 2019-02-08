@@ -376,7 +376,7 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
    * Mayfield, P. "`Understanding Binomial Confidence Intervals`" [http://sigmazone.com/binomial-confidence-intervals[pdf]]
    * ATLAS collaboration http://www.pp.rhul.ac.uk/~cowan/atlas/ErrorBars.pdf[efficiency error bar recommendations]
    * ROOT https://root.cern.ch/doc/master/classTEfficiency.html[TEfficiency class] documentation
-   * R binom package [https://cran.r-project.org/web/packages/binom/index.html[CRAN], https://cran.r-project.org/web/packages/binom/binom.pdf[pdf]]
+   * R binom package [https://cran.r-project.org/web/packages/binom/index.html[CRAN]], [https://cran.r-project.org/web/packages/binom/binom.pdf[pdf]]
    * Wikipedia https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval[Binomial proportion confidence interval]
 
 == PredicateBinning
