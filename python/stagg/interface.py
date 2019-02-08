@@ -1551,9 +1551,12 @@ class Extremes(Stagg):
     values = typedproperty(_params["values"])
     filter = typedproperty(_params["filter"])
 
-    description = ""
+    description = "Represents the minimum or maximum of a distribution; a single value for an <<Axis>> or one per bin for a <<Profile>>; also used in <<ColumnChunk>> to summarize data in a column of an <<Ntuple>>."
     validity_rules = ()
     long_description = """
+The *values* is a buffer containing a single value if this <<Extremes>> is attached under an <<Axis>> (summarizing the quantity that axis represents for all input data) or a buffer containing as many values as there are bins in a <<Histogram>> if this <<Extremes>> is attached under a <<Profile>>. If attached under a <<ColumnChunk>> in an <<Ntuple>>, it represents the minimum or maximum values in each <<Page>> of the <<ColumnChunk>>, to quickly determine if the <<Page>> needs to be read/decompressed, for instance.
+
+If not all of the data were included in the min/max calculation, a *filter* describes which values were excluded. This <<StatisticFilter>> is described below.
 """
 
     def __init__(self, values, filter=None):
