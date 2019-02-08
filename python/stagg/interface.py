@@ -4235,9 +4235,10 @@ class Assignment(Stagg):
     identifier = typedproperty(_params["identifier"])
     expression = typedproperty(_params["expression"])
 
-    description = ""
+    description = "Represents one derived feature in a <<Variation>>."
     validity_rules = ()
     long_description = """
+The *identifier* is the name of the derived feature that gets recomputed in this <<Variation>>, and *expression* is what it is assigned to. No constraints are placed on the *expression* syntax; it may even be a key to a lookup function or a human-readable description.
 """
 
     def __init__(self, identifier, expression):

@@ -459,7 +459,7 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
 
 == Assignment
 
-**
+*Represents one derived feature in a <<Variation>>.*
 
 [%hardbreaks]
 •{nbsp} *identifier*: unique str (required)
@@ -467,7 +467,7 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
 
 *Details:*
 
-
+The *identifier* is the name of the derived feature that gets recomputed in this <<Variation>>, and *expression* is what it is assigned to. No constraints are placed on the *expression* syntax; it may even be a key to a lookup function or a human-readable description.
 
 == UnweightedCounts
 
