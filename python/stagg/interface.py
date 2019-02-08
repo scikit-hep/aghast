@@ -4268,9 +4268,15 @@ class Variation(Stagg):
     systematic          = typedproperty(_params["systematic"])
     category_systematic = typedproperty(_params["category_systematic"])
 
-    description = ""
-    validity_rules = ()
+    description = "Represents one systematic variation, which is one bin of a <<VariationBinning>>."
+    validity_rules = ("The *identifier* in each of the *assignments* must be unique.",)
     long_description = """
+The *assignments* specify how the derived features were computed when filling this bin as <<Assignment>> objects (see below).
+
+
+
+
+
 """
 
     def __init__(self, assignments, systematic=None, category_systematic=None):
@@ -4339,17 +4345,24 @@ class Variation(Stagg):
 
 class VariationBinning(Binning):
     _params = {
-        "variations": stagg.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        "variations":                stagg.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        "systematic_names":          stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
+        "category_systematic_names": stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
         }
 
-    variations = typedproperty(_params["variations"])
+    variations                = typedproperty(_params["variations"])
+    systematic_names          = typedproperty(_params["systematic_names"])
+    category_systematic_names = typedproperty(_params["category_systematic_names"])
 
     description = "Associates alternative derived features of the same input data, which may represent systematic variations of the data, with bins."
-    validity_rules = ("All *variations* must define the same set of *identifiers* in its *assignments*.",)
+    validity_rules = ("All *variations* must define the same set of *identifiers* in its *assignments*.",
+                      "All *variations* must have the same lengh *systematic* vector as this binning has *systematic_names* and the same length *category_systematic* vector as this binning has *category_systematic_names*.")
     long_description = """
 This binning is intended to represent systematic variations of the same data. A filling procedure should fill every bin with derived features computed in different ways. In this way, the relevance of a systematic error can be estimated.
 
 Each of the *variations* are <<Variation>> objects, which are defined below.
+
+The *systematic_names* labels the dimensions of the <<Variation>> *systematic* vectors; they must all have the same number of dimensions. The *category_systematic_names* labels the dimensions of the <<Variation>> *category_systematic* vectors; they, too, must all have the same number of dimensions.
 
 *See also:*
 
@@ -4358,8 +4371,10 @@ Each of the *variations* are <<Variation>> objects, which are defined below.
    * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
-    def __init__(self, variations):
+    def __init__(self, variations, systematic_names=None, category_systematic_names=None):
         self.variations = variations
+        self.systematic_names = systematic_names
+        self.category_systematic_names = category_systematic_names
 
     def _valid(self, seen, recursive):
         idset = None
@@ -4368,7 +4383,11 @@ Each of the *variations* are <<Variation>> objects, which are defined below.
             if idset is None:
                 idset = thisidset
             if idset != thisidset:
-                raise ValueError("one variation defines identifiers {{{0}}} while another defines {{{1}}}".format(", ".join(sorted(idset)), ", ".join(sorted(thisidset))))
+                raise ValueError("variation defines identifiers {{{0}}} while another defines {{{1}}}".format(", ".join(sorted(idset)), ", ".join(sorted(thisidset))))
+            if len(variation.systematic) != len(self.systematic_names):
+                raise ValueError("variation has systematic [{0}] (length {1}) but systematic_names has length {2}".format(", ".join("%g" % x for x in variation.systematic), len(variation.systematic), len(self.systematic_names)))
+            if len(variation.category_systematic) != len(self.category_systematic_names):
+                raise ValueError("variation has category_systematic [{0}] (length {1}) but category_systematic_names has length {2}".format(", ".join(repr(x) for x in variation.category_systematic), len(variation.category_systematic), len(self.category_systematic_names)))
         if recursive:
             _valid(self.variations, seen, recursive)
 
@@ -4381,14 +4400,32 @@ Each of the *variations* are <<Variation>> objects, which are defined below.
 
     def _toflatbuffers(self, builder):
         variations = [x._toflatbuffers(builder) for x in self.variations]
+        systematic_names = None if len(self.systematic_names) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.systematic_names]
+        category_systematic_names = None if len(self.category_systematic_names) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic_names]
 
         stagg.stagg_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
         for x in variations[::-1]:
             builder.PrependUOffsetTRelative(x)
         variations = builder.EndVector(len(variations))
 
+        if systematic_names is not None:
+            stagg.stagg_generated.VariationBinning.VariationBinningStartSystematicNamesVector(builder, len(systematic_names))
+            for x in systematic_names[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            systematic_names = builder.EndVector(len(systematic_names))
+
+        if category_systematic_names is not None:
+            stagg.stagg_generated.VariationBinning.VariationBinningStartCategorySystematicNamesVector(builder, len(category_systematic_names))
+            for x in category_systematic_names[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            category_systematic_names = builder.EndVector(len(category_systematic_names))
+
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
+        if systematic_names is not None:
+            stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
+        if category_systematic_names is not None:
+            stagg.stagg_generated.VariationBinning.VariationBinningAddCategorySystematicNames(builder, category_systematic_names)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
 
     def _dump(self, indent, width, end):

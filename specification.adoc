@@ -414,13 +414,18 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
 
 [%hardbreaks]
 •{nbsp} *variations*: list of <<Variation>> with length in [1, ∞) (required)
-All *variations* must define the same set of *identifiers* in its *assignments*.
+•{nbsp} *systematic_names*: list of str (default: null/empty)
+•{nbsp} *category_systematic_names*: list of str (default: null/empty)
+All *variations* must define the same set of *identifiers* in its *assignments*. +
+All *variations* must have the same lengh *systematic* vector as this binning has *systematic_names* and the same length *category_systematic* vector as this binning has *category_systematic_names*.
 
 *Details:*
 
 This binning is intended to represent systematic variations of the same data. A filling procedure should fill every bin with derived features computed in different ways. In this way, the relevance of a systematic error can be estimated.
 
 Each of the *variations* are <<Variation>> objects, which are defined below.
+
+The *systematic_names* labels the dimensions of the <<Variation>> *systematic* vectors; they must all have the same number of dimensions. The *category_systematic_names* labels the dimensions of the <<Variation>> *category_systematic* vectors; they, too, must all have the same number of dimensions.
 
 *See also:*
 
@@ -430,16 +435,17 @@ Each of the *variations* are <<Variation>> objects, which are defined below.
 
 == Variation
 
-**
+*Represents one systematic variation, which is one bin of a <<VariationBinning>>.*
 
 [%hardbreaks]
 •{nbsp} *assignments*: list of <<Assignment>> (required)
 •{nbsp} *systematic*: list of float (default: null/empty)
 •{nbsp} *category_systematic*: list of str (default: null/empty)
+The *identifier* in each of the *assignments* must be unique.
 
 *Details:*
 
-
+The *assignments* specify how the derived features were computed when filling this bin as <<Assignment>> objects (see below).
 
 == Assignment
 

@@ -329,6 +329,8 @@ table Variation {
 
 table VariationBinning {
   variations: [Variation] (required);
+  systematic_names: [string];
+  category_systematic_names: [string];
 }
 
 union Binning {
