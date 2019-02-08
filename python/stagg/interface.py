@@ -965,7 +965,7 @@ The *postfilter_slice*, if provided, selects a subset of the bytes returned by t
       has_step: bool;
     }
 
-though in Python, a builtin `slice` object should be used. The *postfilter_slice* is interpreted according to Python's rules (negative indexes, low-inclusive and high-exclusive, clipping-not-errors if beyond the range, etc.).
+though in Python, a builtin `slice` object should be provided to this class's constructor. The *postfilter_slice* is interpreted according to Python's rules (negative indexes, low-inclusive and high-exclusive, clipping-not-errors if beyond the range, etc.).
 
 The *dtype* is the numeric type of the array, which includes `bool`, all signed and unsigned integers from 8 bits to 64 bits, and IEEE 754 floating point types with 32 or 64 bits. The `none` interpretation is presumed, if necessary, to be unsigned, 8 bit integers.
 
