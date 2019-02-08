@@ -3391,7 +3391,7 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
 
    * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
    * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
-   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
+   * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
     def __init__(self, categories, loc_overflow=BinLocation.nonexistent):
@@ -4073,7 +4073,7 @@ class PredicateBinning(Binning, OverlappingFill):
     predicates       = typedproperty(_params["predicates"])
     overlapping_fill = typedproperty(_params["overlapping_fill"])
 
-    description = "Associates predicates, boolean functions computed during filling, with bins."
+    description = "Associates predicates (derived boolean features), which may represent different data \"`regions,`\" with bins."
     validity_rules = ()
     long_description = """
 This binning is intended to represent data "`regions,`" such as signal and control regions, defined by boolean functions of some input variables. The details of the predicate function are not captured by this class; they are expressed as strings in the *predicates* property. It is up to the user or application to associate string-valued *predicates* with data regions or predicate functions, as executable code, as keys in a lookup function, or as human-readable titles.
@@ -4086,7 +4086,7 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
 
    * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
    * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
-   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
+   * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
     def __init__(self, predicates, overlapping_fill=OverlappingFill.undefined):
@@ -4344,23 +4344,31 @@ class VariationBinning(Binning):
 
     variations = typedproperty(_params["variations"])
 
-    description = ""
-    validity_rules = ()
+    description = "Associates alternative derived features of the same input data, which may represent systematic variations of the data, with bins."
+    validity_rules = ("All *variations* must define the same set of *identifiers* in its *assignments*.",)
     long_description = """
+This binning is intended to represent systematic variations of the same data. A filling procedure should fill every bin with derived features computed in different ways. In this way, the relevance of a systematic error can be estimated.
 
-
+Each of the *variations* are <<Variation>> objects, which are defined below.
 
 *See also:*
 
    * <<CategoryBinning>>: for disjoint categories with a possible overflow bin.
    * <<PredicateBinning>>: for possibly overlapping regions defined by predicate functions.
-   * <<VariationBinning>>: for completely overlapping input events, computed different ways.
+   * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
     def __init__(self, variations):
         self.variations = variations
 
     def _valid(self, seen, recursive):
+        idset = None
+        for variation in self.variations:
+            thisidset = set(x.identifier for x in variation.assignments)
+            if idset is None:
+                idset = thisidset
+            if idset != thisidset:
+                raise ValueError("one variation defines identifiers {{{0}}} while another defines {{{1}}}".format(", ".join(sorted(idset)), ", ".join(sorted(thisidset))))
         if recursive:
             _valid(self.variations, seen, recursive)
 
@@ -4480,7 +4488,7 @@ class Axis(Stagg):
     long_description = """
 The dimension or dimensions are subdivided by the *binning* property; all other properties provide additional information.
 
-If the axis represents a computed *expression*, it may be encoded here as a string. The *title* is a human-readable description.
+If the axis represents a computed *expression* (derived feature), it may be encoded here as a string. The *title* is a human-readable description.
 
 A <<Statistics>> object (one per dimension) summarizes the data separately from the histogram counts. For instance, it may contain the mean and standard deviation of all data along a dimension, which is more accurate than a mean and standard deviation derived from the counts.
 
