@@ -1708,9 +1708,19 @@ class Statistics(Stagg):
     min    = typedproperty(_params["min"])
     max    = typedproperty(_params["max"])
 
-    description = ""
-    validity_rules = ()
+    description = "Represents summary statistics for a <<Histogram>> axis or for each bin in a <<Profile>>."
+    validity_rules = ("All *moments* must have unique *n* and *weightpower* properties.",
+                      "All *quantiles* must have unique *n* and *weightpower* properties.")
     long_description = """
+This object provides a statistical summary of a distribution without binning it as a histogram does. Examples include mean, standard deviation, median, and mode.
+
+Anything that can be computed from moments, such as the mean and standard deviation, are stored as raw moments, in the *moments* property. Concepts like "`mean`" and "`standard deviation`" are not explicitly called out by the structure; they must be constructed.
+
+Medians, quartiles, and quintiles are all stored in the *quantiles* property.
+
+If the mode of the distribution was computed, it is stored in the *mode* property.
+
+The minimum and maximum of a distribution are special cases of quantiles, but quantiles can't in general be combined from preaggregated subsets of the data. The *min* and *max* can be combined (they are monadic calculations, like the sums that are *moments*), so they are stored separately as <<Extremes>>.
 """
 
     def __init__(self, moments=None, quantiles=None, mode=None, min=None, max=None):
