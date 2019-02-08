@@ -952,7 +952,7 @@ This array class provides its own interpretation in terms of data type and dimen
 
 The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes with known length.
 
-The list of *filters* are applied to convert the bytes into an array. Typically, *filters* are compression algorithms such as `gzip`, `lzma`, and `lz4`, but they may be any zero-argument transformation (e.g. zigzag deencoding of integers or an affine mapping from integers to floating point numbers). If there is more than one filter, the output of each step is provided as input to the next.
+The list of *filters* are applied to convert bytes in the *buffer* into an array. Typically, *filters* are compression algorithms such as `gzip`, `lzma`, and `lz4`, but they may be any zero-argument transformation (e.g. zigzag deencoding of integers or an affine mapping from integers to floating point numbers). If there is more than one filter, the output of each step is provided as input to the next.
 
 The *postfilter_slice*, if provided, selects a subset of the bytes returned by the last filter (or directly in the *buffer* if there are no *filters*). A slice has the following structure:
 
