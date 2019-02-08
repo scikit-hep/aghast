@@ -327,8 +327,15 @@ table Variation {
   category_systematic: [string];
 }
 
+enum SystematicUnits: byte {
+  syst_unspecified = 0,
+  syst_confidence = 1,
+  syst_sigmas = 2,
+}
+
 table VariationBinning {
   variations: [Variation] (required);
+  systematic_units: SystematicUnits = syst_unspecified;
   systematic_names: [string];
   category_systematic_names: [string];
 }

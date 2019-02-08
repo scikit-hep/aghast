@@ -88,6 +88,7 @@ import stagg.stagg_generated.FractionBinning
 import stagg.stagg_generated.PredicateBinning
 import stagg.stagg_generated.Assignment
 import stagg.stagg_generated.Variation
+import stagg.stagg_generated.SystematicUnits
 import stagg.stagg_generated.VariationBinning
 import stagg.stagg_generated.Binning
 import stagg.stagg_generated.Axis
@@ -4271,8 +4272,9 @@ class Variation(Stagg):
     description = "Represents one systematic variation, which is one bin of a <<VariationBinning>>."
     validity_rules = ("The *identifier* in each of the *assignments* must be unique.",)
     long_description = """
-The *assignments* specify how the derived features were computed when filling this bin as <<Assignment>> objects (see below).
+The *assignments* specify how the derived features were computed when filling this bin. The <<Assignment>> class is defined below.
 
+The *systematic* vector expresses the HERE
 
 
 
@@ -4343,14 +4345,24 @@ The *assignments* specify how the derived features were computed when filling th
 
 ################################################# VariationBinning
 
+class SystematicUnitsEnum(Enum):
+    base = "VariationBinning"
+
 class VariationBinning(Binning):
+    unspecified = SystematicUnitsEnum("unspecified", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_unspecified)
+    confidence  = SystematicUnitsEnum("confidence", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_confidence)
+    sigmas      = SystematicUnitsEnum("sigmas", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_sigmas)
+    units = [unspecified, confidence, sigmas]
+
     _params = {
         "variations":                stagg.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        "systematic_units":          stagg.checktype.CheckEnum("VariationBinning", "systematic_units", required=False, choices=units),
         "systematic_names":          stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
         "category_systematic_names": stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
         }
 
     variations                = typedproperty(_params["variations"])
+    systematic_units          = typedproperty(_params["systematic_units"])
     systematic_names          = typedproperty(_params["systematic_names"])
     category_systematic_names = typedproperty(_params["category_systematic_names"])
 
@@ -4371,8 +4383,9 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
    * <<VariationBinning>>: for completely overlapping input data, with derived features computed different ways.
 """
 
-    def __init__(self, variations, systematic_names=None, category_systematic_names=None):
+    def __init__(self, variations, systematic_units=unspecified, systematic_names=None, category_systematic_names=None):
         self.variations = variations
+        self.systematic_units = systematic_units
         self.systematic_names = systematic_names
         self.category_systematic_names = category_systematic_names
 
@@ -4422,6 +4435,8 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
 
         stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
+        if self.systematic_units != self.unspecified:
+            stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicUnits(builder, self.systematic_units.value)
         if systematic_names is not None:
             stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
         if category_systematic_names is not None:
@@ -4430,6 +4445,12 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
 
     def _dump(self, indent, width, end):
         args = ["variations=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.variations], indent, width, end), indent, end) + "]"]
+        if self.systematic_units != self.unspecified:
+            args.append("systematic_units={0}".format(repr(self.systematic_units)))
+        if self.systematic_names is not None:
+            args.append("systematic_names=[{0}]".format(", ".join(repr(x) for x in self.systematic_names)))
+        if self.category_systematic_names is not None:
+            args.append("category_systematic_names=[{0}]".format(", ".join(repr(x) for x in self.category_systematic_names)))
         return _dumpline(self, args, indent, width, end)
 
     def toCategoryBinning(self, format="%g"):
@@ -4465,7 +4486,7 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
             index = numpy.full(len(self.variations), -1, dtype=numpy.int64)
             index[start:stop:step] = numpy.arange(length)
 
-            binning = VariationBinning([x.detached() for x in variations])
+            binning = VariationBinning([x.detached() for x in variations], systematic_units=self.systematic_units, systematic_names=self.systematic_names, category_systematic_names=self.category_systematic_names)
 
             return binning, (index,)
 
@@ -4485,7 +4506,7 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
                     raise IndexError("index {0} would result in no bins".format(where))
                 index = self.full(len(self.variations), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(variations))
-                binning = VariationBinning([x.detached() for x in variations])
+                binning = VariationBinning([x.detached() for x in variations], systematic_units=self.systematic_units, systematic_names=self.systematic_names, category_systematic_names=self.category_systematic_names)
                 return binning, (index,)
 
         if isiloc:
