@@ -628,7 +628,7 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
 
 == Profile
 
-*Summarizes a dependent variable in a <<Histogram>>, binned by the <<Histogram>> *axis* (independent variables).*
+*Summarizes a dependent variable in a <<Histogram>>, binned by the <<Histogram>> axis (independent variables).*
 
 [%hardbreaks]
 •{nbsp} *expression*: str (required)

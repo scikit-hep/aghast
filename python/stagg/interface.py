@@ -4725,7 +4725,7 @@ class Profile(Stagg):
     metadata   = typedproperty(_params["metadata"])
     decoration = typedproperty(_params["decoration"])
 
-    description = "Summarizes a dependent variable in a <<Histogram>>, binned by the <<Histogram>> *axis* (independent variables)."
+    description = "Summarizes a dependent variable in a <<Histogram>>, binned by the <<Histogram>> axis (independent variables)."
     validity_rules = ()
     long_description = """
 Although a statistician's histogram strictly represents a distribution, it is often useful to store a few more values per bin to estimate average values for an empirical function from a dataset. This practice is common in particle physics, from HPROF in CERNLIB to https://root.cern.ch/doc/master/classTProfile.html[TProfile] in ROOT.
