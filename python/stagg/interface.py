@@ -847,9 +847,12 @@ class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    description = ""
+    description = "A generic, uninterpreted array in the Flatbuffers hierarchy; used for small buffers, like <<Ntuple>> pages, that are interpreted centrally, as in an <<Ntuple>> column."
     validity_rules = ()
     long_description = """
+This array class does not provide its own interpretation in terms of data type and dimension order. The interpretation must be provided elsewhere, such as in an ntuple's <<Column>>. This is to avoid repeating (and possibly introduce conflicting) interpretation metadata for many buffers whose type is identical but are stored in pages for performance reasons.
+
+The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes with known length.
 """
 
     def __init__(self, buffer):
@@ -897,9 +900,12 @@ class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     numbytes      = typedproperty(_params["numbytes"])
     external_source = typedproperty(_params["external_source"])
 
-    description = ""
+    description = "A generic, uninterpreted array stored outside the Flatbuffers hierarchy; used for small buffers, like <<Ntuple>> pages, that are interpreted centrally, as in an <<Ntuple>> column."
     validity_rules = ()
     long_description = """
+This array class is like <<RawInlineBuffer>>, but its contents are outside of the Flatbuffers hierarchy. Instead of a *buffer* property, it has a *pointer* and a *numbytes* to specify the source of bytes.
+
+If the *external_source* is `memory`, then the *pointer* and *numbytes* are interpreted as a raw array in memory. If the *external_source* is `samefile`, then the *pointer* is taken to be a seek position in the same file that stores the Flatbuffer (assuming the Flatbuffer resides in a file). If *external_source* is `file`, then the *location* property is taken to be a file path, and the *pointer* is taken to be a seek position in that file. If *external_source* is `url`, then the *location* property is taken to be a URL and the bytes are requested by HTTP.
 """
 
     def __init__(self, pointer, numbytes, external_source=ExternalBuffer.memory):
