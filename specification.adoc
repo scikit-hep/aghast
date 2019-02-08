@@ -553,14 +553,14 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
 
 == InterpretedInlineInt64Buffer
 
-*An integer array in the Flatbuffers hierarchy; used for integer quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins.*
+*An integer array in the Flatbuffers hierarchy; used for integer-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins.*
 
 [%hardbreaks]
 •{nbsp} *buffer*: buffer (required)
 
 *Details:*
 
-This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 
 == InterpretedInlineFloat64Buffer
 
@@ -571,7 +571,7 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
 
 *Details:*
 
-This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 
 == InterpretedExternalBuffer
 

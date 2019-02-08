@@ -1099,10 +1099,10 @@ class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
 
     buffer = typedproperty(_params["buffer"])
 
-    description = "An integer array in the Flatbuffers hierarchy; used for integer quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
+    description = "An integer array in the Flatbuffers hierarchy; used for integer-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
     validity_rules = ()
     long_description = """
-This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `int64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 """
 
     def __init__(self, buffer):
@@ -1180,7 +1180,7 @@ class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     description = "A floating point array in the Flatbuffers hierarchy; used for real-valued quantities that can have different values in different <<Histogram>> or <<BinnedEvaluatedFunction>> bins."
     validity_rules = ()
     long_description = """
-This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid over-specification.
+This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no *postfilter_slice*, a *dtype* of `float64`, an *endianness* of `little_endian`, and a *dimension_order* of `c_order`. It is provided as an optimization because many small arrays should avoid unnecessary Flatbuffers lookup overhead.
 """
 
     def __init__(self, buffer):
