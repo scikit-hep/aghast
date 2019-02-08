@@ -1489,7 +1489,7 @@ class Moments(Stagg):
     long_description = """
 Moments are primarily used for mean and standard deviation, but they can also be used to compute skew, kurtosis, etc. In general, a moment is a sum of weights (to some power) times the quantity of interest (to some power). Moments from preaggregated subsets of the data can simply be added, whereas a prepared mean cannot.
 
-The *sumwxn* is a buffer containing a single value if this <<Moment>> is attached under an <<Axis>> (summarizing the quantity that axis represents for all input data) or a buffer containing as many values as there are bins in a <<Histogram>> if this <<Moment>> is attached under a <<Profile>>. Thus, it serves two puproses: auxiliary data about an <<Axis>> and the bin-by-bin data that make up a profile plot.
+The *sumwxn* is a buffer containing a single value if this <<Moment>> is attached under an <<Axis>> (summarizing the quantity that axis represents for all input data) or a buffer containing as many values as there are bins in a <<Histogram>> if this <<Moment>> is attached under a <<Profile>>. Thus, it serves two purposes: auxiliary data about an <<Axis>> and the bin-by-bin data that make up a profile plot.
 
 The quantity of interest is raised to the power *n*. Thus, the total number of entries would be computed from `n = 0`, the mean from `n = 1`, and the standard deviation from the `n = 2` and `n = 1` moments.
 
@@ -1604,9 +1604,18 @@ class Quantiles(Stagg):
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
 
-    description = ""
+    description = "Represents one type of quantile; a single value for an <<Axis>> or one per bin for a <<Profile>>."
     validity_rules = ()
     long_description = """
+Quantiles are a generalization of median, quartiles, and quintiles. A median is the point in a distribution where 50% of the probability is below that value, quartiles are 25%, 50%, 75%, and quintiles are 20%, 40%, 60%, 80%.
+
+The *values* is a buffer containing a single value if this <<Quantile>> is attached under an <<Axis>> (summarizing the quantity that axis represents for all input data) or a buffer containing as many values as there are bins in a <<Histogram>> if this <<Moment>> is attached under a <<Profile>>. Thus, it serves two purposes: auxiliary data about an <<Axis>> and the bin-by-bin data that make up a box-and-whiskers plot.
+
+The dividing point is *p*, a value between 0 and 1 (inclusive on both endpoints). For a median, `p = 0.5`, etc.
+
+If *weightpower* is not zero, the contribution of input values to *p* were weighted. `weightpower = 1` would be typical of a <<Histogram>> with <<WeightedCounts>>, so that the weighted quantile agrees with an approximate calculation performed on the histogram's distribution.
+
+If not all of the data were included in the sum, a *filter* describes which values were excluded. This <<StatisticFilter>> is described below.
 """
 
     def __init__(self, values, p=0.5, weightpower=0, filter=None):
