@@ -4766,9 +4766,14 @@ class UnweightedCounts(Counts):
 
     counts = typedproperty(_params["counts"])
 
-    description = ""
+    description = "Represents counts in a <<Histogram>> that were filled without weighting. (All inputs increase bin values by one unit.)"
     validity_rules = ()
     long_description = """
+The *counts* buffer contains the actual values. Since these counts are unweighted, they could have unsigned integer type, but no such constraint is applied.
+
+A <<Histogram>> bin count is typically interpreted as an estimate of the probability of a data value falling into that bin times the total number of input values. It is therefore estimating a probability distribution, and that estimate has uncertainty. The uncertainty for unweighted counts follows a Poisson distribution. In the limit of large counts, the uncertainty approaches the square root of the number of counts, with deviations from this for small counts. A separate statistic to quantify this uncertainty is unnecessary because it can be fully determined from the number of counts.
+
+To be valid, the length of the *counts* buffer (in number of items, not number of bytes) must be equal to the number of bins in this <<Histogram>>, including any axes inherited by nesting the <<Histogram>> in a <<Collection>>. The number of bins in the <<Histogram>> is the product of the number of bins in each <<Axis>>, including any underflow, overflow, or nanflow bins. That is, it must be possible to reshape the buffer into a multidimensional array, in which every dimension corresponds to one <<Axis>>.
 """
 
     def __init__(self, counts):
@@ -4831,9 +4836,16 @@ class WeightedCounts(Counts):
     sumw2      = typedproperty(_params["sumw2"])
     unweighted = typedproperty(_params["unweighted"])
 
-    description = ""
+    description = "Represents counts in a <<Histogram>> that were filled with weights. (Some inputs may increase bin values more than others, or even by a negative amount.)"
     validity_rules = ()
     long_description = """
+The *sumw* (sum of weights) buffer contains the actual values. Since these values are weighted, they might need a floating point or even signed type.
+
+A <<Histogram>> bin count is typically interpreted as an estimate of the probability of a data value falling into that bin times the total number of input values. It is therefore estimating a probability distribution, and that estimate has uncertainty. The uncertainty for weighted counts is approximately the square root of the sum of squared weights, so this object can optionally store *sumw2*, the sum of squared weights, to compute this uncertainty.
+
+It may also be necessary to know the unweighted counts, as well as the weighted counts, so there is an *unweighted* property for that.
+
+To be valid, the length of all of these buffers (in number of items, not number of bytes) must be equal to the number of bins in this <<Histogram>>, including any axes inherited by nesting the <<Histogram>> in a <<Collection>>. The number of bins in the <<Histogram>> is the product of the number of bins in each <<Axis>>, including any underflow, overflow, or nanflow bins. That is, it must be possible to reshape these buffers into multidimensional arrays of the same shape, in which every dimension corresponds to one <<Axis>>.
 """
 
     def __init__(self, sumw, sumw2=None, unweighted=None):
