@@ -1484,9 +1484,18 @@ class Moments(Stagg):
     weightpower = typedproperty(_params["weightpower"])
     filter      = typedproperty(_params["filter"])
 
-    description = ""
+    description = "Represents one type of moment; a single value for an <<Axis>> or one per bin for a <<Profile>>."
     validity_rules = ()
     long_description = """
+Moments are primarily used for mean and standard deviation, but they can also be used to compute skew, kurtosis, etc. In general, a moment is a sum of weights (to some power) times the quantity of interest (to some power). Moments from preaggregated subsets of the data can simply be added, whereas a prepared mean cannot.
+
+The *sumwxn* is a buffer containing a single value if this <<Moment>> is attached under an <<Axis>> (summarizing the quantity that axis represents for all input data) or a buffer containing as many values as there are bins in a <<Histogram>> if this <<Moment>> is attached under a <<Profile>>. Thus, it serves two puproses: auxiliary data about an <<Axis>> and the bin-by-bin data that make up a profile plot.
+
+The quantity of interest is raised to the power *n*. Thus, the total number of entries would be computed from `n = 0`, the mean from `n = 1`, and the standard deviation from the `n = 2` and `n = 1` moments.
+
+The weights are raised to the power *weightpower*. Typically, the *weightpower* would be zero in a <<Histogram>> with <<UnweightedCounts>> and one in a <<Histogram>> with <<WeightedCounts>>, but `weightpower = 2` is necessary for some calculations.
+
+If not all of the data were included in the sum, a *filter* describes which values were excluded. This <<StatisticFilter>> is described below.
 """
 
     def __init__(self, sumwxn, n, weightpower=0, filter=None):
