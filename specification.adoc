@@ -4,7 +4,20 @@
 
 == Basic Types
 
-Stagg is encoded in a Flatbuffers specification (see link:flatbuffers/stagg.fbs[]). Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages].
+Stagg is encoded in a Flatbuffers specification (see link:flatbuffers/stagg.fbs[]). Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages]. However, the code the Flatbuffers code generator produces is too low-level even for applications to use as a backend, so we describe the interfaces and types of wrapper classes here.
+
+These class descriptions are sufficiently constrained to fit into any static type system, and while they include heterogeneous lists (lists of an enumerated union type), they can be decomposed into homogeneous lists with an additional level of nesting. In fact, the Flatbuffers specification doesn't allow heterogeneous lists, so it provides an example of this decomposition. (For example, the heterogeneous *objects* list in a <<Collection>>, which can contain <<Histogram>>, <<ParameterizedFunction>>, <<BinnedEvaluatedFunction>>, and <<Ntuple>>, is encoded in Flatbuffers as a homogeneous list of `Object`, which contains a _single_ union of `ObjectData`.)
+
+Basic types, like booleans, integers, floating point numbers, and strings, are passed through without modification (though strings are explicitly encoded in "utf-8"; Flatbuffers strings are not encoding-aware). Integers and floating point numbers may have a constrained range, such as [0, ∞) for non-negative or (0, ∞] for positive, including ∞. (A square bracket includes the endpoint; a round bracket excludes it.) Empty strings and missing strings (null) are distinct.
+
+Lists may contain basic types or class instances, and there is no distinction between empty lists and missing lists (an artifact of Flatbuffers).
+
+In some cases, we want a mapping type, such as str → X, so that objects are retrievable by name, rather than index. Flatbuffers does not have such a type, so we build it by decomposing the high-level mapping into a low-level pair of lists with equal length. (For example, the *objects* mapping in a <<Collection>> is encoded in Flatbuffers as a list `objects` and a list `lookup`.)
+
+Class objects may be missing (null) if they are not required. Required properties are a Flatbuffers feature: it doesn't generate code that would allow the serialized object to be missing. The class schemas can evolve to include more properties (with full forward and backward compatibility), but properties cannot be removed and required properties cannot become non-required.
+
+Any properties that are not required have a default value (usually null).
+
 
 
 
