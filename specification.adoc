@@ -928,7 +928,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 == Column
 
-**
+*Provides a name, meaning, and a data type for one column of <<Ntuple>> data.*
 
 [%hardbreaks]
 •{nbsp} *identifier*: unique str (required)
@@ -942,10 +942,11 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
+The *postfilter_slice*'s *step* cannot be zero.
 
 *Details:*
 
-
+HERE
 
 == NtupleInstance
 

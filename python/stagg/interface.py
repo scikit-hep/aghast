@@ -6205,9 +6205,11 @@ class Column(Stagg, Interpretation):
     metadata         = typedproperty(_params["metadata"])
     decoration       = typedproperty(_params["decoration"])
 
-    description = ""
-    validity_rules = ()
+    description = "Provides a name, meaning, and a data type for one column of <<Ntuple>> data."
+    validity_rules = ("The *postfilter_slice*'s *step* cannot be zero.",)
     long_description = """
+HERE
+
 """
 
     def __init__(self, identifier, dtype, endianness=InterpretedBuffer.little_endian, filters=None, postfilter_slice=None, title=None, metadata=None, decoration=None):
