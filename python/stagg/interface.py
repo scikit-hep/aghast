@@ -5991,9 +5991,13 @@ class ColumnChunk(Stagg):
     page_min  = typedproperty(_params["page_min"])
     page_max  = typedproperty(_params["page_max"])
 
-    description = ""
-    validity_rules = ()
+    description = "An internal division of an <<Ntuple>> column for parallel processing."
+    validity_rules = ("The *page_offsets* must start with 0, be monotonically increasing, and its length must be one more than the length of *pages*.",
+                      "If *page_min* or *page_max* is included, its length must be equal to the length of *pages*.")
     long_description = """
+Column chunks are further divided into *pages*, which are separate buffers, may be located on different disk pages, and may be separately compressed. Like an <<NtupleInstance>>'s *column_offsets*, the *page_offsets* provides an index for finding particular entries; unlike *column_offsets*, the *page_offsets* are required (to avoid reading unnecessary *pages*). The starting entry (inclusive) for page `i` is `page_offsets[i]` and the stopping entry (exclusive) for page `i` is `page_offsets[i + 1]`.
+
+Additionally, pages may have a "`zone map`" of minimum and maximum values in each page, so that it may be skipped if a value in the desired range won't be found. The *page_min* and *page_max* are <<Extremes>>.
 """
 
     def __init__(self, pages, page_offsets, page_min=None, page_max=None):
@@ -6011,11 +6015,11 @@ class ColumnChunk(Stagg):
             raise ValueError("ColumnChunk.page_offsets length is {0}, but it must be one longer than ColumnChunk.pages, which is {1}".format(len(self.page_offsets), len(self.pages)))
         if len(self.page_min) != 0:
             if len(self.page_min) != len(self.pages):
-                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_min), len(self.pages)))
+                raise ValueError("ColumnChunk.page_min length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_min), len(self.pages)))
             raise NotImplementedError("check min")
         if len(self.page_max) != 0:
             if len(self.page_max) != len(self.pages):
-                raise ValueError("ColumnChunk.page_extremes length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_max), len(self.pages)))
+                raise ValueError("ColumnChunk.page_max length {0} must be equal to ColumnChunk.pages length {1}".format(len(self.page_max), len(self.pages)))
             raise NotImplementedError("check max")
         if recursive:
             _valid(self.pages, seen, recursive)

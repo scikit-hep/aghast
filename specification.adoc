@@ -1010,17 +1010,21 @@ The *metadata* property has no semantic constraints, but it is included here to 
 
 == ColumnChunk
 
-**
+*An internal division of an <<Ntuple>> column for parallel processing.*
 
 [%hardbreaks]
 •{nbsp} *pages*: list of <<Page>> (required)
 •{nbsp} *page_offsets*: list of int with length in [1, ∞) (required)
 •{nbsp} *page_min*: list of <<Extremes>> (default: null/empty)
 •{nbsp} *page_max*: list of <<Extremes>> (default: null/empty)
+The *page_offsets* must start with 0, be monotonically increasing, and its length must be one more than the length of *pages*. +
+If *page_min* or *page_max* is included, its length must be equal to the length of *pages*.
 
 *Details:*
 
+Column chunks are further divided into *pages*, which are separate buffers, may be located on different disk pages, and may be separately compressed. Like an <<NtupleInstance>>'s *column_offsets*, the *page_offsets* provides an index for finding particular entries; unlike *column_offsets*, the *page_offsets* are required (to avoid reading unnecessary *pages*). The starting entry (inclusive) for page `i` is `page_offsets[i]` and the stopping entry (exclusive) for page `i` is `page_offsets[i + 1]`.
 
+Additionally, pages may have a "`zone map`" of minimum and maximum values in each page, so that it may be skipped if a value in the desired range won't be found. The *page_min* and *page_max* are <<Extremes>>.
 
 == Page
 
