@@ -995,15 +995,18 @@ Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets
 
 == Chunk
 
-**
+*An internal division of an <<NtupleInstance>> containing a whole number of entries.*
 
 [%hardbreaks]
 •{nbsp} *column_chunks*: list of <<ColumnChunk>> (required)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
+The number of *column_chunks* must be equal to the number of *columns* in the <<Ntuple>> in which this <<Chunk>> is embedded.
 
 *Details:*
 
+A <<Chunk>> is a division that cuts across all *columns* (of the <<Ntuple>> in which it is embedded); the individual columns are split into *column_chunks*. Consequently, there must be as many *column_chunks* as there are *columns* and they are identified by index position.
 
+The *metadata* property has no semantic constraints, but it is included here to provide hints for parallel processing systems.
 
 == ColumnChunk
 

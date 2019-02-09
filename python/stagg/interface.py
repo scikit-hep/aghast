@@ -6131,9 +6131,12 @@ class Chunk(Stagg):
     column_chunks = typedproperty(_params["column_chunks"])
     metadata      = typedproperty(_params["metadata"])
 
-    description = ""
-    validity_rules = ()
+    description = "An internal division of an <<NtupleInstance>> containing a whole number of entries."
+    validity_rules = ("The number of *column_chunks* must be equal to the number of *columns* in the <<Ntuple>> in which this <<Chunk>> is embedded.",)
     long_description = """
+A <<Chunk>> is a division that cuts across all *columns* (of the <<Ntuple>> in which it is embedded); the individual columns are split into *column_chunks*. Consequently, there must be as many *column_chunks* as there are *columns* and they are identified by index position.
+
+The *metadata* property has no semantic constraints, but it is included here to provide hints for parallel processing systems.
 """
 
     def __init__(self, column_chunks, metadata=None):
