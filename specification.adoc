@@ -2,6 +2,14 @@
 
 == Introduction
 
+Stagg is an encoding of **st**atistical **agg**regations, 
+
+
+
+
+
+
+
 == Data Types
 
 Stagg is encoded in a Flatbuffers specification (see link:flatbuffers/stagg.fbs[]). Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages]. However, the code the Flatbuffers code generator produces is too low-level even for applications to use as a backend, so we describe the interfaces and types of wrapper classes here.
