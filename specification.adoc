@@ -58,8 +58,8 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
-The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs (regardless of order). +
-The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs (regardless of order).
+The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs (unordered). +
+The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs (unordered).
 
 *Details:*
 
@@ -807,7 +807,7 @@ If not all of the data were included in the quantile calculation, a *filter* des
 The *identifiers* of all *parameters* must be unique. +
 After converting from negative indexes, *paramaxis* values must be unique. +
 All *paramaxis* values must be in [0, number of axes, including any inherited from a <<Collection>>). +
-The *xindex* and *yindex* of each Covariance in *parameter_covariances* must be in [0, number of *parameters*) and be unique pairs (regardless of order).
+The *xindex* and *yindex* of each Covariance in *parameter_covariances* must be in [0, number of *parameters*) and be unique pairs (unordered).
 
 *Details:*
 
@@ -906,13 +906,16 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 [%hardbreaks]
 •{nbsp} *columns*: list of <<Column>> with length in [1, ∞) (required)
 •{nbsp} *instances*: list of <<NtupleInstance>> with length in [1, ∞) (required)
+•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
+•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
 •{nbsp} *functions*: str → <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>> (default: null/empty)
 •{nbsp} *title*: str (default: null)
 •{nbsp} *metadata*: <<Metadata>> (default: null)
 •{nbsp} *decoration*: <<Decoration>> (default: null)
 •{nbsp} *script*: str (default: null)
 The *identifier* of each of the *columns* must be unique. +
-The number of *instances* must equal the number of <<Collection>> axes at this level of hierarchy.
+The number of *instances* must equal the number of <<Collection>> axes at this level of hierarchy. +
+The *xindex* and *yindex* of each Covariance in *column_covariances* must be in [0, number of <<Ntuple>> *columns*) and be unique pairs (unordered).
 
 *Details:*
 
@@ -921,6 +924,8 @@ Unlike <<Histogram>>, which represents aggregated data, an <<Ntuple>> represents
 Ntuples are standalone objects in a <<Collection>>, like histograms, and as such, they are subject to a <<Collection>>'s *axis*. If the <<Collection>> has an axis with N bins (representing, for example, different data regions or systematic variations), the <<Ntuple>> object represents M different ntuples (for each of the regions or variations). Thus, it must have N objects of type <<NtupleInstance>> in its *instances* parameter.
 
 All of these instances share *columns*, which define the name, meaning, and data type of elements in each tuple.
+
+The *column_statistics* and *column_covariances* provide additional information about the data in the columns: moments, quantiles, modes, and correlations. Their buffers have one item for each of the *instances* (e.g. a column mean can be recorded for each <<NtupleInstance>> separately).
 
 Like a <<Histogram>>, an <<Ntuple>> can have attached *functions*, but since the <<Ntuple>> doesn't define a binning, these functions can only be <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>>.
 
@@ -975,17 +980,18 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
 
 == NtupleInstance
 
-**
+*A single instance of an <<Ntuple>>; allows for an <<Ntuple>> to be instantiated in a <<Collection>> with <<Axis>>.*
 
 [%hardbreaks]
 •{nbsp} *chunks*: list of <<Chunk>> (required)
 •{nbsp} *chunk_offsets*: list of int (default: null/empty)
-•{nbsp} *column_statistics*: list of <<Statistics>> (default: null/empty)
-•{nbsp} *column_covariances*: list of <<Covariance>> (default: null/empty)
+The *chunk_offsets*, if present, must start with 0, be monotonically increasing, and its length must be one more than the length of *chunks*.
 
 *Details:*
 
+Whereas the <<Ntuple>> might be thought of as a collection of ntuples with the same type (split by a <<Collection>>'s <<Axis>>), an <<NtupleInstance>> would appear to a data analyst as a single ntuple table of data. For scalability, however, it is internally divided into *chunks*. A <<Chunk>> contains a whole number of ntuple entries (table rows) across all columns. A parallel processing system could divide work such that each processor operates on one <<Chunk>>.
 
+Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets* list. The starting entry (inclusive) for chunk `i` is `chunk_offsets[i]` and the stopping entry (exclusive) for chunk `i` is `chunk_offsets[i + 1]`.
 
 == Chunk
 

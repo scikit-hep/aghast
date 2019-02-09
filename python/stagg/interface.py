@@ -6308,18 +6308,19 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
 
 class NtupleInstance(Stagg):
     _params = {
-        "chunks":             stagg.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
-        "chunk_offsets":      stagg.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
+        "chunks":        stagg.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
+        "chunk_offsets": stagg.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
         }
 
-    chunks             = typedproperty(_params["chunks"])
-    chunk_offsets      = typedproperty(_params["chunk_offsets"])
+    chunks        = typedproperty(_params["chunks"])
+    chunk_offsets = typedproperty(_params["chunk_offsets"])
 
     description = "A single instance of an <<Ntuple>>; allows for an <<Ntuple>> to be instantiated in a <<Collection>> with <<Axis>>."
     validity_rules = ("The *chunk_offsets*, if present, must start with 0, be monotonically increasing, and its length must be one more than the length of *chunks*.",)
     long_description = """
-HERE
+Whereas the <<Ntuple>> might be thought of as a collection of ntuples with the same type (split by a <<Collection>>'s <<Axis>>), an <<NtupleInstance>> would appear to a data analyst as a single ntuple table of data. For scalability, however, it is internally divided into *chunks*. A <<Chunk>> contains a whole number of ntuple entries (table rows) across all columns. A parallel processing system could divide work such that each processor operates on one <<Chunk>>.
 
+Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets* list. The starting entry (inclusive) for chunk `i` is `chunk_offsets[i]` and the stopping entry (exclusive) for chunk `i` is `chunk_offsets[i + 1]`.
 """
 
     def __init__(self, chunks, chunk_offsets=None):
