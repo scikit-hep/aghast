@@ -30,7 +30,7 @@ Class objects may be missing (null) if they are not required. Required propertie
 
 Any properties that are not required have a default value (usually null).
 
-In addition to the type constraints, which are tighter in the wrapper classes than they are in the Flatbuffers serialization, we list invariants (conditions that must be true) that depend on multiple properties. To avoid unnecessary Flatbuffers deserialization, these are not automatically checked, but a check can be invoked and any behavior when those invariants are not satisfied is undefined.
+In addition to the type constraints, which are tighter in the wrapper classes than they are in the Flatbuffers serialization, we list invariants (conditions that must be true) that depend on multiple properties or multiple class objects. To avoid unnecessary Flatbuffers deserialization, these are not automatically checked, but a check can be invoked and any behavior when those invariants are not satisfied is undefined.
 
 A standalone Stagg object is one of the following types: <<Collection>>, <<Histogram>>, <<ParameterizedFunction>>, <<BinnedEvaluatedFunction>>, and <<Ntuple>>.
 
