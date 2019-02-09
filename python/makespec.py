@@ -50,7 +50,10 @@ prologue = """= Stagg Specification
 
 == Basic Types
 
-Stagg is encoded in a Flatbuffers specification (see link:/flatbuffers/stagg.fbs[]). 
+Stagg is encoded in a Flatbuffers specification (see link:flatbuffers/stagg.fbs[]). Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages].
+
+
+
 
 """
 
