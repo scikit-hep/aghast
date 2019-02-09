@@ -6208,7 +6208,7 @@ class Column(Stagg, Interpretation):
     description = "Provides a name, meaning, and a data type for one column of <<Ntuple>> data."
     validity_rules = ("The *postfilter_slice*'s *step* cannot be zero.",)
     long_description = """
-Whereas the bin contents for instances of a <<Histogram>> (a <<Histogram>> within a <<Collection>> with an <<Axis>>) are expressed in a single buffer, instances of an <<Ntuple>> (<<NtupleInstance>>) have _separate_ buffers (since they may need to grow). Also, even a single <<NtupleInstance>> may have more than one <<Chunk>> or <<Page>>, which means separate buffers. Rather than duplicating the columns names and data types (possibly allowing those duplicates to disagree with each other), we define the column type once with a <<Column>> object. Rather than containing interpreted buffers, ntuples are filled with uninterpreted <<RawInlineBuffer>> and <<RawExternalBuffer>> instances.
+Whereas the bin contents for instances of a <<Histogram>> (a <<Histogram>> within a <<Collection>> with an <<Axis>>) are expressed in a single buffer, instances of an <<Ntuple>> have separate buffers (since they may need to grow). Also, even a single <<NtupleInstance>> may have more than one <<Chunk>> or <<Page>>, which means separate buffers. Rather than duplicating the columns names and data types (possibly allowing those duplicates to disagree with each other), we define the column type once with a <<Column>> object. Rather than containing interpreted buffers, ntuples are filled with uninterpreted <<RawInlineBuffer>> and <<RawExternalBuffer>> instances.
 
 <<Column>> properties are similar to interpreted buffer properties (see <<InterpretedInlineBuffer>>), except that it has no *buffer*.
 
