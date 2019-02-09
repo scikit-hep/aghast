@@ -1068,7 +1068,7 @@ If the *external_source* is `memory`, then the *pointer* and *numbytes* are inte
 
 == Metadata
 
-**
+*Optional container for applications to attach metadata to histograms, functions, ntuples, and collections.*
 
 [%hardbreaks]
 •{nbsp} *data*: str (required)
@@ -1076,17 +1076,21 @@ If the *external_source* is `memory`, then the *pointer* and *numbytes* are inte
 
 *Details:*
 
+Anything that an application needs to track that is not or won't be encoded in Stagg structures may be attached as metadata. The *data* are expressed as a string in some *language*, such as JSON.
 
+Graphical properties of plots are not encoded in Stagg, but they may use <<Decoration>> for graphics-specific metadata.
 
 == Decoration
 
-**
+*Optional container for applications to attach graphical properties to histograms, functions, ntuples, and collections.*
 
 [%hardbreaks]
 •{nbsp} *data*: str (required)
-•{nbsp} *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.root_json+`} +
+•{nbsp} *language*: one of {`+Decoration.unspecified+`, `+Decoration.css+`, `+Decoration.vega+`, `+Decoration.json+`} +
 (required)
 
 *Details:*
 
+The Stagg specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
 
+The *data* are expressed as a string in some *language*, such as CSS, Vega, or ROOT's JSON format.

@@ -520,9 +520,12 @@ class Metadata(Stagg):
     data     = typedproperty(_params["data"])
     language = typedproperty(_params["language"])
 
-    description = ""
+    description = "Optional container for applications to attach metadata to histograms, functions, ntuples, and collections."
     validity_rules = ()
     long_description = """
+Anything that an application needs to track that is not or won't be encoded in Stagg structures may be attached as metadata. The *data* are expressed as a string in some *language*, such as JSON.
+
+Graphical properties of plots are not encoded in Stagg, but they may use <<Decoration>> for graphics-specific metadata.
 """
 
     def __init__(self, data, language=unspecified):
@@ -552,8 +555,8 @@ class Decoration(Stagg):
     unspecified = DecorationLanguageEnum("unspecified", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
     css         = DecorationLanguageEnum("css", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_css)
     vega        = DecorationLanguageEnum("vega", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    root_json   = DecorationLanguageEnum("root_json", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_root_json)
-    language = [unspecified, css, vega, root_json]
+    json        = DecorationLanguageEnum("json", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_json)
+    language = [unspecified, css, vega, json]
 
     _params = {
         "data":     stagg.checktype.CheckString("Decoration", "data", required=True),
@@ -563,9 +566,12 @@ class Decoration(Stagg):
     data     = typedproperty(_params["data"])
     language = typedproperty(_params["language"])
 
-    description = ""
+    description = "Optional container for applications to attach graphical properties to histograms, functions, ntuples, and collections."
     validity_rules = ()
     long_description = """
+The Stagg specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
+
+The *data* are expressed as a string in some *language*, such as CSS, Vega, or ROOT's JSON format.
 """
 
     def __init__(self, data, language=unspecified):

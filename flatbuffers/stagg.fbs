@@ -18,7 +18,7 @@ enum DecorationLanguage: uint {
   deco_unspecified = 0,
   deco_css = 1,
   deco_vega = 2,
-  deco_root_json = 3
+  deco_json = 3
 }
 
 table Decoration {
