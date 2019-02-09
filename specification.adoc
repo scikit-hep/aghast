@@ -916,11 +916,15 @@ The number of *instances* must equal the number of <<Collection>> axes at this l
 
 *Details:*
 
-Unlike <<Histogram>>, which represents aggregated data, an <<Ntuple>> does not represent a sum (or maxima, modes, or quantiles). It may be the result of some filtering or it may be a table returned by a group-by operation, and it could be useful for generating scatter plots, for unbinned fits, or for machine learning.
+Unlike <<Histogram>>, which represents aggregated data, an <<Ntuple>> represents points in an n-dimensional vector space. It may be the result of some filtering or it may be a table returned by a group-by operation, and it could be useful for generating scatter plots, for unbinned fits, or for machine learning.
 
-Ntuples are standalone objects in a <<Collection>>, like histograms, and as such, they are subject to a <<Collection>>'s *axis*.
+Ntuples are standalone objects in a <<Collection>>, like histograms, and as such, they are subject to a <<Collection>>'s *axis*. If the <<Collection>> has an axis with N bins (representing, for example, different data regions or systematic variations), the <<Ntuple>> object represents M different ntuples (for each of the regions or variations). Thus, it must have N objects of type <<NtupleInstance>> in its *instances* parameter.
 
-HERE
+All of these instances share *columns*, which define the name, meaning, and data type of elements in each tuple.
+
+Like a <<Histogram>>, an <<Ntuple>> can have attached *functions*, but since the <<Ntuple>> doesn't define a binning, these functions can only be <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>>.
+
+The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 
 == Column
 
