@@ -1028,14 +1028,14 @@ Additionally, pages may have a "`zone map`" of minimum and maximum values in eac
 
 == Page
 
-**
+*The atomic unit of reading/decompression for an <<Ntuple>> column.*
 
 [%hardbreaks]
 •{nbsp} *buffer*: <<RawInlineBuffer>> or <<RawExternalBuffer>> (required)
 
 *Details:*
 
-
+A <<Page>> contains one raw *buffer*, which may be inline or external.
 
 == RawInlineBuffer
 

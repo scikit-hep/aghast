@@ -5907,9 +5907,10 @@ class Page(Stagg):
 
     buffer = typedproperty(_params["buffer"])
 
-    description = ""
+    description = "The atomic unit of reading/decompression for an <<Ntuple>> column."
     validity_rules = ()
     long_description = """
+A <<Page>> contains one raw *buffer*, which may be inline or external.
 """
 
     def __init__(self, buffer):
