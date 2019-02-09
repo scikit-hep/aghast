@@ -946,7 +946,32 @@ The *postfilter_slice*'s *step* cannot be zero.
 
 *Details:*
 
-HERE
+Whereas the bin contents for instances of a <<Histogram>> (a <<Histogram>> within a <<Collection>> with an <<Axis>>) are expressed in a single buffer, instances of an <<Ntuple>> (<<NtupleInstance>>) have _separate buffers (since they may need to grow). Also, the <<Ntuple>> may have more than one <<Chunk>> or <<Page>>, which means separate buffers. Rather than duplicating the columns names and data types (possibly allowing those duplicates to disagree with each other), we define the column type once with a <<Column>> object. Rather than containing interpreted buffers, ntuples are filled with <<RawInlineBuffer>> and <<RawExternalBuffer>> instances.
+
+<<Column>> properties are similar to interpreted buffer properties (see <<InterpretedInlineBuffer>>), except that it has no *buffer*.
+
+The list of *filters* are applied to convert bytes in the *buffer* into an array. Typically, *filters* are compression algorithms such as `gzip`, `lzma`, and `lz4`, but they may be any predefined transformation (e.g. zigzag deencoding of integers or affine mappings from integers to floating point numbers may be added in the future). If there is more than one filter, the output of each step is provided as input to the next.
+
+The *postfilter_slice*, if provided, selects a subset of the bytes returned by the last filter (or directly in the *buffer* if there are no *filters*). A slice has the following structure:
+
+    struct Slice {
+      start: long;
+      stop: long;
+      step: int;
+      has_start: bool;
+      has_stop: bool;
+      has_step: bool;
+    }
+
+though in Python, a builtin `slice` object should be provided to this class's constructor. The *postfilter_slice* is interpreted according to Python's rules (negative indexes, start-inclusive and stop-exclusive, clipping-not-errors if beyond the range, etc.).
+
+The *dtype* is the numeric type of the array, which includes `bool`, all signed and unsigned integers from 8 bits to 64 bits, and IEEE 754 floating point types with 32 or 64 bits. The `none` interpretation is presumed, if necessary, to be unsigned, 8 bit integers.
+
+The *endianness* may be `little_endian` or `big_endian`; the former is used by most recent architectures.
+
+The *dimension_order* may be `c_order` to follow the C programming language's convention or `fortran` to follow the FORTRAN programming language's convention. The *dimension_order* only has an effect when shaping an array with more than one dimension.
+
+The *title*, *metadata*, and *decoration* properties have no semantic constraints.
 
 == NtupleInstance
 
