@@ -62,7 +62,7 @@ What this specification does not define are any methods for filling, fitting, or
 
 == Data Types
 
-Stagg is encoded in link:flatbuffers/stagg.fbs[]. Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages]. However, the code the Flatbuffers code generator produces is too low-level even for applications to use as a backend, so we describe the interfaces and types of wrapper classes here.
+Stagg is specified as a Flatbuffers format in link:flatbuffers/stagg.fbs[]. Flatbuffers provides a standard suite of types that can be translated into https://google.github.io/flatbuffers/flatbuffers_support.html[many languages]. However, the code the Flatbuffers code generator produces is too low-level even for applications to use as a backend, so we describe the interfaces and types of wrapper classes here.
 
 These class descriptions are sufficiently constrained to fit into any static type system, and while they include heterogeneous lists (lists of an enumerated union type), they can be decomposed into homogeneous lists with an additional level of nesting. In fact, the Flatbuffers specification doesn't allow heterogeneous lists, so it provides an example of this decomposition. (For example, the heterogeneous *objects* list in a <<Collection>>, which can contain <<Histogram>>, <<ParameterizedFunction>>, <<BinnedEvaluatedFunction>>, and <<Ntuple>>, is encoded in Flatbuffers as a homogeneous list of `Object`, which contains a _single_ union of `ObjectData`.)
 
