@@ -257,7 +257,7 @@ class Test(unittest.TestCase):
     def test_validity_Statistics(self):
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics()]), Axis(RegularBinning(10, RealInterval(-5, 5)), statistics=[Statistics()])], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(100))))
         h.checkvalid()
-        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])])
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_statistics=[Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.array([0.0])), 2)])])
         h.checkvalid()
 
     def test_validity_Covariance(self):
@@ -267,9 +267,9 @@ class Test(unittest.TestCase):
         h.checkvalid()
         h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(10))), [Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)])), Profile("", Statistics([Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 1), Moments(InterpretedInlineBuffer.fromarray(numpy.zeros(10)), 2)]))], profile_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
         h.checkvalid()
-        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])])
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)))])
         h.checkvalid()
-        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=1), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=0)])])
+        h = Ntuple([Column("one", Column.int32), Column("two", Column.int16)], [NtupleInstance([Chunk([ColumnChunk([Page(RawInlineBuffer(b"\x05\x00\x00\x00"))], [0, 1]), ColumnChunk([Page(RawInlineBuffer(b"\x03\x00"))], [0, 1])])])], column_covariances=[Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=1), Covariance(0, 1, InterpretedInlineBuffer.fromarray(numpy.arange(1)), weightpower=0)])
         h.checkvalid()
 
     def test_validity_Profile(self):

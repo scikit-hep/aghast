@@ -5178,7 +5178,7 @@ class ParameterizedFunction(Function, FunctionObject):
     validity_rules = ("The *identifiers* of all *parameters* must be unique.",
                       "After converting from negative indexes, *paramaxis* values must be unique.",
                       "All *paramaxis* values must be in [0, number of axes, including any inherited from a <<Collection>>).",
-                      "The *xindex* and *yindex* of each Covariance in *parameter_covariances* must be in [0, number of *parameters*) and be unique pairs (regardless of order).")
+                      "The *xindex* and *yindex* of each Covariance in *parameter_covariances* must be in [0, number of *parameters*) and be unique pairs (unordered).")
     long_description = """
 A common application for functions is to attach a fit result to a <<Histogram>>. This class defines a function as a mathematical *expression* with *parameters*. No particular syntax is specified for the *expression*.
 
@@ -5632,8 +5632,8 @@ class Histogram(Object):
     script              = typedproperty(_params["script"])
 
     description = "Histogram of a distribution, defined by a (possibly weighted) count of observations in each bin of an n-dimensional space."
-    validity_rules = ("The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs (regardless of order).",
-                      "The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs (regardless of order).")
+    validity_rules = ("The *xindex* and *yindex* of each Covariance in *axis_covariances* must be in [0, number of *axis*) and be unique pairs (unordered).",
+                      "The *xindex* and *yindex* of each Covariance in *profile_covariances* must be in [0, number of *profile*) and be unique pairs (unordered).")
     long_description = """
 The space is subdivided by an n-dimensional *axis*. As described in <<Collection>>, nesting a histogram within a collection prepends the collection's *axis*. The number of <<Axis>> objects is not necessarily the dimensionality of the space; some binnings, such as <<HexagonalBinning>>, define more than one dimension (though most do not).
 
@@ -6310,25 +6310,21 @@ class NtupleInstance(Stagg):
     _params = {
         "chunks":             stagg.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
         "chunk_offsets":      stagg.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
-        "column_statistics":  stagg.checktype.CheckVector("NtupleInstance", "column_statistics", required=False, type=Statistics),
-        "column_covariances": stagg.checktype.CheckVector("NtupleInstance", "column_covariances", required=False, type=Covariance),
         }
 
     chunks             = typedproperty(_params["chunks"])
     chunk_offsets      = typedproperty(_params["chunk_offsets"])
-    column_statistics  = typedproperty(_params["column_statistics"])
-    column_covariances = typedproperty(_params["column_covariances"])
 
-    description = ""
-    validity_rules = ()
+    description = "A single instance of an <<Ntuple>>; allows for an <<Ntuple>> to be instantiated in a <<Collection>> with <<Axis>>."
+    validity_rules = ("The *chunk_offsets*, if present, must start with 0, be monotonically increasing, and its length must be one more than the length of *chunks*.",)
     long_description = """
+HERE
+
 """
 
-    def __init__(self, chunks, chunk_offsets=None, column_statistics=None, column_covariances=None):
+    def __init__(self, chunks, chunk_offsets=None):
         self.chunks = chunks
         self.chunk_offsets = chunk_offsets
-        self.column_statistics = column_statistics
-        self.column_covariances = column_covariances
 
     def _valid(self, seen, recursive):
         if not isinstance(getattr(self, "_parent", None), Ntuple):
@@ -6341,12 +6337,8 @@ class NtupleInstance(Stagg):
 
             if len(self.chunk_offsets) != len(self.chunks) + 1:
                 raise ValueError("Ntuple.chunk_offsets length is {0}, but it must be one longer than Ntuple.chunks, which is {1}".format(len(self.chunk_offsets), len(self.chunks)))
-        if len(self.column_covariances) != 0:
-            Covariance._validindexes(self.column_covariances, len(self.columns))
         if recursive:
             _valid(self.chunks, seen, recursive)
-            _valid(self.column_statistics, seen, recursive)
-            _valid(self.column_covariances, seen, recursive)
 
     @property
     def columns(self):
@@ -6386,16 +6378,10 @@ class NtupleInstance(Stagg):
         out._flatbuffers.Chunks = fb.Chunks
         out._flatbuffers.ChunksLength = fb.ChunksLength
         out._flatbuffers.ChunkOffsets = lambda: numpy.empty(0, dtype="<i8") if fb.ChunkOffsetsLength() == 0 else fb.ChunkOffsetsAsNumpy()
-        out._flatbuffers.ColumnStatistics = fb.ColumnStatistics
-        out._flatbuffers.ColumnStatisticsLength = fb.ColumnStatisticsLength
-        out._flatbuffers.ColumnCovariances = fb.ColumnCovariances
-        out._flatbuffers.ColumnCovariancesLength = fb.ColumnCovariancesLength
         return out
 
     def _toflatbuffers(self, builder):
         chunks = [x._toflatbuffers(builder) for x in self.chunks]
-        column_statistics = None if len(self.column_statistics) == 0 else [x._toflatbuffers(builder) for x in self.column_statistics]
-        column_covariances = None if len(self.column_covariances) == 0 else [x._toflatbuffers(builder) for x in self.column_covariances]
 
         stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
         for x in chunks[::-1]:
@@ -6411,62 +6397,47 @@ class NtupleInstance(Stagg):
             builder.Bytes[builder.head : builder.head + len(chunkoffsetsbuf)] = chunkoffsetsbuf
             chunk_offsets = builder.EndVector(len(self.chunk_offsets))
 
-        if column_statistics is not None:
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceStartColumnStatisticsVector(builder, len(column_statistics))
-            for x in column_statistics[::-1]:
-                builder.PrependUOffsetTRelative(x)
-            column_statistics = builder.EndVector(len(column_statistics))
-
-        if column_covariances is not None:
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceStartColumnCovariancesVector(builder, len(column_covariances))
-            for x in column_covariances[::-1]:
-                builder.PrependUOffsetTRelative(x)
-            column_covariances = builder.EndVector(len(column_covariances))
-
         stagg.stagg_generated.NtupleInstance.NtupleInstanceStart(builder)
         stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
         if chunk_offsets is not None:
             stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
-        if column_statistics is not None:
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceAddColumnStatistics(builder, column_statistics)
-        if column_covariances is not None:
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceAddColumnCovariances(builder, column_covariances)
         return stagg.stagg_generated.NtupleInstance.NtupleInstanceEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["chunks=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.chunks], indent, width, end), indent, end) + "]"]
         if len(self.chunk_offsets) != 0:
             args.append("chunk_offsets={0}".format(_dumparray(self.chunk_offsets, indent, end)))
-        if len(self.column_statistics) != 0:
-            args.append("column_statistics=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_statistics], indent, width, end), indent, end)))
-        if len(self.column_covariances) != 0:
-            args.append("column_covariances=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_covariances], indent, width, end), indent, end)))
         return _dumpline(self, args, indent, width, end)
 
 ################################################# Ntuple
 
 class Ntuple(Object):
     _params = {
-        "columns":    stagg.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":  stagg.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "functions":  stagg.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
-        "title":      stagg.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":   stagg.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration": stagg.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
-        "script":     stagg.checktype.CheckString("Ntuple", "script", required=False),
+        "columns":            stagg.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":          stagg.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "column_statistics":  stagg.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "column_covariances": stagg.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
+        "functions":          stagg.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":              stagg.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":           stagg.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":         stagg.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "script":             stagg.checktype.CheckString("Ntuple", "script", required=False),
         }
 
-    columns    = typedproperty(_params["columns"])
-    instances  = typedproperty(_params["instances"])
-    functions  = typedproperty(_params["functions"])
-    title      = typedproperty(_params["title"])
-    metadata   = typedproperty(_params["metadata"])
-    decoration = typedproperty(_params["decoration"])
-    script     = typedproperty(_params["script"])
+    columns            = typedproperty(_params["columns"])
+    instances          = typedproperty(_params["instances"])
+    column_statistics  = typedproperty(_params["column_statistics"])
+    column_covariances = typedproperty(_params["column_covariances"])
+    functions          = typedproperty(_params["functions"])
+    title              = typedproperty(_params["title"])
+    metadata           = typedproperty(_params["metadata"])
+    decoration         = typedproperty(_params["decoration"])
+    script             = typedproperty(_params["script"])
 
     description = "A non-aggregated collection of data; points in an n-dimensional vector space."
     validity_rules = ("The *identifier* of each of the *columns* must be unique.",
-                      "The number of *instances* must equal the number of <<Collection>> axes at this level of hierarchy.")
+                      "The number of *instances* must equal the number of <<Collection>> axes at this level of hierarchy.",
+                      "The *xindex* and *yindex* of each Covariance in *column_covariances* must be in [0, number of <<Ntuple>> *columns*) and be unique pairs (unordered).")
     long_description = """
 Unlike <<Histogram>>, which represents aggregated data, an <<Ntuple>> represents points in an n-dimensional vector space. It may be the result of some filtering or it may be a table returned by a group-by operation, and it could be useful for generating scatter plots, for unbinned fits, or for machine learning.
 
@@ -6474,14 +6445,18 @@ Ntuples are standalone objects in a <<Collection>>, like histograms, and as such
 
 All of these instances share *columns*, which define the name, meaning, and data type of elements in each tuple.
 
+The *column_statistics* and *column_covariances* provide additional information about the data in the columns: moments, quantiles, modes, and correlations. Their buffers have one item for each of the *instances* (e.g. a column mean can be recorded for each <<NtupleInstance>> separately).
+
 Like a <<Histogram>>, an <<Ntuple>> can have attached *functions*, but since the <<Ntuple>> doesn't define a binning, these functions can only be <<ParameterizedFunction>> or <<BinnedEvaluatedFunction>>.
 
 The *title*, *metadata*, *decoration*, and *script* properties have no semantic constraints.
 """
 
-    def __init__(self, columns, instances, functions=None, title=None, metadata=None, decoration=None, script=None):
+    def __init__(self, columns, instances, column_statistics=None, column_covariances=None, functions=None, title=None, metadata=None, decoration=None, script=None):
         self.columns = columns
         self.instances = instances
+        self.column_statistics = column_statistics
+        self.column_covariances = column_covariances
         self.functions = functions
         self.title = title
         self.metadata = metadata
@@ -6494,9 +6469,13 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
             raise ValueError("Ntuple.columns keys must be unique")
         if len(self.instances) != functools.reduce(operator.mul, shape, 1):
             raise ValueError("Ntuple.instances length is {0} but multiplicity at this location in the hierarchy is {1}".format(len(self.instances), functools.reduce(operator.mul, shape, 1)))
+        if len(self.column_covariances) != 0:
+            Covariance._validindexes(self.column_covariances, len(self.columns))
         if recursive:
             _valid(self.columns, seen, recursive)
             _valid(self.instances, seen, recursive)
+            _valid(self.column_statistics, seen, recursive)
+            _valid(self.column_covariances, seen, recursive)
             _valid(self.functions, seen, recursive)
             _valid(self.metadata, seen, recursive)
             _valid(self.decoration, seen, recursive)
@@ -6509,6 +6488,10 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         out._flatbuffers.ColumnsLength = fbntuple.ColumnsLength
         out._flatbuffers.Instances = fbntuple.Instances
         out._flatbuffers.InstancesLength = fbntuple.InstancesLength
+        out._flatbuffers.ColumnStatistics = fbntuple.ColumnStatistics
+        out._flatbuffers.ColumnStatisticsLength = fbntuple.ColumnStatisticsLength
+        out._flatbuffers.ColumnCovariances = fbntuple.ColumnCovariances
+        out._flatbuffers.ColumnCovariancesLength = fbntuple.ColumnCovariancesLength
         out._flatbuffers.Functions = fbntuple.Functions
         out._flatbuffers.FunctionsLength = fbntuple.FunctionsLength
         out._flatbuffers.FunctionsLookup = fbntuple.FunctionsLookup
@@ -6520,6 +6503,8 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
     def _toflatbuffers(self, builder):
         instances = [x._toflatbuffers(builder) for x in self.instances]
+        column_statistics = None if len(self.column_statistics) == 0 else [x._toflatbuffers(builder) for x in self.column_statistics]
+        column_covariances = None if len(self.column_covariances) == 0 else [x._toflatbuffers(builder) for x in self.column_covariances]
         functions = None if len(self.functions) == 0 else [x._toflatbuffers(builder) for x in self.functions.values()]
         script = None if self.script is None else builder.CreateString(self.script.encode("utf-8"))
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
@@ -6550,9 +6535,25 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
                 builder.PrependUOffsetTRelative(x)
             functions_lookup = builder.EndVector(len(functions_lookup))
 
+        if column_statistics is not None:
+            stagg.stagg_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
+            for x in column_statistics[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            column_statistics = builder.EndVector(len(column_statistics))
+
+        if column_covariances is not None:
+            stagg.stagg_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
+            for x in column_covariances[::-1]:
+                builder.PrependUOffsetTRelative(x)
+            column_covariances = builder.EndVector(len(column_covariances))
+
         stagg.stagg_generated.Ntuple.NtupleStart(builder)
         stagg.stagg_generated.Ntuple.NtupleAddColumns(builder, columns)
         stagg.stagg_generated.Ntuple.NtupleAddInstances(builder, instances)
+        if column_statistics is not None:
+            stagg.stagg_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
+        if column_covariances is not None:
+            stagg.stagg_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
         if functions is not None:
             stagg.stagg_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
             stagg.stagg_generated.Ntuple.NtupleAddFunctions(builder, functions)
@@ -6573,6 +6574,10 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
     def _dump(self, indent, width, end):
         args = ["columns=[" + _dumpeq(_dumplist(x._dump(indent + "    ", width, end) for x in self.columns), indent, end) + "]", "instances=[" + _dumpeq(_dumplist(x._dump(indent + "    ", width, end) for x in self.instances), indent, end) + "]"]
+        if len(self.column_statistics) != 0:
+            args.append("column_statistics=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_statistics], indent, width, end), indent, end)))
+        if len(self.column_covariances) != 0:
+            args.append("column_covariances=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_covariances], indent, width, end), indent, end)))
         if len(self.functions) != 0:
             args.append("functions=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.functions], indent, width, end), indent, end)))
         if self.title is not None:
