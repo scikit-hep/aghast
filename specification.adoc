@@ -4,6 +4,8 @@
 
 == Basic Types
 
+Stagg is encoded in a Flatbuffers specification (see link:/flatbuffers/stagg.fbs). 
+
 
 
 == Collection
@@ -1093,4 +1095,4 @@ Graphical properties of plots are not encoded in Stagg, but they may use <<Decor
 
 The Stagg specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
 
-The *data* are expressed as a string in some *language*, such as CSS, Vega, or ROOT's JSON format.
+The *data* are expressed as a string in some *language*, such as CSS, Vega, or JSON format.

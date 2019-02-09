@@ -571,7 +571,7 @@ class Decoration(Stagg):
     long_description = """
 The Stagg specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
 
-The *data* are expressed as a string in some *language*, such as CSS, Vega, or ROOT's JSON format.
+The *data* are expressed as a string in some *language*, such as CSS, Vega, or JSON format.
 """
 
     def __init__(self, data, language=unspecified):

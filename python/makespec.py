@@ -44,11 +44,13 @@ import stagg
 import stagg.checktype
 import stagg.interface
 
-prelude = """= Stagg Specification
+prologue = """= Stagg Specification
 
 == Introduction
 
 == Basic Types
+
+Stagg is encoded in a Flatbuffers specification (see link:/flatbuffers/stagg.fbs). 
 
 """
 
@@ -233,7 +235,7 @@ def formatted(cls, end="\n"):
 
 if __name__ == "__main__":
     with open("../specification.adoc", "w") as file:
-        file.write(prelude)
+        file.write(prologue)
 
         for cls in classes:
             file.write(formatted(cls))
