@@ -3456,9 +3456,9 @@ Irregular bins are usually not directly created by histogramming libraries, but 
                 intervals = numpy.array(self.intervals, dtype=numpy.object)[where]
                 if len(intervals) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
-                index = self.full(len(self.intervals), -1, dtype=numpy.int64)
+                index = numpy.full(len(self.intervals), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(intervals))
-                binning = IrregularBinning(intervals, overflow=overflow, overlapping_fill=self.overlapping_fill)
+                binning = IrregularBinning([x.detached() for x in intervals], overflow=(None if self.overflow is None else self.overflow.detached()), overlapping_fill=self.overlapping_fill)
                 flows = [] if self.overflow is None else [(self.overflow.loc_underflow, -1), (self.overflow.loc_overflow, -1), (self.overflow.loc_nanflow, -1)]
                 selfmap = self._selfmap(flows, index)
                 return binning, (selfmap,)
@@ -3486,7 +3486,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
             if overlapping_fill == self.overlapping_fill:
                 return self, (None,), (None,)
             else:
-                return IrregularBinning([x.detached(reclaim=True) for x in intervals], overflow=self.overflow.detached(reclaim=True), overlapping_fill=overlapping_fill), (None,), (None,)
+                return IrregularBinning([x.detached(reclaim=True) for x in intervals], overflow=(None if self.overflow is None else self.overflow.detached(reclaim=True)), overlapping_fill=overlapping_fill), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(intervals))
@@ -3644,7 +3644,7 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
                 categories = numpy.array(self.categories, dtype=numpy.object)[where]
                 if len(categories) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
-                index = self.full(len(self.categories), -1, dtype=numpy.int64)
+                index = numpy.full(len(self.categories), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(categories))
                 binning = CategoryBinning(categories, loc_overflow=self.loc_overflow)
                 selfmap = self._selfmap([(self.loc_overflow, -1)], index)
@@ -3826,7 +3826,7 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
         bins = self.bins + numbins
         minbin = max(self.minbin + numbins, MININT64)
         maxbin = min(self.maxbin + numbins, MAXINT64)
-        return SparseRegularBinning(bins, self.bin_width, origin, overflow=self.overflow.detached(), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
+        return SparseRegularBinning(bins, self.bin_width, origin, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin)
 
     def toIrregularBinning(self):
         if self.low_inclusive and self.high_inclusive:
@@ -3992,9 +3992,9 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
                 bins = self.bins[where]
                 if len(bins) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
-                index = self.full(len(self.bins), -1, dtype=numpy.int64)
+                index = numpy.full(len(self.bins), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(bins))
-                binning = SparseRegularBinning(bins, self.bin_width, origin=self.origin, overflow=self.overflow, low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=self.minbin, maxbin=self.maxbin)
+                binning = SparseRegularBinning(bins, self.bin_width, origin=self.origin, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=self.minbin, maxbin=self.maxbin)
                 flows = [] if self.overflow is None else [(self.overflow.loc_underflow, -1), (self.overflow.loc_overflow, -1), (self.overflow.loc_nanflow, -1)]
                 selfmap = self._selfmap(flows, index)
                 return binning, (selfmap,)
@@ -4026,7 +4026,7 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
             if self.minbin == other.minbin and self.maxbin == other.maxbin:
                 return self, (None,), (None,)
             else:
-                return SparseRegularBinning(bins, self.bin_width, self.origin, overflow=self.overflow.detached(), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin), (None,), (None,)
+                return SparseRegularBinning(bins, self.bin_width, self.origin, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin), (None,), (None,)
 
         else:
             overflow, pos_underflow, pos_overflow, pos_nanflow = RealOverflow._common(self.overflow, other.overflow, len(bins))
@@ -4039,7 +4039,7 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
                 if self.minbin == other.minbin and self.maxbin == other.maxbin:
                     return self, (None,), (othermap,)
                 else:
-                    return SparseRegularBinning(bins, self.bin_width, self.origin, overflow=self.overflow.detached(), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin), (None,), (othermap,)
+                    return SparseRegularBinning(bins, self.bin_width, self.origin, overflow=(None if self.overflow is None else self.overflow.detached()), low_inclusive=self.low_inclusive, high_inclusive=self.high_inclusive, minbin=minbin, maxbin=maxbin), (None,), (othermap,)
 
             else:
                 selfmap = self._selfmap([] if self.overflow is None else [(self.overflow.loc_underflow, pos_underflow), (self.overflow.loc_overflow, pos_overflow), (self.overflow.loc_nanflow, pos_nanflow)],
@@ -4318,7 +4318,7 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
                 predicates = numpy.array(self.predicates, dtype=numpy.object)[where]
                 if len(predicates) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
-                index = self.full(len(self.predicates), -1, dtype=numpy.int64)
+                index = numpy.full(len(self.predicates), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(predicates))
                 binning = PredicateBinning(predicates, overlapping_fill=self.overlapping_fill)
                 return binning, (index,)
@@ -4640,7 +4640,7 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
                 variations = numpy.array(self.variations, dtype=numpy.object)[where]
                 if len(variations) == 0:
                     raise IndexError("index {0} would result in no bins".format(where))
-                index = self.full(len(self.variations), -1, dtype=numpy.int64)
+                index = numpy.full(len(self.variations), -1, dtype=numpy.int64)
                 index[where] = numpy.arange(len(variations))
                 binning = VariationBinning([x.detached() for x in variations], systematic_units=self.systematic_units, systematic_names=self.systematic_names, category_systematic_names=self.category_systematic_names)
                 return binning, (index,)
