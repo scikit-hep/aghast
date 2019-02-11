@@ -821,10 +821,10 @@ class InterpretedBuffer(Interpretation):
                                            endianness=self.endianness,
                                            dimension_order=self.dimension_order)
 
-    def _add(self, other, noclobber):
+    def _add(self, other, noclobber, op=numpy.add):
         if noclobber:
             if isinstance(self, InterpretedInlineBuffer) or isinstance(other, InterpretedInlineBuffer):
-                return InterpretedInlineBuffer((self.flatarray + other.flatarray).view(numpy.uint8),
+                return InterpretedInlineBuffer(op(self.flatarray, other.flatarray).view(numpy.uint8),
                                                filters=self.filters,
                                                postfilter_slice=self.postfilter_slice,
                                                dtype=self.dtype,
@@ -832,16 +832,17 @@ class InterpretedBuffer(Interpretation):
                                                dimension_order=self.dimension_order)
 
             elif isinstance(self, InterpretedInlineFloat64Buffer) or isinstance(other, InterpretedInlineFloat64Buffer):
-                return InterpretedInlineFloat64Buffer((self.flatarray + other.flatarray).view(numpy.uint8))
+                return InterpretedInlineFloat64Buffer(op(self.flatarray, other.flatarray).view(numpy.uint8))
 
             elif isinstance(self, InterpretedInlineInt64Buffer) or isinstance(other, InterpretedInlineInt64Buffer):
-                return InterpretedInlineInt64Buffer((self.flatarray + other.flatarray).view(numpy.uint8))
+                return InterpretedInlineInt64Buffer(op(self.flatarray, other.flatarray).view(numpy.uint8))
 
             else:
                 raise AssertionError((type(self), type(other)))
 
         else:
-            self.flatarray += other.flatarray
+            array = self.flatarray
+            op(array, other.flatarray, out=array)
             return self
 
 ################################################# RawInlineBuffer
@@ -1417,12 +1418,13 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
             args.append("location={0}".format(_dumpstring(self.location)))
         return _dumpline(self, args, indent, width, end)
 
-    def _add(self, other, noclobber):
+    def _add(self, other, noclobber, op=numpy.add):
         if noclobber or self.external_source != self.memory or len(self.filters) != 0:
-            return super(InterpretedExternalBuffer, self)._add(other, noclobber)
+            return super(InterpretedExternalBuffer, self)._add(other, noclobber, op=op)
 
         else:
-            self.flatarray += other.flatarray
+            array = self.flatarray
+            op(array, other.flatarray, out=array)
             return self
 
 ################################################# StatisticFilter
@@ -1547,6 +1549,9 @@ If not all of the data were included in the sum, a *filter* describes which valu
             args.append("filter={0}".format(_dumpeq(self.filter._dump(indent + "  ", end, flie, flush), indent, end)))
         return _dumpline(self, args, indent, width, end)
 
+    def _add(self, other, noclobber):
+        return self.sumwxn._add(other.sumwxn, noclobber)
+
 ################################################# Extremes
 
 class Extremes(Stagg):
@@ -1598,6 +1603,12 @@ If not all of the data were included in the min/max calculation, a *filter* desc
         if self.filter is not None:
             args.append("filter={0}".format(_dumpeq(self.filter._dump(indent + "  ", end, flie, flush), indent, end)))
         return _dumpline(self, args, indent, width, end)
+
+    def _min(self, other, noclobber):
+        return self.values._add(other.values, noclobber, op=numpy.minimize)
+
+    def _max(self, other, noclobber):
+        return self.values._add(other.values, noclobber, op=numpy.maximize)
 
 ################################################# Quantiles
 
@@ -1818,6 +1829,12 @@ The minimum and maximum of a distribution are special cases of quantiles, but qu
         if self.max is not None:
             args.append("max={0}".format(_dumpeq(self.max._dump(indent + "    ", width, end), indent, end)))
         return _dumpline(self, args, indent, width, end)
+
+    def _add(self, other, noclobber):
+        return Statistics(
+            moments=sum([[x._add(y, noclobber) for y in other.moments if x.n == y.n and x.weightpower == y.weightpower] for x in self.moments], []),
+            min=None if self.min is None or other.min is None else self.min._min(other.min),
+            max=None if self.max is None or other.max is None else self.max._max(other.max))
 
 ################################################# Covariance
 
@@ -4444,9 +4461,9 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
 
         stagg.stagg_generated.Variation.VariationStart(builder)
         stagg.stagg_generated.Variation.VariationAddAssignments(builder, assignments)
-        if len(systematic) != 0:
+        if systematic is not None:
             stagg.stagg_generated.Variation.VariationAddSystematic(builder, systematic)
-        if len(category_systematic) != 0:
+        if category_systematic is not None:
             stagg.stagg_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
         return stagg.stagg_generated.Variation.VariationEnd(builder)
 
@@ -4556,9 +4573,9 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         if self.systematic_units != self.unspecified:
             stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicUnits(builder, self.systematic_units.value)
-        if len(systematic_names) != 0:
+        if systematic_names is not None:
             stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
-        if len(category_systematic_names) != 0:
+        if category_systematic_names is not None:
             stagg.stagg_generated.VariationBinning.VariationBinningAddCategorySystematicNames(builder, category_systematic_names)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
 
@@ -5886,8 +5903,9 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
         selfcounts._add(othercounts, noclobber)
 
-        for axis, (binning, sm, om) in zip(self.axis, triples[-len(self.axis):]):
-            axis.binning = binning
+        for selfaxis, otheraxis, (binning, sm, om) in zip(self.axis, other.axis, triples[-len(self.axis):]):
+            selfaxis.binning = binning
+            selfaxis.statistics = [x._add(y, noclobber) for x, y in zip(selfaxis.statistics, otheraxis.statistics)]
 
         if self.counts is not selfcounts:
             self.counts = selfcounts
