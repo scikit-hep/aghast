@@ -455,6 +455,8 @@ class CheckBuffer(Check):
         super(CheckBuffer, self).__call__(obj)
         if obj is None:
             return obj
+        if isinstance(obj, numpy.ndarray) and not obj.flags.c_contiguous:
+            obj = obj.copy(order="C")
         try:
             return numpy.frombuffer(obj, dtype=numpy.uint8)
         except AttributeError:

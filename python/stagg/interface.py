@@ -890,7 +890,7 @@ The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes wit
         return stagg.stagg_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(repr(self.buffer.tostring()))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# RawExternalBuffer
@@ -1087,7 +1087,7 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
         return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
         if len(self.filters) != 0:
             args.append("filters=[{0}]".format(", ".format(repr(x) for x in self.filters)))
         if self.postfilter_slice is not None:
@@ -1180,7 +1180,7 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
         return stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# InterpretedInlineFloat64Buffer
@@ -1261,7 +1261,7 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
         return stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["buffer={0}".format(_dumparray(self.flatarray, indent, end))]
+        args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# InterpretedExternalBuffer
