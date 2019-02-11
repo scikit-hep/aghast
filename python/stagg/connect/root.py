@@ -117,18 +117,22 @@ def toroot(obj, name):
         for axis in obj.axis:
             if axis.binning is None:
                 axissummary.append((RegularBinning, 1, 0.0, 1.0))
-                slc.append(slice(-numpy.inf, numpy.inf))
+                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
+                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
             elif isinstance(axis.binning, IntegerBinning):
                 axissummary.append((RegularBinning, 1 + axis.binning.max - axis.binning.min, axis.binning.min - 0.5, axis.binning.max + 0.5))
-                slc.append(slice(-numpy.inf, numpy.inf))
+                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
+                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
             elif isinstance(axis.binning, RegularBinning):
                 axissummary.append((RegularBinning, axis.binning.num, axis.binning.interval.low, axis.binning.interval.high))
-                slc.append(slice(-numpy.inf, numpy.inf))
+                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
+                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
             elif isinstance(axis.binning, HexagonalBinning):
                 raise TypeError("no ROOT equivalent for HexagonalBinning")
             elif isinstance(axis.binning, EdgesBinning):
                 axissummary.append((EdgesBinning, numpy.array(axis.binning.edges, dtype=numpy.float64, copy=False)))
-                slc.append(slice(-numpy.inf, numpy.inf))
+                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
+                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
             elif isinstance(axis.binning, IrregularBinning):
                 axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
                 slc.append(slice(None))
@@ -249,8 +253,16 @@ def toroot(obj, name):
                     if moment.n == 2 and moment.weightpower == 1 and len(sumwxn) == 1:
                         stats3, = sumwxn
 
-            if numentries is not None:
-                out.SetEntries(numentries)
+            if numentries is None:
+                if isinstance(obj.counts, UnweightedCounts):
+                    numentries = obj.counts.flatarray.sum()
+                elif obj.counts.unweighted is not None:
+                    numentries = obj.counts.unweighted.flatarray.sum()
+                else:
+                    numentries = obj.counts.sumw.flatarray.sum()
+
+            out.SetEntries(numentries)
+
             if stats0 is not None and stats1 is not None and stats2 is not None and stats3 is not None:
                 stats = numpy.array([stats0, stats1, stats2, stats3], dtype=numpy.float64)
                 out.PutStats(stats)
