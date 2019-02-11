@@ -5801,7 +5801,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         if len(self.profile_covariances) != 0:
             args.append("profile_covariances=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.profile_covariances], indent, width, end), indent, end)))
         if len(self.functions) != 0:
-            args.append("functions=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.functions], indent, width, end), indent, end)))
+            args.append("functions={{{0}}}".format(_dumpeq(_dumplist(["{0}: {1}".format(repr(n), x._dump(indent + "    ", width, end)) for n, x in self.functions.items()], indent, width, end), indent, end)))
         if self.title is not None:
             args.append("title={0}".format(_dumpstring(self.title)))
         if self.metadata is not None:
@@ -6594,7 +6594,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         if len(self.column_covariances) != 0:
             args.append("column_covariances=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_covariances], indent, width, end), indent, end)))
         if len(self.functions) != 0:
-            args.append("functions=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.functions], indent, width, end), indent, end)))
+            args.append("functions={{{0}}}".format(_dumpeq(_dumplist(["{0}: {1}".format(repr(n), x._dump(indent + "    ", width, end)) for n, x in self.functions.items()], indent, width, end), indent, end)))
         if self.title is not None:
             args.append("title={0}".format(_dumpstring(self.title)))
         if self.metadata is not None:
@@ -6742,7 +6742,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
     def _dump(self, indent, width, end):
         args = []
         if len(self.objects) != 0:
-            args.append("objects=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.objects], indent, width, end), indent, end)))
+            args.append("objects={{{0}}}".format(_dumpeq(_dumplist(["{0}: {1}".format(repr(n), x._dump(indent + "    ", width, end)) for n, x in self.objects.items()], indent, width, end), indent, end)))
         if len(self.axis) != 0:
             args.append("axis=[{0}]".format(_dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.axis], indent, width, end), indent, end)))
         if self.title is not None:
