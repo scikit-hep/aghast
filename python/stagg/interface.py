@@ -1550,7 +1550,7 @@ If not all of the data were included in the sum, a *filter* describes which valu
         return _dumpline(self, args, indent, width, end)
 
     def _add(self, other, noclobber):
-        return self.sumwxn._add(other.sumwxn, noclobber)
+        return Moments(self.sumwxn._add(other.sumwxn, noclobber), self.n, weightpower=self.weightpower, filter=(None if self.filter is None else self.filter.detached()))
 
 ################################################# Extremes
 
@@ -1605,10 +1605,10 @@ If not all of the data were included in the min/max calculation, a *filter* desc
         return _dumpline(self, args, indent, width, end)
 
     def _min(self, other, noclobber):
-        return self.values._add(other.values, noclobber, op=numpy.minimize)
+        return Extremes(self.values._add(other.values, noclobber, op=numpy.minimum), filter=(None if self.filter is None else self.filter.detached()))
 
     def _max(self, other, noclobber):
-        return self.values._add(other.values, noclobber, op=numpy.maximize)
+        return Extremes(self.values._add(other.values, noclobber, op=numpy.maximum), filter=(None if self.filter is None else self.filter.detached()))
 
 ################################################# Quantiles
 
@@ -1833,8 +1833,8 @@ The minimum and maximum of a distribution are special cases of quantiles, but qu
     def _add(self, other, noclobber):
         return Statistics(
             moments=sum([[x._add(y, noclobber) for y in other.moments if x.n == y.n and x.weightpower == y.weightpower] for x in self.moments], []),
-            min=None if self.min is None or other.min is None else self.min._min(other.min),
-            max=None if self.max is None or other.max is None else self.max._max(other.max))
+            min=None if self.min is None or other.min is None else self.min._min(other.min, noclobber),
+            max=None if self.max is None or other.max is None else self.max._max(other.max, noclobber))
 
 ################################################# Covariance
 
