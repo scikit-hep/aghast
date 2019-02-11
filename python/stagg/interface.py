@@ -3302,7 +3302,7 @@ Irregular bins are usually not directly created by histogramming libraries, but 
         args = ["intervals=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.intervals], indent, width, end), indent, end) + "]"]
         if self.overflow is not None:
             args.append("overflow={0}".format(_dumpeq(self.overflow._dump(indent + "    ", width, end), indent, end)))
-        if self.overlapping_fill is not True:
+        if self.overlapping_fill != self.unspecified:
             args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
         return _dumpline(self, args, indent, width, end)
 
@@ -3545,7 +3545,7 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
         return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["categories=[" + ", ".join(repr(x) for x in self.categories) + "]"]
+        args = ["categories=[" + ", ".join(_dumpstring(x) for x in self.categories) + "]"]
         if self.loc_overflow != BinLocation.nonexistent:
             args.append("loc_overflow={0}".format(repr(self.loc_overflow)))
         return _dumpline(self, args, indent, width, end)
@@ -3795,7 +3795,7 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
             args.append("origin={0}".format(repr(self.origin)))
         if self.low_inclusive is not True:
             args.append("low_inclusive={0}".format(repr(self.low_inclusive)))
-        if self.high_inclusive is not True:
+        if self.high_inclusive is not False:
             args.append("high_inclusive={0}".format(repr(self.high_inclusive)))
         if self.minbin != MININT64:
             args.append("minbin={0}".format(repr(self.minbin)))
@@ -4232,7 +4232,7 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
         return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["predicates=[" + ", ".join(repr(x) for x in self.predicates) + "]"]
+        args = ["predicates=[" + ", ".join(_dumpstring(x) for x in self.predicates) + "]"]
         if self.overlapping_fill != OverlappingFill.unspecified:
             args.append("overlapping_fill={0}".format(repr(self.overlapping_fill)))
         return _dumpline(self, args, indent, width, end)
@@ -4370,7 +4370,7 @@ The *identifier* is the name of the derived feature that gets recomputed in this
         return stagg.stagg_generated.Assignment.AssignmentEnd(builder)
 
     def _dump(self, indent, width, end):
-        args = ["identifier={0}".format(repr(self.identifier)), "expression={0}".format(_dumpeq(self.expression._dump(indent + "    ", width, end), indent, end))]
+        args = ["identifier={0}".format(_dumpstring(self.identifier)), "expression={0}".format(_dumpstring(self.expression))]
         return _dumpline(self, args, indent, width, end)
 
 ################################################# Variation
@@ -4444,17 +4444,17 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
 
         stagg.stagg_generated.Variation.VariationStart(builder)
         stagg.stagg_generated.Variation.VariationAddAssignments(builder, assignments)
-        if systematic is not None:
+        if len(systematic) != 0:
             stagg.stagg_generated.Variation.VariationAddSystematic(builder, systematic)
-        if category_systematic is not None:
+        if len(category_systematic) != 0:
             stagg.stagg_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
         return stagg.stagg_generated.Variation.VariationEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["assignments=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.assignments], indent, width, end), indent, end) + "]"]
-        if self.systematic is not None:
+        if len(self.systematic) != 0:
             args.append("systematic=[{0}]".format(", ".join(repr(x) for x in self.systematic)))
-        if self.category_systematic is not None:
+        if len(self.category_systematic) != 0:
             args.append("category_systematic=[{0}]".format(", ".join(repr(x) for x in self.category_systematic)))
         return _dumpline(self, args, indent, width, end)
 
@@ -4556,9 +4556,9 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
         stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         if self.systematic_units != self.unspecified:
             stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicUnits(builder, self.systematic_units.value)
-        if systematic_names is not None:
+        if len(systematic_names) != 0:
             stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
-        if category_systematic_names is not None:
+        if len(category_systematic_names) != 0:
             stagg.stagg_generated.VariationBinning.VariationBinningAddCategorySystematicNames(builder, category_systematic_names)
         return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
 
@@ -4566,9 +4566,9 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
         args = ["variations=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.variations], indent, width, end), indent, end) + "]"]
         if self.systematic_units != self.unspecified:
             args.append("systematic_units={0}".format(repr(self.systematic_units)))
-        if self.systematic_names is not None:
+        if len(self.systematic_names) != 0:
             args.append("systematic_names=[{0}]".format(", ".join(repr(x) for x in self.systematic_names)))
-        if self.category_systematic_names is not None:
+        if len(self.category_systematic_names) != 0:
             args.append("category_systematic_names=[{0}]".format(", ".join(repr(x) for x in self.category_systematic_names)))
         return _dumpline(self, args, indent, width, end)
 
