@@ -2402,7 +2402,7 @@ A single interval defines a <<RegularBinning>> and a set of intervals defines an
         args = ["low={0}".format(repr(self.low)), "high={0}".format(repr(self.high))]
         if self.low_inclusive is not True:
             args.append("low_inclusive={0}".format(self.low_inclusive))
-        if self.high_inclusive is not True:
+        if self.high_inclusive is not False:
             args.append("high_inclusive={0}".format(self.high_inclusive))
         return _dumpline(self, args, indent, width, end)
 

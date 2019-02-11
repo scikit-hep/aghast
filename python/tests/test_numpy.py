@@ -30,18 +30,32 @@
 
 import unittest
 
-import pytest
 import numpy
 
 from stagg import *
-
-pandas = pytest.importorskip("pandas")
-connect_pandas = pytest.importorskip("stagg.connect.pandas")
+import stagg.connect.numpy as connect_numpy
 
 class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def test_pandas(self):
-        a = Histogram([Axis(IntegerBinning(5, 9)), Axis(IntegerBinning(-5, 5))], WeightedCounts(InterpretedInlineBuffer.fromarray(numpy.arange(55)), sumw2=InterpretedInlineBuffer.fromarray(numpy.arange(55))), profile=[Profile("qqq", Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.arange(55)), n=2, weightpower=2), Moments(InterpretedInlineBuffer.fromarray(numpy.arange(55)), n=0)], quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.arange(55)), p=0.5)], max=Extremes(InterpretedInlineBuffer.fromarray(numpy.arange(55))), min=Extremes(InterpretedInlineBuffer.fromarray(numpy.arange(55))), mode=Modes(InterpretedInlineBuffer.fromarray(numpy.arange(55))))), Profile("zzz", Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(numpy.arange(55)), n=2, weightpower=2), Moments(InterpretedInlineBuffer.fromarray(numpy.arange(55)), n=0)], quantiles=[Quantiles(InterpretedInlineBuffer.fromarray(numpy.arange(55)), p=1)], max=Extremes(InterpretedInlineBuffer.fromarray(numpy.arange(55))), min=Extremes(InterpretedInlineBuffer.fromarray(numpy.arange(55))), mode=Modes(InterpretedInlineBuffer.fromarray(numpy.arange(55)))))])
-        connect_pandas.tostagg(connect_pandas.topandas(a)[:25])
+    def test_numpy1d(self):
+        before = numpy.histogram(numpy.random.normal(0, 1, int(1e6)), bins=100, range=(-5, 5))
+        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        assert numpy.array_equal(before[0], after[0])
+        assert numpy.array_equal(before[1], after[1])
+
+    def test_numpy2d(self):
+        before = numpy.histogram2d(x=numpy.random.normal(0, 1, int(1e6)), y=numpy.random.normal(0, 1, int(1e6)), bins=(10, 10), range=((-5, 5), (-5, 5)))
+        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        assert numpy.array_equal(before[0], after[0])
+        assert numpy.array_equal(before[1], after[1])
+        assert numpy.array_equal(before[2], after[2])
+
+    def test_numpydd(self):
+        before = numpy.histogramdd((numpy.random.normal(0, 1, int(1e6)), numpy.random.normal(0, 1, int(1e6)), numpy.random.normal(0, 1, int(1e6))), bins=(5, 5, 5), range=((-5, 5), (-5, 5), (-5, 5)))
+        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        assert numpy.array_equal(before[0], after[0])
+        assert numpy.array_equal(before[1][0], after[1][0])
+        assert numpy.array_equal(before[1][1], after[1][1])
+        assert numpy.array_equal(before[1][2], after[1][2])

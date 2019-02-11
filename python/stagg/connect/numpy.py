@@ -33,8 +33,49 @@ import numpy
 from stagg import *
 import stagg.interface
 
+def binning2array(binning):
+    if not isinstance(binning, EdgesBinning):
+        if not hasattr(binning, "toEdgesBinning"):
+            raise TypeError("cannot convert {0} to a Numpy binning".format(type(binning).__name__))
+        binning = binning.toEdgesBinning()
+    if binning.overflow is not None and binning.overflow.loc_underflow != BinLocation.nonexistent and binning.overflow.loc_overflow != BinLocation.nonexistent:
+        out = numpy.empty(len(binning.edges) + 2, dtype=binning.edges.dtype)
+        out[0] = -numpy.inf
+        out[-1] = numpy.inf
+        out[1:-1] = binning.edges
+    elif binning.overflow is not None and binning.overflow.loc_underflow != BinLocation.nonexistent:
+        out = numpy.empty(len(binning.edges) + 1, dtype=binning.edges.dtype)
+        out[0] = -numpy.inf
+        out[1:] = binning.edges
+    elif binning.overflow is not None and binning.overflow.loc_overflow != BinLocation.nonexistent:
+        out = numpy.empty(len(binning.edges) + 1, dtype=binning.edges.dtype)
+        out[-1] = numpy.inf
+        out[:-1] = binning.edges
+    else:
+        out = binning.edges
+    return out
+        
 def tonumpy(obj):
-    raise NotImplementedError
+    if isinstance(obj, Histogram):
+        edges = [binning2array(x.binning) for x in obj.axis]
+        slices = ()
+        for x in edges:
+            start = -numpy.inf if x[0] == -numpy.inf else None
+            stop = numpy.inf if x[-1] == numpy.inf else None
+            slices = slices + (slice(start, stop),)
+        counts = obj.counts[slices]
+        if isinstance(counts, dict):
+            counts = counts["sumw"]
+
+        if len(edges) == 1:
+            return counts, edges[0]
+        elif len(edges) == 2:
+            return counts, edges[0], edges[1]
+        else:
+            return counts, edges
+
+    else:
+        raise TypeError("cannot convert {0} to a Numpy histogram".format(type(obj).__name__))
 
 def array2counts(array):
     if issubclass(array.dtype.type, numpy.integer) and (array >= 0).all():
