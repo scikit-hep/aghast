@@ -403,6 +403,13 @@ class Object(Ghast):
         fb2.Init(data.Bytes, data.Pos)
         return interface._fromflatbuffers(fb, fb2)
 
+    def __getstate__(self):
+        return self.tobuffer()
+
+    def __setstate__(self, state):
+        out = Object._fromflatbuffers(aghast.aghast_generated.Object.Object.GetRootAsObject(state, 0))
+        self._flatbuffers = out._flatbuffers
+
     def tobuffer(self):
         self.checkvalid()
         builder = flatbuffers.Builder(1024)

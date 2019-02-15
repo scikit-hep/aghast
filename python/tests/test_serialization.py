@@ -28,6 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import pickle
 import unittest
 
 import numpy
@@ -37,6 +38,10 @@ from aghast import *
 class Test(unittest.TestCase):
     def runTest(self):
         pass
+
+    def test_pickle(self):
+        h = Histogram([Axis(RegularBinning(10, RealInterval(-5, 5)))], UnweightedCounts(InterpretedInlineBuffer.fromarray(numpy.array([0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9]))))
+        assert h == pickle.loads(pickle.dumps(h))
 
     def test_serialization_Metadata(self):
         h = Collection({}, metadata=Metadata("""{"one": 1, "two": 2}""", language=Metadata.json))
