@@ -44,78 +44,78 @@ except ImportError:
 import numpy
 import flatbuffers
 
-import stagg.stagg_generated.MetadataLanguage
-import stagg.stagg_generated.Metadata
-import stagg.stagg_generated.DecorationLanguage
-import stagg.stagg_generated.Decoration
-import stagg.stagg_generated.DType
-import stagg.stagg_generated.Endianness
-import stagg.stagg_generated.DimensionOrder
-import stagg.stagg_generated.Filter
-import stagg.stagg_generated.Slice
-import stagg.stagg_generated.ExternalSource
-import stagg.stagg_generated.RawInlineBuffer
-import stagg.stagg_generated.RawExternalBuffer
-import stagg.stagg_generated.InterpretedInlineBuffer
-import stagg.stagg_generated.InterpretedInlineInt64Buffer
-import stagg.stagg_generated.InterpretedInlineFloat64Buffer
-import stagg.stagg_generated.InterpretedExternalBuffer
-import stagg.stagg_generated.RawBuffer
-import stagg.stagg_generated.InterpretedBuffer
-import stagg.stagg_generated.StatisticFilter
-import stagg.stagg_generated.Moments
-import stagg.stagg_generated.Extremes
-import stagg.stagg_generated.Quantiles
-import stagg.stagg_generated.Modes
-import stagg.stagg_generated.Statistics
-import stagg.stagg_generated.Covariance
-import stagg.stagg_generated.BinLocation
-import stagg.stagg_generated.IntegerBinning
-import stagg.stagg_generated.RealInterval
-import stagg.stagg_generated.NonRealMapping
-import stagg.stagg_generated.RealOverflow
-import stagg.stagg_generated.RegularBinning
-import stagg.stagg_generated.HexagonalCoordinates
-import stagg.stagg_generated.HexagonalBinning
-import stagg.stagg_generated.EdgesBinning
-import stagg.stagg_generated.OverlappingFillStrategy
-import stagg.stagg_generated.IrregularBinning
-import stagg.stagg_generated.CategoryBinning
-import stagg.stagg_generated.SparseRegularBinning
-import stagg.stagg_generated.FractionLayout
-import stagg.stagg_generated.FractionErrorMethod
-import stagg.stagg_generated.FractionBinning
-import stagg.stagg_generated.PredicateBinning
-import stagg.stagg_generated.Assignment
-import stagg.stagg_generated.Variation
-import stagg.stagg_generated.SystematicUnits
-import stagg.stagg_generated.VariationBinning
-import stagg.stagg_generated.Binning
-import stagg.stagg_generated.Axis
-import stagg.stagg_generated.Profile
-import stagg.stagg_generated.UnweightedCounts
-import stagg.stagg_generated.WeightedCounts
-import stagg.stagg_generated.Counts
-import stagg.stagg_generated.Parameter
-import stagg.stagg_generated.ParameterizedFunction
-import stagg.stagg_generated.EvaluatedFunction
-import stagg.stagg_generated.FunctionData
-import stagg.stagg_generated.Function
-import stagg.stagg_generated.BinnedEvaluatedFunction
-import stagg.stagg_generated.FunctionObjectData
-import stagg.stagg_generated.FunctionObject
-import stagg.stagg_generated.Histogram
-import stagg.stagg_generated.Page
-import stagg.stagg_generated.ColumnChunk
-import stagg.stagg_generated.Chunk
-import stagg.stagg_generated.Column
-import stagg.stagg_generated.NtupleInstance
-import stagg.stagg_generated.Ntuple
-import stagg.stagg_generated.ObjectData
-import stagg.stagg_generated.Object
-import stagg.stagg_generated.Collection
+import aghast.aghast_generated.MetadataLanguage
+import aghast.aghast_generated.Metadata
+import aghast.aghast_generated.DecorationLanguage
+import aghast.aghast_generated.Decoration
+import aghast.aghast_generated.DType
+import aghast.aghast_generated.Endianness
+import aghast.aghast_generated.DimensionOrder
+import aghast.aghast_generated.Filter
+import aghast.aghast_generated.Slice
+import aghast.aghast_generated.ExternalSource
+import aghast.aghast_generated.RawInlineBuffer
+import aghast.aghast_generated.RawExternalBuffer
+import aghast.aghast_generated.InterpretedInlineBuffer
+import aghast.aghast_generated.InterpretedInlineInt64Buffer
+import aghast.aghast_generated.InterpretedInlineFloat64Buffer
+import aghast.aghast_generated.InterpretedExternalBuffer
+import aghast.aghast_generated.RawBuffer
+import aghast.aghast_generated.InterpretedBuffer
+import aghast.aghast_generated.StatisticFilter
+import aghast.aghast_generated.Moments
+import aghast.aghast_generated.Extremes
+import aghast.aghast_generated.Quantiles
+import aghast.aghast_generated.Modes
+import aghast.aghast_generated.Statistics
+import aghast.aghast_generated.Covariance
+import aghast.aghast_generated.BinLocation
+import aghast.aghast_generated.IntegerBinning
+import aghast.aghast_generated.RealInterval
+import aghast.aghast_generated.NonRealMapping
+import aghast.aghast_generated.RealOverflow
+import aghast.aghast_generated.RegularBinning
+import aghast.aghast_generated.HexagonalCoordinates
+import aghast.aghast_generated.HexagonalBinning
+import aghast.aghast_generated.EdgesBinning
+import aghast.aghast_generated.OverlappingFillStrategy
+import aghast.aghast_generated.IrregularBinning
+import aghast.aghast_generated.CategoryBinning
+import aghast.aghast_generated.SparseRegularBinning
+import aghast.aghast_generated.FractionLayout
+import aghast.aghast_generated.FractionErrorMethod
+import aghast.aghast_generated.FractionBinning
+import aghast.aghast_generated.PredicateBinning
+import aghast.aghast_generated.Assignment
+import aghast.aghast_generated.Variation
+import aghast.aghast_generated.SystematicUnits
+import aghast.aghast_generated.VariationBinning
+import aghast.aghast_generated.Binning
+import aghast.aghast_generated.Axis
+import aghast.aghast_generated.Profile
+import aghast.aghast_generated.UnweightedCounts
+import aghast.aghast_generated.WeightedCounts
+import aghast.aghast_generated.Counts
+import aghast.aghast_generated.Parameter
+import aghast.aghast_generated.ParameterizedFunction
+import aghast.aghast_generated.EvaluatedFunction
+import aghast.aghast_generated.FunctionData
+import aghast.aghast_generated.Function
+import aghast.aghast_generated.BinnedEvaluatedFunction
+import aghast.aghast_generated.FunctionObjectData
+import aghast.aghast_generated.FunctionObject
+import aghast.aghast_generated.Histogram
+import aghast.aghast_generated.Page
+import aghast.aghast_generated.ColumnChunk
+import aghast.aghast_generated.Chunk
+import aghast.aghast_generated.Column
+import aghast.aghast_generated.NtupleInstance
+import aghast.aghast_generated.Ntuple
+import aghast.aghast_generated.ObjectData
+import aghast.aghast_generated.Object
+import aghast.aghast_generated.Collection
 
-import stagg.checktype
+import aghast.checktype
 
 MININT64 = -9223372036854775808
 MAXINT64 = 9223372036854775807
@@ -146,21 +146,21 @@ def typedproperty(check):
             fbnametag = fbname + "ByTag"
             if hasattr(self._flatbuffers, fbnametag):
                 value = getattr(self._flatbuffers, fbnametag)()
-                stagg.checktype.setparent(self, value)
+                aghast.checktype.setparent(self, value)
             elif hasattr(self._flatbuffers, fbnamelookup):
-                value = stagg.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
+                value = aghast.checktype.FBLookup(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbnamelookup), getattr(self._flatbuffers, fbname), check, self)
             elif hasattr(self._flatbuffers, fbnamelen):
-                value = stagg.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
+                value = aghast.checktype.FBVector(getattr(self._flatbuffers, fbnamelen)(), getattr(self._flatbuffers, fbname), check, self)
             else:
                 value = check.fromflatbuffers(getattr(self._flatbuffers, fbname)())
-                stagg.checktype.setparent(self, value)
+                aghast.checktype.setparent(self, value)
             setattr(self, private, value)
         return getattr(self, private)
 
     @prop.setter
     def prop(self, value):
         value = check(value)
-        stagg.checktype.setparent(self, value)
+        aghast.checktype.setparent(self, value)
         setattr(self, "_" + check.paramname, value)
 
     return prop
@@ -168,16 +168,16 @@ def typedproperty(check):
 def _valid(obj, seen, recursive):
     if obj is None:
         pass
-    elif isinstance(obj, Stagg):
+    elif isinstance(obj, Ghast):
         if id(obj) in seen:
             raise ValueError("hierarchy is recursively nested")
         seen.add(id(obj))
         obj._validtypes()
         obj._valid(seen, recursive)
-    elif isinstance(obj, stagg.checktype.Vector):
+    elif isinstance(obj, aghast.checktype.Vector):
         for x in obj:
             _valid(x, seen, recursive)
-    elif isinstance(obj, stagg.checktype.Lookup):
+    elif isinstance(obj, aghast.checktype.Lookup):
         for x in obj.values():
             _valid(x, seen, recursive)
     else:
@@ -187,11 +187,11 @@ def _getbykey(self, field, where):
     lookup = "_lookup_" + field
     if not hasattr(self, lookup):
         values = getattr(self, field)
-        if isinstance(values, stagg.checktype.Vector):
+        if isinstance(values, aghast.checktype.Vector):
             setattr(self, lookup, {x.identifier: x for x in values})
             if len(getattr(self, lookup)) != len(values):
                 raise ValueError("{0}.{1} keys must be unique".format(type(self).__name__, field))
-        elif isinstance(values, stagg.checktype.Lookup):
+        elif isinstance(values, aghast.checktype.Lookup):
             setattr(self, lookup, values)
         else:
             raise AssertionError(type(values))
@@ -233,9 +233,9 @@ class _LocIndexer(object):
 
         return self.obj._getloc(self._isiloc, where, binnings)
 
-################################################# Stagg
+################################################# Ghast
 
-class Stagg(object):
+class Ghast(object):
     def __repr__(self):
         if "identifier" in self._params:
             identifier = " " + repr(self.identifier)
@@ -297,9 +297,9 @@ class Stagg(object):
                     private = "_" + n
                     if hasattr(self, private):
                         x = getattr(self, private)
-                        if isinstance(x, (Stagg, stagg.checktype.Vector, stagg.checktype.Lookup)):
+                        if isinstance(x, (Ghast, aghast.checktype.Vector, aghast.checktype.Lookup)):
                             x = x._detached(False)
-                        stagg.checktype.setparent(out, x)
+                        aghast.checktype.setparent(out, x)
                         setattr(out, private, x)
             return out
 
@@ -328,7 +328,7 @@ class Stagg(object):
         for n in self._params:
             selfn = getattr(self, n)
             othern = getattr(other, n)
-            if selfn is None or isinstance(selfn, (Stagg, Enum)):
+            if selfn is None or isinstance(selfn, (Ghast, Enum)):
                 if selfn != othern:
                     return False
             elif isinstance(selfn, numpy.ndarray) and isinstance(othern, numpy.ndarray):
@@ -372,7 +372,7 @@ class Enum(object):
     
 ################################################# Object
 
-class Object(Stagg):
+class Object(Ghast):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -438,20 +438,20 @@ class Object(Stagg):
             file = FileLike(file)
 
         try:
-            file.write(b"StAg")
+            file.write(b"gast")
             builder = flatbuffers.Builder(1024)
             builder.Finish(self._toflatbuffers(builder))
             offset = file.tell()
             file.write(builder.Output())
             file.write(struct.pack("<Q", offset))
-            file.write(b"StAg")
+            file.write(b"gast")
 
         finally:
             if opened:
                 file.close()
 
 def frombuffer(buffer, checkvalid=False, offset=0):
-    out = Object._fromflatbuffers(stagg.stagg_generated.Object.Object.GetRootAsObject(buffer, offset))
+    out = Object._fromflatbuffers(aghast.aghast_generated.Object.Object.GetRootAsObject(buffer, offset))
     if checkvalid:
         out.checkvalid()
     return out
@@ -462,10 +462,10 @@ def fromarray(array, checkvalid=False):
 def fromfile(file, mode="r+", checkvalid=False):
     if isinstance(file, str):
         file = numpy.memmap(file, dtype=numpy.uint8, mode=mode)
-    if file[:4].tostring() != b"StAg":
-        raise OSError("file does not begin with magic 'StAg'")
-    if file[-4:].tostring() != b"StAg":
-        raise OSError("file does not end with magic 'StAg'")
+    if file[:4].tostring() != b"gast":
+        raise OSError("file does not begin with magic 'gast'")
+    if file[-4:].tostring() != b"gast":
+        raise OSError("file does not end with magic 'gast'")
     offset, = struct.unpack("<Q", file[-12:-4])
     return frombuffer(file[offset:-12], checkvalid=checkvalid)
 
@@ -507,14 +507,14 @@ def _dumparray(obj, indent, end):
 class MetadataLanguageEnum(Enum):
     base = "Metadata"
 
-class Metadata(Stagg):
-    unspecified = MetadataLanguageEnum("unspecified", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
-    json        = MetadataLanguageEnum("json", stagg.stagg_generated.MetadataLanguage.MetadataLanguage.meta_json)
+class Metadata(Ghast):
+    unspecified = MetadataLanguageEnum("unspecified", aghast.aghast_generated.MetadataLanguage.MetadataLanguage.meta_unspecified)
+    json        = MetadataLanguageEnum("json", aghast.aghast_generated.MetadataLanguage.MetadataLanguage.meta_json)
     language = [unspecified, json]
 
     _params = {
-        "data":     stagg.checktype.CheckString("Metadata", "data", required=True),
-        "language": stagg.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
+        "data":     aghast.checktype.CheckString("Metadata", "data", required=True),
+        "language": aghast.checktype.CheckEnum("Metadata", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -523,9 +523,9 @@ class Metadata(Stagg):
     description = "Optional container for applications to attach metadata to histograms, functions, ntuples, and collections."
     validity_rules = ()
     long_description = """
-Anything that an application needs to track that is not or won't be encoded in Stagg structures may be attached as metadata. The *data* are expressed as a string in some *language*, such as JSON.
+Anything that an application needs to track that is not or won't be encoded in aghast structures may be attached as metadata. The *data* are expressed as a string in some *language*, such as JSON.
 
-Graphical properties of plots are not encoded in Stagg, but they may use <<Decoration>> for graphics-specific metadata.
+Graphical properties of plots are not encoded in aghast, but they may use <<Decoration>> for graphics-specific metadata.
 """
 
     def __init__(self, data, language=unspecified):
@@ -534,11 +534,11 @@ Graphical properties of plots are not encoded in Stagg, but they may use <<Decor
 
     def _toflatbuffers(self, builder):
         data = builder.CreateString(self.data.encode("utf-8"))
-        stagg.stagg_generated.Metadata.MetadataStart(builder)
-        stagg.stagg_generated.Metadata.MetadataAddData(builder, data)
+        aghast.aghast_generated.Metadata.MetadataStart(builder)
+        aghast.aghast_generated.Metadata.MetadataAddData(builder, data)
         if self.language != self.unspecified:
-            stagg.stagg_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
-        return stagg.stagg_generated.Metadata.MetadataEnd(builder)
+            aghast.aghast_generated.Metadata.MetadataAddLanguage(builder, self.language.value)
+        return aghast.aghast_generated.Metadata.MetadataEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["data={0}".format(_dumpstring(self.data))]
@@ -551,16 +551,16 @@ Graphical properties of plots are not encoded in Stagg, but they may use <<Decor
 class DecorationLanguageEnum(Enum):
     base = "Decoration"
 
-class Decoration(Stagg):
-    unspecified = DecorationLanguageEnum("unspecified", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
-    css         = DecorationLanguageEnum("css", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_css)
-    vega        = DecorationLanguageEnum("vega", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_vega)
-    json        = DecorationLanguageEnum("json", stagg.stagg_generated.DecorationLanguage.DecorationLanguage.deco_json)
+class Decoration(Ghast):
+    unspecified = DecorationLanguageEnum("unspecified", aghast.aghast_generated.DecorationLanguage.DecorationLanguage.deco_unspecified)
+    css         = DecorationLanguageEnum("css", aghast.aghast_generated.DecorationLanguage.DecorationLanguage.deco_css)
+    vega        = DecorationLanguageEnum("vega", aghast.aghast_generated.DecorationLanguage.DecorationLanguage.deco_vega)
+    json        = DecorationLanguageEnum("json", aghast.aghast_generated.DecorationLanguage.DecorationLanguage.deco_json)
     language = [unspecified, css, vega, json]
 
     _params = {
-        "data":     stagg.checktype.CheckString("Decoration", "data", required=True),
-        "language": stagg.checktype.CheckEnum("Decoration", "language", required=True, choices=language),
+        "data":     aghast.checktype.CheckString("Decoration", "data", required=True),
+        "language": aghast.checktype.CheckEnum("Decoration", "language", required=True, choices=language),
         }
 
     data     = typedproperty(_params["data"])
@@ -569,7 +569,7 @@ class Decoration(Stagg):
     description = "Optional container for applications to attach graphical properties to histograms, functions, ntuples, and collections."
     validity_rules = ()
     long_description = """
-The Stagg specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
+The aghast specification does not encode any graphical properties, such as colors or arrangements of a plot. However, an application may want to save or communicate these properties. The <<Decoration>> class is intended to hold this information.
 
 The *data* are expressed as a string in some *language*, such as CSS, Vega, or JSON format.
 """
@@ -580,11 +580,11 @@ The *data* are expressed as a string in some *language*, such as CSS, Vega, or J
 
     def _toflatbuffers(self, builder):
         data = builder.CreateString(self.data.encode("utf-8"))
-        stagg.stagg_generated.Decoration.DecorationStart(builder)
-        stagg.stagg_generated.Decoration.DecorationAddData(builder, data)
+        aghast.aghast_generated.Decoration.DecorationStart(builder)
+        aghast.aghast_generated.Decoration.DecorationAddData(builder, data)
         if self.language != self.unspecified:
-            stagg.stagg_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
-        return stagg.stagg_generated.Decoration.DecorationEnd(builder)
+            aghast.aghast_generated.Decoration.DecorationAddLanguage(builder, self.language.value)
+        return aghast.aghast_generated.Decoration.DecorationEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["data={0}".format(_dumpstring(self.data))]
@@ -597,11 +597,11 @@ The *data* are expressed as a string in some *language*, such as CSS, Vega, or J
 class BufferFilterEnum(Enum):
     base = "Buffer"
 
-class Buffer(Stagg):
-    none = BufferFilterEnum("none", stagg.stagg_generated.Filter.Filter.filter_none)
-    gzip = BufferFilterEnum("gzip", stagg.stagg_generated.Filter.Filter.filter_gzip)
-    lzma = BufferFilterEnum("lzma", stagg.stagg_generated.Filter.Filter.filter_lzma)
-    lz4  = BufferFilterEnum("lz4", stagg.stagg_generated.Filter.Filter.filter_lz4)
+class Buffer(Ghast):
+    none = BufferFilterEnum("none", aghast.aghast_generated.Filter.Filter.filter_none)
+    gzip = BufferFilterEnum("gzip", aghast.aghast_generated.Filter.Filter.filter_gzip)
+    lzma = BufferFilterEnum("lzma", aghast.aghast_generated.Filter.Filter.filter_lzma)
+    lz4  = BufferFilterEnum("lz4", aghast.aghast_generated.Filter.Filter.filter_lz4)
     filters = [none, gzip, lzma, lz4]
 
     def __init__(self):
@@ -615,10 +615,10 @@ class ExternalSourceEnum(Enum):
     base = "ExternalBuffer"
 
 class ExternalBuffer(object):
-    memory   = ExternalSourceEnum("memory", stagg.stagg_generated.ExternalSource.ExternalSource.external_memory)
-    samefile = ExternalSourceEnum("samefile", stagg.stagg_generated.ExternalSource.ExternalSource.external_samefile)
-    file     = ExternalSourceEnum("file", stagg.stagg_generated.ExternalSource.ExternalSource.external_file)
-    url      = ExternalSourceEnum("url", stagg.stagg_generated.ExternalSource.ExternalSource.external_url)
+    memory   = ExternalSourceEnum("memory", aghast.aghast_generated.ExternalSource.ExternalSource.external_memory)
+    samefile = ExternalSourceEnum("samefile", aghast.aghast_generated.ExternalSource.ExternalSource.external_samefile)
+    file     = ExternalSourceEnum("file", aghast.aghast_generated.ExternalSource.ExternalSource.external_file)
+    url      = ExternalSourceEnum("url", aghast.aghast_generated.ExternalSource.ExternalSource.external_url)
     sources = [memory, samefile, file, url]
 
     def __init__(self):
@@ -643,22 +643,22 @@ class EndiannessEnum(Enum):
         self.endianness = endianness
 
 class Interpretation(object):
-    none    = DTypeEnum("none", stagg.stagg_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
-    bool    = DTypeEnum("bool", stagg.stagg_generated.DType.DType.dtype_bool, numpy.dtype(numpy.bool_))
-    int8    = DTypeEnum("int8", stagg.stagg_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
-    uint8   = DTypeEnum("uint8", stagg.stagg_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
-    int16   = DTypeEnum("int16", stagg.stagg_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
-    uint16  = DTypeEnum("uint16", stagg.stagg_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
-    int32   = DTypeEnum("int32", stagg.stagg_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
-    uint32  = DTypeEnum("uint32", stagg.stagg_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
-    int64   = DTypeEnum("int64", stagg.stagg_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
-    uint64  = DTypeEnum("uint64", stagg.stagg_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
-    float32 = DTypeEnum("float32", stagg.stagg_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
-    float64 = DTypeEnum("float64", stagg.stagg_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
+    none    = DTypeEnum("none", aghast.aghast_generated.DType.DType.dtype_none, numpy.dtype(numpy.uint8))
+    bool    = DTypeEnum("bool", aghast.aghast_generated.DType.DType.dtype_bool, numpy.dtype(numpy.bool_))
+    int8    = DTypeEnum("int8", aghast.aghast_generated.DType.DType.dtype_int8, numpy.dtype(numpy.int8))
+    uint8   = DTypeEnum("uint8", aghast.aghast_generated.DType.DType.dtype_uint8, numpy.dtype(numpy.uint8))
+    int16   = DTypeEnum("int16", aghast.aghast_generated.DType.DType.dtype_int16, numpy.dtype(numpy.int16))
+    uint16  = DTypeEnum("uint16", aghast.aghast_generated.DType.DType.dtype_uint16, numpy.dtype(numpy.uint16))
+    int32   = DTypeEnum("int32", aghast.aghast_generated.DType.DType.dtype_int32, numpy.dtype(numpy.int32))
+    uint32  = DTypeEnum("uint32", aghast.aghast_generated.DType.DType.dtype_uint32, numpy.dtype(numpy.uint32))
+    int64   = DTypeEnum("int64", aghast.aghast_generated.DType.DType.dtype_int64, numpy.dtype(numpy.int64))
+    uint64  = DTypeEnum("uint64", aghast.aghast_generated.DType.DType.dtype_uint64, numpy.dtype(numpy.uint64))
+    float32 = DTypeEnum("float32", aghast.aghast_generated.DType.DType.dtype_float32, numpy.dtype(numpy.float32))
+    float64 = DTypeEnum("float64", aghast.aghast_generated.DType.DType.dtype_float64, numpy.dtype(numpy.float64))
     dtypes = [none, bool, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64]
 
-    little_endian = EndiannessEnum("little_endian", stagg.stagg_generated.Endianness.Endianness.little_endian, "<")
-    big_endian    = EndiannessEnum("big_endian", stagg.stagg_generated.Endianness.Endianness.big_endian, ">")
+    little_endian = EndiannessEnum("little_endian", aghast.aghast_generated.Endianness.Endianness.little_endian, "<")
+    big_endian    = EndiannessEnum("big_endian", aghast.aghast_generated.Endianness.Endianness.big_endian, ">")
     endiannesses = [little_endian, big_endian]
 
     def __init__(self):
@@ -718,8 +718,8 @@ class DimensionOrderEnum(Enum):
         self.dimension_order = dimension_order
 
 class InterpretedBuffer(Interpretation):
-    c_order       = DimensionOrderEnum("c_order", stagg.stagg_generated.DimensionOrder.DimensionOrder.c_order, "C")
-    fortran_order = DimensionOrderEnum("fortran", stagg.stagg_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
+    c_order       = DimensionOrderEnum("c_order", aghast.aghast_generated.DimensionOrder.DimensionOrder.c_order, "C")
+    fortran_order = DimensionOrderEnum("fortran", aghast.aghast_generated.DimensionOrder.DimensionOrder.fortran_order, "F")
     orders = [c_order, fortran_order]
 
     def __init__(self):
@@ -849,7 +849,7 @@ class InterpretedBuffer(Interpretation):
 
 class RawInlineBuffer(Buffer, RawBuffer, InlineBuffer):
     _params = {
-        "buffer": stagg.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
+        "buffer": aghast.checktype.CheckBuffer("RawInlineBuffer", "buffer", required=True),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -881,14 +881,14 @@ The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes wit
         return out
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferStartBufferVector(builder, len(self.buffer))
+        aghast.aghast_generated.RawInlineBuffer.RawInlineBufferStartBufferVector(builder, len(self.buffer))
         builder.head = builder.head - len(self.buffer)
         builder.Bytes[builder.head : builder.head + len(self.buffer)] = self.buffer.tostring()
         buffer = builder.EndVector(len(self.buffer))
 
-        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferStart(builder)
-        stagg.stagg_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
-        return stagg.stagg_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
+        aghast.aghast_generated.RawInlineBuffer.RawInlineBufferStart(builder)
+        aghast.aghast_generated.RawInlineBuffer.RawInlineBufferAddBuffer(builder, buffer)
+        return aghast.aghast_generated.RawInlineBuffer.RawInlineBufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
@@ -898,9 +898,9 @@ The *buffer* is the actual data, encoded in Flatbuffers as an array of bytes wit
 
 class RawExternalBuffer(Buffer, RawBuffer, ExternalBuffer):
     _params = {
-        "pointer":         stagg.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":        stagg.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
-        "external_source": stagg.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
+        "pointer":         aghast.checktype.CheckInteger("RawExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":        aghast.checktype.CheckInteger("RawExternalBuffer", "numbytes", required=True, min=0),
+        "external_source": aghast.checktype.CheckEnum("RawExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
         }
 
     pointer       = typedproperty(_params["pointer"])
@@ -925,12 +925,12 @@ If the *external_source* is `memory`, then the *pointer* and *numbytes* are inte
         return numpy.ctypeslib.as_array(ctypes.cast(self.pointer, ctypes.POINTER(ctypes.c_uint8)), shape=(self.numbytes,))
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferStart(builder)
-        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
-        stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
+        aghast.aghast_generated.RawExternalBuffer.RawExternalBufferStart(builder)
+        aghast.aghast_generated.RawExternalBuffer.RawExternalBufferAddPointer(builder, self.pointer)
+        aghast.aghast_generated.RawExternalBuffer.RawExternalBufferAddNumbytes(builder, self.numbytes)
         if self.external_source != ExternalBuffer.memory:
-            stagg.stagg_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
-        return stagg.stagg_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
+            aghast.aghast_generated.RawExternalBuffer.RawExternalBufferAddExternalSource(builder, self.external_source.value)
+        return aghast.aghast_generated.RawExternalBuffer.RawExternalBufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["pointer={0}".format(repr(self.pointer)), "numbytes={0}".format(repr(self.numbytes))]
@@ -942,12 +942,12 @@ If the *external_source* is `memory`, then the *pointer* and *numbytes* are inte
 
 class InterpretedInlineBuffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
-        "buffer":           stagg.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
-        "filters":          stagg.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": stagg.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
-        "dtype":            stagg.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       stagg.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  stagg.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "buffer":           aghast.checktype.CheckBuffer("InterpretedInlineBuffer", "buffer", required=True),
+        "filters":          aghast.checktype.CheckVector("InterpretedInlineBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": aghast.checktype.CheckSlice("InterpretedInlineBuffer", "postfilter_slice", required=False),
+        "dtype":            aghast.checktype.CheckEnum("InterpretedInlineBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       aghast.checktype.CheckEnum("InterpretedInlineBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  aghast.checktype.CheckEnum("InterpretedInlineBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
         }
 
     buffer           = typedproperty(_params["buffer"])
@@ -1060,7 +1060,7 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
         return out
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, self.buffer.nbytes)
+        aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartBufferVector(builder, self.buffer.nbytes)
         builder.head = builder.head - self.buffer.nbytes
         builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
         buffer = builder.EndVector(self.buffer.nbytes)
@@ -1068,24 +1068,24 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
         if len(self.filters) == 0:
             filters = None
         else:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
-        stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddBuffer(builder, buffer)
+        aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferStart(builder)
+        aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddBuffer(builder, buffer)
         if filters is not None:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddFilters(builder, filters)
         if self.postfilter_slice is not None:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddPostfilterSlice(builder, aghast.aghast_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if self.dtype != self.none:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDtype(builder, self.dtype.value)
         if self.endianness != self.little_endian:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddEndianness(builder, self.endianness.value)
         if self.dimension_order != self.c_order:
-            stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
-        return stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
+            aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferAddDimensionOrder(builder, self.dimension_order.value)
+        return aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
@@ -1107,7 +1107,7 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
 
 class InterpretedInlineInt64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
-        "buffer": stagg.checktype.CheckBuffer("InterpretedInlineInt64Buffer", "buffer", required=True),
+        "buffer": aghast.checktype.CheckBuffer("InterpretedInlineInt64Buffer", "buffer", required=True),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -1171,14 +1171,14 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
         return out
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStartBufferVector(builder, self.buffer.nbytes)
+        aghast.aghast_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStartBufferVector(builder, self.buffer.nbytes)
         builder.head = builder.head - self.buffer.nbytes
         builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
         buffer = builder.EndVector(self.buffer.nbytes)
 
-        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStart(builder)
-        stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferAddBuffer(builder, buffer)
-        return stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
+        aghast.aghast_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferStart(builder)
+        aghast.aghast_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferAddBuffer(builder, buffer)
+        return aghast.aghast_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
@@ -1188,7 +1188,7 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
 
 class InterpretedInlineFloat64Buffer(Buffer, InterpretedBuffer, InlineBuffer):
     _params = {
-        "buffer": stagg.checktype.CheckBuffer("InterpretedInlineFloat64Buffer", "buffer", required=True),
+        "buffer": aghast.checktype.CheckBuffer("InterpretedInlineFloat64Buffer", "buffer", required=True),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -1252,14 +1252,14 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
         return out
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStartBufferVector(builder, self.buffer.nbytes)
+        aghast.aghast_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStartBufferVector(builder, self.buffer.nbytes)
         builder.head = builder.head - self.buffer.nbytes
         builder.Bytes[builder.head : builder.head + self.buffer.nbytes] = self.buffer.tostring()
         buffer = builder.EndVector(self.buffer.nbytes)
 
-        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStart(builder)
-        stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferAddBuffer(builder, buffer)
-        return stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
+        aghast.aghast_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferStart(builder)
+        aghast.aghast_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferAddBuffer(builder, buffer)
+        return aghast.aghast_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64BufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["buffer={0}".format(_dumparray(self.flatarray, indent + "    ", end))]
@@ -1269,15 +1269,15 @@ This class is equivalent to an <<InterpretedInlineBuffer>> with no *filters*, no
 
 class InterpretedExternalBuffer(Buffer, InterpretedBuffer, ExternalBuffer):
     _params = {
-        "pointer":          stagg.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
-        "numbytes":         stagg.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
-        "external_source":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
-        "filters":          stagg.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": stagg.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
-        "dtype":            stagg.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
-        "endianness":       stagg.checktype.CheckEnum("InterpretedExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
-        "dimension_order":  stagg.checktype.CheckEnum("InterpretedExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
-        "location":         stagg.checktype.CheckString("InterpretedExternalBuffer", "location", required=False),
+        "pointer":          aghast.checktype.CheckInteger("InterpretedExternalBuffer", "pointer", required=True, min=0),
+        "numbytes":         aghast.checktype.CheckInteger("InterpretedExternalBuffer", "numbytes", required=True, min=0),
+        "external_source":  aghast.checktype.CheckEnum("InterpretedExternalBuffer", "external_source", required=False, choices=ExternalBuffer.sources),
+        "filters":          aghast.checktype.CheckVector("InterpretedExternalBuffer", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": aghast.checktype.CheckSlice("InterpretedExternalBuffer", "postfilter_slice", required=False),
+        "dtype":            aghast.checktype.CheckEnum("InterpretedExternalBuffer", "dtype", required=False, choices=InterpretedBuffer.dtypes),
+        "endianness":       aghast.checktype.CheckEnum("InterpretedExternalBuffer", "endianness", required=False, choices=InterpretedBuffer.endiannesses),
+        "dimension_order":  aghast.checktype.CheckEnum("InterpretedExternalBuffer", "dimension_order", required=False, choices=InterpretedBuffer.orders),
+        "location":         aghast.checktype.CheckString("InterpretedExternalBuffer", "location", required=False),
         }
 
     pointer          = typedproperty(_params["pointer"])
@@ -1374,29 +1374,29 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
         if len(self.filters) == 0:
             filters = None
         else:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
-        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPointer(builder, self.pointer)
-        stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddNumbytes(builder, self.numbytes)
+        aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferStart(builder)
+        aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPointer(builder, self.pointer)
+        aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddNumbytes(builder, self.numbytes)
         if self.external_source != ExternalBuffer.memory:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddExternalSource(builder, self.external_source.values)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddExternalSource(builder, self.external_source.values)
         if filters is not None:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddFilters(builder, filters)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddFilters(builder, filters)
         if self.postfilter_slice is not None:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddPostfilterSlice(builder, aghast.aghast_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if self.dtype != self.none:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDtype(builder, self.dtype.value)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDtype(builder, self.dtype.value)
         if self.endianness != self.little_endian:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddEndianness(builder, self.endianness.value)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddEndianness(builder, self.endianness.value)
         if self.dimension_order != self.c_order:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDimensionOrder(builder, self.dimension_order.value)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddDimensionOrder(builder, self.dimension_order.value)
         if location is not None:
-            stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
-        return stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
+            aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferAddLocation(builder, location)
+        return aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBufferEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["pointer={0}".format(repr(self.pointer)), "numbytes={0}".format(repr(self.numbytes))]
@@ -1429,13 +1429,13 @@ The *dimension_order* may be `c_order` to follow the C programming language's co
 
 ################################################# StatisticFilter
 
-class StatisticFilter(Stagg):
+class StatisticFilter(Ghast):
     _params = {
-        "min": stagg.checktype.CheckNumber("StatisticFilter", "min", required=False),
-        "max": stagg.checktype.CheckNumber("StatisticFilter", "max", required=False),
-        "excludes_minf": stagg.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
-        "excludes_pinf": stagg.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
-        "excludes_nan":  stagg.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
+        "min": aghast.checktype.CheckNumber("StatisticFilter", "min", required=False),
+        "max": aghast.checktype.CheckNumber("StatisticFilter", "max", required=False),
+        "excludes_minf": aghast.checktype.CheckBool("StatisticFilter", "excludes_minf", required=False),
+        "excludes_pinf": aghast.checktype.CheckBool("StatisticFilter", "excludes_pinf", required=False),
+        "excludes_nan":  aghast.checktype.CheckBool("StatisticFilter", "excludes_nan", required=False),
         }
 
     min       = typedproperty(_params["min"])
@@ -1462,7 +1462,7 @@ The statistic to which this filter belongs was calculated from finite values bet
             raise ValueError("StatisticFilter.min ({0}) must be less than or equal to StatisticFilter.max ({1})".format(self.min, self.max))
 
     def _toflatbuffers(self, builder):
-        return stagg.stagg_generated.StatisticFilter.CreateStatisticFilter(builder, self.min, self.max, self.excludes_minf, self.excludes_pinf, self.excludes_nan)
+        return aghast.aghast_generated.StatisticFilter.CreateStatisticFilter(builder, self.min, self.max, self.excludes_minf, self.excludes_pinf, self.excludes_nan)
 
     def _dump(self, indent, width, end):
         args = []
@@ -1480,12 +1480,12 @@ The statistic to which this filter belongs was calculated from finite values bet
 
 ################################################# Moments
 
-class Moments(Stagg):
+class Moments(Ghast):
     _params = {
-        "sumwxn":      stagg.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
-        "n":           stagg.checktype.CheckInteger("Moments", "n", required=True, min=-128, max=127),
-        "weightpower": stagg.checktype.CheckInteger("Moments", "weightpower", required=False, min=-128, max=127),
-        "filter":      stagg.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
+        "sumwxn":      aghast.checktype.CheckClass("Moments", "sumwxn", required=True, type=InterpretedBuffer),
+        "n":           aghast.checktype.CheckInteger("Moments", "n", required=True, min=-128, max=127),
+        "weightpower": aghast.checktype.CheckInteger("Moments", "weightpower", required=False, min=-128, max=127),
+        "filter":      aghast.checktype.CheckClass("Moments", "filter", required=False, type=StatisticFilter),
         }
 
     sumwxn      = typedproperty(_params["sumwxn"])
@@ -1531,15 +1531,15 @@ If not all of the data were included in the sum, a *filter* describes which valu
     def _toflatbuffers(self, builder):
         sumwxn = self.sumwxn._toflatbuffers(builder)
 
-        stagg.stagg_generated.Moments.MomentsStart(builder)
-        stagg.stagg_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
-        stagg.stagg_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
-        stagg.stagg_generated.Moments.MomentsAddN(builder, self.n)
+        aghast.aghast_generated.Moments.MomentsStart(builder)
+        aghast.aghast_generated.Moments.MomentsAddSumwxnType(builder, _InterpretedBuffer_invlookup[type(self.sumwxn)])
+        aghast.aghast_generated.Moments.MomentsAddSumwxn(builder, sumwxn)
+        aghast.aghast_generated.Moments.MomentsAddN(builder, self.n)
         if self.weightpower != 0:
-            stagg.stagg_generated.Moments.MomentsAddWeightpower(builder, self.weightpower)
+            aghast.aghast_generated.Moments.MomentsAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
-            stagg.stagg_generated.Moments.MomentsAddFilter(builder, self.filter._toflatbuffers(builder))
-        return stagg.stagg_generated.Moments.MomentsEnd(builder)
+            aghast.aghast_generated.Moments.MomentsAddFilter(builder, self.filter._toflatbuffers(builder))
+        return aghast.aghast_generated.Moments.MomentsEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["sumwxn={0}".format(_dumpeq(self.sumwxn._dump(indent + "    ", width, end), indent, end)), "n={0}".format(repr(self.n))]
@@ -1554,10 +1554,10 @@ If not all of the data were included in the sum, a *filter* describes which valu
 
 ################################################# Extremes
 
-class Extremes(Stagg):
+class Extremes(Ghast):
     _params = {
-        "values": stagg.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
-        "filter": stagg.checktype.CheckClass("Extremes", "filter", required=False, type=StatisticFilter),
+        "values": aghast.checktype.CheckClass("Extremes", "values", required=True, type=InterpretedBuffer),
+        "filter": aghast.checktype.CheckClass("Extremes", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -1591,12 +1591,12 @@ If not all of the data were included in the min/max calculation, a *filter* desc
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
 
-        stagg.stagg_generated.Extremes.ExtremesStart(builder)
-        stagg.stagg_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.Extremes.ExtremesAddValues(builder, values)
+        aghast.aghast_generated.Extremes.ExtremesStart(builder)
+        aghast.aghast_generated.Extremes.ExtremesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.Extremes.ExtremesAddValues(builder, values)
         if self.filter is not None:
-            stagg.stagg_generated.Extremes.ExtremesAddFilter(builder, self.filter._toflatbuffers(builder))
-        return stagg.stagg_generated.Extremes.ExtremesEnd(builder)
+            aghast.aghast_generated.Extremes.ExtremesAddFilter(builder, self.filter._toflatbuffers(builder))
+        return aghast.aghast_generated.Extremes.ExtremesEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
@@ -1612,12 +1612,12 @@ If not all of the data were included in the min/max calculation, a *filter* desc
 
 ################################################# Quantiles
 
-class Quantiles(Stagg):
+class Quantiles(Ghast):
     _params = {
-        "values":      stagg.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
-        "p":           stagg.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
-        "weightpower": stagg.checktype.CheckInteger("Quantiles", "weightpower", required=False, min=-128, max=127),
-        "filter":      stagg.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
+        "values":      aghast.checktype.CheckClass("Quantiles", "values", required=True, type=InterpretedBuffer),
+        "p":           aghast.checktype.CheckNumber("Quantiles", "p", required=True, min=0.0, max=1.0),
+        "weightpower": aghast.checktype.CheckInteger("Quantiles", "weightpower", required=False, min=-128, max=127),
+        "filter":      aghast.checktype.CheckClass("Quantiles", "filter", required=False, type=StatisticFilter),
         }
 
     values      = typedproperty(_params["values"])
@@ -1663,15 +1663,15 @@ If not all of the data were included in the quantile calculation, a *filter* des
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
 
-        stagg.stagg_generated.Quantiles.QuantilesStart(builder)
-        stagg.stagg_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.Quantiles.QuantilesAddValues(builder, values)
-        stagg.stagg_generated.Quantiles.QuantilesAddP(builder, self.p)
+        aghast.aghast_generated.Quantiles.QuantilesStart(builder)
+        aghast.aghast_generated.Quantiles.QuantilesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.Quantiles.QuantilesAddValues(builder, values)
+        aghast.aghast_generated.Quantiles.QuantilesAddP(builder, self.p)
         if self.weightpower != 0:
-            stagg.stagg_generated.Quantiles.QuantilesAddWeightpower(builder, self.weightpower)
+            aghast.aghast_generated.Quantiles.QuantilesAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
-            stagg.stagg_generated.Quantiles.QuantilesAddFilter(builder, self.filter._toflatbuffers(builder))
-        return stagg.stagg_generated.Quantiles.QuantilesEnd(builder)
+            aghast.aghast_generated.Quantiles.QuantilesAddFilter(builder, self.filter._toflatbuffers(builder))
+        return aghast.aghast_generated.Quantiles.QuantilesEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end)), "p={0}".format(repr(self.p))]
@@ -1683,10 +1683,10 @@ If not all of the data were included in the quantile calculation, a *filter* des
 
 ################################################# Modes
 
-class Modes(Stagg):
+class Modes(Ghast):
     _params = {
-        "values": stagg.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
-        "filter": stagg.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
+        "values": aghast.checktype.CheckClass("Modes", "values", required=True, type=InterpretedBuffer),
+        "filter": aghast.checktype.CheckClass("Modes", "filter", required=False, type=StatisticFilter),
         }
 
     values = typedproperty(_params["values"])
@@ -1720,12 +1720,12 @@ If not all of the data were included in the mode calculation, a *filter* describ
     def _toflatbuffers(self, builder):
         values = self.values._toflatbuffers(builder)
 
-        stagg.stagg_generated.Modes.ModesStart(builder)
-        stagg.stagg_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.Modes.ModesAddValues(builder, values)
+        aghast.aghast_generated.Modes.ModesStart(builder)
+        aghast.aghast_generated.Modes.ModesAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.Modes.ModesAddValues(builder, values)
         if self.filter is not None:
-            stagg.stagg_generated.Modes.ModesAddFilter(builder, self.filter._toflatbuffers(builder))
-        return stagg.stagg_generated.Modes.ModesEnd(builder)
+            aghast.aghast_generated.Modes.ModesAddFilter(builder, self.filter._toflatbuffers(builder))
+        return aghast.aghast_generated.Modes.ModesEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
@@ -1735,13 +1735,13 @@ If not all of the data were included in the mode calculation, a *filter* describ
 
 ################################################# Statistics
 
-class Statistics(Stagg):
+class Statistics(Ghast):
     _params = {
-        "moments":   stagg.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
-        "quantiles": stagg.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
-        "mode":     stagg.checktype.CheckClass("Statistics", "mode", required=False, type=Modes),
-        "min":    stagg.checktype.CheckClass("Statistics", "min", required=False, type=Extremes),
-        "max":    stagg.checktype.CheckClass("Statistics", "max", required=False, type=Extremes),
+        "moments":   aghast.checktype.CheckVector("Statistics", "moments", required=False, type=Moments),
+        "quantiles": aghast.checktype.CheckVector("Statistics", "quantiles", required=False, type=Quantiles),
+        "mode":      aghast.checktype.CheckClass("Statistics", "mode", required=False, type=Modes),
+        "min":       aghast.checktype.CheckClass("Statistics", "min", required=False, type=Extremes),
+        "max":       aghast.checktype.CheckClass("Statistics", "max", required=False, type=Extremes),
         }
 
     moments   = typedproperty(_params["moments"])
@@ -1792,29 +1792,29 @@ The minimum and maximum of a distribution are special cases of quantiles, but qu
         max = None if self.max is None else self.max._toflatbuffers(builder)
 
         if moments is not None:
-            stagg.stagg_generated.Statistics.StatisticsStartMomentsVector(builder, len(moments))
+            aghast.aghast_generated.Statistics.StatisticsStartMomentsVector(builder, len(moments))
             for x in moments[::-1]:
                 builder.PrependUOffsetTRelative(x)
             moments = builder.EndVector(len(moments))
 
         if quantiles is not None:
-            stagg.stagg_generated.Statistics.StatisticsStartQuantilesVector(builder, len(quantiles))
+            aghast.aghast_generated.Statistics.StatisticsStartQuantilesVector(builder, len(quantiles))
             for x in quantiles[::-1]:
                 builder.PrependUOffsetTRelative(x)
             quantiles = builder.EndVector(len(quantiles))
 
-        stagg.stagg_generated.Statistics.StatisticsStart(builder)
+        aghast.aghast_generated.Statistics.StatisticsStart(builder)
         if moments is not None:
-            stagg.stagg_generated.Statistics.StatisticsAddMoments(builder, moments)
+            aghast.aghast_generated.Statistics.StatisticsAddMoments(builder, moments)
         if quantiles is not None:
-            stagg.stagg_generated.Statistics.StatisticsAddQuantiles(builder, quantiles)
+            aghast.aghast_generated.Statistics.StatisticsAddQuantiles(builder, quantiles)
         if mode is not None:
-            stagg.stagg_generated.Statistics.StatisticsAddMode(builder, mode)
+            aghast.aghast_generated.Statistics.StatisticsAddMode(builder, mode)
         if min is not None:
-            stagg.stagg_generated.Statistics.StatisticsAddMin(builder, min)
+            aghast.aghast_generated.Statistics.StatisticsAddMin(builder, min)
         if max is not None:
-            stagg.stagg_generated.Statistics.StatisticsAddMax(builder, max)
-        return stagg.stagg_generated.Statistics.StatisticsEnd(builder)
+            aghast.aghast_generated.Statistics.StatisticsAddMax(builder, max)
+        return aghast.aghast_generated.Statistics.StatisticsEnd(builder)
 
     def _dump(self, indent, width, end):
         args = []
@@ -1838,13 +1838,13 @@ The minimum and maximum of a distribution are special cases of quantiles, but qu
 
 ################################################# Covariance
 
-class Covariance(Stagg):
+class Covariance(Ghast):
     _params = {
-        "xindex":      stagg.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
-        "yindex":      stagg.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
-        "sumwxy":      stagg.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
-        "weightpower": stagg.checktype.CheckInteger("Covariance", "weightpower", required=False, min=-128, max=127),
-        "filter":      stagg.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
+        "xindex":      aghast.checktype.CheckInteger("Covariance", "xindex", required=True, min=0),
+        "yindex":      aghast.checktype.CheckInteger("Covariance", "yindex", required=True, min=0),
+        "sumwxy":      aghast.checktype.CheckClass("Covariance", "sumwxy", required=True, type=InterpretedBuffer),
+        "weightpower": aghast.checktype.CheckInteger("Covariance", "weightpower", required=False, min=-128, max=127),
+        "filter":      aghast.checktype.CheckClass("Covariance", "filter", required=False, type=StatisticFilter),
         }
 
     xindex      = typedproperty(_params["xindex"])
@@ -1903,16 +1903,16 @@ If not all of the data were included in the quantile calculation, a *filter* des
     def _toflatbuffers(self, builder):
         sumwxy = self.sumwxy._toflatbuffers(builder)
 
-        stagg.stagg_generated.Covariance.CovarianceStart(builder)
-        stagg.stagg_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
-        stagg.stagg_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
-        stagg.stagg_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
-        stagg.stagg_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
+        aghast.aghast_generated.Covariance.CovarianceStart(builder)
+        aghast.aghast_generated.Covariance.CovarianceAddXindex(builder, self.xindex)
+        aghast.aghast_generated.Covariance.CovarianceAddYindex(builder, self.yindex)
+        aghast.aghast_generated.Covariance.CovarianceAddSumwxyType(builder, _InterpretedBuffer_invlookup[type(self.sumwxy)])
+        aghast.aghast_generated.Covariance.CovarianceAddSumwxy(builder, sumwxy)
         if self.weightpower != 0:
-            stagg.stagg_generated.Covariance.CovarianceAddWeightpower(builder, self.weightpower)
+            aghast.aghast_generated.Covariance.CovarianceAddWeightpower(builder, self.weightpower)
         if self.filter is not None:
-            stagg.stagg_generated.Covariance.CovarianceAddFilter(builder, self.filter._toflatbuffers(builder))
-        return stagg.stagg_generated.Covariance.CovarianceEnd(builder)
+            aghast.aghast_generated.Covariance.CovarianceAddFilter(builder, self.filter._toflatbuffers(builder))
+        return aghast.aghast_generated.Covariance.CovarianceEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["xindex={0}".format(repr(self.xindex)), "yindex={0}".format(repr(self.yindex)), "sumwxy={0}".format(_dumpeq(self.sumwxy._dump(indent + "    ", width, end), indent, end))]
@@ -1924,7 +1924,7 @@ If not all of the data were included in the quantile calculation, a *filter* des
 
 ################################################# Binning
 
-class Binning(Stagg):
+class Binning(Ghast):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -2114,13 +2114,13 @@ class BinLocationEnum(Enum):
     base = "BinLocation"
 
 class BinLocation(object):
-    below3      = BinLocationEnum("below3", stagg.stagg_generated.BinLocation.BinLocation.loc_below3)
-    below2      = BinLocationEnum("below2", stagg.stagg_generated.BinLocation.BinLocation.loc_below2)
-    below1      = BinLocationEnum("below1", stagg.stagg_generated.BinLocation.BinLocation.loc_below1)
-    nonexistent = BinLocationEnum("nonexistent", stagg.stagg_generated.BinLocation.BinLocation.loc_nonexistent)
-    above1      = BinLocationEnum("above1", stagg.stagg_generated.BinLocation.BinLocation.loc_above1)
-    above2      = BinLocationEnum("above2", stagg.stagg_generated.BinLocation.BinLocation.loc_above2)
-    above3      = BinLocationEnum("above3", stagg.stagg_generated.BinLocation.BinLocation.loc_above3)
+    below3      = BinLocationEnum("below3", aghast.aghast_generated.BinLocation.BinLocation.loc_below3)
+    below2      = BinLocationEnum("below2", aghast.aghast_generated.BinLocation.BinLocation.loc_below2)
+    below1      = BinLocationEnum("below1", aghast.aghast_generated.BinLocation.BinLocation.loc_below1)
+    nonexistent = BinLocationEnum("nonexistent", aghast.aghast_generated.BinLocation.BinLocation.loc_nonexistent)
+    above1      = BinLocationEnum("above1", aghast.aghast_generated.BinLocation.BinLocation.loc_above1)
+    above2      = BinLocationEnum("above2", aghast.aghast_generated.BinLocation.BinLocation.loc_above2)
+    above3      = BinLocationEnum("above3", aghast.aghast_generated.BinLocation.BinLocation.loc_above3)
     locations  = [below3, below2, below1, nonexistent, above1, above2, above3]
     _locations = {-3: below3, -2: below2, -1: below1, 0: nonexistent, 1: above1, 2: above2, 3: above3}
 
@@ -2176,10 +2176,10 @@ class BinLocation(object):
 
 class IntegerBinning(Binning, BinLocation):
     _params = {
-        "min":       stagg.checktype.CheckInteger("IntegerBinning", "min", required=True),
-        "max":       stagg.checktype.CheckInteger("IntegerBinning", "max", required=True),
-        "loc_underflow": stagg.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
-        "loc_overflow":  stagg.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "min":           aghast.checktype.CheckInteger("IntegerBinning", "min", required=True),
+        "max":           aghast.checktype.CheckInteger("IntegerBinning", "max", required=True),
+        "loc_underflow": aghast.checktype.CheckEnum("IntegerBinning", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_overflow":  aghast.checktype.CheckEnum("IntegerBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
         }
 
     min       = typedproperty(_params["min"])
@@ -2216,14 +2216,14 @@ If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots
         return 1
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.IntegerBinning.IntegerBinningStart(builder)
-        stagg.stagg_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
-        stagg.stagg_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
+        aghast.aghast_generated.IntegerBinning.IntegerBinningStart(builder)
+        aghast.aghast_generated.IntegerBinning.IntegerBinningAddMin(builder, self.min)
+        aghast.aghast_generated.IntegerBinning.IntegerBinningAddMax(builder, self.max)
         if self.loc_underflow != self.nonexistent:
-            stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
+            aghast.aghast_generated.IntegerBinning.IntegerBinningAddLocUnderflow(builder, self.loc_underflow.value)
         if self.loc_overflow != self.nonexistent:
-            stagg.stagg_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
-        return stagg.stagg_generated.IntegerBinning.IntegerBinningEnd(builder)
+            aghast.aghast_generated.IntegerBinning.IntegerBinningAddLocOverflow(builder, self.loc_overflow.value)
+        return aghast.aghast_generated.IntegerBinning.IntegerBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["min={0}".format(repr(self.min)), "max={0}".format(repr(self.max))]
@@ -2378,12 +2378,12 @@ If *loc_underflow* and *loc_overflow* are `nonexistent`, then there are no slots
 
 ################################################# RealInterval
 
-class RealInterval(Stagg):
+class RealInterval(Ghast):
     _params = {
-        "low":            stagg.checktype.CheckNumber("RealInterval", "low", required=True),
-        "high":           stagg.checktype.CheckNumber("RealInterval", "high", required=True),
-        "low_inclusive":  stagg.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
-        "high_inclusive": stagg.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
+        "low":            aghast.checktype.CheckNumber("RealInterval", "low", required=True),
+        "high":           aghast.checktype.CheckNumber("RealInterval", "high", required=True),
+        "low_inclusive":  aghast.checktype.CheckBool("RealInterval", "low_inclusive", required=False),
+        "high_inclusive": aghast.checktype.CheckBool("RealInterval", "high_inclusive", required=False),
         }
 
     low            = typedproperty(_params["low"])
@@ -2413,7 +2413,7 @@ A single interval defines a <<RegularBinning>> and a set of intervals defines an
             raise ValueError("RealInterval describes an empty set ({0} == {1} and both endpoints are exclusive)".format(self.low, self.high))
 
     def _toflatbuffers(self, builder):
-        return stagg.stagg_generated.RealInterval.CreateRealInterval(builder, self.low, self.high, self.low_inclusive, self.high_inclusive)
+        return aghast.aghast_generated.RealInterval.CreateRealInterval(builder, self.low, self.high, self.low_inclusive, self.high_inclusive)
 
     def _dump(self, indent, width, end):
         args = ["low={0}".format(repr(self.low)), "high={0}".format(repr(self.high))]
@@ -2431,20 +2431,20 @@ A single interval defines a <<RegularBinning>> and a set of intervals defines an
 class NonRealMappingEnum(Enum):
     base = "RealOverflow"
 
-class RealOverflow(Stagg, BinLocation):
-    missing      = NonRealMappingEnum("missing", stagg.stagg_generated.NonRealMapping.NonRealMapping.missing)
-    in_underflow = NonRealMappingEnum("in_underflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_underflow)
-    in_overflow  = NonRealMappingEnum("in_overflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_overflow)
-    in_nanflow   = NonRealMappingEnum("in_nanflow", stagg.stagg_generated.NonRealMapping.NonRealMapping.in_nanflow)
+class RealOverflow(Ghast, BinLocation):
+    missing      = NonRealMappingEnum("missing", aghast.aghast_generated.NonRealMapping.NonRealMapping.missing)
+    in_underflow = NonRealMappingEnum("in_underflow", aghast.aghast_generated.NonRealMapping.NonRealMapping.in_underflow)
+    in_overflow  = NonRealMappingEnum("in_overflow", aghast.aghast_generated.NonRealMapping.NonRealMapping.in_overflow)
+    in_nanflow   = NonRealMappingEnum("in_nanflow", aghast.aghast_generated.NonRealMapping.NonRealMapping.in_nanflow)
     mappings = [missing, in_underflow, in_overflow, in_nanflow]
 
     _params = {
-        "loc_underflow": stagg.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
-        "loc_overflow":  stagg.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
-        "loc_nanflow":   stagg.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
-        "minf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
-        "pinf_mapping":  stagg.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
-        "nan_mapping":   stagg.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
+        "loc_underflow": aghast.checktype.CheckEnum("RealOverflow", "loc_underflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_overflow":  aghast.checktype.CheckEnum("RealOverflow", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "loc_nanflow":   aghast.checktype.CheckEnum("RealOverflow", "loc_nanflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "minf_mapping":  aghast.checktype.CheckEnum("RealOverflow", "minf_mapping", required=False, choices=mappings),
+        "pinf_mapping":  aghast.checktype.CheckEnum("RealOverflow", "pinf_mapping", required=False, choices=mappings),
+        "nan_mapping":   aghast.checktype.CheckEnum("RealOverflow", "nan_mapping", required=False, choices=mappings),
         }
 
     loc_underflow = typedproperty(_params["loc_underflow"])
@@ -2490,7 +2490,7 @@ The *minf_mapping* specifies whether \u2012\u221e values were ignored when the h
         return int(self.loc_underflow != self.nonexistent) + int(self.loc_overflow != self.nonexistent) + int(self.loc_nanflow != self.nonexistent)
 
     def _toflatbuffers(self, builder):
-        return stagg.stagg_generated.RealOverflow.CreateRealOverflow(builder, self.loc_underflow.value, self.loc_overflow.value, self.loc_nanflow.value, self.minf_mapping.value, self.pinf_mapping.value, self.nan_mapping.value)
+        return aghast.aghast_generated.RealOverflow.CreateRealOverflow(builder, self.loc_underflow.value, self.loc_overflow.value, self.loc_nanflow.value, self.minf_mapping.value, self.pinf_mapping.value, self.nan_mapping.value)
 
     def _dump(self, indent, width, end):
         args = []
@@ -2628,10 +2628,10 @@ The *minf_mapping* specifies whether \u2012\u221e values were ignored when the h
 
 class RegularBinning(Binning):
     _params = {
-        "num":      stagg.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
-        "interval": stagg.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
-        "overflow": stagg.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
-        "circular": stagg.checktype.CheckBool("RegularBinning", "circular", required=False),
+        "num":      aghast.checktype.CheckInteger("RegularBinning", "num", required=True, min=1),
+        "interval": aghast.checktype.CheckClass("RegularBinning", "interval", required=True, type=RealInterval),
+        "overflow": aghast.checktype.CheckClass("RegularBinning", "overflow", required=False, type=RealOverflow),
+        "circular": aghast.checktype.CheckBool("RegularBinning", "circular", required=False),
         }
 
     num      = typedproperty(_params["num"])
@@ -2686,14 +2686,14 @@ If the binning is *circular*, then it represents a finite segment in which *inte
         return 1
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.RegularBinning.RegularBinningStart(builder)
-        stagg.stagg_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
-        stagg.stagg_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))
+        aghast.aghast_generated.RegularBinning.RegularBinningStart(builder)
+        aghast.aghast_generated.RegularBinning.RegularBinningAddNum(builder, self.num)
+        aghast.aghast_generated.RegularBinning.RegularBinningAddInterval(builder, self.interval._toflatbuffers(builder))
         if self.overflow is not None:
-            stagg.stagg_generated.RegularBinning.RegularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
+            aghast.aghast_generated.RegularBinning.RegularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.circular is not False:
-            stagg.stagg_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
-        return stagg.stagg_generated.RegularBinning.RegularBinningEnd(builder)
+            aghast.aghast_generated.RegularBinning.RegularBinningAddCircular(builder, self.circular)
+        return aghast.aghast_generated.RegularBinning.RegularBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["num={0}".format(repr(self.num)), "interval={0}".format(_dumpeq(self.interval._dump(indent + "    ", width, end), indent, end))]
@@ -2842,25 +2842,25 @@ class HexagonalCoordinatesEnum(Enum):
     base = "HexagonalBinning"
 
 class HexagonalBinning(Binning):
-    offset         = HexagonalCoordinatesEnum("offset", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
-    doubled_offset = HexagonalCoordinatesEnum("doubled_offset", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
-    cube_xy        = HexagonalCoordinatesEnum("cube_xy", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
-    cube_yz        = HexagonalCoordinatesEnum("cube_yz", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
-    cube_xz        = HexagonalCoordinatesEnum("cube_xz", stagg.stagg_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
+    offset         = HexagonalCoordinatesEnum("offset", aghast.aghast_generated.HexagonalCoordinates.HexagonalCoordinates.hex_offset)
+    doubled_offset = HexagonalCoordinatesEnum("doubled_offset", aghast.aghast_generated.HexagonalCoordinates.HexagonalCoordinates.hex_doubled_offset)
+    cube_xy        = HexagonalCoordinatesEnum("cube_xy", aghast.aghast_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xy)
+    cube_yz        = HexagonalCoordinatesEnum("cube_yz", aghast.aghast_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_yz)
+    cube_xz        = HexagonalCoordinatesEnum("cube_xz", aghast.aghast_generated.HexagonalCoordinates.HexagonalCoordinates.hex_cube_xz)
     coordinates = [offset, doubled_offset, cube_xy, cube_yz, cube_xz]
 
     _params = {
-        "qmin":        stagg.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
-        "qmax":        stagg.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
-        "rmin":        stagg.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
-        "rmax":        stagg.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
-        "coordinates": stagg.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
-        "xorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "yorigin":     stagg.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
-        "bin_width":   stagg.checktype.CheckNumber("HexagonalBinning", "bin_width", required=False, min=0.0, min_inclusive=False, max_inclusive=False),
-        "qangle":      stagg.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
-        "qoverflow":   stagg.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
-        "roverflow":   stagg.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
+        "qmin":        aghast.checktype.CheckInteger("HexagonalBinning", "qmin", required=True),
+        "qmax":        aghast.checktype.CheckInteger("HexagonalBinning", "qmax", required=True),
+        "rmin":        aghast.checktype.CheckInteger("HexagonalBinning", "rmin", required=True),
+        "rmax":        aghast.checktype.CheckInteger("HexagonalBinning", "rmax", required=True),
+        "coordinates": aghast.checktype.CheckEnum("HexagonalBinning", "coordinates", required=False, choices=coordinates),
+        "xorigin":     aghast.checktype.CheckNumber("HexagonalBinning", "xorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "yorigin":     aghast.checktype.CheckNumber("HexagonalBinning", "yorigin", required=False, min_inclusive=False, max_inclusive=False),
+        "bin_width":   aghast.checktype.CheckNumber("HexagonalBinning", "bin_width", required=False, min=0.0, min_inclusive=False, max_inclusive=False),
+        "qangle":      aghast.checktype.CheckNumber("HexagonalBinning", "qangle", required=False, min=-0.5*math.pi, max=0.5*math.pi),
+        "qoverflow":   aghast.checktype.CheckClass("HexagonalBinning", "qoverflow", required=False, type=RealOverflow),
+        "roverflow":   aghast.checktype.CheckClass("HexagonalBinning", "roverflow", required=False, type=RealOverflow),
         }
 
     qmin        = typedproperty(_params["qmin"])
@@ -2930,26 +2930,26 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
         return 2
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.HexagonalBinning.HexagonalBinningStart(builder)
-        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
-        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
-        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRmin(builder, self.rmin)
-        stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRmax(builder, self.rmax)
+        aghast.aghast_generated.HexagonalBinning.HexagonalBinningStart(builder)
+        aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddQmin(builder, self.qmin)
+        aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddQmax(builder, self.qmax)
+        aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddRmin(builder, self.rmin)
+        aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddRmax(builder, self.rmax)
         if self.coordinates != self.offset:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddOffset(builder, self.coordinates)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddOffset(builder, self.coordinates)
         if self.xorigin != 0.0:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddXorigin(builder, self.xorigin)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddXorigin(builder, self.xorigin)
         if self.yorigin != 0.0:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddYorigin(builder, self.yorigin)
         if self.qangle != 0.0:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddQangle(builder, self.qangle)
         if self.bin_width != 1.0:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddBinWidth(builder, self.bin_width)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddBinWidth(builder, self.bin_width)
         if self.qoverflow is not None:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, self.qoverflow._toflatbuffers(builder))
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddQoverflow(builder, self.qoverflow._toflatbuffers(builder))
         if self.roverflow is not None:
-            stagg.stagg_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, self.roverflow._toflatbuffers(builder))
-        return stagg.stagg_generated.HexagonalBinning.HexagonalBinningEnd(builder)
+            aghast.aghast_generated.HexagonalBinning.HexagonalBinningAddRoverflow(builder, self.roverflow._toflatbuffers(builder))
+        return aghast.aghast_generated.HexagonalBinning.HexagonalBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["qmin={0}".format(repr(self.qmin)), "qmax={0}".format(repr(self.qmax)), "rmin={0}".format(repr(self.rmin)), "rmax={0}".format(repr(self.rmax))]
@@ -3010,11 +3010,11 @@ A roughly but not exactly rectangular region of `x` and `y` fall within a slot i
 
 class EdgesBinning(Binning):
     _params = {
-        "edges":          stagg.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
-        "overflow":       stagg.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
-        "low_inclusive":  stagg.checktype.CheckBool("EdgesBinning", "low_inclusive", required=False),
-        "high_inclusive": stagg.checktype.CheckBool("EdgesBinning", "high_inclusive", required=False),
-        "circular":       stagg.checktype.CheckBool("EdgesBinning", "circular", required=False),
+        "edges":          aghast.checktype.CheckVector("EdgesBinning", "edges", required=True, type=float, minlen=1),
+        "overflow":       aghast.checktype.CheckClass("EdgesBinning", "overflow", required=False, type=RealOverflow),
+        "low_inclusive":  aghast.checktype.CheckBool("EdgesBinning", "low_inclusive", required=False),
+        "high_inclusive": aghast.checktype.CheckBool("EdgesBinning", "high_inclusive", required=False),
+        "circular":       aghast.checktype.CheckBool("EdgesBinning", "circular", required=False),
         }
 
     edges          = typedproperty(_params["edges"])
@@ -3087,22 +3087,22 @@ If the binning is *circular*, then it represents a finite segment in which *inte
 
     def _toflatbuffers(self, builder):
         edgesbuf = self.edges.tostring()
-        stagg.stagg_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
+        aghast.aghast_generated.EdgesBinning.EdgesBinningStartEdgesVector(builder, len(self.edges))
         builder.head = builder.head - len(edgesbuf)
         builder.Bytes[builder.head : builder.head + len(edgesbuf)] = edgesbuf
         edges = builder.EndVector(len(self.edges))
 
-        stagg.stagg_generated.EdgesBinning.EdgesBinningStart(builder)
-        stagg.stagg_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
+        aghast.aghast_generated.EdgesBinning.EdgesBinningStart(builder)
+        aghast.aghast_generated.EdgesBinning.EdgesBinningAddEdges(builder, edges)
         if self.overflow is not None:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.low_inclusive is not True:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
         if self.circular is not False:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddCircular(builder, self.circular)
-        return stagg.stagg_generated.EdgesBinning.EdgesBinningEnd(builder)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddCircular(builder, self.circular)
+        return aghast.aghast_generated.EdgesBinning.EdgesBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["edges={0}".format(_dumparray(self.edges, indent, end))]
@@ -3242,17 +3242,17 @@ class OverlappingFillStrategyEnum(Enum):
     base = "IrregularBinning"
 
 class OverlappingFill(object):
-    unspecified = OverlappingFillStrategyEnum("unspecified", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_unspecified)
-    all         = OverlappingFillStrategyEnum("all", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
-    first       = OverlappingFillStrategyEnum("first", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
-    last        = OverlappingFillStrategyEnum("last", stagg.stagg_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
+    unspecified = OverlappingFillStrategyEnum("unspecified", aghast.aghast_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_unspecified)
+    all         = OverlappingFillStrategyEnum("all", aghast.aghast_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_all)
+    first       = OverlappingFillStrategyEnum("first", aghast.aghast_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_first)
+    last        = OverlappingFillStrategyEnum("last", aghast.aghast_generated.OverlappingFillStrategy.OverlappingFillStrategy.overfill_last)
     overlapping_fill_strategies = [unspecified, all, first, last]
 
 class IrregularBinning(Binning, OverlappingFill):
     _params = {
-        "intervals":        stagg.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
-        "overflow":         stagg.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
-        "overlapping_fill": stagg.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
+        "intervals":        aghast.checktype.CheckVector("IrregularBinning", "intervals", required=True, type=RealInterval, minlen=1),
+        "overflow":         aghast.checktype.CheckClass("IrregularBinning", "overflow", required=False, type=RealOverflow),
+        "overlapping_fill": aghast.checktype.CheckEnum("IrregularBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
         }
 
     intervals        = typedproperty(_params["intervals"])
@@ -3302,18 +3302,18 @@ Irregular bins are usually not directly created by histogramming libraries, but 
         return 1
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(self.intervals))
+        aghast.aghast_generated.IrregularBinning.IrregularBinningStartIntervalsVector(builder, len(self.intervals))
         for x in self.intervals[::-1]:
             x._toflatbuffers(builder)
         intervals = builder.EndVector(len(self.intervals))
 
-        stagg.stagg_generated.IrregularBinning.IrregularBinningStart(builder)
-        stagg.stagg_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
+        aghast.aghast_generated.IrregularBinning.IrregularBinningStart(builder)
+        aghast.aghast_generated.IrregularBinning.IrregularBinningAddIntervals(builder, intervals)
         if self.overflow is not None:
-            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
+            aghast.aghast_generated.IrregularBinning.IrregularBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.overlapping_fill != self.unspecified:
-            stagg.stagg_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
-        return stagg.stagg_generated.IrregularBinning.IrregularBinningEnd(builder)
+            aghast.aghast_generated.IrregularBinning.IrregularBinningAddOverlappingFill(builder, self.overlapping_fill.value)
+        return aghast.aghast_generated.IrregularBinning.IrregularBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["intervals=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.intervals], indent, width, end), indent, end) + "]"]
@@ -3507,8 +3507,8 @@ Irregular bins are usually not directly created by histogramming libraries, but 
 
 class CategoryBinning(Binning, BinLocation):
     _params = {
-        "categories":   stagg.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
-        "loc_overflow": stagg.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
+        "categories":   aghast.checktype.CheckVector("CategoryBinning", "categories", required=True, type=str),
+        "loc_overflow": aghast.checktype.CheckEnum("CategoryBinning", "loc_overflow", required=False, choices=BinLocation.locations, intlookup=BinLocation._locations),
         }
 
     categories = typedproperty(_params["categories"])
@@ -3550,16 +3550,16 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
     def _toflatbuffers(self, builder):
         categories = [builder.CreateString(x.encode("utf-8")) for x in self.categories]
 
-        stagg.stagg_generated.CategoryBinning.CategoryBinningStartCategoriesVector(builder, len(categories))
+        aghast.aghast_generated.CategoryBinning.CategoryBinningStartCategoriesVector(builder, len(categories))
         for x in categories[::-1]:
             builder.PrependUOffsetTRelative(x)
         categories = builder.EndVector(len(categories))
 
-        stagg.stagg_generated.CategoryBinning.CategoryBinningStart(builder)
-        stagg.stagg_generated.CategoryBinning.CategoryBinningAddCategories(builder, categories)
+        aghast.aghast_generated.CategoryBinning.CategoryBinningStart(builder)
+        aghast.aghast_generated.CategoryBinning.CategoryBinningAddCategories(builder, categories)
         if self.loc_overflow != self.nonexistent:
-            stagg.stagg_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
-        return stagg.stagg_generated.CategoryBinning.CategoryBinningEnd(builder)
+            aghast.aghast_generated.CategoryBinning.CategoryBinningAddLocOverflow(builder, self.loc_overflow.value)
+        return aghast.aghast_generated.CategoryBinning.CategoryBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["categories=[" + ", ".join(_dumpstring(x) for x in self.categories) + "]"]
@@ -3690,14 +3690,14 @@ If *loc_overflow* is `nonexistent`, unspecified strings were ignored in the fill
 
 class SparseRegularBinning(Binning, BinLocation):
     _params = {
-        "bins":           stagg.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
-        "bin_width":      stagg.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
-        "origin":         stagg.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
-        "overflow":       stagg.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
-        "low_inclusive":  stagg.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
-        "high_inclusive": stagg.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
-        "minbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "minbin", required=False, min=MININT64, max=MAXINT64),
-        "maxbin":         stagg.checktype.CheckInteger("SparseRegularBinning", "maxbin", required=False, min=MININT64, max=MAXINT64),
+        "bins":           aghast.checktype.CheckVector("SparseRegularBinning", "bins", required=True, type=int),
+        "bin_width":      aghast.checktype.CheckNumber("SparseRegularBinning", "bin_width", required=True, min=0, min_inclusive=False),
+        "origin":         aghast.checktype.CheckNumber("SparseRegularBinning", "origin", required=False),
+        "overflow":       aghast.checktype.CheckClass("SparseRegularBinning", "overflow", required=False, type=RealOverflow),
+        "low_inclusive":  aghast.checktype.CheckBool("SparseRegularBinning", "low_inclusive", required=False),
+        "high_inclusive": aghast.checktype.CheckBool("SparseRegularBinning", "high_inclusive", required=False),
+        "minbin":         aghast.checktype.CheckInteger("SparseRegularBinning", "minbin", required=False, min=MININT64, max=MAXINT64),
+        "maxbin":         aghast.checktype.CheckInteger("SparseRegularBinning", "maxbin", required=False, min=MININT64, max=MAXINT64),
         }
 
     bins           = typedproperty(_params["bins"])
@@ -3784,27 +3784,27 @@ Therefore, even though this binning is sparse, it can have underflow and overflo
 
     def _toflatbuffers(self, builder):
         binsbuf = self.bins.tostring()
-        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
+        aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningStartBinsVector(builder, len(self.bins))
         builder.head = builder.head - len(binsbuf)
         builder.Bytes[builder.head : builder.head + len(binsbuf)] = binsbuf
         bins = builder.EndVector(len(self.bins))
 
-        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
-        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
-        stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
+        aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningStart(builder)
+        aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningAddBins(builder, bins)
+        aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningAddBinWidth(builder, self.bin_width)
         if self.origin != 0.0:
-            stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
+            aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningAddOrigin(builder, self.origin)
         if self.overflow is not None:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddOverflow(builder, self.overflow._toflatbuffers(builder))
         if self.low_inclusive is not True:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddLowInclusive(builder, self.low_inclusive)
         if self.high_inclusive is not False:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddHighInclusive(builder, self.high_inclusive)
         if self.minbin != MININT64:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddMinbin(builder, self.minbin)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddMinbin(builder, self.minbin)
         if self.maxbin != MAXINT64:
-            stagg.stagg_generated.EdgesBinning.EdgesBinningAddMaxbin(builder, self.maxbin)
-        return stagg.stagg_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
+            aghast.aghast_generated.EdgesBinning.EdgesBinningAddMaxbin(builder, self.maxbin)
+        return aghast.aghast_generated.SparseRegularBinning.SparseRegularBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["bins={0}".format(_dumparray(self.bins, indent, end)), "bin_width={0}".format(repr(self.bin_width))]
@@ -4055,25 +4055,25 @@ class FractionErrorMethodEnum(Enum):
     base = "FractionBinning"
 
 class FractionBinning(Binning):
-    passall  = FractionLayoutEnum("passall", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passall)
-    failall  = FractionLayoutEnum("failall", stagg.stagg_generated.FractionLayout.FractionLayout.frac_failall)
-    passfail = FractionLayoutEnum("passfail", stagg.stagg_generated.FractionLayout.FractionLayout.frac_passfail)
+    passall  = FractionLayoutEnum("passall", aghast.aghast_generated.FractionLayout.FractionLayout.frac_passall)
+    failall  = FractionLayoutEnum("failall", aghast.aghast_generated.FractionLayout.FractionLayout.frac_failall)
+    passfail = FractionLayoutEnum("passfail", aghast.aghast_generated.FractionLayout.FractionLayout.frac_passfail)
     layouts = [passall, failall, passfail]
 
-    unspecified      = FractionErrorMethodEnum("unspecified", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_unspecified)
-    normal           = FractionErrorMethodEnum("normal", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
-    clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
-    wilson           = FractionErrorMethodEnum("wilson", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
-    agresti_coull    = FractionErrorMethodEnum("agresti_coull", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
-    feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
-    jeffrey          = FractionErrorMethodEnum("jeffrey", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
-    bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", stagg.stagg_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
+    unspecified      = FractionErrorMethodEnum("unspecified", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_unspecified)
+    normal           = FractionErrorMethodEnum("normal", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_normal)
+    clopper_pearson  = FractionErrorMethodEnum("clopper_pearson", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_clopper_pearson)
+    wilson           = FractionErrorMethodEnum("wilson", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_wilson)
+    agresti_coull    = FractionErrorMethodEnum("agresti_coull", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_agresti_coull)
+    feldman_cousins  = FractionErrorMethodEnum("feldman_cousins", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_feldman_cousins)
+    jeffrey          = FractionErrorMethodEnum("jeffrey", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_jeffrey)
+    bayesian_uniform = FractionErrorMethodEnum("bayesian_uniform", aghast.aghast_generated.FractionErrorMethod.FractionErrorMethod.frac_bayesian_uniform)
     error_methods = [unspecified, normal, clopper_pearson, wilson, agresti_coull, feldman_cousins, jeffrey, bayesian_uniform]
 
     _params = {
-        "layout": stagg.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
-        "layout_reversed": stagg.checktype.CheckBool("FractionBinning", "layout_reversed", required=False),
-        "error_method": stagg.checktype.CheckEnum("FractionBinning", "error_method", required=False, choices=error_methods),
+        "layout":          aghast.checktype.CheckEnum("FractionBinning", "layout", required=False, choices=layouts),
+        "layout_reversed": aghast.checktype.CheckBool("FractionBinning", "layout_reversed", required=False),
+        "error_method":    aghast.checktype.CheckEnum("FractionBinning", "error_method", required=False, choices=error_methods),
         }
 
     layout          = typedproperty(_params["layout"])
@@ -4126,14 +4126,14 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
         return 1
 
     def _toflatbuffers(self, builder):
-        stagg.stagg_generated.FractionBinning.FractionBinningStart(builder)
+        aghast.aghast_generated.FractionBinning.FractionBinningStart(builder)
         if self.layout != self.passall:
-            stagg.stagg_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
+            aghast.aghast_generated.FractionBinning.FractionBinningAddLayout(builder, self.layout.value)
         if self.layout_reversed is not False:
-            stagg.stagg_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
+            aghast.aghast_generated.FractionBinning.FractionBinningAddLayoutReversed(builder, self.layout_reversed)
         if self.error_method != self.unspecified:
-            stagg.stagg_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
-        return stagg.stagg_generated.FractionBinning.FractionBinningEnd(builder)
+            aghast.aghast_generated.FractionBinning.FractionBinningAddErrorMethod(builder, self.error_method.value)
+        return aghast.aghast_generated.FractionBinning.FractionBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = []
@@ -4200,8 +4200,8 @@ Proportion: Comparison of Seven Methods`" [https://doi.org/10.1002/(SICI)1097-02
 
 class PredicateBinning(Binning, OverlappingFill):
     _params = {
-        "predicates":       stagg.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
-        "overlapping_fill": stagg.checktype.CheckEnum("PredicateBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
+        "predicates":       aghast.checktype.CheckVector("PredicateBinning", "predicates", required=True, type=str, minlen=1),
+        "overlapping_fill": aghast.checktype.CheckEnum("PredicateBinning", "overlapping_fill", required=False, choices=OverlappingFill.overlapping_fill_strategies),
         }
 
     predicates       = typedproperty(_params["predicates"])
@@ -4237,16 +4237,16 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
     def _toflatbuffers(self, builder):
         predicates = [builder.CreateString(x.encode("utf-8")) for x in self.predicates]
 
-        stagg.stagg_generated.PredicateBinning.PredicateBinningStartPredicatesVector(builder, len(predicates))
+        aghast.aghast_generated.PredicateBinning.PredicateBinningStartPredicatesVector(builder, len(predicates))
         for x in predicates[::-1]:
             builder.PrependUOffsetTRelative(x)
         predicates = builder.EndVector(len(predicates))
 
-        stagg.stagg_generated.PredicateBinning.PredicateBinningStart(builder)
-        stagg.stagg_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
+        aghast.aghast_generated.PredicateBinning.PredicateBinningStart(builder)
+        aghast.aghast_generated.PredicateBinning.PredicateBinningAddPredicates(builder, predicates)
         if self.overlapping_fill != self.unspecified:
-            stagg.stagg_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
-        return stagg.stagg_generated.PredicateBinning.PredicateBinningEnd(builder)
+            aghast.aghast_generated.PredicateBinning.PredicateBinningAddOverlappingFill(builder, self.overlapping_fill.value)
+        return aghast.aghast_generated.PredicateBinning.PredicateBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["predicates=[" + ", ".join(_dumpstring(x) for x in self.predicates) + "]"]
@@ -4359,10 +4359,10 @@ Use a <<CategoryBinning>> if the data regions are strictly disjoint, have string
 
 ################################################# Assignment
 
-class Assignment(Stagg):
+class Assignment(Ghast):
     _params = {
-        "identifier": stagg.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
-        "expression": stagg.checktype.CheckString("Assignment", "expression", required=True),
+        "identifier": aghast.checktype.CheckKey("Assignment", "identifier", required=True, type=str),
+        "expression": aghast.checktype.CheckString("Assignment", "expression", required=True),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -4381,10 +4381,10 @@ The *identifier* is the name of the derived feature that gets recomputed in this
     def _toflatbuffers(self, builder):
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         expression = builder.CreateString(self.expression.encode("utf-8"))
-        stagg.stagg_generated.Assignment.AssignmentStart(builder)
-        stagg.stagg_generated.Assignment.AssignmentAddIdentifier(builder, identifier)
-        stagg.stagg_generated.Assignment.AssignmentAddExpression(builder, expression)
-        return stagg.stagg_generated.Assignment.AssignmentEnd(builder)
+        aghast.aghast_generated.Assignment.AssignmentStart(builder)
+        aghast.aghast_generated.Assignment.AssignmentAddIdentifier(builder, identifier)
+        aghast.aghast_generated.Assignment.AssignmentAddExpression(builder, expression)
+        return aghast.aghast_generated.Assignment.AssignmentEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["identifier={0}".format(_dumpstring(self.identifier)), "expression={0}".format(_dumpstring(self.expression))]
@@ -4392,11 +4392,11 @@ The *identifier* is the name of the derived feature that gets recomputed in this
 
 ################################################# Variation
 
-class Variation(Stagg):
+class Variation(Ghast):
     _params = {
-        "assignments":         stagg.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
-        "systematic":          stagg.checktype.CheckVector("Variation", "systematic", required=False, type=float),
-        "category_systematic": stagg.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
+        "assignments":         aghast.checktype.CheckVector("Variation", "assignments", required=True, type=Assignment),
+        "systematic":          aghast.checktype.CheckVector("Variation", "systematic", required=False, type=float),
+        "category_systematic": aghast.checktype.CheckVector("Variation", "category_systematic", required=False, type=str),
         }
 
     assignments         = typedproperty(_params["assignments"])
@@ -4439,7 +4439,7 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
         assignments = [x._toflatbuffers(builder) for x in self.assignments]
         category_systematic = None if len(self.category_systematic) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic]
 
-        stagg.stagg_generated.Variation.VariationStartAssignmentsVector(builder, len(assignments))
+        aghast.aghast_generated.Variation.VariationStartAssignmentsVector(builder, len(assignments))
         for x in assignments[::-1]:
             builder.PrependUOffsetTRelative(x)
         assignments = builder.EndVector(len(assignments))
@@ -4448,24 +4448,24 @@ Some systematic errors are quantitative (e.g. misalignment) and others are categ
             systematic = None
         else:
             systematicbuf = systematic.tostring()
-            stagg.stagg_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
+            aghast.aghast_generated.Variation.VariationStartSystematicVector(builder, len(self.systematic))
             builder.head = builder.head - len(systematicbuf)
             builder.Bytes[builder.head : builder.head + len(systematicbuf)] = systematicbuf
             systematic = builder.EndVector(len(self.systematic))
 
         if category_systematic is not None:
-            stagg.stagg_generated.Variation.VariationStartCategorySystematicVector(builder, len(category_systematic))
+            aghast.aghast_generated.Variation.VariationStartCategorySystematicVector(builder, len(category_systematic))
             for x in category_systematic[::-1]:
                 builder.PrependUOffsetTRelative(x)
             category_systematic = builder.EndVector(len(category_systematic))
 
-        stagg.stagg_generated.Variation.VariationStart(builder)
-        stagg.stagg_generated.Variation.VariationAddAssignments(builder, assignments)
+        aghast.aghast_generated.Variation.VariationStart(builder)
+        aghast.aghast_generated.Variation.VariationAddAssignments(builder, assignments)
         if systematic is not None:
-            stagg.stagg_generated.Variation.VariationAddSystematic(builder, systematic)
+            aghast.aghast_generated.Variation.VariationAddSystematic(builder, systematic)
         if category_systematic is not None:
-            stagg.stagg_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
-        return stagg.stagg_generated.Variation.VariationEnd(builder)
+            aghast.aghast_generated.Variation.VariationAddCategorySystematic(builder, category_systematic)
+        return aghast.aghast_generated.Variation.VariationEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["assignments=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.assignments], indent, width, end), indent, end) + "]"]
@@ -4481,16 +4481,16 @@ class SystematicUnitsEnum(Enum):
     base = "VariationBinning"
 
 class VariationBinning(Binning):
-    unspecified = SystematicUnitsEnum("unspecified", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_unspecified)
-    confidence  = SystematicUnitsEnum("confidence", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_confidence)
-    sigmas      = SystematicUnitsEnum("sigmas", stagg.stagg_generated.SystematicUnits.SystematicUnits.syst_sigmas)
+    unspecified = SystematicUnitsEnum("unspecified", aghast.aghast_generated.SystematicUnits.SystematicUnits.syst_unspecified)
+    confidence  = SystematicUnitsEnum("confidence", aghast.aghast_generated.SystematicUnits.SystematicUnits.syst_confidence)
+    sigmas      = SystematicUnitsEnum("sigmas", aghast.aghast_generated.SystematicUnits.SystematicUnits.syst_sigmas)
     units = [unspecified, confidence, sigmas]
 
     _params = {
-        "variations":                stagg.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
-        "systematic_units":          stagg.checktype.CheckEnum("VariationBinning", "systematic_units", required=False, choices=units),
-        "systematic_names":          stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
-        "category_systematic_names": stagg.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
+        "variations":                aghast.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
+        "systematic_units":          aghast.checktype.CheckEnum("VariationBinning", "systematic_units", required=False, choices=units),
+        "systematic_names":          aghast.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
+        "category_systematic_names": aghast.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
         }
 
     variations                = typedproperty(_params["variations"])
@@ -4552,32 +4552,32 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
         systematic_names = None if len(self.systematic_names) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.systematic_names]
         category_systematic_names = None if len(self.category_systematic_names) == 0 else [builder.CreateString(x.encode("utf-8")) for x in self.category_systematic_names]
 
-        stagg.stagg_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
+        aghast.aghast_generated.VariationBinning.VariationBinningStartVariationsVector(builder, len(variations))
         for x in variations[::-1]:
             builder.PrependUOffsetTRelative(x)
         variations = builder.EndVector(len(variations))
 
         if systematic_names is not None:
-            stagg.stagg_generated.VariationBinning.VariationBinningStartSystematicNamesVector(builder, len(systematic_names))
+            aghast.aghast_generated.VariationBinning.VariationBinningStartSystematicNamesVector(builder, len(systematic_names))
             for x in systematic_names[::-1]:
                 builder.PrependUOffsetTRelative(x)
             systematic_names = builder.EndVector(len(systematic_names))
 
         if category_systematic_names is not None:
-            stagg.stagg_generated.VariationBinning.VariationBinningStartCategorySystematicNamesVector(builder, len(category_systematic_names))
+            aghast.aghast_generated.VariationBinning.VariationBinningStartCategorySystematicNamesVector(builder, len(category_systematic_names))
             for x in category_systematic_names[::-1]:
                 builder.PrependUOffsetTRelative(x)
             category_systematic_names = builder.EndVector(len(category_systematic_names))
 
-        stagg.stagg_generated.VariationBinning.VariationBinningStart(builder)
-        stagg.stagg_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
+        aghast.aghast_generated.VariationBinning.VariationBinningStart(builder)
+        aghast.aghast_generated.VariationBinning.VariationBinningAddVariations(builder, variations)
         if self.systematic_units != self.unspecified:
-            stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicUnits(builder, self.systematic_units.value)
+            aghast.aghast_generated.VariationBinning.VariationBinningAddSystematicUnits(builder, self.systematic_units.value)
         if systematic_names is not None:
-            stagg.stagg_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
+            aghast.aghast_generated.VariationBinning.VariationBinningAddSystematicNames(builder, systematic_names)
         if category_systematic_names is not None:
-            stagg.stagg_generated.VariationBinning.VariationBinningAddCategorySystematicNames(builder, category_systematic_names)
-        return stagg.stagg_generated.VariationBinning.VariationBinningEnd(builder)
+            aghast.aghast_generated.VariationBinning.VariationBinningAddCategorySystematicNames(builder, category_systematic_names)
+        return aghast.aghast_generated.VariationBinning.VariationBinningEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["variations=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.variations], indent, width, end), indent, end) + "]"]
@@ -4660,14 +4660,14 @@ The *systematic_names* labels the dimensions of the <<Variation>> *systematic* v
 
 ################################################# Axis
 
-class Axis(Stagg):
+class Axis(Ghast):
     _params = {
-        "binning":    stagg.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
-        "expression": stagg.checktype.CheckString("Axis", "expression", required=False),
-        "statistics": stagg.checktype.CheckVector("Axis", "statistics", required=False, type=Statistics),
-        "title":      stagg.checktype.CheckString("Axis", "title", required=False),
-        "metadata":   stagg.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
-        "decoration": stagg.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
+        "binning":    aghast.checktype.CheckClass("Axis", "binning", required=False, type=Binning),
+        "expression": aghast.checktype.CheckString("Axis", "expression", required=False),
+        "statistics": aghast.checktype.CheckVector("Axis", "statistics", required=False, type=Statistics),
+        "title":      aghast.checktype.CheckString("Axis", "title", required=False),
+        "metadata":   aghast.checktype.CheckClass("Axis", "metadata", required=False, type=Metadata),
+        "decoration": aghast.checktype.CheckClass("Axis", "decoration", required=False, type=Decoration),
         }
 
     binning    = typedproperty(_params["binning"])
@@ -4732,7 +4732,7 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
         statistics = None if len(self.statistics) == 0 else [x._toflatbuffers(builder) for x in self.statistics]
 
         if statistics is not None:
-            stagg.stagg_generated.Axis.AxisStartStatisticsVector(builder, len(statistics))
+            aghast.aghast_generated.Axis.AxisStartStatisticsVector(builder, len(statistics))
             for x in statistics[::-1]:
                 builder.PrependUOffsetTRelative(x)
             statistics = builder.EndVector(len(statistics))
@@ -4743,21 +4743,21 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
 
-        stagg.stagg_generated.Axis.AxisStart(builder)
+        aghast.aghast_generated.Axis.AxisStart(builder)
         if binning is not None:
-            stagg.stagg_generated.Axis.AxisAddBinningType(builder, _Binning_invlookup[type(self.binning)])
-            stagg.stagg_generated.Axis.AxisAddBinning(builder, binning)
+            aghast.aghast_generated.Axis.AxisAddBinningType(builder, _Binning_invlookup[type(self.binning)])
+            aghast.aghast_generated.Axis.AxisAddBinning(builder, binning)
         if expression is not None:
-            stagg.stagg_generated.Axis.AxisAddExpression(builder, expression)
+            aghast.aghast_generated.Axis.AxisAddExpression(builder, expression)
         if statistics is not None:
-            stagg.stagg_generated.Axis.AxisAddStatistics(builder, statistics)
+            aghast.aghast_generated.Axis.AxisAddStatistics(builder, statistics)
         if title is not None:
-            stagg.stagg_generated.Axis.AxisAddTitle(builder, title)
+            aghast.aghast_generated.Axis.AxisAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Axis.AxisAddMetadata(builder, metadata)
+            aghast.aghast_generated.Axis.AxisAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Axis.AxisAddDecoration(builder, decoration)
-        return stagg.stagg_generated.Axis.AxisEnd(builder)
+            aghast.aghast_generated.Axis.AxisAddDecoration(builder, decoration)
+        return aghast.aghast_generated.Axis.AxisEnd(builder)
 
     def _dump(self, indent, width, end):
         args = []
@@ -4777,13 +4777,13 @@ The *expression*, *title*, *metadata*, and *decoration* properties have no seman
 
 ################################################# Profile
 
-class Profile(Stagg):
+class Profile(Ghast):
     _params = {
-        "expression": stagg.checktype.CheckString("Profile", "expression", required=True),
-        "statistics": stagg.checktype.CheckClass("Profile", "statistics", required=True, type=Statistics),
-        "title":      stagg.checktype.CheckString("Profile", "title", required=False),
-        "metadata":   stagg.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
-        "decoration": stagg.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
+        "expression": aghast.checktype.CheckString("Profile", "expression", required=True),
+        "statistics": aghast.checktype.CheckClass("Profile", "statistics", required=True, type=Statistics),
+        "title":      aghast.checktype.CheckString("Profile", "title", required=False),
+        "metadata":   aghast.checktype.CheckClass("Profile", "metadata", required=False, type=Metadata),
+        "decoration": aghast.checktype.CheckClass("Profile", "decoration", required=False, type=Decoration),
         }
 
     expression = typedproperty(_params["expression"])
@@ -4828,16 +4828,16 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
         decoration = None if self.decoration is None else self.decoration._toflatbuffers(builder)
 
-        stagg.stagg_generated.Profile.ProfileStart(builder)
-        stagg.stagg_generated.Profile.ProfileAddExpression(builder, expression)
-        stagg.stagg_generated.Profile.ProfileAddStatistics(builder, statistics)
+        aghast.aghast_generated.Profile.ProfileStart(builder)
+        aghast.aghast_generated.Profile.ProfileAddExpression(builder, expression)
+        aghast.aghast_generated.Profile.ProfileAddStatistics(builder, statistics)
         if title is not None:
-            stagg.stagg_generated.Profile.ProfileAddTitle(builder, title)
+            aghast.aghast_generated.Profile.ProfileAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Profile.ProfileAddMetadata(builder, metadata)
+            aghast.aghast_generated.Profile.ProfileAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Profile.ProfileAddDecoration(builder, decoration)
-        return stagg.stagg_generated.Profile.ProfileEnd(builder)
+            aghast.aghast_generated.Profile.ProfileAddDecoration(builder, decoration)
+        return aghast.aghast_generated.Profile.ProfileEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["expression={0}".format(repr(self.expression)), "statistics={0}".format(_dumpeq(self.statistics._dump(indent + "    ", width, end), indent, end))]
@@ -4851,7 +4851,7 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
 
 ################################################# Counts
 
-class Counts(Stagg):
+class Counts(Ghast):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -4905,7 +4905,7 @@ class Counts(Stagg):
 
 class UnweightedCounts(Counts):
     _params = {
-        "counts": stagg.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
+        "counts": aghast.checktype.CheckClass("UnweightedCounts", "counts", required=True, type=InterpretedBuffer),
         }
 
     counts = typedproperty(_params["counts"])
@@ -4936,10 +4936,10 @@ To be valid, the length of the *counts* buffer (in number of items, not number o
 
     def _toflatbuffers(self, builder):
         counts = self.counts._toflatbuffers(builder)
-        stagg.stagg_generated.UnweightedCounts.UnweightedCountsStart(builder)
-        stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
-        stagg.stagg_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
-        return stagg.stagg_generated.UnweightedCounts.UnweightedCountsEnd(builder)
+        aghast.aghast_generated.UnweightedCounts.UnweightedCountsStart(builder)
+        aghast.aghast_generated.UnweightedCounts.UnweightedCountsAddCountsType(builder, _InterpretedBuffer_invlookup[type(self.counts)])
+        aghast.aghast_generated.UnweightedCounts.UnweightedCountsAddCounts(builder, counts)
+        return aghast.aghast_generated.UnweightedCounts.UnweightedCountsEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["counts={0}".format(_dumpeq(self.counts._dump(indent + "    ", width, end), indent, end))]
@@ -4971,9 +4971,9 @@ To be valid, the length of the *counts* buffer (in number of items, not number o
 
 class WeightedCounts(Counts):
     _params = {
-        "sumw":       stagg.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
-        "sumw2":      stagg.checktype.CheckClass("WeightedCounts", "sumw2", required=False, type=InterpretedBuffer),
-        "unweighted": stagg.checktype.CheckClass("WeightedCounts", "unweighted", required=False, type=UnweightedCounts),
+        "sumw":       aghast.checktype.CheckClass("WeightedCounts", "sumw", required=True, type=InterpretedBuffer),
+        "sumw2":      aghast.checktype.CheckClass("WeightedCounts", "sumw2", required=False, type=InterpretedBuffer),
+        "unweighted": aghast.checktype.CheckClass("WeightedCounts", "unweighted", required=False, type=UnweightedCounts),
         }
 
     sumw       = typedproperty(_params["sumw"])
@@ -5017,15 +5017,15 @@ To be valid, the length of all of these buffers (in number of items, not number 
         sumw2 = None if self.sumw2 is None else self.sumw2._toflatbuffers(builder)
         unweighted = None if self.unweighted is None else self.unweighted._toflatbuffers(builder)
 
-        stagg.stagg_generated.WeightedCounts.WeightedCountsStart(builder)
-        stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
-        stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw(builder, sumw)
+        aghast.aghast_generated.WeightedCounts.WeightedCountsStart(builder)
+        aghast.aghast_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
+        aghast.aghast_generated.WeightedCounts.WeightedCountsAddSumw(builder, sumw)
         if sumw2 is not None:
-            stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw2Type(builder, _InterpretedBuffer_invlookup[type(self.sumw2)])
-            stagg.stagg_generated.WeightedCounts.WeightedCountsAddSumw2(builder, sumw2)
+            aghast.aghast_generated.WeightedCounts.WeightedCountsAddSumw2Type(builder, _InterpretedBuffer_invlookup[type(self.sumw2)])
+            aghast.aghast_generated.WeightedCounts.WeightedCountsAddSumw2(builder, sumw2)
         if unweighted is not None:
-            stagg.stagg_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
-        return stagg.stagg_generated.WeightedCounts.WeightedCountsEnd(builder)
+            aghast.aghast_generated.WeightedCounts.WeightedCountsAddUnweighted(builder, unweighted)
+        return aghast.aghast_generated.WeightedCounts.WeightedCountsEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["sumw={0}".format(_dumpeq(self.sumw._dump(indent + "    ", width, end), indent, end))]
@@ -5090,11 +5090,11 @@ To be valid, the length of all of these buffers (in number of items, not number 
 
 ################################################# Parameter
 
-class Parameter(Stagg):
+class Parameter(Ghast):
     _params = {
-        "identifier": stagg.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
-        "values":     stagg.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
-        "errors":     stagg.checktype.CheckClass("Parameter", "errors", required=False, type=InterpretedBuffer),
+        "identifier": aghast.checktype.CheckKey("Parameter", "identifier", required=True, type=str),
+        "values":     aghast.checktype.CheckClass("Parameter", "values", required=True, type=InterpretedBuffer),
+        "errors":     aghast.checktype.CheckClass("Parameter", "errors", required=False, type=InterpretedBuffer),
         }
 
     identifier = typedproperty(_params["identifier"])
@@ -5131,14 +5131,14 @@ A parameter is named by an *identifier* and stores one or two buffers for *value
         errors = None if self.errors is None else self.errors._toflatbuffers(builder)
         identifier = builder.CreateString(self.identifier.encode("utf-8"))
         
-        stagg.stagg_generated.Parameter.ParameterStart(builder)
-        stagg.stagg_generated.Parameter.ParameterAddIdentifier(builder, identifier)
-        stagg.stagg_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.Parameter.ParameterAddValues(builder, values)
+        aghast.aghast_generated.Parameter.ParameterStart(builder)
+        aghast.aghast_generated.Parameter.ParameterAddIdentifier(builder, identifier)
+        aghast.aghast_generated.Parameter.ParameterAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.Parameter.ParameterAddValues(builder, values)
         if errors is not None:
-            stagg.stagg_generated.Parameter.ParameterAddErrorsType(builder, _InterpretedBuffer_invlookup[type(self.errors)])
-            stagg.stagg_generated.Parameter.ParameterAddErrors(builder, values)
-        return stagg.stagg_generated.Parameter.ParameterEnd(builder)
+            aghast.aghast_generated.Parameter.ParameterAddErrorsType(builder, _InterpretedBuffer_invlookup[type(self.errors)])
+            aghast.aghast_generated.Parameter.ParameterAddErrors(builder, values)
+        return aghast.aghast_generated.Parameter.ParameterEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["parameter={0}".format(repr(self.parameter)), "values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
@@ -5148,7 +5148,7 @@ A parameter is named by an *identifier* and stores one or two buffers for *value
 
 ################################################# Function
 
-class Function(Stagg):
+class Function(Ghast):
     def __init__(self):
         raise TypeError("{0} is an abstract base class; do not construct".format(type(self).__name__))
 
@@ -5178,14 +5178,14 @@ class FunctionObject(Object):
 
 class ParameterizedFunction(Function, FunctionObject):
     _params = {
-        "expression":            stagg.checktype.CheckString("ParameterizedFunction", "expression", required=True),
-        "parameters":            stagg.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
-        "paramaxis":             stagg.checktype.CheckVector("ParameterizedFunction", "paramaxis", required=False, type=int),
-        "parameter_covariances": stagg.checktype.CheckVector("ParameterizedFunction", "parameter_covariances", required=False, type=Covariance),
-        "title":                 stagg.checktype.CheckString("ParameterizedFunction", "title", required=False),
-        "metadata":              stagg.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
-        "decoration":            stagg.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
-        "script":                stagg.checktype.CheckString("ParameterizedFunction", "script", required=False),
+        "expression":            aghast.checktype.CheckString("ParameterizedFunction", "expression", required=True),
+        "parameters":            aghast.checktype.CheckVector("ParameterizedFunction", "parameters", required=False, type=Parameter),
+        "paramaxis":             aghast.checktype.CheckVector("ParameterizedFunction", "paramaxis", required=False, type=int),
+        "parameter_covariances": aghast.checktype.CheckVector("ParameterizedFunction", "parameter_covariances", required=False, type=Covariance),
+        "title":                 aghast.checktype.CheckString("ParameterizedFunction", "title", required=False),
+        "metadata":              aghast.checktype.CheckClass("ParameterizedFunction", "metadata", required=False, type=Metadata),
+        "decoration":            aghast.checktype.CheckClass("ParameterizedFunction", "decoration", required=False, type=Decoration),
+        "script":                aghast.checktype.CheckString("ParameterizedFunction", "script", required=False),
         }
 
     expression             = typedproperty(_params["expression"])
@@ -5268,7 +5268,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         expression = builder.CreateString(self.expression.encode("utf-8"))
 
         if parameters is not None:
-            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStartParametersVector(builder, len(parameters))
+            aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionStartParametersVector(builder, len(parameters))
             for x in parameters[::-1]:
                 builder.PrependUOffsetTRelative(x)
             parameters = builder.EndVector(len(parameters))
@@ -5277,59 +5277,59 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
             paramaxis = None
         else:
             paramaxisbuf = self.paramaxis.tostring()
-            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStartParamaxisVector(builder, len(self.paramaxis))
+            aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionStartParamaxisVector(builder, len(self.paramaxis))
             builder.head = builder.head - len(paramaxisbuf)
             builder.Bytes[builder.head : builder.head + len(paramaxisbuf)] = paramaxisbuf
             paramaxis = builder.EndVector(len(self.paramaxis))
 
         if parameter_covariances is not None:
-            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStartParameterCovariancesVector(builder, len(parameter_covariances))
+            aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionStartParameterCovariancesVector(builder, len(parameter_covariances))
             for x in parameter_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             parameter_covariances = builder.EndVector(len(parameter_covariances))
 
-        stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
-        stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
+        aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionStart(builder)
+        aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionAddExpression(builder, expression)
         if parameters is not None:
-            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
+            aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionAddParameters(builder, parameters)
         if paramaxis is not None:
-            stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionAddParamaxis(builder, paramaxis)
+            aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionAddParamaxis(builder, paramaxis)
         if parameter_covariances is not None:
-            stagg.stagg_generated.ParameterizedFunctionAddParameterCovariances(builder, parameter_covariances)
-        parameterized = stagg.stagg_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
+            aghast.aghast_generated.ParameterizedFunctionAddParameterCovariances(builder, parameter_covariances)
+        parameterized = aghast.aghast_generated.ParameterizedFunction.ParameterizedFunctionEnd(builder)
 
         if isinstance(getattr(self, "_parent", None), Histogram):
-            stagg.stagg_generated.Function.FunctionStart(builder)
-            stagg.stagg_generated.Function.FunctionAddDataType(builder, stagg.stagg_generated.FunctionData.FunctionData.ParameterizedFunction)
-            stagg.stagg_generated.Function.FunctionAddData(builder, parameterized)
+            aghast.aghast_generated.Function.FunctionStart(builder)
+            aghast.aghast_generated.Function.FunctionAddDataType(builder, aghast.aghast_generated.FunctionData.FunctionData.ParameterizedFunction)
+            aghast.aghast_generated.Function.FunctionAddData(builder, parameterized)
             if title is not None:
-                stagg.stagg_generated.Function.FunctionAddTitle(builder, title)
+                aghast.aghast_generated.Function.FunctionAddTitle(builder, title)
             if metadata is not None:
-                stagg.stagg_generated.Function.FunctionAddMetadata(builder, metadata)
+                aghast.aghast_generated.Function.FunctionAddMetadata(builder, metadata)
             if decoration is not None:
-                stagg.stagg_generated.Function.FunctionAddDecoration(builder, decoration)
+                aghast.aghast_generated.Function.FunctionAddDecoration(builder, decoration)
             if script is not None:
-                stagg.stagg_generated.Function.FunctionAddScript(builder, script)
-            return stagg.stagg_generated.Function.FunctionEnd(builder)
+                aghast.aghast_generated.Function.FunctionAddScript(builder, script)
+            return aghast.aghast_generated.Function.FunctionEnd(builder)
 
         else:
-            stagg.stagg_generated.FunctionObject.FunctionObjectStart(builder)
-            stagg.stagg_generated.FunctionObject.FunctionObjectAddDataType(builder, stagg.stagg_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
-            stagg.stagg_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
-            function_object = stagg.stagg_generated.FunctionObject.FunctionObjectEnd(builder)
+            aghast.aghast_generated.FunctionObject.FunctionObjectStart(builder)
+            aghast.aghast_generated.FunctionObject.FunctionObjectAddDataType(builder, aghast.aghast_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction)
+            aghast.aghast_generated.FunctionObject.FunctionObjectAddData(builder, parameterized)
+            function_object = aghast.aghast_generated.FunctionObject.FunctionObjectEnd(builder)
 
-            stagg.stagg_generated.Object.ObjectStart(builder)
-            stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.FunctionObject)
-            stagg.stagg_generated.Object.ObjectAddData(builder, function_object)
+            aghast.aghast_generated.Object.ObjectStart(builder)
+            aghast.aghast_generated.Object.ObjectAddDataType(builder, aghast.aghast_generated.ObjectData.ObjectData.FunctionObject)
+            aghast.aghast_generated.Object.ObjectAddData(builder, function_object)
             if title is not None:
-                stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
+                aghast.aghast_generated.Object.ObjectAddTitle(builder, title)
             if metadata is not None:
-                stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
+                aghast.aghast_generated.Object.ObjectAddMetadata(builder, metadata)
             if decoration is not None:
-                stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
+                aghast.aghast_generated.Object.ObjectAddDecoration(builder, decoration)
             if script is not None:
-                stagg.stagg_generated.Object.ObjectAddScript(builder, script)
-            return stagg.stagg_generated.Object.ObjectEnd(builder)
+                aghast.aghast_generated.Object.ObjectAddScript(builder, script)
+            return aghast.aghast_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["expression={0}".format(_dumpstring(self.expression))]
@@ -5356,13 +5356,13 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 class EvaluatedFunction(Function):
     _params = {
-        "values":      stagg.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives": stagg.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "errors":      stagg.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
-        "title":       stagg.checktype.CheckString("EvaluatedFunction", "title", required=False),
-        "metadata":    stagg.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":  stagg.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
-        "script":      stagg.checktype.CheckString("EvaluatedFunction", "script", required=False),
+        "values":      aghast.checktype.CheckClass("EvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": aghast.checktype.CheckClass("EvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "errors":      aghast.checktype.CheckVector("EvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       aghast.checktype.CheckString("EvaluatedFunction", "title", required=False),
+        "metadata":    aghast.checktype.CheckClass("EvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  aghast.checktype.CheckClass("EvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      aghast.checktype.CheckString("EvaluatedFunction", "script", required=False),
         }
 
     values      = typedproperty(_params["values"])
@@ -5428,33 +5428,33 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
 
         if errors is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
             for x in errors[::-1]:
                 builder.PrependUOffsetTRelative(x)
             errors = builder.EndVector(len(errors))
 
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
-        evaluated = stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
 
-        stagg.stagg_generated.Function.FunctionStart(builder)
-        stagg.stagg_generated.Function.FunctionAddDataType(builder, stagg.stagg_generated.FunctionData.FunctionData.EvaluatedFunction)
-        stagg.stagg_generated.Function.FunctionAddData(builder, evaluated)
+        aghast.aghast_generated.Function.FunctionStart(builder)
+        aghast.aghast_generated.Function.FunctionAddDataType(builder, aghast.aghast_generated.FunctionData.FunctionData.EvaluatedFunction)
+        aghast.aghast_generated.Function.FunctionAddData(builder, evaluated)
         if title is not None:
-            stagg.stagg_generated.Function.FunctionAddTitle(builder, title)
+            aghast.aghast_generated.Function.FunctionAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Function.FunctionAddMetadata(builder, metadata)
+            aghast.aghast_generated.Function.FunctionAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Function.FunctionAddDecoration(builder, decoration)
+            aghast.aghast_generated.Function.FunctionAddDecoration(builder, decoration)
         if script is not None:
-            stagg.stagg_generated.Function.FunctionAddScript(builder, script)
-        return stagg.stagg_generated.Function.FunctionEnd(builder)
+            aghast.aghast_generated.Function.FunctionAddScript(builder, script)
+        return aghast.aghast_generated.Function.FunctionEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
@@ -5476,14 +5476,14 @@ If the *derivatives* or the *errors* of the function at each bin are also known,
 
 class BinnedEvaluatedFunction(FunctionObject):
     _params = {
-        "axis":        stagg.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
-        "values":      stagg.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
-        "derivatives": stagg.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
-        "errors":      stagg.checktype.CheckVector("BinnedEvaluatedFunction", "errors", required=False, type=Quantiles),
-        "title":       stagg.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
-        "metadata":    stagg.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
-        "decoration":  stagg.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
-        "script":      stagg.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
+        "axis":        aghast.checktype.CheckVector("BinnedEvaluatedFunction", "axis", required=True, type=Axis, minlen=1),
+        "values":      aghast.checktype.CheckClass("BinnedEvaluatedFunction", "values", required=True, type=InterpretedBuffer),
+        "derivatives": aghast.checktype.CheckClass("BinnedEvaluatedFunction", "derivatives", required=False, type=InterpretedBuffer),
+        "errors":      aghast.checktype.CheckVector("BinnedEvaluatedFunction", "errors", required=False, type=Quantiles),
+        "title":       aghast.checktype.CheckString("BinnedEvaluatedFunction", "title", required=False),
+        "metadata":    aghast.checktype.CheckClass("BinnedEvaluatedFunction", "metadata", required=False, type=Metadata),
+        "decoration":  aghast.checktype.CheckClass("BinnedEvaluatedFunction", "decoration", required=False, type=Decoration),
+        "script":      aghast.checktype.CheckString("BinnedEvaluatedFunction", "script", required=False),
         }
 
     axis        = typedproperty(_params["axis"])
@@ -5565,48 +5565,48 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         axis = [x._toflatbuffers(builder) for x in self.axis]
         
         if errors is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionStartErrorsVector(builder, len(errors))
             for x in errors[::-1]:
                 builder.PrependUOffsetTRelative(x)
             errors = builder.EndVector(len(errors))
 
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
-        stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionStart(builder)
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddValuesType(builder, _InterpretedBuffer_invlookup[type(self.values)])
+        aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddValues(builder, values)
         if derivatives is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddDerivativesType(builder, _InterpretedBuffer_invlookup[type(self.derivatives)])
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddDerivatives(builder, derivatives)
         if errors is not None:
-            stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
-        evaluated = stagg.stagg_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
+            aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionAddErrors(builder, errors)
+        evaluated = aghast.aghast_generated.EvaluatedFunction.EvaluatedFunctionEnd(builder)
 
-        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
+        aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStartAxisVector(builder, len(axis))
         for x in axis[::-1]:
             builder.PrependUOffsetTRelative(x)
         axis = builder.EndVector(len(axis))
 
-        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
-        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)
-        stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddData(builder, evaluated)
-        binned_evaluated = stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionEnd(builder)
+        aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionStart(builder)
+        aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddAxis(builder, axis)
+        aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionAddData(builder, evaluated)
+        binned_evaluated = aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunctionEnd(builder)
 
-        stagg.stagg_generated.FunctionObject.FunctionObjectStart(builder)
-        stagg.stagg_generated.FunctionObject.FunctionObjectAddDataType(builder, stagg.stagg_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction)
-        stagg.stagg_generated.FunctionObject.FunctionObjectAddData(builder, binned_evaluated)
-        function_object = stagg.stagg_generated.FunctionObject.FunctionObjectEnd(builder)
+        aghast.aghast_generated.FunctionObject.FunctionObjectStart(builder)
+        aghast.aghast_generated.FunctionObject.FunctionObjectAddDataType(builder, aghast.aghast_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction)
+        aghast.aghast_generated.FunctionObject.FunctionObjectAddData(builder, binned_evaluated)
+        function_object = aghast.aghast_generated.FunctionObject.FunctionObjectEnd(builder)
 
-        stagg.stagg_generated.Object.ObjectStart(builder)
-        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.FunctionObject)
-        stagg.stagg_generated.Object.ObjectAddData(builder, function_object)
+        aghast.aghast_generated.Object.ObjectStart(builder)
+        aghast.aghast_generated.Object.ObjectAddDataType(builder, aghast.aghast_generated.ObjectData.ObjectData.FunctionObject)
+        aghast.aghast_generated.Object.ObjectAddData(builder, function_object)
         if title is not None:
-            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
+            aghast.aghast_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
+            aghast.aghast_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
+            aghast.aghast_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
-        return stagg.stagg_generated.Object.ObjectEnd(builder)
+            aghast.aghast_generated.Object.ObjectAddScript(builder, script)
+        return aghast.aghast_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["axis[" + _dumpeq(_dumplist(x._dump(indent + "    ", width, end) for x in self.axis), indent, end) + "]", "values={0}".format(_dumpeq(self.values._dump(indent + "    ", width, end), indent, end))]
@@ -5631,16 +5631,16 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 class Histogram(Object):
     _params = {
-        "axis":                stagg.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
-        "counts":              stagg.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
-        "profile":             stagg.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
-        "axis_covariances":    stagg.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
-        "profile_covariances": stagg.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
-        "functions":           stagg.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
-        "title":               stagg.checktype.CheckString("Histogram", "title", required=False),
-        "metadata":            stagg.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
-        "decoration":          stagg.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
-        "script":              stagg.checktype.CheckString("Histogram", "script", required=False),
+        "axis":                aghast.checktype.CheckVector("Histogram", "axis", required=True, type=Axis, minlen=1),
+        "counts":              aghast.checktype.CheckClass("Histogram", "counts", required=True, type=Counts),
+        "profile":             aghast.checktype.CheckVector("Histogram", "profile", required=False, type=Profile),
+        "axis_covariances":    aghast.checktype.CheckVector("Histogram", "axis_covariances", required=False, type=Covariance),
+        "profile_covariances": aghast.checktype.CheckVector("Histogram", "profile_covariances", required=False, type=Covariance),
+        "functions":           aghast.checktype.CheckLookup("Histogram", "functions", required=False, type=Function),
+        "title":               aghast.checktype.CheckString("Histogram", "title", required=False),
+        "metadata":            aghast.checktype.CheckClass("Histogram", "metadata", required=False, type=Metadata),
+        "decoration":          aghast.checktype.CheckClass("Histogram", "decoration", required=False, type=Decoration),
+        "script":              aghast.checktype.CheckString("Histogram", "script", required=False),
         }
 
     axis                = typedproperty(_params["axis"])
@@ -5745,69 +5745,69 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         profile = None if len(self.profile) == 0 else [x._toflatbuffers(builder) for x in self.profile]
         axis = [x._toflatbuffers(builder) for x in self.axis]
 
-        stagg.stagg_generated.Histogram.HistogramStartAxisVector(builder, len(axis))
+        aghast.aghast_generated.Histogram.HistogramStartAxisVector(builder, len(axis))
         for x in axis[::-1]:
             builder.PrependUOffsetTRelative(x)
         axis = builder.EndVector(len(axis))
 
         if profile is not None:
-            stagg.stagg_generated.Histogram.HistogramStartProfileVector(builder, len(profile))
+            aghast.aghast_generated.Histogram.HistogramStartProfileVector(builder, len(profile))
             for x in profile[::-1]:
                 builder.PrependUOffsetTRelative(x)
             profile = builder.EndVector(len(profile))
 
         if axis_covariances is not None:
-            stagg.stagg_generated.Histogram.HistogramStartAxisCovariancesVector(builder, len(axis_covariances))
+            aghast.aghast_generated.Histogram.HistogramStartAxisCovariancesVector(builder, len(axis_covariances))
             for x in axis_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             axis_covariances = builder.EndVector(len(axis_covariances))
 
         if profile_covariances is not None:
-            stagg.stagg_generated.Histogram.HistogramStartProfileCovariancesVector(builder, len(profile_covariances))
+            aghast.aghast_generated.Histogram.HistogramStartProfileCovariancesVector(builder, len(profile_covariances))
             for x in profile_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             profile_covariances = builder.EndVector(len(profile_covariances))
 
         if functions is not None:
-            stagg.stagg_generated.Histogram.HistogramStartFunctionsVector(builder, len(functions))
+            aghast.aghast_generated.Histogram.HistogramStartFunctionsVector(builder, len(functions))
             for x in functions[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions = builder.EndVector(len(functions))
 
         functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
         if functions_lookup is not None:
-            stagg.stagg_generated.Histogram.HistogramStartFunctionsLookupVector(builder, len(functions_lookup))
+            aghast.aghast_generated.Histogram.HistogramStartFunctionsLookupVector(builder, len(functions_lookup))
             for x in functions_lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions_lookup = builder.EndVector(len(functions_lookup))
 
-        stagg.stagg_generated.Histogram.HistogramStart(builder)
-        stagg.stagg_generated.Histogram.HistogramAddAxis(builder, axis)
-        stagg.stagg_generated.Histogram.HistogramAddCountsType(builder, _Counts_invlookup[type(self.counts)])
-        stagg.stagg_generated.Histogram.HistogramAddCounts(builder, counts)
+        aghast.aghast_generated.Histogram.HistogramStart(builder)
+        aghast.aghast_generated.Histogram.HistogramAddAxis(builder, axis)
+        aghast.aghast_generated.Histogram.HistogramAddCountsType(builder, _Counts_invlookup[type(self.counts)])
+        aghast.aghast_generated.Histogram.HistogramAddCounts(builder, counts)
         if profile is not None:
-            stagg.stagg_generated.Histogram.HistogramAddProfile(builder, profile)
+            aghast.aghast_generated.Histogram.HistogramAddProfile(builder, profile)
         if axis_covariances is not None:
-            stagg.stagg_generated.Histogram.HistogramAddAxisCovariances(builder, axis_covariances)
+            aghast.aghast_generated.Histogram.HistogramAddAxisCovariances(builder, axis_covariances)
         if profile_covariances is not None:
-            stagg.stagg_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
+            aghast.aghast_generated.Histogram.HistogramAddProfileCovariances(builder, profile_covariances)
         if functions is not None:
-            stagg.stagg_generated.Histogram.HistogramAddFunctionsLookup(builder, functions_lookup)
-            stagg.stagg_generated.Histogram.HistogramAddFunctions(builder, functions)
-        data = stagg.stagg_generated.Histogram.HistogramEnd(builder)
+            aghast.aghast_generated.Histogram.HistogramAddFunctionsLookup(builder, functions_lookup)
+            aghast.aghast_generated.Histogram.HistogramAddFunctions(builder, functions)
+        data = aghast.aghast_generated.Histogram.HistogramEnd(builder)
 
-        stagg.stagg_generated.Object.ObjectStart(builder)
-        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Histogram)
-        stagg.stagg_generated.Object.ObjectAddData(builder, data)
+        aghast.aghast_generated.Object.ObjectStart(builder)
+        aghast.aghast_generated.Object.ObjectAddDataType(builder, aghast.aghast_generated.ObjectData.ObjectData.Histogram)
+        aghast.aghast_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
+            aghast.aghast_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
+            aghast.aghast_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
+            aghast.aghast_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
-        return stagg.stagg_generated.Object.ObjectEnd(builder)
+            aghast.aghast_generated.Object.ObjectAddScript(builder, script)
+        return aghast.aghast_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["axis=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.axis], indent, width, end), indent, end) + "]", "counts={0}".format(_dumpeq(self.counts._dump(indent + "    ", width, end), indent, end))]
@@ -5836,7 +5836,7 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         while hasattr(node, "_parent"):
             node = node._parent
             out = list(node.axis) + out
-        return stagg.checktype.Vector(out)
+        return aghast.checktype.Vector(out)
 
     def _expand_ellipsis(self, where, numdims):
         where2 = [None if isinstance(x, numpy.ndarray) else x for x in where]
@@ -5924,9 +5924,9 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 ################################################# Page
 
-class Page(Stagg):
+class Page(Ghast):
     _params = {
-        "buffer": stagg.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
+        "buffer": aghast.checktype.CheckClass("Page", "buffer", required=True, type=RawBuffer),
         }
 
     buffer = typedproperty(_params["buffer"])
@@ -5992,10 +5992,10 @@ A <<Page>> contains one raw *buffer*, which may be inline or external.
 
     def _toflatbuffers(self, builder):
         buffer = self.buffer._toflatbuffers(builder)
-        stagg.stagg_generated.Page.PageStart(builder)
-        stagg.stagg_generated.Page.PageAddBufferType(builder, _RawBuffer_invlookup[type(self.buffer)])
-        stagg.stagg_generated.Page.PageAddBuffer(builder, buffer)
-        return stagg.stagg_generated.Page.PageEnd(builder)
+        aghast.aghast_generated.Page.PageStart(builder)
+        aghast.aghast_generated.Page.PageAddBufferType(builder, _RawBuffer_invlookup[type(self.buffer)])
+        aghast.aghast_generated.Page.PageAddBuffer(builder, buffer)
+        return aghast.aghast_generated.Page.PageEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["buffer={0}".format(_dumpeq(self.buffer._dump(indent + "    ", width, end), indent, end))]
@@ -6003,12 +6003,12 @@ A <<Page>> contains one raw *buffer*, which may be inline or external.
 
 ################################################# ColumnChunk
 
-class ColumnChunk(Stagg):
+class ColumnChunk(Ghast):
     _params = {
-        "pages":        stagg.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
-        "page_offsets": stagg.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
-        "page_min":     stagg.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
-        "page_max":     stagg.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
+        "pages":        aghast.checktype.CheckVector("ColumnChunk", "pages", required=True, type=Page),
+        "page_offsets": aghast.checktype.CheckVector("ColumnChunk", "page_offsets", required=True, type=int, minlen=1),
+        "page_min":     aghast.checktype.CheckVector("ColumnChunk", "page_min", required=False, type=Extremes),
+        "page_max":     aghast.checktype.CheckVector("ColumnChunk", "page_max", required=False, type=Extremes),
         }
 
     pages        = typedproperty(_params["pages"])
@@ -6109,37 +6109,37 @@ Additionally, pages may have a "`zone map`" of minimum and maximum values in eac
         page_min = None if len(self.page_min) == 0 else [x._toflatbuffers(builder) for x in self.page_min]
         page_max = None if len(self.page_max) == 0 else [x._toflatbuffers(builder) for x in self.page_max]
 
-        stagg.stagg_generated.ColumnChunk.ColumnChunkStartPagesVector(builder, len(pages))
+        aghast.aghast_generated.ColumnChunk.ColumnChunkStartPagesVector(builder, len(pages))
         for x in pages[::-1]:
             builder.PrependUOffsetTRelative(x)
         pages = builder.EndVector(len(pages))
 
         pageoffsetsbuf = self.page_offsets.tostring()
-        stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
+        aghast.aghast_generated.ColumnChunk.ColumnChunkStartPageOffsetsVector(builder, len(self.page_offsets))
         builder.head = builder.head - len(pageoffsetsbuf)
         builder.Bytes[builder.head : builder.head + len(pageoffsetsbuf)] = pageoffsetsbuf
         page_offsets = builder.EndVector(len(self.page_offsets))
 
         if page_min is not None:
-            stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageMinVector(builder, len(page_min))
+            aghast.aghast_generated.ColumnChunk.ColumnChunkStartPageMinVector(builder, len(page_min))
             for x in page_min[::-1]:
                 builder.PrependUOffsetTRelative(x)
             page_min = builder.EndVector(len(page_min))
 
         if page_max is not None:
-            stagg.stagg_generated.ColumnChunk.ColumnChunkStartPageMaxVector(builder, len(page_max))
+            aghast.aghast_generated.ColumnChunk.ColumnChunkStartPageMaxVector(builder, len(page_max))
             for x in page_max[::-1]:
                 builder.PrependUOffsetTRelative(x)
             page_max = builder.EndVector(len(page_max))
 
-        stagg.stagg_generated.ColumnChunk.ColumnChunkStart(builder)
-        stagg.stagg_generated.ColumnChunk.ColumnChunkAddPages(builder, pages)
-        stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
+        aghast.aghast_generated.ColumnChunk.ColumnChunkStart(builder)
+        aghast.aghast_generated.ColumnChunk.ColumnChunkAddPages(builder, pages)
+        aghast.aghast_generated.ColumnChunk.ColumnChunkAddPageOffsets(builder, page_offsets)
         if page_min is not None:
-            stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
+            aghast.aghast_generated.ColumnChunk.ColumnChunkAddPageMin(builder, page_min)
         if page_max is not None:
-            stagg.stagg_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
-        return stagg.stagg_generated.ColumnChunk.ColumnChunkEnd(builder)
+            aghast.aghast_generated.ColumnChunk.ColumnChunkAddPageMax(builder, page_max)
+        return aghast.aghast_generated.ColumnChunk.ColumnChunkEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["pages=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.pages], indent, width, end), indent, end) + "]", "page_offsets={0}".format(_dumparray(self.page_offsets, indent, end))]
@@ -6151,10 +6151,10 @@ Additionally, pages may have a "`zone map`" of minimum and maximum values in eac
         
 ################################################# Chunk
 
-class Chunk(Stagg):
+class Chunk(Ghast):
     _params = {
-        "column_chunks": stagg.checktype.CheckVector("Chunk", "column_chunks", required=True, type=ColumnChunk),
-        "metadata":      stagg.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
+        "column_chunks": aghast.checktype.CheckVector("Chunk", "column_chunks", required=True, type=ColumnChunk),
+        "metadata":      aghast.checktype.CheckClass("Chunk", "metadata", required=False, type=Metadata),
         }
 
     column_chunks = typedproperty(_params["column_chunks"])
@@ -6197,16 +6197,16 @@ The *metadata* property has no semantic constraints, but it is included here to 
         column_chunks = [x._toflatbuffers(builder) for x in self.column_chunks]
         metadata = None if self.metadata is None else self.metadata._toflatbuffers(builder)
 
-        stagg.stagg_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
+        aghast.aghast_generated.Chunk.ChunkStartColumnChunksVector(builder, len(column_chunks))
         for x in column_chunks[::-1]:
             builder.PrependUOffsetTRelative(x)
         column_chunks = builder.EndVector(len(column_chunks))
 
-        stagg.stagg_generated.Chunk.ChunkStart(builder)
-        stagg.stagg_generated.Chunk.ChunkAddColumnChunks(builder, column_chunks)
+        aghast.aghast_generated.Chunk.ChunkStart(builder)
+        aghast.aghast_generated.Chunk.ChunkAddColumnChunks(builder, column_chunks)
         if metadata is not None:
-            stagg.stagg_generated.Chunk.ChunkAddMetadata(builder, metadata)
-        return stagg.stagg_generated.Chunk.ChunkEnd(builder)
+            aghast.aghast_generated.Chunk.ChunkAddMetadata(builder, metadata)
+        return aghast.aghast_generated.Chunk.ChunkEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["column_chunks=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.column_chunks], indent, width, end), indent, end) + "]"]
@@ -6216,16 +6216,16 @@ The *metadata* property has no semantic constraints, but it is included here to 
 
 ################################################# Column
 
-class Column(Stagg, Interpretation):
+class Column(Ghast, Interpretation):
     _params = {
-        "identifier":       stagg.checktype.CheckKey("Column", "identifier", required=True, type=str),
-        "dtype":            stagg.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
-        "endianness":       stagg.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
-        "filters":          stagg.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
-        "postfilter_slice": stagg.checktype.CheckSlice("Column", "postfilter_slice", required=False),
-        "title":            stagg.checktype.CheckString("Column", "title", required=False),
-        "metadata":         stagg.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
-        "decoration":       stagg.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
+        "identifier":       aghast.checktype.CheckKey("Column", "identifier", required=True, type=str),
+        "dtype":            aghast.checktype.CheckEnum("Column", "dtype", required=True, choices=Interpretation.dtypes),
+        "endianness":       aghast.checktype.CheckEnum("Column", "endianness", required=False, choices=Interpretation.endiannesses),
+        "filters":          aghast.checktype.CheckVector("Column", "filters", required=False, type=Buffer.filters),
+        "postfilter_slice": aghast.checktype.CheckSlice("Column", "postfilter_slice", required=False),
+        "title":            aghast.checktype.CheckString("Column", "title", required=False),
+        "metadata":         aghast.checktype.CheckClass("Column", "metadata", required=False, type=Metadata),
+        "decoration":       aghast.checktype.CheckClass("Column", "decoration", required=False, type=Decoration),
         }
 
     identifier       = typedproperty(_params["identifier"])
@@ -6294,27 +6294,27 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
         if len(self.filters) == 0:
             filters = None
         else:
-            stagg.stagg_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
+            aghast.aghast_generated.Column.ColumnStartFiltersVector(builder, len(self.filters))
             for x in self.filters[::-1]:
                 builder.PrependUint32(x.value)
             filters = builder.EndVector(len(self.filters))
 
-        stagg.stagg_generated.Column.ColumnStart(builder)
-        stagg.stagg_generated.Column.ColumnAddIdentifier(builder, identifier)
-        stagg.stagg_generated.Column.ColumnAddDtype(builder, self.dtype.value)
+        aghast.aghast_generated.Column.ColumnStart(builder)
+        aghast.aghast_generated.Column.ColumnAddIdentifier(builder, identifier)
+        aghast.aghast_generated.Column.ColumnAddDtype(builder, self.dtype.value)
         if self.endianness != InterpretedBuffer.little_endian:
-            stagg.stagg_generated.Column.ColumnAddEndianness(builder, self.endianness.value)
+            aghast.aghast_generated.Column.ColumnAddEndianness(builder, self.endianness.value)
         if filters is not None:
-            stagg.stagg_generated.Column.ColumnAddFilters(builder, self.filters)
+            aghast.aghast_generated.Column.ColumnAddFilters(builder, self.filters)
         if self.postfilter_slice is not None:
-            stagg.stagg_generated.Column.ColumnAddPostfilterSlice(builder, stagg.stagg_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
+            aghast.aghast_generated.Column.ColumnAddPostfilterSlice(builder, aghast.aghast_generated.Slice.CreateSlice(builder, self.postfilter_slice.start, self.postfilter_slice.stop, self.postfilter_slice.step, self.postfilter_slice.hasStart, self.postfilter_slice.hasStop, self.postfilter_slice.hasStep))
         if title is not None:
-            stagg.stagg_generated.Column.ColumnAddTitle(builder, title)
+            aghast.aghast_generated.Column.ColumnAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Column.ColumnAddMetadata(builder, metadata)
+            aghast.aghast_generated.Column.ColumnAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Column.ColumnAddDecoration(builder, decoration)
-        return stagg.stagg_generated.Column.ColumnEnd(builder)
+            aghast.aghast_generated.Column.ColumnAddDecoration(builder, decoration)
+        return aghast.aghast_generated.Column.ColumnEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["identifier={0}".format(_dumpstring(self.identifier)), "dtype={0}".format(repr(self.dtype))]
@@ -6338,10 +6338,10 @@ The *title*, *metadata*, and *decoration* properties have no semantic constraint
 
 ################################################# NtupleInstance
 
-class NtupleInstance(Stagg):
+class NtupleInstance(Ghast):
     _params = {
-        "chunks":        stagg.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
-        "chunk_offsets": stagg.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
+        "chunks":        aghast.checktype.CheckVector("NtupleInstance", "chunks", required=True, type=Chunk),
+        "chunk_offsets": aghast.checktype.CheckVector("NtupleInstance", "chunk_offsets", required=False, type=int),
         }
 
     chunks        = typedproperty(_params["chunks"])
@@ -6416,7 +6416,7 @@ Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets
     def _toflatbuffers(self, builder):
         chunks = [x._toflatbuffers(builder) for x in self.chunks]
 
-        stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
+        aghast.aghast_generated.NtupleInstance.NtupleInstanceStartChunksVector(builder, len(chunks))
         for x in chunks[::-1]:
             builder.PrependUOffsetTRelative(x)
         chunks = builder.EndVector(len(chunks))
@@ -6425,16 +6425,16 @@ Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets
             chunk_offsets = None
         else:
             chunkoffsetsbuf = self.chunk_offsets.tostring()
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
+            aghast.aghast_generated.NtupleInstance.NtupleInstanceStartChunkOffsetsVector(builder, len(self.chunk_offsets))
             builder.head = builder.head - len(chunkoffsetsbuf)
             builder.Bytes[builder.head : builder.head + len(chunkoffsetsbuf)] = chunkoffsetsbuf
             chunk_offsets = builder.EndVector(len(self.chunk_offsets))
 
-        stagg.stagg_generated.NtupleInstance.NtupleInstanceStart(builder)
-        stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
+        aghast.aghast_generated.NtupleInstance.NtupleInstanceStart(builder)
+        aghast.aghast_generated.NtupleInstance.NtupleInstanceAddChunks(builder, chunks)
         if chunk_offsets is not None:
-            stagg.stagg_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
-        return stagg.stagg_generated.NtupleInstance.NtupleInstanceEnd(builder)
+            aghast.aghast_generated.NtupleInstance.NtupleInstanceAddChunkOffsets(builder, chunk_offsets)
+        return aghast.aghast_generated.NtupleInstance.NtupleInstanceEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["chunks=[" + _dumpeq(_dumplist([x._dump(indent + "    ", width, end) for x in self.chunks], indent, width, end), indent, end) + "]"]
@@ -6446,15 +6446,15 @@ Optionally, the entry ranges for each chunk can be expressed in a *chunk_offsets
 
 class Ntuple(Object):
     _params = {
-        "columns":            stagg.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
-        "instances":          stagg.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
-        "column_statistics":  stagg.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
-        "column_covariances": stagg.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
-        "functions":          stagg.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
-        "title":              stagg.checktype.CheckString("Ntuple", "title", required=False),
-        "metadata":           stagg.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
-        "decoration":         stagg.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
-        "script":             stagg.checktype.CheckString("Ntuple", "script", required=False),
+        "columns":            aghast.checktype.CheckVector("Ntuple", "columns", required=True, type=Column, minlen=1),
+        "instances":          aghast.checktype.CheckVector("Ntuple", "instances", required=True, type=NtupleInstance, minlen=1),
+        "column_statistics":  aghast.checktype.CheckVector("Ntuple", "column_statistics", required=False, type=Statistics),
+        "column_covariances": aghast.checktype.CheckVector("Ntuple", "column_covariances", required=False, type=Covariance),
+        "functions":          aghast.checktype.CheckLookup("Ntuple", "functions", required=False, type=FunctionObject),
+        "title":              aghast.checktype.CheckString("Ntuple", "title", required=False),
+        "metadata":           aghast.checktype.CheckClass("Ntuple", "metadata", required=False, type=Metadata),
+        "decoration":         aghast.checktype.CheckClass("Ntuple", "decoration", required=False, type=Decoration),
+        "script":             aghast.checktype.CheckString("Ntuple", "script", required=False),
         }
 
     columns            = typedproperty(_params["columns"])
@@ -6545,65 +6545,65 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         title = None if self.title is None else builder.CreateString(self.title.encode("utf-8"))
         columns = [x._toflatbuffers(builder) for x in self.columns]
 
-        stagg.stagg_generated.Ntuple.NtupleStartColumnsVector(builder, len(columns))
+        aghast.aghast_generated.Ntuple.NtupleStartColumnsVector(builder, len(columns))
         for x in columns[::-1]:
             builder.PrependUOffsetTRelative(x)
         columns = builder.EndVector(len(columns))
 
-        stagg.stagg_generated.Ntuple.NtupleStartInstancesVector(builder, len(instances))
+        aghast.aghast_generated.Ntuple.NtupleStartInstancesVector(builder, len(instances))
         for x in instances[::-1]:
             builder.PrependUOffsetTRelative(x)
         instances = builder.EndVector(len(instances))
 
         if functions is not None:
-            stagg.stagg_generated.Ntuple.NtupleStartFunctionsVector(builder, len(functions))
+            aghast.aghast_generated.Ntuple.NtupleStartFunctionsVector(builder, len(functions))
             for x in functions[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions = builder.EndVector(len(functions))
 
         functions_lookup = None if len(self.functions) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.functions.keys()]
         if functions_lookup is not None:
-            stagg.stagg_generated.Ntuple.NtupleStartFunctionsLookupVector(builder, len(functions_lookup))
+            aghast.aghast_generated.Ntuple.NtupleStartFunctionsLookupVector(builder, len(functions_lookup))
             for x in functions_lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             functions_lookup = builder.EndVector(len(functions_lookup))
 
         if column_statistics is not None:
-            stagg.stagg_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
+            aghast.aghast_generated.Ntuple.NtupleStartColumnStatisticsVector(builder, len(column_statistics))
             for x in column_statistics[::-1]:
                 builder.PrependUOffsetTRelative(x)
             column_statistics = builder.EndVector(len(column_statistics))
 
         if column_covariances is not None:
-            stagg.stagg_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
+            aghast.aghast_generated.Ntuple.NtupleStartColumnCovariancesVector(builder, len(column_covariances))
             for x in column_covariances[::-1]:
                 builder.PrependUOffsetTRelative(x)
             column_covariances = builder.EndVector(len(column_covariances))
 
-        stagg.stagg_generated.Ntuple.NtupleStart(builder)
-        stagg.stagg_generated.Ntuple.NtupleAddColumns(builder, columns)
-        stagg.stagg_generated.Ntuple.NtupleAddInstances(builder, instances)
+        aghast.aghast_generated.Ntuple.NtupleStart(builder)
+        aghast.aghast_generated.Ntuple.NtupleAddColumns(builder, columns)
+        aghast.aghast_generated.Ntuple.NtupleAddInstances(builder, instances)
         if column_statistics is not None:
-            stagg.stagg_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
+            aghast.aghast_generated.Ntuple.NtupleAddColumnStatistics(builder, column_statistics)
         if column_covariances is not None:
-            stagg.stagg_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
+            aghast.aghast_generated.Ntuple.NtupleAddColumnCovariances(builder, column_covariances)
         if functions is not None:
-            stagg.stagg_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
-            stagg.stagg_generated.Ntuple.NtupleAddFunctions(builder, functions)
-        data = stagg.stagg_generated.Ntuple.NtupleEnd(builder)
+            aghast.aghast_generated.Ntuple.NtupleAddFunctionsLookup(builder, functions_lookup)
+            aghast.aghast_generated.Ntuple.NtupleAddFunctions(builder, functions)
+        data = aghast.aghast_generated.Ntuple.NtupleEnd(builder)
 
-        stagg.stagg_generated.Object.ObjectStart(builder)
-        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Ntuple)
-        stagg.stagg_generated.Object.ObjectAddData(builder, data)
+        aghast.aghast_generated.Object.ObjectStart(builder)
+        aghast.aghast_generated.Object.ObjectAddDataType(builder, aghast.aghast_generated.ObjectData.ObjectData.Ntuple)
+        aghast.aghast_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
+            aghast.aghast_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
+            aghast.aghast_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
+            aghast.aghast_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
-        return stagg.stagg_generated.Object.ObjectEnd(builder)
+            aghast.aghast_generated.Object.ObjectAddScript(builder, script)
+        return aghast.aghast_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
         args = ["columns=[" + _dumpeq(_dumplist(x._dump(indent + "    ", width, end) for x in self.columns), indent, end) + "]", "instances=[" + _dumpeq(_dumplist(x._dump(indent + "    ", width, end) for x in self.instances), indent, end) + "]"]
@@ -6630,12 +6630,12 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
 
 class Collection(Object):
     _params = {
-        "objects":    stagg.checktype.CheckLookup("Collection", "objects", required=False, type=Object),
-        "axis":       stagg.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
-        "title":      stagg.checktype.CheckString("Collection", "title", required=False),
-        "metadata":   stagg.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
-        "decoration": stagg.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
-        "script":     stagg.checktype.CheckString("Collection", "script", required=False),
+        "objects":    aghast.checktype.CheckLookup("Collection", "objects", required=False, type=Object),
+        "axis":       aghast.checktype.CheckVector("Collection", "axis", required=False, type=Axis),
+        "title":      aghast.checktype.CheckString("Collection", "title", required=False),
+        "metadata":   aghast.checktype.CheckClass("Collection", "metadata", required=False, type=Metadata),
+        "decoration": aghast.checktype.CheckClass("Collection", "decoration", required=False, type=Decoration),
+        "script":     aghast.checktype.CheckString("Collection", "script", required=False),
         }
 
     objects        = typedproperty(_params["objects"])
@@ -6718,44 +6718,44 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
         axis = None if len(self.axis) == 0 else [x._toflatbuffers(builder) for x in self.axis]
 
         if axis is not None:
-            stagg.stagg_generated.Collection.CollectionStartAxisVector(builder, len(axis))
+            aghast.aghast_generated.Collection.CollectionStartAxisVector(builder, len(axis))
             for x in axis[::-1]:
                 builder.PrependUOffsetTRelative(x)
             axis = builder.EndVector(len(axis))
 
         if objects is not None:
-            stagg.stagg_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
+            aghast.aghast_generated.Collection.CollectionStartObjectsVector(builder, len(objects))
             for x in objects[::-1]:
                 builder.PrependUOffsetTRelative(x)
             objects = builder.EndVector(len(objects))
 
         lookup = None if len(self.objects) == 0 else [builder.CreateString(n.encode("utf-8")) for n in self.objects.keys()]
         if lookup is not None:
-            stagg.stagg_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
+            aghast.aghast_generated.Collection.CollectionStartLookupVector(builder, len(lookup))
             for x in lookup[::-1]:
                 builder.PrependUOffsetTRelative(x)
             lookup = builder.EndVector(len(lookup))
 
-        stagg.stagg_generated.Collection.CollectionStart(builder)
+        aghast.aghast_generated.Collection.CollectionStart(builder)
         if objects is not None:
-            stagg.stagg_generated.Collection.CollectionAddLookup(builder, lookup)
-            stagg.stagg_generated.Collection.CollectionAddObjects(builder, objects)
+            aghast.aghast_generated.Collection.CollectionAddLookup(builder, lookup)
+            aghast.aghast_generated.Collection.CollectionAddObjects(builder, objects)
         if axis is not None:
-            stagg.stagg_generated.Collection.CollectionAddAxis(builder, axis)
-        data = stagg.stagg_generated.Collection.CollectionEnd(builder)
+            aghast.aghast_generated.Collection.CollectionAddAxis(builder, axis)
+        data = aghast.aghast_generated.Collection.CollectionEnd(builder)
 
-        stagg.stagg_generated.Object.ObjectStart(builder)
-        stagg.stagg_generated.Object.ObjectAddDataType(builder, stagg.stagg_generated.ObjectData.ObjectData.Collection)
-        stagg.stagg_generated.Object.ObjectAddData(builder, data)
+        aghast.aghast_generated.Object.ObjectStart(builder)
+        aghast.aghast_generated.Object.ObjectAddDataType(builder, aghast.aghast_generated.ObjectData.ObjectData.Collection)
+        aghast.aghast_generated.Object.ObjectAddData(builder, data)
         if title is not None:
-            stagg.stagg_generated.Object.ObjectAddTitle(builder, title)
+            aghast.aghast_generated.Object.ObjectAddTitle(builder, title)
         if metadata is not None:
-            stagg.stagg_generated.Object.ObjectAddMetadata(builder, metadata)
+            aghast.aghast_generated.Object.ObjectAddMetadata(builder, metadata)
         if decoration is not None:
-            stagg.stagg_generated.Object.ObjectAddDecoration(builder, decoration)
+            aghast.aghast_generated.Object.ObjectAddDecoration(builder, decoration)
         if script is not None:
-            stagg.stagg_generated.Object.ObjectAddScript(builder, script)
-        return stagg.stagg_generated.Object.ObjectEnd(builder)
+            aghast.aghast_generated.Object.ObjectAddScript(builder, script)
+        return aghast.aghast_generated.Object.ObjectEnd(builder)
 
     def _dump(self, indent, width, end):
         args = []
@@ -6820,55 +6820,55 @@ The *title*, *metadata*, *decoration*, and *script* properties have no semantic 
             axis.binning = binning
 
 _RawBuffer_lookup = {
-    stagg.stagg_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, stagg.stagg_generated.RawInlineBuffer.RawInlineBuffer),
-    stagg.stagg_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, stagg.stagg_generated.RawExternalBuffer.RawExternalBuffer),
+    aghast.aghast_generated.RawBuffer.RawBuffer.RawInlineBuffer: (RawInlineBuffer, aghast.aghast_generated.RawInlineBuffer.RawInlineBuffer),
+    aghast.aghast_generated.RawBuffer.RawBuffer.RawExternalBuffer: (RawExternalBuffer, aghast.aghast_generated.RawExternalBuffer.RawExternalBuffer),
     }
 _RawBuffer_invlookup = {x[0]: n for n, x in _RawBuffer_lookup.items()}
 
 _InterpretedBuffer_lookup = {
-    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, stagg.stagg_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
-    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineInt64Buffer: (InterpretedInlineInt64Buffer, stagg.stagg_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64Buffer),
-    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineFloat64Buffer: (InterpretedInlineFloat64Buffer, stagg.stagg_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64Buffer),
-    stagg.stagg_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, stagg.stagg_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
+    aghast.aghast_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineBuffer: (InterpretedInlineBuffer, aghast.aghast_generated.InterpretedInlineBuffer.InterpretedInlineBuffer),
+    aghast.aghast_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineInt64Buffer: (InterpretedInlineInt64Buffer, aghast.aghast_generated.InterpretedInlineInt64Buffer.InterpretedInlineInt64Buffer),
+    aghast.aghast_generated.InterpretedBuffer.InterpretedBuffer.InterpretedInlineFloat64Buffer: (InterpretedInlineFloat64Buffer, aghast.aghast_generated.InterpretedInlineFloat64Buffer.InterpretedInlineFloat64Buffer),
+    aghast.aghast_generated.InterpretedBuffer.InterpretedBuffer.InterpretedExternalBuffer: (InterpretedExternalBuffer, aghast.aghast_generated.InterpretedExternalBuffer.InterpretedExternalBuffer),
     }
 _InterpretedBuffer_invlookup = {x[0]: n for n, x in _InterpretedBuffer_lookup.items()}
 
 _ObjectData_lookup = {
-    stagg.stagg_generated.ObjectData.ObjectData.Histogram: (Histogram, stagg.stagg_generated.Histogram.Histogram),
-    stagg.stagg_generated.ObjectData.ObjectData.Ntuple: (Ntuple, stagg.stagg_generated.Ntuple.Ntuple),
-    stagg.stagg_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, stagg.stagg_generated.FunctionObject.FunctionObject),
-    stagg.stagg_generated.ObjectData.ObjectData.Collection: (Collection, stagg.stagg_generated.Collection.Collection),
+    aghast.aghast_generated.ObjectData.ObjectData.Histogram: (Histogram, aghast.aghast_generated.Histogram.Histogram),
+    aghast.aghast_generated.ObjectData.ObjectData.Ntuple: (Ntuple, aghast.aghast_generated.Ntuple.Ntuple),
+    aghast.aghast_generated.ObjectData.ObjectData.FunctionObject: (FunctionObject, aghast.aghast_generated.FunctionObject.FunctionObject),
+    aghast.aghast_generated.ObjectData.ObjectData.Collection: (Collection, aghast.aghast_generated.Collection.Collection),
     }
 _ObjectData_invlookup = {x[0]: n for n, x in _ObjectData_lookup.items()}
 
 _FunctionObjectData_lookup = {
-    stagg.stagg_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, stagg.stagg_generated.ParameterizedFunction.ParameterizedFunction),
-    stagg.stagg_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, stagg.stagg_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
+    aghast.aghast_generated.FunctionObjectData.FunctionObjectData.ParameterizedFunction: (ParameterizedFunction, aghast.aghast_generated.ParameterizedFunction.ParameterizedFunction),
+    aghast.aghast_generated.FunctionObjectData.FunctionObjectData.BinnedEvaluatedFunction: (BinnedEvaluatedFunction, aghast.aghast_generated.BinnedEvaluatedFunction.BinnedEvaluatedFunction),
     }
 _FunctionObjectData_invlookup = {x[0]: n for n, x in _FunctionObjectData_lookup.items()}
 
 _FunctionData_lookup = {
-    stagg.stagg_generated.FunctionData.FunctionData.ParameterizedFunction: (ParameterizedFunction, stagg.stagg_generated.ParameterizedFunction.ParameterizedFunction),
-    stagg.stagg_generated.FunctionData.FunctionData.EvaluatedFunction: (EvaluatedFunction, stagg.stagg_generated.EvaluatedFunction.EvaluatedFunction),
+    aghast.aghast_generated.FunctionData.FunctionData.ParameterizedFunction: (ParameterizedFunction, aghast.aghast_generated.ParameterizedFunction.ParameterizedFunction),
+    aghast.aghast_generated.FunctionData.FunctionData.EvaluatedFunction: (EvaluatedFunction, aghast.aghast_generated.EvaluatedFunction.EvaluatedFunction),
     }
 _FunctionData_invlookup = {x[0]: n for n, x in _FunctionData_lookup.items()}
 
 _Binning_lookup = {
-    stagg.stagg_generated.Binning.Binning.IntegerBinning: (IntegerBinning, stagg.stagg_generated.IntegerBinning.IntegerBinning),
-    stagg.stagg_generated.Binning.Binning.RegularBinning: (RegularBinning, stagg.stagg_generated.RegularBinning.RegularBinning),
-    stagg.stagg_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, stagg.stagg_generated.HexagonalBinning.HexagonalBinning),
-    stagg.stagg_generated.Binning.Binning.EdgesBinning: (EdgesBinning, stagg.stagg_generated.EdgesBinning.EdgesBinning),
-    stagg.stagg_generated.Binning.Binning.IrregularBinning: (IrregularBinning, stagg.stagg_generated.IrregularBinning.IrregularBinning),
-    stagg.stagg_generated.Binning.Binning.CategoryBinning: (CategoryBinning, stagg.stagg_generated.CategoryBinning.CategoryBinning),
-    stagg.stagg_generated.Binning.Binning.SparseRegularBinning: (SparseRegularBinning, stagg.stagg_generated.SparseRegularBinning.SparseRegularBinning),
-    stagg.stagg_generated.Binning.Binning.FractionBinning: (FractionBinning, stagg.stagg_generated.FractionBinning.FractionBinning),
-    stagg.stagg_generated.Binning.Binning.PredicateBinning: (PredicateBinning, stagg.stagg_generated.PredicateBinning.PredicateBinning),
-    stagg.stagg_generated.Binning.Binning.VariationBinning: (VariationBinning, stagg.stagg_generated.VariationBinning.VariationBinning),
+    aghast.aghast_generated.Binning.Binning.IntegerBinning: (IntegerBinning, aghast.aghast_generated.IntegerBinning.IntegerBinning),
+    aghast.aghast_generated.Binning.Binning.RegularBinning: (RegularBinning, aghast.aghast_generated.RegularBinning.RegularBinning),
+    aghast.aghast_generated.Binning.Binning.HexagonalBinning: (HexagonalBinning, aghast.aghast_generated.HexagonalBinning.HexagonalBinning),
+    aghast.aghast_generated.Binning.Binning.EdgesBinning: (EdgesBinning, aghast.aghast_generated.EdgesBinning.EdgesBinning),
+    aghast.aghast_generated.Binning.Binning.IrregularBinning: (IrregularBinning, aghast.aghast_generated.IrregularBinning.IrregularBinning),
+    aghast.aghast_generated.Binning.Binning.CategoryBinning: (CategoryBinning, aghast.aghast_generated.CategoryBinning.CategoryBinning),
+    aghast.aghast_generated.Binning.Binning.SparseRegularBinning: (SparseRegularBinning, aghast.aghast_generated.SparseRegularBinning.SparseRegularBinning),
+    aghast.aghast_generated.Binning.Binning.FractionBinning: (FractionBinning, aghast.aghast_generated.FractionBinning.FractionBinning),
+    aghast.aghast_generated.Binning.Binning.PredicateBinning: (PredicateBinning, aghast.aghast_generated.PredicateBinning.PredicateBinning),
+    aghast.aghast_generated.Binning.Binning.VariationBinning: (VariationBinning, aghast.aghast_generated.VariationBinning.VariationBinning),
     }
 _Binning_invlookup = {x[0]: n for n, x in _Binning_lookup.items()}
     
 _Counts_lookup = {
-    stagg.stagg_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, stagg.stagg_generated.UnweightedCounts.UnweightedCounts),
-    stagg.stagg_generated.Counts.Counts.WeightedCounts: (WeightedCounts, stagg.stagg_generated.WeightedCounts.WeightedCounts),
+    aghast.aghast_generated.Counts.Counts.UnweightedCounts: (UnweightedCounts, aghast.aghast_generated.UnweightedCounts.UnweightedCounts),
+    aghast.aghast_generated.Counts.Counts.WeightedCounts: (WeightedCounts, aghast.aghast_generated.WeightedCounts.WeightedCounts),
     }
 _Counts_invlookup = {x[0]: n for n, x in _Counts_lookup.items()}

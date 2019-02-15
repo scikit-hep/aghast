@@ -1,4 +1,4 @@
-namespace stagg_generated;
+namespace aghast_generated;
 
 ///////////////////////////////////////////////// metadata
 
@@ -519,6 +519,6 @@ table Object {
   script: string;
 }
 
-file_extension "stagg";
-file_identifier "StAg";
+file_extension "agh";
+file_identifier "gast";
 root_type Object;

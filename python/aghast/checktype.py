@@ -43,9 +43,9 @@ except ImportError:
 import numpy
 
 def setparent(parent, value):
-    import stagg.interface
+    import aghast.interface
 
-    if isinstance(value, stagg.interface.Stagg):
+    if isinstance(value, aghast.interface.Ghast):
         if getattr(value, "_parent", parent) is not parent:
             raise ValueError("already attached to another hierarchy: {0}".format(repr(value)))
         else:
@@ -88,8 +88,8 @@ class Vector(Sequence):
         return self._data[where]
 
     def _detached(self, top):
-        import stagg.interface
-        return Vector([x if not isinstance(x, stagg.interface.Stagg) else x._detached(False) for x in self])
+        import aghast.interface
+        return Vector([x if not isinstance(x, aghast.interface.Ghast) else x._detached(False) for x in self])
 
     def __repr__(self):
         tmp = [repr(x) for x in self]
@@ -135,13 +135,13 @@ class FBVector(Vector):
 
 class Lookup(Mapping):
     def __init__(self, data):
-        import stagg.interface
+        import aghast.interface
         if data is None:
             self._data = collections.OrderedDict()
         else:
             self._data = collections.OrderedDict(data)
         for n, x in self._data.items():
-            if isinstance(x, stagg.interface.Stagg) and not hasattr(x, "_parent"):
+            if isinstance(x, aghast.interface.Ghast) and not hasattr(x, "_parent"):
                 x._identifier = n
 
     def __len__(self):
@@ -154,8 +154,8 @@ class Lookup(Mapping):
         return iter(self._data)
 
     def _detached(self, top):
-        import stagg.interface
-        return Lookup({n: x if not isinstance(x, stagg.interface.Stagg) else x._detached(False) for n, x in self.items()})
+        import aghast.interface
+        return Lookup({n: x if not isinstance(x, aghast.interface.Ghast) else x._detached(False) for n, x in self.items()})
 
     def __repr__(self):
         tmp = [repr(n) + ": " + repr(x) for n, x in self.items()]
@@ -198,13 +198,13 @@ class FBLookup(Lookup):
         return iter(self._lookup)
 
     def __getitem__(self, where):
-        import stagg.interface
+        import aghast.interface
 
         item = self._got.get(where, None)
         if item is None:
             item = self._check.fromflatbuffers(self._get(self._lookup[where]))
             self._got[where] = item
-            if isinstance(item, stagg.interface.Stagg):
+            if isinstance(item, aghast.interface.Ghast):
                 item._identifier = where
             setparent(self._parent, item)
         return item

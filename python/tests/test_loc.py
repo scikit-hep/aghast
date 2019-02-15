@@ -32,7 +32,7 @@ import unittest
 
 import numpy
 
-from stagg import *
+from aghast import *
 
 class Test(unittest.TestCase):
     def runTest(self):

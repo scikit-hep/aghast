@@ -30,8 +30,8 @@
 
 import numpy
 
-from stagg import *
-import stagg.interface
+from aghast import *
+import aghast.interface
 
 def binning2array(binning):
     if not isinstance(binning, EdgesBinning):
@@ -95,7 +95,7 @@ def array2binning(array):
     else:
         return EdgesBinning(array)
 
-def tostagg(obj):
+def fromnumpy(obj):
     if isinstance(obj, tuple) and len(obj) == 2 and isinstance(obj[0], numpy.ndarray) and isinstance(obj[1], numpy.ndarray):
         counts, edges = obj
         return Histogram([Axis(array2binning(edges))], array2counts(counts))

@@ -34,7 +34,7 @@ try:
 except ImportError:
     raise ImportError("\n\nInstall ROOT package with:\n\n    conda install -c conda-forge root")
 
-from stagg import *
+from aghast import *
 
 def getbincontents(obj):
     if isinstance(obj, (ROOT.TH1C, ROOT.TH2C, ROOT.TH3C)):
@@ -286,7 +286,7 @@ def toroot(obj, name):
     else:
         raise TypeError("cannot convert {0}".format(type(obj)))
 
-def tostagg(obj, collection=False):
+def fromroot(obj, collection=False):
     if isinstance(obj, ROOT.TH1):
         if isinstance(obj, ROOT.TProfile):
             raise NotImplementedError

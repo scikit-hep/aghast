@@ -38,7 +38,7 @@ try:
 except ImportError:
     raise ImportError("Install pandas package with:\n    pip install pandas\nor\n    conda install pandas")
 
-from stagg import *
+from aghast import *
 
 def binning2index(binning):
     if binning is None:
@@ -324,7 +324,7 @@ def index2binning(index):
     else:
         return CategoryBinning([str(x) for x in index])
 
-def tostagg(obj):
+def frompandas(obj):
     if ((isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns) and ("unweighted" in obj["counts"].columns or "sumw" in obj["counts"].columns or "sumw2" in obj["counts"].columns)) or ("unweighted" in obj.columns or "sumw" in obj.columns or "sumw2" in obj.columns):
         # this is a histogram; make the data dense in the Cartesian grid
         unstacked = obj.unstack()

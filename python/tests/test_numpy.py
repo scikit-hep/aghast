@@ -32,8 +32,8 @@ import unittest
 
 import numpy
 
-from stagg import *
-import stagg.connect.numpy as connect_numpy
+from aghast import *
+import aghast.connect.numpy as connect_numpy
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -41,20 +41,20 @@ class Test(unittest.TestCase):
 
     def test_numpy1d(self):
         before = numpy.histogram(numpy.random.normal(0, 1, int(1e6)), bins=100, range=(-5, 5))
-        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        after = connect_numpy.tonumpy(connect_numpy.fromnumpy(before))
         assert numpy.array_equal(before[0], after[0])
         assert numpy.array_equal(before[1], after[1])
 
     def test_numpy2d(self):
         before = numpy.histogram2d(x=numpy.random.normal(0, 1, int(1e6)), y=numpy.random.normal(0, 1, int(1e6)), bins=(10, 10), range=((-5, 5), (-5, 5)))
-        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        after = connect_numpy.tonumpy(connect_numpy.fromnumpy(before))
         assert numpy.array_equal(before[0], after[0])
         assert numpy.array_equal(before[1], after[1])
         assert numpy.array_equal(before[2], after[2])
 
     def test_numpydd(self):
         before = numpy.histogramdd((numpy.random.normal(0, 1, int(1e6)), numpy.random.normal(0, 1, int(1e6)), numpy.random.normal(0, 1, int(1e6))), bins=(5, 5, 5), range=((-5, 5), (-5, 5), (-5, 5)))
-        after = connect_numpy.tonumpy(connect_numpy.tostagg(before))
+        after = connect_numpy.tonumpy(connect_numpy.fromnumpy(before))
         assert numpy.array_equal(before[0], after[0])
         assert numpy.array_equal(before[1][0], after[1][0])
         assert numpy.array_equal(before[1][1], after[1][1])

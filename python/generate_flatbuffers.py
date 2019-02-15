@@ -32,13 +32,13 @@ import os
 import shutil
 
 if __name__ == "__main__":
-    if os.path.exists(os.path.join("stagg", "stagg_generated")):
-        shutil.rmtree(os.path.join("stagg", "stagg_generated"))
+    if os.path.exists(os.path.join("aghast", "aghast_generated")):
+        shutil.rmtree(os.path.join("aghast", "aghast_generated"))
 
-    os.chdir("stagg")
-    os.system("flatc --python ../../flatbuffers/stagg.fbs")
+    os.chdir("aghast")
+    os.system("flatc --python ../../flatbuffers/aghast.fbs")
 
-    with open(os.path.join("stagg_generated", "StatisticFilter.py")) as f:
+    with open(os.path.join("aghast_generated", "StatisticFilter.py")) as f:
         tmp = f.read().replace("inf.0", "float('inf')")
-    with open(os.path.join("stagg_generated", "StatisticFilter.py"), "w") as f:
+    with open(os.path.join("aghast_generated", "StatisticFilter.py"), "w") as f:
         f.write(tmp)

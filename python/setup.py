@@ -35,10 +35,10 @@ from setuptools import setup
 
 def get_version():
     g = {}
-    exec(open(os.path.join("stagg", "version.py")).read(), g)
+    exec(open(os.path.join("aghast", "version.py")).read(), g)
     return g["__version__"]
 
-setup(name = "stagg",
+setup(name = "aghast",
       version = get_version(),
       packages = find_packages(exclude = ["tests"]),
       scripts = [],
@@ -49,8 +49,8 @@ setup(name = "stagg",
       author_email = "pivarski@princeton.edu",
       maintainer = "Jim Pivarski (IRIS-HEP)",
       maintainer_email = "pivarski@princeton.edu",
-      url = "https://github.com/diana-hep/stagg",
-      download_url = "https://github.com/diana-hep/stagg/releases",
+      url = "https://github.com/diana-hep/aghast",
+      download_url = "https://github.com/diana-hep/aghast/releases",
       license = "BSD 3-clause",
       test_suite = "tests",
       install_requires = ["flatbuffers>=1.8.0", "numpy"],
