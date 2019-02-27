@@ -14,6 +14,17 @@ Furthermore, aghast is a [Flatbuffers](http://google.github.io/flatbuffers/) sch
 
 Not on PyPI yet. For now, you have to clone this GitHub repository.
 
+```bash
+conda install numpy                         # unless you've already installed Numpy another way
+conda install -c conda-forge flatbuffers    # for the flatc code generator (unless already installed)
+pip install flatbuffers                     # for the flatbuffers Python runtime
+cd python                                   # only implementation so far is in Python
+./generate_flatbuffers.py                   # use flatc to generate some of the code
+python setup.py install                     # if you want to use it outside of this directory
+```
+
+Now you should be able to `import aghast` or `from aghast import *` in Python.
+
 ## Documentation
 
 Suite of examples as a Jupyter notebook:
