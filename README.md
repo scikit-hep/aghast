@@ -1,6 +1,6 @@
 # Aghast
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diana-hep/aghast/binder-2?filepath=binder%2Fexamples.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diana-hep/aghast/binder-3?filepath=binder%2Fexamples.ipynb)
 
 Aghast is a histogramming library that does not fill histograms and does not plot them. Its role is behind the scenes, to provide better communication between histogramming libraries.
 
@@ -19,7 +19,7 @@ Not on PyPI yet. For now, you have to clone this GitHub repository.
 Suite of examples as a Jupyter notebook:
 
    * [in GitHub](binder/examples.ipynb)
-   * [on Binder](https://mybinder.org/v2/gh/diana-hep/aghast/binder-2?filepath=binder%2Fexamples.ipynb)
+   * [on Binder](https://mybinder.org/v2/gh/diana-hep/aghast/binder-3?filepath=binder%2Fexamples.ipynb)
 
 Full specification:
 
