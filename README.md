@@ -1,6 +1,6 @@
 ![](docs/source/logo-300px.png)
 
-# Aghast
+# aghast
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diana-hep/aghast/binder-3?filepath=binder%2Fexamples.ipynb)
 
