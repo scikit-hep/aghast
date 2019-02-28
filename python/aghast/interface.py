@@ -125,11 +125,11 @@ def _sameedges(one, two):
     if len(one) != len(two):
         return False
     if len(one) == 1:
-        return one[0] - two[0] < 1e-10
+        return one[0] - two[0] < 1e-6
     gap = min((one[1:] - one[:-1]).min(), (two[1:] - two[:-1]).min())
     if gap <= 0:
         return False
-    return (numpy.absolute(one - two) / gap < 1e-10).all()
+    return (numpy.absolute(one - two) / gap < 1e-6).all()
 
 def _name2fb(name):
     return "".join(x.capitalize() for x in name.split("_"))
