@@ -110,3 +110,8 @@ def test_root_oned(cls):
     for x in data: before.Fill(x)
     after = connect_root.toroot(connect_root.fromroot(before), rootname())
     check1d(before, after)
+
+@pytest.mark.parametrize("cls", [TH2D])   # [ROOT.TH2C, ROOT.TH2S, ROOT.TH2I, ROOT.TH2F, ROOT.TH2D])
+def test_root_twod(cls):
+    before = cls(rootname(), "title", 5, -2.0, 2.0, 6, -3.0, 3.0)
+    # test driven development: make examples here of what you want to convert and then fill in the code that does it
