@@ -102,7 +102,7 @@ def fromfnalhist(obj):
 
 def tofnalhist(obj):
     if not isinstance(obj, Histogram):
-        raise TypeError("cannot convert {0} to a Numpy histogram".format(type(obj).__name__))
+        raise TypeError("cannot convert {0} to a fnal_column_analysis_tools histogram".format(type(obj).__name__))
 
     axes = []
     sparse_binning = {}
