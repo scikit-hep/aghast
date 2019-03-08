@@ -37,7 +37,7 @@ except ImportError:
 
 from aghast import *
 
-ovf_convention = lambda: RealOverflow(loc_underflow=BinLocation.below1,
+_ovf_convention = lambda: RealOverflow(loc_underflow=BinLocation.below1,
                                        loc_overflow=BinLocation.above1,
                                        loc_nanflow=BinLocation.above2)
 
@@ -59,12 +59,12 @@ def fromfnalhist(obj):
         elif isinstance(ax, hist.Bin) and ax._uniform:
             axes.append(Axis(RegularBinning(ax._bins,
                             RealInterval(ax._lo, ax._hi),
-                            overflow=ovf_convention()
+                            overflow=_ovf_convention()
                             ), expression=ax.name, title=ax.label))
             expanded_shape.append(ax.size)
         elif isinstance(ax, hist.Bin) and not ax._uniform:
             axes.append(Axis(EdgesBinning(ax._bins[:-1],
-                                        overflow=ovf_convention()
+                                        overflow=_ovf_convention()
                                         ), expression=ax.name, title=ax.label))
             expanded_shape.append(ax.size)
         else:
@@ -123,7 +123,7 @@ def tofnalhist(obj):
         elif isinstance(ax.binning, RegularBinning):
             if not ax.binning.interval.low_inclusive:
                 warnings.warn("fnal_column_analysis_tools hist types do not understand non-low-inclusive binning", RuntimeWarning)
-            if ax.binning.overflow == ovf_convention():
+            if ax.binning.overflow == _ovf_convention():
                 dense_map[i] = slice(None)
                 dense_shape.append(ax.binning.num+3)
             else:
@@ -137,7 +137,7 @@ def tofnalhist(obj):
         elif isinstance(ax.binning, EdgesBinning):
             if not ax.binning.low_inclusive:
                 warnings.warn("fnal_column_analysis_tools hist types do not understand non-low-inclusive binning", RuntimeWarning)
-            if ax.binning.overflow == ovf_convention():
+            if ax.binning.overflow == _ovf_convention():
                 dense_map[i] = slice(None)
                 dense_shape.append(ax.binning.edges.size+2)
             else:
