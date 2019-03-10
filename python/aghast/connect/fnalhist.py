@@ -29,7 +29,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy
-import warnings
 try:
     import fnal_column_analysis_tools.hist as hist
 except ImportError:
@@ -111,18 +110,14 @@ def tofnalhist(obj):
     for i, ax in enumerate(obj.axis):
         if isinstance(ax.binning, CategoryBinning):
             sparse_binning[i] = ax.binning.categories
-            if ax.binning.loc_overflow == BinLocation.below1:
+            if ax.binning.loc_overflow.value < BinLocation.nonexistent.value:
                 sparse_binning[i].insert(0, "")
-            elif ax.binning.loc_overflow == BinLocation.above1:
+            elif ax.binning.loc_overflow.value > BinLocation.nonexistent.value:
                 sparse_binning[i].append("")
-            elif ax.binning.loc_overflow != BinLocation.nonexistent:
-                warnings.warn("why would you have the sole overflow bin not adjacent to normal range?!", RuntimeWarning)
             new_ax = hist.Cat(ax.expression, ax.title)
             new_ax._categories = sparse_binning[i]
             axes.append(new_ax)
         elif isinstance(ax.binning, RegularBinning):
-            if not ax.binning.interval.low_inclusive:
-                warnings.warn("fnal_column_analysis_tools hist types do not understand non-low-inclusive binning", RuntimeWarning)
             if ax.binning.overflow == _ovf_convention():
                 dense_map[i] = slice(None)
                 dense_shape.append(ax.binning.num+3)
@@ -135,8 +130,6 @@ def tofnalhist(obj):
                                  ax.binning.interval.high
                                 ))
         elif isinstance(ax.binning, EdgesBinning):
-            if not ax.binning.low_inclusive:
-                warnings.warn("fnal_column_analysis_tools hist types do not understand non-low-inclusive binning", RuntimeWarning)
             if ax.binning.overflow == _ovf_convention():
                 dense_map[i] = slice(None)
                 dense_shape.append(ax.binning.edges.size+2)
