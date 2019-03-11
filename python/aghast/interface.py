@@ -2061,7 +2061,17 @@ class Binning(Ghast):
             shift = len(BinLocation._belows([(loc_underflow,), (loc_overflow,), (loc_nanflow,)]))
             return (i + shift,)
 
-        else:
+        elif isinstance(where, Iterable):
+            if Ellipsis in where:
+                where = tuple(where)
+                while True:
+                    try:
+                        i = where.index(Ellipsis)
+                    except ValueError:
+                        break
+                    else:
+                        where = where[:i] + tuple(range(length)) + where[i + 1:]
+
             where = numpy.array(where, copy=False)
 
             if len(where.shape) == 1 and issubclass(where.dtype.type, numpy.floating):
@@ -2090,7 +2100,10 @@ class Binning(Ghast):
                 if not okay.all():
                     raise IndexError("forbidden indexes for this {0}: {1}".format(type(self).__name__, ", ".join(set(repr(x) for x in where[~okay]))))
                 mask = numpy.isfinite(where)
-                where = where[mask].astype(numpy.int64)
+                wheremask = where[mask]
+                if (numpy.round(wheremask) != wheremask).any():
+                    raise IndexError("numeric indexes must be integers or ..., -inf, inf, nan")
+                where = wheremask.astype(numpy.int64)
                 index[mask] = numpy.where(where < 0, where + length, where) + shift
                 return (index,)
 
@@ -2112,8 +2125,8 @@ class Binning(Ghast):
                     abovemask = numpy.zeros(shiftabove, dtype=where.dtype)
                     return (numpy.concatenate([belowmask, where, abovemask]),)
 
-            else:
-                raise TypeError("{0} accepts an integer, -inf/inf/nan, an integer/-inf/inf/nan slice (`:`), ellipsis (`...`), projection (`None`), an array of integers/-inf/inf/nan, or an array of booleans, not {1}".format(type(self).__name__, repr(where)))
+        else:
+            raise TypeError("{0} accepts an integer, -inf/inf/nan, an integer/-inf/inf/nan slice (`:`), ellipsis (`...`), projection (`None`), an array of integers/.../-inf/inf/nan (`...` means all non-overflow bins), or an array of booleans, not {1}".format(type(self).__name__, repr(where)))
 
 ################################################# BinLocation
 
