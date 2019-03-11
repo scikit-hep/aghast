@@ -118,11 +118,8 @@ def tofnalhist(obj):
             new_ax._categories = sparse_binning[i]
             axes.append(new_ax)
         elif isinstance(ax.binning, RegularBinning):
-            if ax.binning.overflow == _ovf_convention():
-                dense_map[i] = slice(None)
-                dense_shape.append(ax.binning.num+3)
-            else:
-                raise NotImplementedError("not yet able to import from hist types with alternative overflow conventions")
+            dense_map[i] = [-numpy.inf, ..., numpy.inf, numpy.nan]
+            dense_shape.append(ax.binning.num+3)
             axes.append(hist.Bin(ax.expression,
                                  ax.title,
                                  ax.binning.num,
@@ -130,11 +127,8 @@ def tofnalhist(obj):
                                  ax.binning.interval.high
                                 ))
         elif isinstance(ax.binning, EdgesBinning):
-            if ax.binning.overflow == _ovf_convention():
-                dense_map[i] = slice(None)
-                dense_shape.append(ax.binning.edges.size+2)
-            else:
-                raise NotImplementedError("not yet able to import from hist types with alternative overflow conventions")
+            dense_map[i] = [-numpy.inf, ..., numpy.inf, numpy.nan]
+            dense_shape.append(ax.binning.edges.size+2)
             axes.append(hist.Bin(ax.expression,
                                  ax.title,
                                  ax.binning.edges
@@ -158,9 +152,10 @@ def tofnalhist(obj):
             extract_index[k] = v
         extract_index = tuple(extract_index)
         if isinstance(obj.counts, UnweightedCounts):
-            hout._sumw[insert_index] = obj.counts.array[extract_index].reshape(dense_shape)
+            hout._sumw[insert_index] = obj.counts[extract_index]
         elif isinstance(obj.counts, WeightedCounts):
-            hout._sumw[insert_index] = obj.counts.sumw.array[extract_index].reshape(dense_shape)
-            hout._sumw2[insert_index] = obj.counts.sumw2.array[extract_index].reshape(dense_shape)
+            counts = obj.counts[extract_index]
+            hout._sumw[insert_index] = counts['sumw']
+            hout._sumw2[insert_index] = counts['sumw2']
     
     return hout
