@@ -272,6 +272,7 @@ def toroot(obj, name):
             return out
 
         elif len(axissummary) == 2:
+            # start here for Aghast -> ROOT conversion; probably after you've already made some ghastly histograms from ROOT
             raise NotImplementedError
 
         elif len(axissummary) == 3:
@@ -363,6 +364,7 @@ def fromroot(obj, collection=False):
                 return out
 
         elif isinstance(obj, ROOT.TH2):
+            # start here for ROOT -> Aghast; this should probably be the direction you do first, to have something to work with
             raise NotImplementedError
 
         elif isinstance(obj, ROOT.TH3):
