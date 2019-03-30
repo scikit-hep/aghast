@@ -30,7 +30,14 @@
 
 from __future__ import absolute_import
 
-import numpy
+import sys
+if sys.version_info[0] <= 2:
+    # because absolute_import doesn't seem to work for PyPy 2.7
+    import imp
+    numpy_file, numpy_pathname, numpy_desc = imp.find_module("numpy")
+    numpy = imp.load_module("numpy", numpy_file, numpy_pathname, numpy_desc)
+else:
+    import numpy
 
 from aghast import *
 import aghast.interface

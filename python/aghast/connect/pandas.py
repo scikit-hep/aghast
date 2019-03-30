@@ -28,13 +28,22 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
+
 import functools
 import operator
 import re
+import sys
 
 import numpy
 try:
-    import pandas
+    if sys.version_info[0] <= 2:
+        # because absolute_import doesn't seem to work for PyPy 2.7
+        import imp
+        pandas_file, pandas_pathname, pandas_desc = imp.find_module("pandas")
+        pandas = imp.load_module("pandas", pandas_file, pandas_pathname, pandas_desc)
+    else:
+        import pandas
 except ImportError:
     raise ImportError("Install pandas package with:\n    pip install pandas\nor\n    conda install pandas")
 
