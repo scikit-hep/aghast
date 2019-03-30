@@ -332,16 +332,19 @@ class Ghast(object):
                 if selfn != othern:
                     return False
             elif isinstance(selfn, numpy.ndarray) and isinstance(othern, numpy.ndarray):
-                return selfn.shape == othern.shape and (selfn == othern).all()
+                if not (selfn.shape == othern.shape and (selfn == othern).all()):
+                    return False
             else:
                 try:
                     if len(selfn) != len(othern):
                         return False
                 except TypeError:
-                    return selfn == othern
-                for x, y in zip(selfn, othern):
-                    if x != y:
+                    if selfn != othern:
                         return False
+                else:
+                    for x, y in zip(selfn, othern):
+                        if x != y:
+                            return False
         else:
             return True
 
