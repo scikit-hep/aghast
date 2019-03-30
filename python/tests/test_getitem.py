@@ -28,6 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
 import unittest
 
 import numpy
@@ -234,7 +235,8 @@ class Test(unittest.TestCase):
         assert a.counts[numpy.inf] == 999
         assert a.counts[numpy.nan] == 123
         assert a.counts[[7, numpy.inf, 4, 7, 5, numpy.nan, -1]].tolist() == [7, 999, 4, 7, 5, 123, 9]
-        assert a.counts[[numpy.inf, ..., numpy.nan]].tolist() == [999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 123]
+        if sys.version_info[0] >= 3:
+            exec("assert a.counts[[numpy.inf, ..., numpy.nan]].tolist() == [999, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 123]")
         assert a.counts[numpy.array([7, numpy.inf, 4, 7, 5, numpy.nan, -1])].tolist() == [7, 999, 4, 7, 5, 123, 9]
         assert a.counts[[True, False, True, False, True, False, True, False, True, False]].tolist() == [0, 2, 4, 6, 8]
         assert a.counts[numpy.array([True, False, True, False, True, False, True, False, True, False])].tolist() == [0, 2, 4, 6, 8]
