@@ -12,20 +12,29 @@ The purpose of aghast is to be an intermediate when converting ROOT histograms i
 
 Furthermore, aghast is a [Flatbuffers](http://google.github.io/flatbuffers/) schema, so it can be deciphered in [many languages](https://google.github.io/flatbuffers/flatbuffers_support.html), with [lazy, random-access](https://github.com/mzaks/FlatBuffersSwift/wiki/FlatBuffers-Explained), and uses a [small amount of memory](http://google.github.io/flatbuffers/md__benchmarks.html). A collection of histograms, functions, and ntuples can be shared among processes as shared memory, used in remote procedure calls, processed incrementally in a memory-mapped file, or saved in files with future-proof [schema evolution](https://google.github.io/flatbuffers/md__schemas.html).
 
-## Installation
+## Installation from packages
 
-Not on PyPI yet. For now, you have to clone this GitHub repository.
+Not on PyPI or conda yet. Refer to manual installation.
+
+## Manual installation
+
+After you git-clone this GitHub repository:
 
 ```bash
-conda install numpy                         # unless you've already installed Numpy another way
-conda install -c conda-forge flatbuffers    # for the flatc code generator (unless already installed)
-pip install flatbuffers                     # for the flatbuffers Python runtime
-cd python                                   # only implementation so far is in Python
-./generate_flatbuffers.py                   # use flatc to generate some of the code
-python setup.py install                     # if you want to use it outside of this directory
+conda install numpy                    # unless you've already installed Numpy another way, which is likely
+pip install flatbuffers                # for the flatbuffers Python runtime
+cd python                              # only implementation so far is in Python
+python setup.py install                # if you want to use it outside of this directory
 ```
 
 Now you should be able to `import aghast` or `from aghast import *` in Python.
+
+If you need to change `flatbuffers/aghast.fbs`, you'll need to additionally:
+
+   1. Get `flatc` to compile it. I use `conda install -c conda-forge flatbuffers`. (This executable is _not_ included in the pip `flatbuffers` package, and the Python runtime is _not_ included in the conda `flatbuffers` package. They're disjoint.)
+   2. In the `python` directory, run `./generate_flatbuffers.py` (which calls `flatc` and does some post-processing).
+
+Every time you update `flatbuffers/aghast.fbs`, re-run `./generate_flatbuffers.py`.
 
 ## Documentation
 
