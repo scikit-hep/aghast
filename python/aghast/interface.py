@@ -334,6 +334,13 @@ class Ghast(object):
             elif isinstance(selfn, numpy.ndarray) and isinstance(othern, numpy.ndarray):
                 if not (selfn.shape == othern.shape and (selfn == othern).all()):
                     return False
+            elif isinstance(selfn, aghast.checktype.Lookup):
+                assert isinstance(othern, aghast.checktype.Lookup)
+                if not set(selfn) == set(othern):
+                    return False
+                for x in selfn:
+                    if selfn[x] != othern[x]:
+                        return False
             else:
                 try:
                     if len(selfn) != len(othern):

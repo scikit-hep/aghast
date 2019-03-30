@@ -43,8 +43,7 @@ install:
   - pip install $NUMPY
   - if [[ $TRAVIS_PYTHON_VERSION = pypy* ]] ; then pip install "numpy<1.16.0" ; fi       # FIXME: pypy bug in numpy
   - python -c 'import numpy; print(numpy.__version__)'
-  - pip install pandas
-  - python -c 'import pandas; print(pandas.__version__)'
+  - if [[ $TRAVIS_PYTHON_VERSION != pypy* ]] ; then pip install pandas ; fi
   - pip install "flatbuffers>=1.8.0"
   - pip install pytest pytest-runner
   - pip install --upgrade pyOpenSSL     # for deployment
