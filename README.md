@@ -18,11 +18,10 @@ Not on PyPI or conda yet. Refer to manual installation.
 
 ## Manual installation
 
-After you git-clone this GitHub repository:
+After you git-clone this GitHub repository and ensure that `numpy` is installed, somehow:
 
 ```bash
-conda install numpy               # unless you've already installed Numpy another way, which is likely
-pip install flatbuffers           # for the flatbuffers Python runtime
+pip install "flatbuffers>=1.8.0"  # for the flatbuffers Python runtime with Numpy interface
 cd python                         # only implementation so far is in Python
 python setup.py install           # if you want to use it outside of this directory
 ```
