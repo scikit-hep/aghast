@@ -21,10 +21,10 @@ Not on PyPI or conda yet. Refer to manual installation.
 After you git-clone this GitHub repository:
 
 ```bash
-conda install numpy                    # unless you've already installed Numpy another way, which is likely
-pip install flatbuffers                # for the flatbuffers Python runtime
-cd python                              # only implementation so far is in Python
-python setup.py install                # if you want to use it outside of this directory
+conda install numpy               # unless you've already installed Numpy another way, which is likely
+pip install flatbuffers           # for the flatbuffers Python runtime
+cd python                         # only implementation so far is in Python
+python setup.py install           # if you want to use it outside of this directory
 ```
 
 Now you should be able to `import aghast` or `from aghast import *` in Python.
