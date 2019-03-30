@@ -4509,7 +4509,7 @@ class VariationBinning(Binning):
     _params = {
         "variations":                aghast.checktype.CheckVector("VariationBinning", "variations", required=True, type=Variation, minlen=1),
         "systematic_units":          aghast.checktype.CheckEnum("VariationBinning", "systematic_units", required=False, choices=units),
-        "systematic_names":          aghast.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
+        "systematic_names":          aghast.checktype.CheckVector("VariationBinning", "systematic_names", required=False, type=str),
         "category_systematic_names": aghast.checktype.CheckVector("VariationBinning", "category_systematic_names", required=False, type=str),
         }
 
