@@ -1,0 +1,62 @@
+language: python
+dist: xenial
+
+os:
+  - linux
+
+python:
+  - 2.7
+  - 3.5
+  - 3.6
+  - 3.7
+  - pypy2.7-5.10.0
+  - pypy3.5
+
+env:
+  - NUMPY="numpy==1.13.1"
+  - NUMPY="numpy==1.14.5"
+  - NUMPY="numpy>=1.15"
+
+matrix:
+  exclude:
+    - python: 3.7
+      env: NUMPY="numpy==1.13.1"
+    - python: pypy2.7-5.10.0
+      env: NUMPY="numpy==1.14.5"
+    - python: pypy3.5
+      env: NUMPY="numpy==1.14.5"
+    - python: pypy2.7-5.10.0
+      env: NUMPY="numpy==1.13.1"
+    - python: pypy3.5
+      env: NUMPY="numpy==1.13.1"
+
+addons:
+  apt:
+    packages:
+      - python-setuptools
+
+script:
+  cd python; pytest tests
+
+install:
+  - pip install --upgrade setuptools_scm
+  - pip install $NUMPY
+  - if [[ $TRAVIS_PYTHON_VERSION = pypy* ]] ; then pip install "numpy<1.16.0" ; fi       # FIXME: pypy bug in numpy
+  - python -c 'import numpy; print(numpy.__version__)'
+  - pip install "flatbuffers>=1.8.0"
+  - pip install pytest pytest-runner
+  - pip install --upgrade pyOpenSSL     # for deployment
+
+notifications:
+  slack: scikit-hep:b6cgBXwccPoaCNLn5VKFJFVy
+
+# deploy:
+#   provider: pypi
+#   user: pivarski
+#   password:
+#     secure: ""
+#   distributions: "sdist bdist_wheel --universal"
+#   on:
+#     tags: true
+#     branch: master
+#     condition: '$TRAVIS_PYTHON_VERSION = "3.7" && $NUMPY = "numpy>=1.15"'
