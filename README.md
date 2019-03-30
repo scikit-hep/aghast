@@ -30,10 +30,10 @@ Now you should be able to `import aghast` or `from aghast import *` in Python.
 
 If you need to change `flatbuffers/aghast.fbs`, you'll need to additionally:
 
-   1. Get `flatc` to compile it. I use `conda install -c conda-forge flatbuffers`. (This executable is _not_ included in the pip `flatbuffers` package, and the Python runtime is _not_ included in the conda `flatbuffers` package. They're disjoint.)
+   1. Get `flatc` to generate Python sources from `flatbuffers/aghast.fbs`. I use `conda install -c conda-forge flatbuffers`. (The `flatc` executable is _not_ included in the pip `flatbuffers` package, and the Python runtime is _not_ included in the conda `flatbuffers` package. They're disjoint.)
    2. In the `python` directory, run `./generate_flatbuffers.py` (which calls `flatc` and does some post-processing).
 
-Every time you update `flatbuffers/aghast.fbs`, re-run `./generate_flatbuffers.py`.
+Every time you change `flatbuffers/aghast.fbs`, re-run `./generate_flatbuffers.py`.
 
 ## Documentation
 
