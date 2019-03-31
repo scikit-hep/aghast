@@ -51,16 +51,16 @@ install:
 notifications:
   slack: scikit-hep:b6cgBXwccPoaCNLn5VKFJFVy
 
-# deploy:
-#   provider: pypi
-#   user: pivarski
-#   password:
-#     secure: ""
-#   distributions: "sdist bdist_wheel --universal"
-#   on:
-#     tags: true
-#     branch: master
-#     condition: '$TRAVIS_PYTHON_VERSION = "3.7" && $NUMPY = "numpy>=1.15"'
+deploy:
+  provider: pypi
+  user: pivarski
+  password:
+    secure: "ll6TswTNkAH9WcbQjG9750rGCdzWERvIv4owldT0eEL7OCe9/9HaYv5Tc4NcCdNaxsTIOmd0StkWgZIWxz/YZqSPIlCJbHDFnH+gda3gDrLcY96QqKb81mAhe2XsgUG0IWc1+lLhdqnC2nepVF7caags1SqxYzozSioRN6BptvZDqLUZmZ8jlxbPS0+mPGpRa2a3udY4mo71ToGwnfjKNAKLyXrEthWuSE4dz/f9FYyuFPEkP2WndDo1jHrKPNIbx1iKUcPQJQhLTBMsd8MQgRPoskgBIqG3U8QGWCCj3SmJgd9dmSfGmVyN+y50vpPWpo2Z0kU7ldUkY7HsRtF2ew5mOfzU4GjWs4wC247gWoTBxGNCpdJcBxzzUMxYyabF9rA+klQfjp5Kud7ujaHLZJQzDGfqLsjCVobiZ7sIn0dfWDE/jB3V7vARBAXrhmg/6Bvvu7ULmdeZ0i/+hKB9bVHENFXvw9lUegEAjijyuJZWqWCsevybSkpqVDUF6a/GO15quclJc5SMdBoRlJ3cY1mYyubRdmJnMTEr0rUoOzocMKxjdEZMzcljLEuSaBk2XJJejXUdcoHFKGsHFC25x+xNmMeSVaQm2OjTFT3DqcWENbDwGtbHpSNcJV176a1DZWQJgYgDw5cX1vLhzLrM9+GI773zhn1vCQpnAStcsMM="
+  distributions: "sdist bdist_wheel --universal"
+  on:
+    tags: true
+    branch: master
+    condition: '$TRAVIS_PYTHON_VERSION = "3.7" && $NUMPY = "numpy>=1.15"'
 
 jobs:
   include:

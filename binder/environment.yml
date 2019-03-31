@@ -4,6 +4,5 @@ dependencies:
   - root
   - pandas
   - numpy
-  - flatbuffers>=1.8.0      # for flatc code generator
   - pip:
       - flatbuffers>=1.8.0  # for Python flatbuffers runtime
