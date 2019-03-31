@@ -17,7 +17,7 @@ Furthermore, aghast is a [Flatbuffers](http://google.github.io/flatbuffers/) sch
 Install aghast like any other Python package:
 
 ```bash
-pip install uproot                        # maybe with sudo or --user, or in virtualenv
+pip install aghast                        # maybe with sudo or --user, or in virtualenv
 ```
 
 <!-- or install with [conda](https://conda.io/en/latest/miniconda.html): -->
