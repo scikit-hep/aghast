@@ -32,6 +32,38 @@ from aghast.interface import frombuffer
 from aghast.interface import fromarray
 from aghast.interface import fromfile
 
+def tonumpy(obj):
+    import aghast._connect._numpy
+    return aghast._connect._numpy.tonumpy(obj)
+
+def fromnumpy(obj):
+    import aghast._connect._numpy
+    return aghast._connect._numpy.fromnumpy(obj)
+
+def topandas(obj):
+    import aghast._connect._pandas
+    return aghast._connect._pandas.topandas(obj)
+
+def frompandas(obj):
+    import aghast._connect._pandas
+    return aghast._connect._pandas.frompandas(obj)
+
+def toroot(obj, name):
+    import aghast._connect._root
+    return aghast._connect._root.toroot(obj, name)
+
+def fromroot(obj, collection=False):
+    import aghast._connect._root
+    return aghast._connect._root.fromroot(obj, collection=collection)
+
+def tofnalhist(obj):
+    import aghast._connect._fnalhist
+    return aghast._connect._fnalhist.tofnalhist(obj)
+
+def fromfnalhist(obj):
+    import aghast._connect._fnalhist
+    return aghast._connect._fnalhist.fromfnalhist(obj)
+
 from aghast.interface import Metadata
 from aghast.interface import Decoration
 from aghast.interface import Buffer

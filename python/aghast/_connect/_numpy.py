@@ -28,16 +28,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import absolute_import
-
-import sys
-if sys.version_info[0] <= 2:
-    # because absolute_import doesn't seem to work for PyPy 2.7
-    import imp
-    numpy_file, numpy_pathname, numpy_desc = imp.find_module("numpy")
-    numpy = imp.load_module("numpy", numpy_file, numpy_pathname, numpy_desc)
-else:
-    import numpy
+import numpy
 
 from aghast import *
 import aghast.interface

@@ -33,10 +33,11 @@ import unittest
 import pytest
 import numpy as np
 
+import aghast
 from aghast import *
 
 hist = pytest.importorskip("fnal_column_analysis_tools.hist")
-connect = pytest.importorskip("aghast.connect.fnalhist")
+connect = pytest.importorskip("aghast._connect._fnalhist")
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -66,7 +67,7 @@ class Test(unittest.TestCase):
         h_mascots.fill(animal="fox", vocalization="none", height=1., mass=30.)
         h_mascots.fill(animal="unicorn", vocalization="", height=np.nan, mass=np.nan)
 
-        h_converted = connect.tofnalhist(connect.fromfnalhist(h_mascots))
+        h_converted = aghast.tofnalhist(aghast.fromfnalhist(h_mascots))
         for k in h_mascots.values().keys():
             assert k in h_converted.values().keys()
             assert np.all(h_mascots.values(overflow='allnan')[k] == h_converted.values(overflow='allnan')[k]), "mismatch for %r" % k

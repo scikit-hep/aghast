@@ -40,7 +40,6 @@ _ovf_convention = lambda: RealOverflow(loc_underflow=BinLocation.below1,
                                        loc_overflow=BinLocation.above1,
                                        loc_nanflow=BinLocation.above2)
 
-
 def fromfnalhist(obj):
     if not isinstance(obj, hist.Hist):
         raise TypeError("cannot convert {0} to an aghast histogram".format(type(obj).__name__))
@@ -86,7 +85,6 @@ def fromfnalhist(obj):
             if obj._sumw2 is not None:
                 expanded_sumw2[insert_slice] = obj._sumw2[tup]
 
-
     if obj._sumw2 is not None:
         counts = WeightedCounts(
             sumw=InterpretedInlineBuffer.fromarray(expanded_sumw),
@@ -97,7 +95,6 @@ def fromfnalhist(obj):
 
     hout = Histogram(axis=axes, title=obj.label, counts=counts)
     return hout
-
 
 def tofnalhist(obj):
     if not isinstance(obj, Histogram):
@@ -135,7 +132,6 @@ def tofnalhist(obj):
                                 ))
         else:
             raise TypeError("unable to convert axes of type {0} to fnalhist axes".format(type(ax).__name__))
-
 
     hout = hist.Hist(obj.title, *axes)
     if isinstance(obj.counts, WeightedCounts):
