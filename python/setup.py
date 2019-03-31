@@ -39,7 +39,7 @@ def get_version():
     return g["__version__"]
 
 def get_description():
-    return open(os.path.join("..", "README.md")).read()
+    return open("README.md").read()
 
 setup(name = "aghast",
       version = get_version(),
