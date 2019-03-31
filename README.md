@@ -1,8 +1,8 @@
-![](docs/source/logo-300px.png)
+![](https://github.com/diana-hep/aghast/raw/master/docs/source/logo-300px.png)
 
 # aghast
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diana-hep/aghast/binder-3?filepath=binder%2Fexamples.ipynb)
+[![Build Status](https://travis-ci.org/diana-hep/aghast.svg?branch=master)](https://travis-ci.org/diana-hep/aghast) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diana-hep/aghast/master?urlpath=lab/tree/binder%2Fexamples.ipynb)
 
 Aghast is a histogramming library that does not fill histograms and does not plot them. Its role is behind the scenes, to provide better communication between histogramming libraries.
 

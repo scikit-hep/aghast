@@ -61,3 +61,15 @@ notifications:
 #     tags: true
 #     branch: master
 #     condition: '$TRAVIS_PYTHON_VERSION = "3.7" && $NUMPY = "numpy>=1.15"'
+
+jobs:
+  include:
+  - stage: binder
+    python: "3.6"
+    env: NPY="numpy>=1.15"
+    addons: skip
+    before_install: skip
+    install: skip
+    script:
+    # Use Binder build API to trigger repo2docker to build image
+    - bash binder/trigger_binder.sh https://mybinder.org/build/gh/diana-hep/aghast/"${TRAVIS_BRANCH}"
