@@ -34,6 +34,7 @@ import functools
 import math
 import numbers
 import operator
+import os
 import struct
 import sys
 try:
@@ -759,6 +760,8 @@ class InterpretedBuffer(Interpretation):
             if isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, (numpy.bool, numpy.bool_)):
                 buf = numpy.compress(index, buf, axis=i)
             elif isinstance(index, numpy.ndarray) and issubclass(index.dtype.type, numpy.integer):
+                if os.name == "nt":    # Windows Numpy take requires 32-bit indexes
+                    index = index.astype(numpy.int32)
                 buf = numpy.take(buf, index, axis=i)
             else:
                 buf = buf[(slice(None),)*i + (index,)]
