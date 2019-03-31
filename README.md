@@ -14,14 +14,27 @@ Furthermore, aghast is a [Flatbuffers](http://google.github.io/flatbuffers/) sch
 
 ## Installation from packages
 
-Not on PyPI or conda yet. Refer to manual installation.
+Install aghast like any other Python package:
+
+```bash
+pip install uproot                        # maybe with sudo or --user, or in virtualenv
+```
+
+<!-- or install with [conda](https://conda.io/en/latest/miniconda.html): -->
+
+<!-- ```bash -->
+<!-- conda config --add channels conda-forge   # if you haven't added conda-forge already -->
+<!-- conda install uproot -->
+<!-- ``` -->
+
+_(Not on conda yet.)_
 
 ## Manual installation
 
 After you git-clone this GitHub repository and ensure that `numpy` is installed, somehow:
 
 ```bash
-pip install "flatbuffers>=1.8.0"  # for the flatbuffers Python runtime with Numpy interface
+pip install "flatbuffers>=1.8.0"  # for the flatbuffers Python runtime with Numpy
 cd python                         # only implementation so far is in Python
 python setup.py install           # if you want to use it outside of this directory
 ```
