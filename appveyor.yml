@@ -47,4 +47,5 @@ build_script:
   - "pip install %NUMPY%"
   - "pip install pytest pytest-runner"
   - "pip install flatbuffers>=1.8.0"
+  - "cd python"
   - "pytest -v tests"
