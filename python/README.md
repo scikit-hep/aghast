@@ -50,11 +50,6 @@ Every time you change `flatbuffers/aghast.fbs`, re-run `./generate_flatbuffers.p
 
 ## Documentation
 
-Suite of examples as a Jupyter notebook:
-
-   * [in GitHub](https://github.com/scikit-hep/aghast/blob/master/binder/examples.ipynb)
-   * [on Binder](https://mybinder.org/v2/gh/scikit-hep/aghast/master?urlpath=lab/tree/binder%2Fexamples.ipynb)
-
 Full specification:
 
    * [Introduction](https://github.com/scikit-hep/aghast/blob/master/specification.adoc#introduction)
@@ -201,16 +196,7 @@ root_hist = aghast.to_root(ghastly_hist, "root_hist")
 root_hist
 ```
 
-    Welcome to JupyROOT 6.17/01
-
-
-
-
-
     <ROOT.TH1D object ("root_hist") at 0x55555e208ef0>
-
-
-
 
 ```python
 import ROOT
@@ -235,20 +221,7 @@ pandas_hist
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
+<table class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -516,13 +489,39 @@ A ghast is also a [Flatbuffers](http://google.github.io/flatbuffers/) object, wh
 ghastly_hist.tobuffer()
 ```
 
-
-
-
-    bytearray(b"\x04\x00\x00\x00\x90\xff\xff\xff\x10\x00\x00\x00\x00\x01\n\x00\x10\x00\x0c\x00\x0b\x00\x04\x00\n\x00\x00\x00`\x00\x00\x00\x00\x00\x00\x01\x04\x00\x00\x00\x01\x00\x00\x00\x0c\x00\x00\x00\x08\x00\x0c\x00\x0b\x00\x04\x00\x08\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02\x08\x00(\x00\x1c\x00\x04\x00\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\xc0\x00\x00\x00\x00\x00\x00\x14@\x01\x00\x00\x00\x00\x00\x00\x00P\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\n\x00\t\x00\x04\x00\x08\x00\x00\x00\x0c\x00\x00\x00\x00\x02\x06\x00\x08\x00\x04\x00\x06\x00\x00\x00\x04\x00\x00\x00\x80\x02\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\t\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x1d\x00\x00\x00\x00\x00\x00\x001\x00\x00\x00\x00\x00\x00\x00P\x00\x00\x00\x00\x00\x00\x00h\x00\x00\x00\x00\x00\x00\x00\xed\x00\x00\x00\x00\x00\x00\x00`\x01\x00\x00\x00\x00\x00\x00+\x02\x00\x00\x00\x00\x00\x00c\x03\x00\x00\x00\x00\x00\x00\xa7\x05\x00\x00\x00\x00\x00\x00\xfe\x07\x00\x00\x00\x00\x00\x00\xdd\x0b\x00\x00\x00\x00\x00\x00\xd2\x11\x00\x00\x00\x00\x00\x00\x95\x1a\x00\x00\x00\x00\x00\x00D%\x00\x00\x00\x00\x00\x00\xd94\x00\x00\x00\x00\x00\x00\x98H\x00\x00\x00\x00\x00\x00\xf9c\x00\x00\x00\x00\x00\x00\xb8\x88\x00\x00\x00\x00\x00\x00\xc8\xb3\x00\x00\x00\x00\x00\x00\xdf\xe6\x00\x00\x00\x00\x00\x00\xcc*\x01\x00\x00\x00\x00\x00\xb9x\x01\x00\x00\x00\x00\x00A\xd4\x01\x00\x00\x00\x00\x00\xef:\x02\x00\x00\x00\x00\x00}\xb5\x02\x00\x00\x00\x00\x00\xc46\x03\x00\x00\x00\x00\x00,\xc2\x03\x00\x00\x00\x00\x00\x9cR\x04\x00\x00\x00\x00\x00a\xe7\x04\x00\x00\x00\x00\x00\x92{\x05\x00\x00\x00\x00\x00\x81\x02\x06\x00\x00\x00\x00\x00\xce\x81\x06\x00\x00\x00\x00\x00\xa7\xe9\x06\x00\x00\x00\x00\x00\xb6>\x07\x00\x00\x00\x00\x00vy\x07\x00\x00\x00\x00\x00\x06\x94\x07\x00\x00\x00\x00\x00\x02\x99\x07\x00\x00\x00\x00\x00\x03|\x07\x00\x00\x00\x00\x00p8\x07\x00\x00\x00\x00\x00\x97\xeb\x06\x00\x00\x00\x00\x00\xb2~\x06\x00\x00\x00\x00\x00Q\x00\x06\x00\x00\x00\x00\x00\x89x\x05\x00\x00\x00\x00\x00K\xe6\x04\x00\x00\x00\x00\x00\x97O\x04\x00\x00\x00\x00\x00\xc5\xc2\x03\x00\x00\x00\x00\x00\xed8\x03\x00\x00\x00\x00\x00\x8e\xb5\x02\x00\x00\x00\x00\x00\xd9?\x02\x00\x00\x00\x00\x00\x02\xd6\x01\x00\x00\x00\x00\x00Py\x01\x00\x00\x00\x00\x00y+\x01\x00\x00\x00\x00\x00\xc3\xe8\x00\x00\x00\x00\x00\x00\xd0\xb2\x00\x00\x00\x00\x00\x00\x9b\x86\x00\x00\x00\x00\x00\x00,e\x00\x00\x00\x00\x00\x00\xbcI\x00\x00\x00\x00\x00\x00\x085\x00\x00\x00\x00\x00\x00c%\x00\x00\x00\x00\x00\x00\x06\x1a\x00\x00\x00\x00\x00\x00\x15\x12\x00\x00\x00\x00\x00\x00Y\x0c\x00\x00\x00\x00\x00\x00\x15\x08\x00\x00\x00\x00\x00\x006\x05\x00\x00\x00\x00\x00\x00n\x03\x00\x00\x00\x00\x00\x00E\x02\x00\x00\x00\x00\x00\x00L\x01\x00\x00\x00\x00\x00\x00\xdc\x00\x00\x00\x00\x00\x00\x00\x87\x00\x00\x00\x00\x00\x00\x00A\x00\x00\x00\x00\x00\x00\x00\'\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00")
-
-
-
+    bytearray(b"\x04\x00\x00\x00\x90\xff\xff\xff\x10\x00\x00\x00\x00\x01\n\x00\x10\x00\x0c\x00\x0b\x00\x04
+                \x00\n\x00\x00\x00`\x00\x00\x00\x00\x00\x00\x01\x04\x00\x00\x00\x01\x00\x00\x00\x0c\x00\x00
+                \x00\x08\x00\x0c\x00\x0b\x00\x04\x00\x08\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02\x08\x00
+                (\x00\x1c\x00\x04\x00\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\xc0\x00\x00\x00\x00\x00
+                \x00\x14@\x01\x00\x00\x00\x00\x00\x00\x00P\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08
+                \x00\n\x00\t\x00\x04\x00\x08\x00\x00\x00\x0c\x00\x00\x00\x00\x02\x06\x00\x08\x00\x04\x00\x06
+                \x00\x00\x00\x04\x00\x00\x00\x80\x02\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00
+                \x00\x00\x00\x00\t\x00\x00\x00\x00\x00\x00\x00\x0f\x00\x00\x00\x00\x00\x00\x00\x1d\x00\x00
+                \x00\x00\x00\x00\x001\x00\x00\x00\x00\x00\x00\x00P\x00\x00\x00\x00\x00\x00\x00h\x00\x00\x00
+                \x00\x00\x00\x00\xed\x00\x00\x00\x00\x00\x00\x00`\x01\x00\x00\x00\x00\x00\x00+\x02\x00\x00
+                \x00\x00\x00\x00c\x03\x00\x00\x00\x00\x00\x00\xa7\x05\x00\x00\x00\x00\x00\x00\xfe\x07\x00
+                \x00\x00\x00\x00\x00\xdd\x0b\x00\x00\x00\x00\x00\x00\xd2\x11\x00\x00\x00\x00\x00\x00\x95\x1a
+                \x00\x00\x00\x00\x00\x00D%\x00\x00\x00\x00\x00\x00\xd94\x00\x00\x00\x00\x00\x00\x98H\x00\x00
+                \x00\x00\x00\x00\xf9c\x00\x00\x00\x00\x00\x00\xb8\x88\x00\x00\x00\x00\x00\x00\xc8\xb3\x00\x00
+                \x00\x00\x00\x00\xdf\xe6\x00\x00\x00\x00\x00\x00\xcc*\x01\x00\x00\x00\x00\x00\xb9x\x01\x00
+                \x00\x00\x00\x00A\xd4\x01\x00\x00\x00\x00\x00\xef:\x02\x00\x00\x00\x00\x00}\xb5\x02\x00\x00
+                \x00\x00\x00\xc46\x03\x00\x00\x00\x00\x00,\xc2\x03\x00\x00\x00\x00\x00\x9cR\x04\x00\x00\x00
+                \x00\x00a\xe7\x04\x00\x00\x00\x00\x00\x92{\x05\x00\x00\x00\x00\x00\x81\x02\x06\x00\x00\x00
+                \x00\x00\xce\x81\x06\x00\x00\x00\x00\x00\xa7\xe9\x06\x00\x00\x00\x00\x00\xb6>\x07\x00\x00
+                \x00\x00\x00vy\x07\x00\x00\x00\x00\x00\x06\x94\x07\x00\x00\x00\x00\x00\x02\x99\x07\x00\x00
+                \x00\x00\x00\x03|\x07\x00\x00\x00\x00\x00p8\x07\x00\x00\x00\x00\x00\x97\xeb\x06\x00\x00\x00
+                \x00\x00\xb2~\x06\x00\x00\x00\x00\x00Q\x00\x06\x00\x00\x00\x00\x00\x89x\x05\x00\x00\x00\x00
+                \x00K\xe6\x04\x00\x00\x00\x00\x00\x97O\x04\x00\x00\x00\x00\x00\xc5\xc2\x03\x00\x00\x00\x00
+                \x00\xed8\x03\x00\x00\x00\x00\x00\x8e\xb5\x02\x00\x00\x00\x00\x00\xd9?\x02\x00\x00\x00\x00
+                \x00\x02\xd6\x01\x00\x00\x00\x00\x00Py\x01\x00\x00\x00\x00\x00y+\x01\x00\x00\x00\x00\x00\xc3
+                \xe8\x00\x00\x00\x00\x00\x00\xd0\xb2\x00\x00\x00\x00\x00\x00\x9b\x86\x00\x00\x00\x00\x00\x00
+                ,e\x00\x00\x00\x00\x00\x00\xbcI\x00\x00\x00\x00\x00\x00\x085\x00\x00\x00\x00\x00\x00c%\x00
+                \x00\x00\x00\x00\x00\x06\x1a\x00\x00\x00\x00\x00\x00\x15\x12\x00\x00\x00\x00\x00\x00Y\x0c
+                \x00\x00\x00\x00\x00\x00\x15\x08\x00\x00\x00\x00\x00\x006\x05\x00\x00\x00\x00\x00\x00n\x03
+                \x00\x00\x00\x00\x00\x00E\x02\x00\x00\x00\x00\x00\x00L\x01\x00\x00\x00\x00\x00\x00\xdc\x00
+                \x00\x00\x00\x00\x00\x00\x87\x00\x00\x00\x00\x00\x00\x00A\x00\x00\x00\x00\x00\x00\x00\'\x00
+                \x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x0f
+                \x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00")
 
 ```python
 print("Numpy size: ", numpy_hist[0].nbytes + numpy_hist[1].nbytes)
@@ -672,14 +671,17 @@ aghast.FractionBinning(error_method=aghast.FractionBinning.clopper_pearson).toCa
 aghast.PredicateBinning(["signal region", "control region"]).toCategoryBinning().dump()
 aghast.VariationBinning([aghast.Variation([aghast.Assignment("x", "nominal")]),
                          aghast.Variation([aghast.Assignment("x", "nominal + sigma")]),
-                         aghast.Variation([aghast.Assignment("x", "nominal - sigma")])]).toCategoryBinning().dump()
+                         aghast.Variation([aghast.Assignment("x", "nominal - sigma")])]
+                        ).toCategoryBinning().dump()
 ```
 
     CategoryBinning(categories=['5', '6', '7', '8', '9', '10'])
     CategoryBinning(
-      categories=['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, 1)', '[1, 2)', '[2, 3)', '[3, 4)', '[4, 5)'])
+      categories=['[-5, -4)', '[-4, -3)', '[-3, -2)', '[-2, -1)', '[-1, 0)', '[0, 1)', '[1, 2)', '[2, 3)',
+                  '[3, 4)', '[4, 5)'])
     CategoryBinning(
-      categories=['[0.01, 0.05)', '[0.05, 0.1)', '[0.1, 0.5)', '[0.5, 1)', '[1, 5)', '[5, 10)', '[10, 50)', '[50, 100)'])
+      categories=['[0.01, 0.05)', '[0.05, 0.1)', '[0.1, 0.5)', '[0.5, 1)', '[1, 5)', '[5, 10)', '[10, 50)',
+                  '[50, 100)'])
     CategoryBinning(categories=['[0, 5)', '[10, 100)', '[-10, 10)'])
     CategoryBinning(categories=['[50, 60)', '[30, 40)', '[-20, -10)', '[80, 90)', '[-1000, -990)'])
     CategoryBinning(categories=['pass', 'all'])
@@ -699,7 +701,8 @@ aghast.RegularBinning(5, aghast.RealInterval(-5, 5), aghast.RealOverflow(
 ```
 
     CategoryBinning(
-      categories=['{nan}', '[-5, -3)', '[-3, -1)', '[-1, 1)', '[1, 3)', '[3, 5)', '[5, +inf]', '[-inf, -5)'])
+      categories=['{nan}', '[-5, -3)', '[-3, -1)', '[-1, 1)', '[1, 3)', '[3, 5)', '[5, +inf]',
+                  '[-inf, -5)'])
 
 
 ## Fancy binning types
@@ -724,20 +727,7 @@ df
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
+<table class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -844,20 +834,7 @@ df
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead tr th {
-        text-align: left;
-    }
-</style>
-<table border="1" class="dataframe">
+<table class="dataframe">
   <thead>
     <tr>
       <th></th>
@@ -974,20 +951,7 @@ df
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
+<table class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -1093,20 +1057,7 @@ df.unstack(level=0)
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead tr th {
-        text-align: left;
-    }
-</style>
-<table border="1" class="dataframe">
+<table class="dataframe">
   <thead>
     <tr>
       <th></th>
@@ -1261,27 +1212,27 @@ Aghast does, however, transform histograms into other histograms, and not just a
 ```python
 h1 = aghast.Histogram([
     aghast.Axis(aghast.RegularBinning(10, aghast.RealInterval(-5, 5)),
-                statistics=[aghast.Statistics(
-                    moments=[
-                        aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([10])), n=1),
-                        aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([20])), n=2)],
-                    quantiles=[
-                        aghast.Quantiles(aghast.InterpretedInlineBuffer.fromarray(numpy.array([30])), p=0.5)],
-                    mode=aghast.Modes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([40]))),
-                    min=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([50]))),
-                    max=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([60]))))])],
+          statistics=[aghast.Statistics(
+              moments=[
+                  aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([10])), n=1),
+                  aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([20])), n=2)],
+              quantiles=[
+                  aghast.Quantiles(aghast.InterpretedInlineBuffer.fromarray(numpy.array([30])), p=0.5)],
+              mode=aghast.Modes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([40]))),
+              min=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([50]))),
+              max=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([60]))))])],
     aghast.UnweightedCounts(aghast.InterpretedInlineBuffer.fromarray(numpy.arange(10))))
 h2 = aghast.Histogram([
     aghast.Axis(aghast.RegularBinning(10, aghast.RealInterval(-5, 5)),
-                statistics=[aghast.Statistics(
-                    moments=[
-                        aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([100])), n=1),
-                        aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([200])), n=2)],
-                    quantiles=[
-                        aghast.Quantiles(aghast.InterpretedInlineBuffer.fromarray(numpy.array([300])), p=0.5)],
-                    mode=aghast.Modes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([400]))),
-                    min=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([500]))),
-                    max=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([600]))))])],
+          statistics=[aghast.Statistics(
+              moments=[
+                  aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([100])), n=1),
+                  aghast.Moments(aghast.InterpretedInlineBuffer.fromarray(numpy.array([200])), n=2)],
+              quantiles=[
+                  aghast.Quantiles(aghast.InterpretedInlineBuffer.fromarray(numpy.array([300])), p=0.5)],
+              mode=aghast.Modes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([400]))),
+              min=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([500]))),
+              max=aghast.Extremes(aghast.InterpretedInlineBuffer.fromarray(numpy.array([600]))))])],
     aghast.UnweightedCounts(aghast.InterpretedInlineBuffer.fromarray(numpy.arange(100, 200, 10))))
 ```
 
