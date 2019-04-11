@@ -6,37 +6,37 @@ from aghast.interface import frombuffer
 from aghast.interface import fromarray
 from aghast.interface import fromfile
 
-def tonumpy(obj):
+def to_numpy(obj):
     import aghast._connect._numpy
-    return aghast._connect._numpy.tonumpy(obj)
+    return aghast._connect._numpy.to_numpy(obj)
 
-def fromnumpy(obj):
+def from_numpy(obj):
     import aghast._connect._numpy
-    return aghast._connect._numpy.fromnumpy(obj)
+    return aghast._connect._numpy.from_numpy(obj)
 
-def topandas(obj):
+def to_pandas(obj):
     import aghast._connect._pandas
-    return aghast._connect._pandas.topandas(obj)
+    return aghast._connect._pandas.to_pandas(obj)
 
-def frompandas(obj):
+def from_pandas(obj):
     import aghast._connect._pandas
-    return aghast._connect._pandas.frompandas(obj)
+    return aghast._connect._pandas.from_pandas(obj)
 
-def toroot(obj, name):
+def to_root(obj, name):
     import aghast._connect._root
-    return aghast._connect._root.toroot(obj, name)
+    return aghast._connect._root.to_root(obj, name)
 
-def fromroot(obj, collection=False):
+def from_root(obj, collection=False):
     import aghast._connect._root
-    return aghast._connect._root.fromroot(obj, collection=collection)
+    return aghast._connect._root.from_root(obj, collection=collection)
 
-def tofnalhist(obj):
+def to_fnalhist(obj):
     import aghast._connect._fnalhist
-    return aghast._connect._fnalhist.tofnalhist(obj)
+    return aghast._connect._fnalhist.to_fnalhist(obj)
 
-def fromfnalhist(obj):
+def from_fnalhist(obj):
     import aghast._connect._fnalhist
-    return aghast._connect._fnalhist.fromfnalhist(obj)
+    return aghast._connect._fnalhist.from_fnalhist(obj)
 
 from aghast.interface import Metadata
 from aghast.interface import Decoration
