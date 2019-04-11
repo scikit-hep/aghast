@@ -49,20 +49,20 @@ def rootname():
 def test_root_oned(cls):
     before = cls(rootname(), "title", 5, -2.0, 2.0)
     before.GetXaxis().SetTitle("title2")
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)
 
     before = cls(rootname(), "title", 5, -2.0, 2.0)
     before.GetXaxis().SetTitle("title2")
     for x in data: before.Fill(x)
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)
 
     before = cls(rootname(), "title", 5, -2.0, 2.0)
     before.GetXaxis().SetTitle("title2")
     for i, x in enumerate(["one", "two", "three", "four", "five"]):
         before.GetXaxis().SetBinLabel(i + 1, x)
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)
 
     before = cls(rootname(), "title", 5, -5.0, 5.0)
@@ -70,18 +70,18 @@ def test_root_oned(cls):
     for i, x in enumerate(["one", "two", "three", "four", "five"]):
         before.GetXaxis().SetBinLabel(i + 1, x)
     for x in data: before.Fill(x)
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)
 
     edges = numpy.array([-5.0, -3.0, 0.0, 5.0, 10.0, 100.0], dtype=numpy.float64)
     before = cls(rootname(), "title", 5, edges)
     before.GetXaxis().SetTitle("title2")
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)
 
     edges = numpy.array([-5.0, -3.0, 0.0, 5.0, 10.0, 100.0], dtype=numpy.float64)
     before = cls(rootname(), "title", 5, edges)
     before.GetXaxis().SetTitle("title2")
     for x in data: before.Fill(x)
-    after = aghast.toroot(aghast.fromroot(before), rootname())
+    after = aghast.to_root(aghast.from_root(before), rootname())
     check1d(before, after)

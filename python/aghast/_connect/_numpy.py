@@ -29,7 +29,7 @@ def binning2array(binning):
         out = binning.edges
     return out
         
-def tonumpy(obj):
+def to_numpy(obj):
     if isinstance(obj, Histogram):
         edges = [binning2array(x.binning) for x in obj.axis]
         slices = ()
@@ -69,7 +69,7 @@ def array2binning(array):
     else:
         return EdgesBinning(array)
 
-def fromnumpy(obj):
+def from_numpy(obj):
     if isinstance(obj, tuple) and len(obj) == 2 and isinstance(obj[0], numpy.ndarray) and isinstance(obj[1], numpy.ndarray):
         counts, edges = obj
         return Histogram([Axis(array2binning(edges))], array2counts(counts))

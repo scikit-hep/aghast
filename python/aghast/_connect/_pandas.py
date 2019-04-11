@@ -111,7 +111,7 @@ def binning2index(binning):
     else:
         raise AssertionError(type(binning))
 
-def topandas(obj):
+def to_pandas(obj):
     if isinstance(obj, Histogram):
         indexes = []
         names = []
@@ -298,7 +298,7 @@ def index2binning(index):
     else:
         return CategoryBinning([str(x) for x in index])
 
-def frompandas(obj):
+def from_pandas(obj):
     if ((isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns) and ("unweighted" in obj["counts"].columns or "sumw" in obj["counts"].columns or "sumw2" in obj["counts"].columns)) or ("unweighted" in obj.columns or "sumw" in obj.columns or "sumw2" in obj.columns):
         # this is a histogram; make the data dense in the Cartesian grid
         unstacked = obj.unstack()

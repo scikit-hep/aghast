@@ -81,7 +81,7 @@ def setbincontents(obj, array):
 
 setbincontents.run = {}
 
-def toroot(obj, name):
+def to_root(obj, name):
     if isinstance(obj, Collection):
         raise NotImplementedError
 
@@ -260,7 +260,7 @@ def toroot(obj, name):
     else:
         raise TypeError("cannot convert {0}".format(type(obj)))
 
-def fromroot(obj, collection=False):
+def from_root(obj, collection=False):
     if isinstance(obj, ROOT.TH1):
         if isinstance(obj, ROOT.TProfile):
             raise NotImplementedError

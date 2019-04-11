@@ -14,7 +14,7 @@ _ovf_convention = lambda: RealOverflow(loc_underflow=BinLocation.below1,
                                        loc_overflow=BinLocation.above1,
                                        loc_nanflow=BinLocation.above2)
 
-def fromfnalhist(obj):
+def from_fnalhist(obj):
     if not isinstance(obj, hist.Hist):
         raise TypeError("cannot convert {0} to an aghast histogram".format(type(obj).__name__))
     axes = []
@@ -70,7 +70,7 @@ def fromfnalhist(obj):
     hout = Histogram(axis=axes, title=obj.label, counts=counts)
     return hout
 
-def tofnalhist(obj):
+def to_fnalhist(obj):
     if not isinstance(obj, Histogram):
         raise TypeError("cannot convert {0} to a fnal_column_analysis_tools histogram".format(type(obj).__name__))
 
