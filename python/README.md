@@ -2,10 +2,10 @@
 
 # aghast
 
-[![Build Status](https://travis-ci.org/scikit-hep/aghast.svg?branch=master)](https://travis-ci.org/scikit-hep/aghast) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/scikit-hep/aghast/master?urlpath=lab/tree/binder%2Ftutorial.ipynb)
-
+[![Build Status](https://travis-ci.org/scikit-hep/aghast.svg?branch=master)](https://travis-ci.org/scikit-hep/aghast)
 [![PyPI version](https://badge.fury.io/py/aghast.svg)](https://badge.fury.io/py/aghast)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/aghast.svg)](https://pypi.org/project/aghast/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/scikit-hep/aghast/master?urlpath=lab/tree/binder%2Ftutorial.ipynb)
 
 Aghast is a histogramming library that does not fill histograms and does not plot them. Its role is behind the scenes, to provide better communication between histogramming libraries.
 
