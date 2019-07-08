@@ -26,18 +26,44 @@ def getbincontents(obj):
     elif isinstance(obj, (ROOT.TH1D, ROOT.TH2D, ROOT.TH3D)):
         out = numpy.empty(obj.GetNcells(), dtype=numpy.float64)
         arraytype = "double"
+
+    elif isinstance(obj, ROOT.TArrayC):
+        out = numpy.empty(obj.fN, dtype=numpy.int8)
+        arraytype = "char"
+    elif isinstance(obj, ROOT.TArrayS):
+        out = numpy.empty(obj.fN, dtype=numpy.int16)
+        arraytype = "short"
+    elif isinstance(obj, ROOT.TArrayI):
+        out = numpy.empty(obj.fN, dtype=numpy.int32)
+        arraytype = "int"
+    elif isinstance(obj, ROOT.TArrayF):
+        out = numpy.empty(obj.fN, dtype=numpy.float32)
+        arraytype = "float"
+    elif isinstance(obj, ROOT.TArrayD):
+        out = numpy.empty(obj.fN, dtype=numpy.float64)
+        arraytype = "double"
+
     else:
         raise AssertionError(type(obj))
 
     name = "_getbincontents_{0}".format(type(obj).__name__)
     if name not in getbincontents.run:
-        ROOT.gInterpreter.Declare("""
-        void %s(%s* hist, %s* array) {
-            int n = hist->GetNcells();
-            for (int i = 0;  i < n;  i++) {
-                array[i] = hist->GetBinContent(i);
-            }
-        }""" % (name, type(obj).__name__, arraytype))
+        if isinstance(obj, (ROOT.TH1, ROOT.TH2, ROOT.TH3)):
+            ROOT.gInterpreter.Declare("""
+            void %s(%s* hist, %s* array) {
+                int n = hist->GetNcells();
+                for (int i = 0;  i < n;  i++) {
+                    array[i] = hist->GetBinContent(i);
+                }
+            }""" % (name, type(obj).__name__, arraytype))
+        else:
+            ROOT.gInterpreter.Declare("""
+            void %s(%s* hist, %s* array) {
+                int n = hist->GetSize();
+                for (int i = 0;  i < n;  i++) {
+                    array[i] = hist->At(i);
+                }
+            }""" % (name, type(obj).__name__, arraytype))
         getbincontents.run[name] = getattr(ROOT, name)
 
     getbincontents.run[name](obj, out)
