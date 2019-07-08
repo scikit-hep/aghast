@@ -127,7 +127,7 @@ def to_root(obj, name):
                 slc.append(slice(None))
             else:
                 raise AssertionError(type(axis.binning))
-                
+
         if isinstance(obj.axis[0].binning, FractionBinning):
             raise NotImplementedError
 
@@ -164,7 +164,7 @@ def to_root(obj, name):
                 num, low, high = axissummary[0][1:]
                 out = cls(name, title, num, low, high)
                 xaxis = out.GetXaxis()
-                
+
             elif axissummary[0][0] is EdgesBinning:
                 edges = axissummary[0][1]
                 out = cls(name, title, len(edges) - 1, edges)
@@ -282,7 +282,7 @@ def from_root(obj, collection=False):
                 categories = None
 
             if obj.GetSumw2N() != 0:
-                sumw2obj = h.GetSumw2()
+                sumw2obj = obj.GetSumw2()
                 sumw2array = getbincontents(sumw2obj)
                 if categories is not None:
                     sumwarray = sumwarray[1 : len(categories) + 1]
