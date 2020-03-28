@@ -160,7 +160,7 @@ def to_root(obj, name):
         sumw = obj.counts[tuple(slc)]
         if isinstance(sumw, dict):
             sumw, sumw2 = sumw["sumw"], sumw["sumw2"]
-            sumw2 = numpy.array(sumw2, dtype=numpy.float64, copy=False)
+            sumw2 = numpy.array(sumw2, dtype=numpy.float64, copy=False) if sumw2 is not None else None
         else:
             sumw2 = None
 
