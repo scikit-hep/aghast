@@ -55,7 +55,7 @@ If you want to use some specific packages on Anaconda channel, the recommended w
 
 ```bash
 # add the packages you need to "environment-test.yml" or "requirements-test.txt"
-conda env create -f environment-test.yml -n aghast				# create your aghast conda environment
+conda env create -f environment-test.yml -n aghast				# create (or update) your aghast conda environment
 conda activate aghast																# activate your aghast environment
 cd python																						# only implementation so far is in Python
 python3 setup.py install 														# to use it outside of this directory
