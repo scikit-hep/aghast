@@ -55,11 +55,11 @@ If you want to use some specific packages on Anaconda channel, the recommended w
 
 ```bash
 # add the packages you need to "environment-test.yml" or "requirements-test.txt"
-conda env create -f environment-test.yml -n aghast	# create (or update) your aghast conda environment
-conda activate aghast																# activate your aghast environment
-cd python																						# only implementation so far is in Python
-python setup.py install 														# to use it outside of this directory, Python2 is not supported right now
-python -m ipykernel install --name aghast					  # install your jupyter kernel "aghast"
+conda env create -f environment-test.yml -n aghast  # create (or update) your aghast conda environment
+conda activate aghast                               # activate your aghast environment
+cd python                                           # only implementation so far is in Python
+python setup.py install                             # to use it outside of this directory, Python2 is not supported right now
+python -m ipykernel install --name aghast           # install your jupyter kernel "aghast"
 ```
 
 Now you should be able to `import aghast` or `from aghast import *` in your notebooks with the kernel "aghast".
