@@ -54,8 +54,8 @@ Every time you change `flatbuffers/aghast.fbs`, re-run `./generate_flatbuffers.p
 If you want to use some specific packages on Anaconda channel, the recommended way is:
 
 ```bash
-# add the packages you need to "environment-tests.yml" or "requirements-tests.txt"
-conda env create -f environment-tests.yml -n aghast				# create your aghast conda environment
+# add the packages you need to "environment-test.yml" or "requirements-test.txt"
+conda env create -f environment-test.yml -n aghast				# create your aghast conda environment
 conda activate aghast																# activate your aghast environment
 cd python																						# only implementation so far is in Python
 python3 setup.py install 														# to use it outside of this directory
