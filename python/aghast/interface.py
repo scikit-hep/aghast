@@ -5033,8 +5033,8 @@ To be valid, the length of all of these buffers (in number of items, not number 
 
     def _toflatbuffers(self, builder):
         sumw = self.sumw._toflatbuffers(builder)
-        sumw2 = None if self.sumw2 is None else self.sumw2._toflatbuffers(builder)
-        unweighted = None if self.unweighted is None else self.unweighted._toflatbuffers(builder)
+        sumw2 = self.sumw2._toflatbuffers(builder) if self.sumw2 is not None else None
+        unweighted = self.unweighted._toflatbuffers(builder) if self.unweighted is not None else None
 
         aghast.aghast_generated.WeightedCounts.WeightedCountsStart(builder)
         aghast.aghast_generated.WeightedCounts.WeightedCountsAddSumwType(builder, _InterpretedBuffer_invlookup[type(self.sumw)])
@@ -5050,27 +5050,29 @@ To be valid, the length of all of these buffers (in number of items, not number 
         args = ["sumw={0}".format(_dumpeq(self.sumw._dump(indent + "    ", width, end), indent, end))]
         if self.sumw2 is not None:
             args.append("sumw2={0}".format(_dumpeq(self.sumw2._dump(indent + "    ", width, end), indent, end)))
+        else:
+            args.append("sumw2=None".format(_dumpeq(self.sumw2._dump(indent + "    ", width, end), indent, end)))
         if self.unweighted is not None:
             args.append("unweighted={0}".format(_dumpeq(self.unweighted._dump(indent + "    ", width, end), indent, end)))
+        else:
+            args.append("unweighted=None".format(_dumpeq(self.unweighted._dump(indent + "    ", width, end), indent, end)))
         return _dumpline(self, args, indent, width, end)
 
     def _reindex(self, oldshape, indexes):
         out = {"sumw": self.sumw._reindex(oldshape, indexes)}
-        if self.sumw2 is not None:
-            out["sumw2"] = self.sumw2._reindex(oldshape, indexes)
-        if self.unweighted is not None:
-            out["unweighted"] = self.unweighted._reindex(oldshape, indexes)
+        out["sumw2"] = self.sumw2._reindex(oldshape, indexes) if self.sumw2 is not None else None
+        out["unweighted"] = self.unweighted._reindex(oldshape, indexes) if self.unweighted is not None else None
         return out
 
     def _rebin(self, oldshape, pairs):
         return WeightedCounts(self.sumw._rebin(oldshape, pairs),
-                              None if self.sumw2 is None else self.sumw2._rebin(oldshape, pairs),
-                              None if self.unweighted is None else self.unweighted._rebin(oldshape, pairs))
+                              self.sumw2._rebin(oldshape, pairs) if self.sumw2 is not None else None,
+                              self.unweighted._rebin(oldshape, pairs) if self.unweighted is not None else None)
 
     def _remap(self, newshape, selfmap):
         return WeightedCounts(self.sumw._remap(newshape, selfmap),
-                              None if self.sumw2 is None else self.sumw2._remap(newshape, selfmap),
-                              None if self.unweighted is None else self.unweighted._remap(newshape, selfmap))
+                              self.sumw2._remap(newshape, selfmap) if self.sumw2 is not None else None,
+                              self.unweighted._remap(newshape, selfmap) if self.unweighted is not None else None)
 
     def _add(self, other, noclobber):
         assert isinstance(other, WeightedCounts)
@@ -5092,19 +5094,15 @@ To be valid, the length of all of these buffers (in number of items, not number 
     @property
     def flatarray(self):
         out = {"sumw": self.sumw.flatarray}
-        if self.sumw2 is not None:
-            out["sumw2"] = self.sumw2.flatarray
-        if self.unweighted is not None:
-            out["unweighted"] = self.unweighted.flatarray
+        out["sumw2"] = self.sumw2.flatarray if self.sumw2 is not None else None
+        out["unweighted"] = self.unweighted.flatarray if self.unweighted else None
         return out
 
     @property
     def array(self):
         out = {"sumw": self.sumw.array}
-        if self.sumw2 is not None:
-            out["sumw2"] = self.sumw2.array
-        if self.unweighted is not None:
-            out["unweighted"] = self.unweighted.array
+        out["sumw2"] = self.sumw2.array if self.sumw2 is not None else None
+        out["unweighted"] = self.unweighted.array if self.unweighted else None
         return out
 
 ################################################# Parameter
