@@ -61,7 +61,7 @@ python setup.py install													# to use it outside of this directory
 python3 -m ipykernel install --name aghast			# create the notebooks kernel aghast
 ```
 
-Now you can use your specific packages in notebooks with the "aghast" kernel.
+Now you can use your specific packages in notebooks with the "aghast" kernel, and any changes should be re-install and the kernel should be restarted before you run your notebooks.
 
 ## Documentation
 
