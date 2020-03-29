@@ -4,5 +4,5 @@ pytest>=5
 setuptools>=42
 setuptools_scm>=3.4
 flatbuffers>=1.8.0
-uproot>=3.11.3       
-uproot-methods>=0.7.3  
+uproot>=3.11.3
+uproot-methods>=0.7.3
