@@ -39,7 +39,7 @@ After you git-clone this GitHub repository and ensure that `numpy` is installed,
 ```bash
 pip install "flatbuffers>=1.8.0"          # for the flatbuffers runtime (with Numpy)
 cd python                                 # only implementation so far is in Python
-python setup.py install                   # to use it outside of this directory, Python2 is not supported right now
+python3 setup.py install                   # to use it outside of this directory, Python2 is not supported right now
 ```
 
 Now you should be able to `import aghast` or `from aghast import *` in Python.
@@ -58,8 +58,8 @@ If you want to use some specific packages on Anaconda channel, the recommended w
 conda env create -f environment-test.yml -n aghast  # create (or update) your aghast conda environment
 conda activate aghast                               # activate your aghast environment
 cd python                                           # only implementation so far is in Python
-python setup.py install                             # to use it outside of this directory, Python2 is not supported right now
-python -m ipykernel install --name aghast           # install your jupyter kernel "aghast"
+python3 setup.py install                             # to use it outside of this directory, Python2 is not supported right now
+python3 -m ipykernel install --name aghast           # install your jupyter kernel "aghast"
 ```
 
 Now you should be able to `import aghast` or `from aghast import *` in your notebooks with the kernel "aghast".
