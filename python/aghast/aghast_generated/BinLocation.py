@@ -11,4 +11,3 @@ class BinLocation(object):
     loc_above1 = 1
     loc_above2 = 2
     loc_above3 = 3
-

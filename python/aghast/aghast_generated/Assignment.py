@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Assignment(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsAssignment(cls, buf, offset):
@@ -32,7 +33,22 @@ class Assignment(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def AssignmentStart(builder): builder.StartObject(2)
-def AssignmentAddIdentifier(builder, identifier): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(identifier), 0)
-def AssignmentAddExpression(builder, expression): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0)
-def AssignmentEnd(builder): return builder.EndObject()
+
+def AssignmentStart(builder):
+    builder.StartObject(2)
+
+
+def AssignmentAddIdentifier(builder, identifier):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(identifier), 0
+    )
+
+
+def AssignmentAddExpression(builder, expression):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0
+    )
+
+
+def AssignmentEnd(builder):
+    return builder.EndObject()

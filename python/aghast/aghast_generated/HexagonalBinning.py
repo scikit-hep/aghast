@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class HexagonalBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsHexagonalBinning(cls, buf, offset):
@@ -57,28 +58,36 @@ class HexagonalBinning(object):
     def Xorigin(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(14))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # HexagonalBinning
     def Yorigin(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # HexagonalBinning
     def Qangle(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(18))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags, o + self._tab.Pos
+            )
         return 0.0
 
     # HexagonalBinning
     def BinWidth(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(20))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags, o + self._tab.Pos
+            )
         return 1.0
 
     # HexagonalBinning
@@ -87,6 +96,7 @@ class HexagonalBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealOverflow import RealOverflow
+
             obj = RealOverflow()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -98,21 +108,64 @@ class HexagonalBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealOverflow import RealOverflow
+
             obj = RealOverflow()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def HexagonalBinningStart(builder): builder.StartObject(11)
-def HexagonalBinningAddQmin(builder, qmin): builder.PrependInt64Slot(0, qmin, 0)
-def HexagonalBinningAddQmax(builder, qmax): builder.PrependInt64Slot(1, qmax, 0)
-def HexagonalBinningAddRmin(builder, rmin): builder.PrependInt64Slot(2, rmin, 0)
-def HexagonalBinningAddRmax(builder, rmax): builder.PrependInt64Slot(3, rmax, 0)
-def HexagonalBinningAddCoordinates(builder, coordinates): builder.PrependInt8Slot(4, coordinates, 0)
-def HexagonalBinningAddXorigin(builder, xorigin): builder.PrependFloat64Slot(5, xorigin, 0.0)
-def HexagonalBinningAddYorigin(builder, yorigin): builder.PrependFloat64Slot(6, yorigin, 0.0)
-def HexagonalBinningAddQangle(builder, qangle): builder.PrependFloat64Slot(7, qangle, 0.0)
-def HexagonalBinningAddBinWidth(builder, binWidth): builder.PrependFloat64Slot(8, binWidth, 1.0)
-def HexagonalBinningAddQoverflow(builder, qoverflow): builder.PrependStructSlot(9, flatbuffers.number_types.UOffsetTFlags.py_type(qoverflow), 0)
-def HexagonalBinningAddRoverflow(builder, roverflow): builder.PrependStructSlot(10, flatbuffers.number_types.UOffsetTFlags.py_type(roverflow), 0)
-def HexagonalBinningEnd(builder): return builder.EndObject()
+
+def HexagonalBinningStart(builder):
+    builder.StartObject(11)
+
+
+def HexagonalBinningAddQmin(builder, qmin):
+    builder.PrependInt64Slot(0, qmin, 0)
+
+
+def HexagonalBinningAddQmax(builder, qmax):
+    builder.PrependInt64Slot(1, qmax, 0)
+
+
+def HexagonalBinningAddRmin(builder, rmin):
+    builder.PrependInt64Slot(2, rmin, 0)
+
+
+def HexagonalBinningAddRmax(builder, rmax):
+    builder.PrependInt64Slot(3, rmax, 0)
+
+
+def HexagonalBinningAddCoordinates(builder, coordinates):
+    builder.PrependInt8Slot(4, coordinates, 0)
+
+
+def HexagonalBinningAddXorigin(builder, xorigin):
+    builder.PrependFloat64Slot(5, xorigin, 0.0)
+
+
+def HexagonalBinningAddYorigin(builder, yorigin):
+    builder.PrependFloat64Slot(6, yorigin, 0.0)
+
+
+def HexagonalBinningAddQangle(builder, qangle):
+    builder.PrependFloat64Slot(7, qangle, 0.0)
+
+
+def HexagonalBinningAddBinWidth(builder, binWidth):
+    builder.PrependFloat64Slot(8, binWidth, 1.0)
+
+
+def HexagonalBinningAddQoverflow(builder, qoverflow):
+    builder.PrependStructSlot(
+        9, flatbuffers.number_types.UOffsetTFlags.py_type(qoverflow), 0
+    )
+
+
+def HexagonalBinningAddRoverflow(builder, roverflow):
+    builder.PrependStructSlot(
+        10, flatbuffers.number_types.UOffsetTFlags.py_type(roverflow), 0
+    )
+
+
+def HexagonalBinningEnd(builder):
+    return builder.EndObject()

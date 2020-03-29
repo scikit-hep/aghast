@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Ntuple(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsNtuple(cls, buf, offset):
@@ -26,6 +27,7 @@ class Ntuple(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Column import Column
+
             obj = Column()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -46,6 +48,7 @@ class Ntuple(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .NtupleInstance import NtupleInstance
+
             obj = NtupleInstance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -66,6 +69,7 @@ class Ntuple(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Statistics import Statistics
+
             obj = Statistics()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -86,6 +90,7 @@ class Ntuple(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Covariance import Covariance
+
             obj = Covariance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -103,7 +108,9 @@ class Ntuple(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.String(
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4)
+            )
         return ""
 
     # Ntuple
@@ -121,6 +128,7 @@ class Ntuple(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .FunctionObject import FunctionObject
+
             obj = FunctionObject()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -133,17 +141,70 @@ class Ntuple(object):
             return self._tab.VectorLen(o)
         return 0
 
-def NtupleStart(builder): builder.StartObject(6)
-def NtupleAddColumns(builder, columns): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(columns), 0)
-def NtupleStartColumnsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleAddInstances(builder, instances): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(instances), 0)
-def NtupleStartInstancesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleAddColumnStatistics(builder, columnStatistics): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(columnStatistics), 0)
-def NtupleStartColumnStatisticsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleAddColumnCovariances(builder, columnCovariances): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(columnCovariances), 0)
-def NtupleStartColumnCovariancesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleAddFunctionsLookup(builder, functionsLookup): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(functionsLookup), 0)
-def NtupleStartFunctionsLookupVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleAddFunctions(builder, functions): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(functions), 0)
-def NtupleStartFunctionsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def NtupleEnd(builder): return builder.EndObject()
+
+def NtupleStart(builder):
+    builder.StartObject(6)
+
+
+def NtupleAddColumns(builder, columns):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(columns), 0
+    )
+
+
+def NtupleStartColumnsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleAddInstances(builder, instances):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(instances), 0
+    )
+
+
+def NtupleStartInstancesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleAddColumnStatistics(builder, columnStatistics):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(columnStatistics), 0
+    )
+
+
+def NtupleStartColumnStatisticsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleAddColumnCovariances(builder, columnCovariances):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(columnCovariances), 0
+    )
+
+
+def NtupleStartColumnCovariancesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleAddFunctionsLookup(builder, functionsLookup):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(functionsLookup), 0
+    )
+
+
+def NtupleStartFunctionsLookupVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleAddFunctions(builder, functions):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(functions), 0
+    )
+
+
+def NtupleStartFunctionsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def NtupleEnd(builder):
+    return builder.EndObject()

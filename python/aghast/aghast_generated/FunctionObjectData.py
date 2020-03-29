@@ -2,8 +2,8 @@
 
 # namespace: aghast_generated
 
+
 class FunctionObjectData(object):
     NONE = 0
     ParameterizedFunction = 1
     BinnedEvaluatedFunction = 2
-

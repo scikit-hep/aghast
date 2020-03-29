@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Covariance(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsCovariance(cls, buf, offset):
@@ -44,6 +45,7 @@ class Covariance(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -62,16 +64,44 @@ class Covariance(object):
         if o != 0:
             x = o + self._tab.Pos
             from .StatisticFilter import StatisticFilter
+
             obj = StatisticFilter()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def CovarianceStart(builder): builder.StartObject(6)
-def CovarianceAddXindex(builder, xindex): builder.PrependInt32Slot(0, xindex, 0)
-def CovarianceAddYindex(builder, yindex): builder.PrependInt32Slot(1, yindex, 0)
-def CovarianceAddSumwxyType(builder, sumwxyType): builder.PrependUint8Slot(2, sumwxyType, 0)
-def CovarianceAddSumwxy(builder, sumwxy): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(sumwxy), 0)
-def CovarianceAddWeightpower(builder, weightpower): builder.PrependInt8Slot(4, weightpower, 0)
-def CovarianceAddFilter(builder, filter): builder.PrependStructSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0)
-def CovarianceEnd(builder): return builder.EndObject()
+
+def CovarianceStart(builder):
+    builder.StartObject(6)
+
+
+def CovarianceAddXindex(builder, xindex):
+    builder.PrependInt32Slot(0, xindex, 0)
+
+
+def CovarianceAddYindex(builder, yindex):
+    builder.PrependInt32Slot(1, yindex, 0)
+
+
+def CovarianceAddSumwxyType(builder, sumwxyType):
+    builder.PrependUint8Slot(2, sumwxyType, 0)
+
+
+def CovarianceAddSumwxy(builder, sumwxy):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(sumwxy), 0
+    )
+
+
+def CovarianceAddWeightpower(builder, weightpower):
+    builder.PrependInt8Slot(4, weightpower, 0)
+
+
+def CovarianceAddFilter(builder, filter):
+    builder.PrependStructSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(filter), 0
+    )
+
+
+def CovarianceEnd(builder):
+    return builder.EndObject()

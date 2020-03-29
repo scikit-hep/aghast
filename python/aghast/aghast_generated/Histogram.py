@@ -6,7 +6,7 @@ import flatbuffers
 
 # ///////////////////////////////////////////////// histogram
 class Histogram(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsHistogram(cls, buf, offset):
@@ -27,6 +27,7 @@ class Histogram(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Axis import Axis
+
             obj = Axis()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -51,6 +52,7 @@ class Histogram(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -64,6 +66,7 @@ class Histogram(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Profile import Profile
+
             obj = Profile()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -84,6 +87,7 @@ class Histogram(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Covariance import Covariance
+
             obj = Covariance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -104,6 +108,7 @@ class Histogram(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Covariance import Covariance
+
             obj = Covariance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -121,7 +126,9 @@ class Histogram(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(16))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.String(
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4)
+            )
         return ""
 
     # Histogram
@@ -139,6 +146,7 @@ class Histogram(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Function import Function
+
             obj = Function()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -151,19 +159,80 @@ class Histogram(object):
             return self._tab.VectorLen(o)
         return 0
 
-def HistogramStart(builder): builder.StartObject(8)
-def HistogramAddAxis(builder, axis): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0)
-def HistogramStartAxisVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramAddCountsType(builder, countsType): builder.PrependUint8Slot(1, countsType, 0)
-def HistogramAddCounts(builder, counts): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(counts), 0)
-def HistogramAddProfile(builder, profile): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(profile), 0)
-def HistogramStartProfileVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramAddAxisCovariances(builder, axisCovariances): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(axisCovariances), 0)
-def HistogramStartAxisCovariancesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramAddProfileCovariances(builder, profileCovariances): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(profileCovariances), 0)
-def HistogramStartProfileCovariancesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramAddFunctionsLookup(builder, functionsLookup): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(functionsLookup), 0)
-def HistogramStartFunctionsLookupVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramAddFunctions(builder, functions): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(functions), 0)
-def HistogramStartFunctionsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def HistogramEnd(builder): return builder.EndObject()
+
+def HistogramStart(builder):
+    builder.StartObject(8)
+
+
+def HistogramAddAxis(builder, axis):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0
+    )
+
+
+def HistogramStartAxisVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramAddCountsType(builder, countsType):
+    builder.PrependUint8Slot(1, countsType, 0)
+
+
+def HistogramAddCounts(builder, counts):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(counts), 0
+    )
+
+
+def HistogramAddProfile(builder, profile):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(profile), 0
+    )
+
+
+def HistogramStartProfileVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramAddAxisCovariances(builder, axisCovariances):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(axisCovariances), 0
+    )
+
+
+def HistogramStartAxisCovariancesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramAddProfileCovariances(builder, profileCovariances):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(profileCovariances), 0
+    )
+
+
+def HistogramStartProfileCovariancesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramAddFunctionsLookup(builder, functionsLookup):
+    builder.PrependUOffsetTRelativeSlot(
+        6, flatbuffers.number_types.UOffsetTFlags.py_type(functionsLookup), 0
+    )
+
+
+def HistogramStartFunctionsLookupVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramAddFunctions(builder, functions):
+    builder.PrependUOffsetTRelativeSlot(
+        7, flatbuffers.number_types.UOffsetTFlags.py_type(functions), 0
+    )
+
+
+def HistogramStartFunctionsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def HistogramEnd(builder):
+    return builder.EndObject()

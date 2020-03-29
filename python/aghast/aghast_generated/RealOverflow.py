@@ -4,27 +4,60 @@
 
 import flatbuffers
 
+
 class RealOverflow(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     # RealOverflow
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # RealOverflow
-    def LocUnderflow(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
-    # RealOverflow
-    def LocOverflow(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(1))
-    # RealOverflow
-    def LocNanflow(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(2))
-    # RealOverflow
-    def MinfMapping(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(3))
-    # RealOverflow
-    def PinfMapping(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4))
-    # RealOverflow
-    def NanMapping(self): return self._tab.Get(flatbuffers.number_types.Int8Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(5))
+    def LocUnderflow(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0),
+        )
 
-def CreateRealOverflow(builder, locUnderflow, locOverflow, locNanflow, minfMapping, pinfMapping, nanMapping):
+    # RealOverflow
+    def LocOverflow(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(1),
+        )
+
+    # RealOverflow
+    def LocNanflow(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(2),
+        )
+
+    # RealOverflow
+    def MinfMapping(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(3),
+        )
+
+    # RealOverflow
+    def PinfMapping(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(4),
+        )
+
+    # RealOverflow
+    def NanMapping(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int8Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(5),
+        )
+
+
+def CreateRealOverflow(
+    builder, locUnderflow, locOverflow, locNanflow, minfMapping, pinfMapping, nanMapping
+):
     builder.Prep(1, 6)
     builder.PrependInt8(nanMapping)
     builder.PrependInt8(pinfMapping)

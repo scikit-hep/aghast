@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class IrregularBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsIrregularBinning(cls, buf, offset):
@@ -25,6 +26,7 @@ class IrregularBinning(object):
             x = self._tab.Vector(o)
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 24
             from .RealInterval import RealInterval
+
             obj = RealInterval()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -43,6 +45,7 @@ class IrregularBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealOverflow import RealOverflow
+
             obj = RealOverflow()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -55,9 +58,30 @@ class IrregularBinning(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def IrregularBinningStart(builder): builder.StartObject(3)
-def IrregularBinningAddIntervals(builder, intervals): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(intervals), 0)
-def IrregularBinningStartIntervalsVector(builder, numElems): return builder.StartVector(24, numElems, 8)
-def IrregularBinningAddOverflow(builder, overflow): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0)
-def IrregularBinningAddOverlappingFill(builder, overlappingFill): builder.PrependInt8Slot(2, overlappingFill, 0)
-def IrregularBinningEnd(builder): return builder.EndObject()
+
+def IrregularBinningStart(builder):
+    builder.StartObject(3)
+
+
+def IrregularBinningAddIntervals(builder, intervals):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(intervals), 0
+    )
+
+
+def IrregularBinningStartIntervalsVector(builder, numElems):
+    return builder.StartVector(24, numElems, 8)
+
+
+def IrregularBinningAddOverflow(builder, overflow):
+    builder.PrependStructSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0
+    )
+
+
+def IrregularBinningAddOverlappingFill(builder, overlappingFill):
+    builder.PrependInt8Slot(2, overlappingFill, 0)
+
+
+def IrregularBinningEnd(builder):
+    return builder.EndObject()

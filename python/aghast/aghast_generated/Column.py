@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Column(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsColumn(cls, buf, offset):
@@ -44,7 +45,10 @@ class Column(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint32Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
+            )
         return 0
 
     # Column
@@ -67,6 +71,7 @@ class Column(object):
         if o != 0:
             x = o + self._tab.Pos
             from .Slice import Slice
+
             obj = Slice()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -85,6 +90,7 @@ class Column(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Metadata import Metadata
+
             obj = Metadata()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -96,19 +102,64 @@ class Column(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Decoration import Decoration
+
             obj = Decoration()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def ColumnStart(builder): builder.StartObject(8)
-def ColumnAddIdentifier(builder, identifier): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(identifier), 0)
-def ColumnAddDtype(builder, dtype): builder.PrependInt8Slot(1, dtype, 0)
-def ColumnAddEndianness(builder, endianness): builder.PrependInt8Slot(2, endianness, 0)
-def ColumnAddFilters(builder, filters): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0)
-def ColumnStartFiltersVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ColumnAddPostfilterSlice(builder, postfilterSlice): builder.PrependStructSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0)
-def ColumnAddTitle(builder, title): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0)
-def ColumnAddMetadata(builder, metadata): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
-def ColumnAddDecoration(builder, decoration): builder.PrependUOffsetTRelativeSlot(7, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0)
-def ColumnEnd(builder): return builder.EndObject()
+
+def ColumnStart(builder):
+    builder.StartObject(8)
+
+
+def ColumnAddIdentifier(builder, identifier):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(identifier), 0
+    )
+
+
+def ColumnAddDtype(builder, dtype):
+    builder.PrependInt8Slot(1, dtype, 0)
+
+
+def ColumnAddEndianness(builder, endianness):
+    builder.PrependInt8Slot(2, endianness, 0)
+
+
+def ColumnAddFilters(builder, filters):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0
+    )
+
+
+def ColumnStartFiltersVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ColumnAddPostfilterSlice(builder, postfilterSlice):
+    builder.PrependStructSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0
+    )
+
+
+def ColumnAddTitle(builder, title):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0
+    )
+
+
+def ColumnAddMetadata(builder, metadata):
+    builder.PrependUOffsetTRelativeSlot(
+        6, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0
+    )
+
+
+def ColumnAddDecoration(builder, decoration):
+    builder.PrependUOffsetTRelativeSlot(
+        7, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0
+    )
+
+
+def ColumnEnd(builder):
+    return builder.EndObject()

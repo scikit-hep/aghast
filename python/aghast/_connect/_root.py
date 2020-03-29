@@ -3,12 +3,16 @@
 # BSD 3-Clause License; see https://github.com/scikit-hep/aghast/blob/master/LICENSE
 
 import numpy
+
 try:
     import ROOT
 except ImportError:
-    raise ImportError("\n\nInstall ROOT package with:\n\n    conda install -c conda-forge root")
+    raise ImportError(
+        "\n\nInstall ROOT package with:\n\n    conda install -c conda-forge root"
+    )
 
 from aghast import *
+
 
 def getbincontents(obj):
     if isinstance(obj, (ROOT.TH1C, ROOT.TH2C, ROOT.TH3C)):
@@ -49,27 +53,35 @@ def getbincontents(obj):
     name = "_getbincontents_{0}".format(type(obj).__name__)
     if name not in getbincontents.run:
         if isinstance(obj, (ROOT.TH1, ROOT.TH2, ROOT.TH3)):
-            ROOT.gInterpreter.Declare("""
+            ROOT.gInterpreter.Declare(
+                """
             void %s(%s* hist, %s* array) {
                 int n = hist->GetNcells();
                 for (int i = 0;  i < n;  i++) {
                     array[i] = hist->GetBinContent(i);
                 }
-            }""" % (name, type(obj).__name__, arraytype))
+            }"""
+                % (name, type(obj).__name__, arraytype)
+            )
         else:
-            ROOT.gInterpreter.Declare("""
+            ROOT.gInterpreter.Declare(
+                """
             void %s(%s* hist, %s* array) {
                 int n = hist->GetSize();
                 for (int i = 0;  i < n;  i++) {
                     array[i] = hist->At(i);
                 }
-            }""" % (name, type(obj).__name__, arraytype))
+            }"""
+                % (name, type(obj).__name__, arraytype)
+            )
         getbincontents.run[name] = getattr(ROOT, name)
 
     getbincontents.run[name](obj, out)
     return out
 
+
 getbincontents.run = {}
+
 
 def setbincontents(obj, array):
     if isinstance(obj, (ROOT.TH1C, ROOT.TH2C, ROOT.TH3C)):
@@ -94,18 +106,23 @@ def setbincontents(obj, array):
 
     name = "_setbincontents_{0}".format(type(obj).__name__)
     if name not in setbincontents.run:
-        ROOT.gInterpreter.Declare("""
+        ROOT.gInterpreter.Declare(
+            """
         void %s(%s* hist, %s* array) {
             int n = hist->GetNcells();
             for (int i = 0;  i < n;  i++) {
                 hist->SetBinContent(i, array[i]);
             }
-        }""" % (name, type(obj).__name__, arraytype))
+        }"""
+            % (name, type(obj).__name__, arraytype)
+        )
         setbincontents.run[name] = getattr(ROOT, name)
 
     setbincontents.run[name](obj, array)
 
+
 setbincontents.run = {}
+
 
 def to_root(obj, name):
     if isinstance(obj, Collection):
@@ -117,39 +134,114 @@ def to_root(obj, name):
         for axis in obj.axis:
             if axis.binning is None:
                 axissummary.append((RegularBinning, 1, 0.0, 1.0))
-                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
-                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
+                slc.append(
+                    slice(
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_underflow
+                        == BinLocation.nonexistent
+                        else -numpy.inf,
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_overflow == BinLocation.nonexistent
+                        else numpy.inf,
+                    )
+                )
             elif isinstance(axis.binning, IntegerBinning):
-                axissummary.append((RegularBinning, 1 + axis.binning.max - axis.binning.min, axis.binning.min - 0.5, axis.binning.max + 0.5))
-                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
-                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
+                axissummary.append(
+                    (
+                        RegularBinning,
+                        1 + axis.binning.max - axis.binning.min,
+                        axis.binning.min - 0.5,
+                        axis.binning.max + 0.5,
+                    )
+                )
+                slc.append(
+                    slice(
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_underflow
+                        == BinLocation.nonexistent
+                        else -numpy.inf,
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_overflow == BinLocation.nonexistent
+                        else numpy.inf,
+                    )
+                )
             elif isinstance(axis.binning, RegularBinning):
-                axissummary.append((RegularBinning, axis.binning.num, axis.binning.interval.low, axis.binning.interval.high))
-                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
-                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
+                axissummary.append(
+                    (
+                        RegularBinning,
+                        axis.binning.num,
+                        axis.binning.interval.low,
+                        axis.binning.interval.high,
+                    )
+                )
+                slc.append(
+                    slice(
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_underflow
+                        == BinLocation.nonexistent
+                        else -numpy.inf,
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_overflow == BinLocation.nonexistent
+                        else numpy.inf,
+                    )
+                )
             elif isinstance(axis.binning, HexagonalBinning):
                 raise TypeError("no ROOT equivalent for HexagonalBinning")
             elif isinstance(axis.binning, EdgesBinning):
-                axissummary.append((EdgesBinning, numpy.array(axis.binning.edges, dtype=numpy.float64, copy=False)))
-                slc.append(slice(None if axis.binning.overflow is None or axis.binning.overflow.loc_underflow == BinLocation.nonexistent else -numpy.inf,
-                                 None if axis.binning.overflow is None or axis.binning.overflow.loc_overflow == BinLocation.nonexistent else numpy.inf))
+                axissummary.append(
+                    (
+                        EdgesBinning,
+                        numpy.array(
+                            axis.binning.edges, dtype=numpy.float64, copy=False
+                        ),
+                    )
+                )
+                slc.append(
+                    slice(
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_underflow
+                        == BinLocation.nonexistent
+                        else -numpy.inf,
+                        None
+                        if axis.binning.overflow is None
+                        or axis.binning.overflow.loc_overflow == BinLocation.nonexistent
+                        else numpy.inf,
+                    )
+                )
             elif isinstance(axis.binning, IrregularBinning):
-                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
+                axissummary.append(
+                    (CategoryBinning, axis.binning.toCategoryBinning().categories)
+                )
                 slc.append(slice(None))
             elif isinstance(axis.binning, CategoryBinning):
                 axissummary.append((CategoryBinning, axis.binning.categories))
                 slc.append(slice(None))
             elif isinstance(axis.binning, SparseRegularBinning):
-                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
+                axissummary.append(
+                    (CategoryBinning, axis.binning.toCategoryBinning().categories)
+                )
                 slc.append(slice(None))
             elif isinstance(axis.binning, FractionBinning):
-                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
+                axissummary.append(
+                    (CategoryBinning, axis.binning.toCategoryBinning().categories)
+                )
                 slc.append(slice(None))
             elif isinstance(axis.binning, PredicateBinning):
-                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
+                axissummary.append(
+                    (CategoryBinning, axis.binning.toCategoryBinning().categories)
+                )
                 slc.append(slice(None))
             elif isinstance(axis.binning, VariationBinning):
-                axissummary.append((CategoryBinning, axis.binning.toCategoryBinning().categories))
+                axissummary.append(
+                    (CategoryBinning, axis.binning.toCategoryBinning().categories)
+                )
                 slc.append(slice(None))
             else:
                 raise AssertionError(type(axis.binning))
@@ -160,7 +252,11 @@ def to_root(obj, name):
         sumw = obj.counts[tuple(slc)]
         if isinstance(sumw, dict):
             sumw, sumw2 = sumw["sumw"], sumw["sumw2"]
-            sumw2 = numpy.array(sumw2, dtype=numpy.float64, copy=False) if sumw2 is not None else None
+            sumw2 = (
+                numpy.array(sumw2, dtype=numpy.float64, copy=False)
+                if sumw2 is not None
+                else None
+            )
         else:
             sumw2 = None
 
@@ -208,17 +304,36 @@ def to_root(obj, name):
                 assert sumw.shape == sumw2.shape
 
             if len(sumw) == out.GetNbinsX():
-                sumw = numpy.concatenate([numpy.array([0], dtype=sumw.dtype), sumw, numpy.array([0], dtype=sumw.dtype)])
+                sumw = numpy.concatenate(
+                    [
+                        numpy.array([0], dtype=sumw.dtype),
+                        sumw,
+                        numpy.array([0], dtype=sumw.dtype),
+                    ]
+                )
                 if sumw2 is not None:
-                    sumw2 = numpy.concatenate([numpy.array([0], dtype=sumw2.dtype), sumw2, numpy.array([0], dtype=sumw2.dtype)])
-            elif len(sumw) == out.GetNbinsX() + 1 and obj.axis[0].loc_underflow == BinLocation.nonexistent:
+                    sumw2 = numpy.concatenate(
+                        [
+                            numpy.array([0], dtype=sumw2.dtype),
+                            sumw2,
+                            numpy.array([0], dtype=sumw2.dtype),
+                        ]
+                    )
+            elif (
+                len(sumw) == out.GetNbinsX() + 1
+                and obj.axis[0].loc_underflow == BinLocation.nonexistent
+            ):
                 sumw = numpy.concatenate([numpy.array([0], dtype=sumw.dtype), sumw])
                 if sumw2 is not None:
-                    sumw2 = numpy.concatenate([numpy.array([0], dtype=sumw2.dtype), sumw2])
+                    sumw2 = numpy.concatenate(
+                        [numpy.array([0], dtype=sumw2.dtype), sumw2]
+                    )
             elif len(sumw) == out.GetNbinsX() + 1:
                 sumw = numpy.concatenate([sumw, numpy.array([0], dtype=sumw.dtype)])
                 if sumw2 is not None:
-                    sumw2 = numpy.concatenate([sumw2, numpy.array([0], dtype=sumw2.dtype)])
+                    sumw2 = numpy.concatenate(
+                        [sumw2, numpy.array([0], dtype=sumw2.dtype)]
+                    )
             elif len(sumw) != out.GetNbinsX() + 2:
                 raise AssertionError((len(sumw), out.GetNbinsX() + 2))
 
@@ -243,15 +358,15 @@ def to_root(obj, name):
                 for moment in obj.axis[0].statistics[0].moments:
                     sumwxn = moment.sumwxn.flatarray
                     if moment.n == 0 and moment.weightpower == 0 and len(sumwxn) == 1:
-                        numentries, = sumwxn
+                        (numentries,) = sumwxn
                     if moment.n == 0 and moment.weightpower == 1 and len(sumwxn) == 1:
-                        stats0, = sumwxn
+                        (stats0,) = sumwxn
                     if moment.n == 0 and moment.weightpower == 2 and len(sumwxn) == 1:
-                        stats1, = sumwxn
+                        (stats1,) = sumwxn
                     if moment.n == 1 and moment.weightpower == 1 and len(sumwxn) == 1:
-                        stats2, = sumwxn
+                        (stats2,) = sumwxn
                     if moment.n == 2 and moment.weightpower == 1 and len(sumwxn) == 1:
-                        stats3, = sumwxn
+                        (stats3,) = sumwxn
 
             if numentries is None:
                 if isinstance(obj.counts, UnweightedCounts):
@@ -263,8 +378,15 @@ def to_root(obj, name):
 
             out.SetEntries(numentries)
 
-            if stats0 is not None and stats1 is not None and stats2 is not None and stats3 is not None:
-                stats = numpy.array([stats0, stats1, stats2, stats3], dtype=numpy.float64)
+            if (
+                stats0 is not None
+                and stats1 is not None
+                and stats2 is not None
+                and stats3 is not None
+            ):
+                stats = numpy.array(
+                    [stats0, stats1, stats2, stats3], dtype=numpy.float64
+                )
                 out.PutStats(stats)
 
             xaxis.SetTitle("" if obj.axis[0].title is None else obj.axis[0].title)
@@ -285,6 +407,7 @@ def to_root(obj, name):
 
     else:
         raise TypeError("cannot convert {0}".format(type(obj)))
+
 
 def from_root(obj, collection=False):
     if isinstance(obj, ROOT.TH1):
@@ -315,12 +438,14 @@ def from_root(obj, collection=False):
                     sumw2array = sumw2array[1 : len(categories) + 1]
                 counts = WeightedCounts(
                     sumw=InterpretedInlineBuffer.fromarray(sumwarray),
-                    sumw2=InterpretedInlineBuffer.fromarray(sumw2array))
+                    sumw2=InterpretedInlineBuffer.fromarray(sumw2array),
+                )
             else:
                 if categories is not None:
                     sumwarray = sumwarray[1 : len(categories) + 1]
                 counts = UnweightedCounts(
-                    counts=InterpretedInlineBuffer.fromarray(sumwarray))
+                    counts=InterpretedInlineBuffer.fromarray(sumwarray)
+                )
 
             if categories is not None:
                 binning = CategoryBinning(categories)
@@ -330,21 +455,48 @@ def from_root(obj, collection=False):
                 edges = numpy.empty(num + 1, dtype=numpy.float64)
                 xaxis.GetLowEdge(edges)
                 edges[-1] = xaxis.GetBinUpEdge(num)
-                binning = EdgesBinning(edges, overflow=RealOverflow(loc_underflow=BinLocation.below1, loc_overflow=BinLocation.above1))
+                binning = EdgesBinning(
+                    edges,
+                    overflow=RealOverflow(
+                        loc_underflow=BinLocation.below1,
+                        loc_overflow=BinLocation.above1,
+                    ),
+                )
 
             else:
                 num = obj.GetNbinsX()
                 low = xaxis.GetBinLowEdge(1)
                 high = xaxis.GetBinUpEdge(num)
-                binning = RegularBinning(num, RealInterval(low, high), overflow=RealOverflow(loc_underflow=BinLocation.below1, loc_overflow=BinLocation.above1))
+                binning = RegularBinning(
+                    num,
+                    RealInterval(low, high),
+                    overflow=RealOverflow(
+                        loc_underflow=BinLocation.below1,
+                        loc_overflow=BinLocation.above1,
+                    ),
+                )
 
             stats = numpy.zeros(4, numpy.float64)
             obj.GetStats(stats)
-            entries = Moments(InterpretedInlineBuffer.fromarray(numpy.array([obj.GetEntries()], dtype=numpy.int64)), n=0, weightpower=0)
-            sumw = Moments(InterpretedInlineBuffer.fromarray(stats[0:1]), n=0, weightpower=1)
-            sumw2 = Moments(InterpretedInlineBuffer.fromarray(stats[1:2]), n=0, weightpower=2)
-            sumwx = Moments(InterpretedInlineBuffer.fromarray(stats[2:3]), n=1, weightpower=1)
-            sumwx2 = Moments(InterpretedInlineBuffer.fromarray(stats[3:4]), n=2, weightpower=1)
+            entries = Moments(
+                InterpretedInlineBuffer.fromarray(
+                    numpy.array([obj.GetEntries()], dtype=numpy.int64)
+                ),
+                n=0,
+                weightpower=0,
+            )
+            sumw = Moments(
+                InterpretedInlineBuffer.fromarray(stats[0:1]), n=0, weightpower=1
+            )
+            sumw2 = Moments(
+                InterpretedInlineBuffer.fromarray(stats[1:2]), n=0, weightpower=2
+            )
+            sumwx = Moments(
+                InterpretedInlineBuffer.fromarray(stats[2:3]), n=1, weightpower=1
+            )
+            sumwx2 = Moments(
+                InterpretedInlineBuffer.fromarray(stats[3:4]), n=2, weightpower=1
+            )
             statistics = [Statistics(moments=[entries, sumw, sumw2, sumwx, sumwx2])]
 
             title = xaxis.GetTitle()

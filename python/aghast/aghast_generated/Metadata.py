@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Metadata(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsMetadata(cls, buf, offset):
@@ -29,10 +30,25 @@ class Metadata(object):
     def Language(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Uint32Flags, o + self._tab.Pos
+            )
         return 0
 
-def MetadataStart(builder): builder.StartObject(2)
-def MetadataAddData(builder, data): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
-def MetadataAddLanguage(builder, language): builder.PrependUint32Slot(1, language, 0)
-def MetadataEnd(builder): return builder.EndObject()
+
+def MetadataStart(builder):
+    builder.StartObject(2)
+
+
+def MetadataAddData(builder, data):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0
+    )
+
+
+def MetadataAddLanguage(builder, language):
+    builder.PrependUint32Slot(1, language, 0)
+
+
+def MetadataEnd(builder):
+    return builder.EndObject()

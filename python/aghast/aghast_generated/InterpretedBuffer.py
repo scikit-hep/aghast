@@ -2,10 +2,10 @@
 
 # namespace: aghast_generated
 
+
 class InterpretedBuffer(object):
     NONE = 0
     InterpretedInlineBuffer = 1
     InterpretedInlineInt64Buffer = 2
     InterpretedInlineFloat64Buffer = 3
     InterpretedExternalBuffer = 4
-

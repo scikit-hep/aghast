@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class InterpretedInlineBuffer(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsInterpretedInlineBuffer(cls, buf, offset):
@@ -23,7 +24,10 @@ class InterpretedInlineBuffer(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint8Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1),
+            )
         return 0
 
     # InterpretedInlineBuffer
@@ -45,7 +49,10 @@ class InterpretedInlineBuffer(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint32Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
+            )
         return 0
 
     # InterpretedInlineBuffer
@@ -68,6 +75,7 @@ class InterpretedInlineBuffer(object):
         if o != 0:
             x = o + self._tab.Pos
             from .Slice import Slice
+
             obj = Slice()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -94,13 +102,48 @@ class InterpretedInlineBuffer(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def InterpretedInlineBufferStart(builder): builder.StartObject(6)
-def InterpretedInlineBufferAddBuffer(builder, buffer): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0)
-def InterpretedInlineBufferStartBufferVector(builder, numElems): return builder.StartVector(1, numElems, 1)
-def InterpretedInlineBufferAddFilters(builder, filters): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0)
-def InterpretedInlineBufferStartFiltersVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def InterpretedInlineBufferAddPostfilterSlice(builder, postfilterSlice): builder.PrependStructSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0)
-def InterpretedInlineBufferAddDtype(builder, dtype): builder.PrependInt8Slot(3, dtype, 0)
-def InterpretedInlineBufferAddEndianness(builder, endianness): builder.PrependInt8Slot(4, endianness, 0)
-def InterpretedInlineBufferAddDimensionOrder(builder, dimensionOrder): builder.PrependInt8Slot(5, dimensionOrder, 0)
-def InterpretedInlineBufferEnd(builder): return builder.EndObject()
+
+def InterpretedInlineBufferStart(builder):
+    builder.StartObject(6)
+
+
+def InterpretedInlineBufferAddBuffer(builder, buffer):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0
+    )
+
+
+def InterpretedInlineBufferStartBufferVector(builder, numElems):
+    return builder.StartVector(1, numElems, 1)
+
+
+def InterpretedInlineBufferAddFilters(builder, filters):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0
+    )
+
+
+def InterpretedInlineBufferStartFiltersVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def InterpretedInlineBufferAddPostfilterSlice(builder, postfilterSlice):
+    builder.PrependStructSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0
+    )
+
+
+def InterpretedInlineBufferAddDtype(builder, dtype):
+    builder.PrependInt8Slot(3, dtype, 0)
+
+
+def InterpretedInlineBufferAddEndianness(builder, endianness):
+    builder.PrependInt8Slot(4, endianness, 0)
+
+
+def InterpretedInlineBufferAddDimensionOrder(builder, dimensionOrder):
+    builder.PrependInt8Slot(5, dimensionOrder, 0)
+
+
+def InterpretedInlineBufferEnd(builder):
+    return builder.EndObject()

@@ -4,21 +4,42 @@
 
 import flatbuffers
 
+
 class RealInterval(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     # RealInterval
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # RealInterval
-    def Low(self): return self._tab.Get(flatbuffers.number_types.Float64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def Low(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0),
+        )
+
     # RealInterval
-    def High(self): return self._tab.Get(flatbuffers.number_types.Float64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
+    def High(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8),
+        )
+
     # RealInterval
-    def LowInclusive(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def LowInclusive(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16),
+        )
+
     # RealInterval
-    def HighInclusive(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(17))
+    def HighInclusive(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(17),
+        )
+
 
 def CreateRealInterval(builder, low, high, lowInclusive, highInclusive):
     builder.Prep(8, 24)

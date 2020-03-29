@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Statistics(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsStatistics(cls, buf, offset):
@@ -26,6 +27,7 @@ class Statistics(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Moments import Moments
+
             obj = Moments()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -46,6 +48,7 @@ class Statistics(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Quantiles import Quantiles
+
             obj = Quantiles()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -64,6 +67,7 @@ class Statistics(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Modes import Modes
+
             obj = Modes()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -75,6 +79,7 @@ class Statistics(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Extremes import Extremes
+
             obj = Extremes()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -86,17 +91,54 @@ class Statistics(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Extremes import Extremes
+
             obj = Extremes()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def StatisticsStart(builder): builder.StartObject(5)
-def StatisticsAddMoments(builder, moments): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(moments), 0)
-def StatisticsStartMomentsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def StatisticsAddQuantiles(builder, quantiles): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(quantiles), 0)
-def StatisticsStartQuantilesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def StatisticsAddMode(builder, mode): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(mode), 0)
-def StatisticsAddMin(builder, min): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(min), 0)
-def StatisticsAddMax(builder, max): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(max), 0)
-def StatisticsEnd(builder): return builder.EndObject()
+
+def StatisticsStart(builder):
+    builder.StartObject(5)
+
+
+def StatisticsAddMoments(builder, moments):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(moments), 0
+    )
+
+
+def StatisticsStartMomentsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def StatisticsAddQuantiles(builder, quantiles):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(quantiles), 0
+    )
+
+
+def StatisticsStartQuantilesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def StatisticsAddMode(builder, mode):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(mode), 0
+    )
+
+
+def StatisticsAddMin(builder, min):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(min), 0
+    )
+
+
+def StatisticsAddMax(builder, max):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(max), 0
+    )
+
+
+def StatisticsEnd(builder):
+    return builder.EndObject()

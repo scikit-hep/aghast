@@ -4,13 +4,16 @@
 
 import math
 import numbers
+
 try:
     from inspect import signature
 except ImportError:
     try:
         from funcsigs import signature
     except ImportError:
-        raise ImportError("Install funcsigs package with:\n    pip install funcsigs\nor\n    conda install funcsigs\n(or just use Python >= 3.3).")
+        raise ImportError(
+            "Install funcsigs package with:\n    pip install funcsigs\nor\n    conda install funcsigs\n(or just use Python >= 3.3)."
+        )
 
 import numpy
 
@@ -102,27 +105,55 @@ classes = [
     aghast.RawExternalBuffer,
     aghast.Metadata,
     aghast.Decoration,
-    ]
+]
 
 unions = {
     aghast.interface.RawBuffer: [aghast.RawInlineBuffer, aghast.RawExternalBuffer],
-    aghast.interface.InterpretedBuffer: [aghast.InterpretedInlineBuffer, aghast.InterpretedInlineInt64Buffer, aghast.InterpretedInlineFloat64Buffer, aghast.InterpretedExternalBuffer],
-    aghast.interface.Binning: [aghast.IntegerBinning, aghast.RegularBinning, aghast.HexagonalBinning, aghast.EdgesBinning, aghast.IrregularBinning, aghast.CategoryBinning, aghast.SparseRegularBinning, aghast.FractionBinning, aghast.PredicateBinning, aghast.VariationBinning],
+    aghast.interface.InterpretedBuffer: [
+        aghast.InterpretedInlineBuffer,
+        aghast.InterpretedInlineInt64Buffer,
+        aghast.InterpretedInlineFloat64Buffer,
+        aghast.InterpretedExternalBuffer,
+    ],
+    aghast.interface.Binning: [
+        aghast.IntegerBinning,
+        aghast.RegularBinning,
+        aghast.HexagonalBinning,
+        aghast.EdgesBinning,
+        aghast.IrregularBinning,
+        aghast.CategoryBinning,
+        aghast.SparseRegularBinning,
+        aghast.FractionBinning,
+        aghast.PredicateBinning,
+        aghast.VariationBinning,
+    ],
     aghast.interface.Counts: [aghast.UnweightedCounts, aghast.WeightedCounts],
     aghast.interface.Function: [aghast.ParameterizedFunction, aghast.EvaluatedFunction],
-    aghast.interface.FunctionObject: [aghast.ParameterizedFunction, aghast.BinnedEvaluatedFunction],
-    aghast.interface.Object: [aghast.Histogram, aghast.Ntuple, aghast.ParameterizedFunction, aghast.BinnedEvaluatedFunction, aghast.Collection],
-    }
+    aghast.interface.FunctionObject: [
+        aghast.ParameterizedFunction,
+        aghast.BinnedEvaluatedFunction,
+    ],
+    aghast.interface.Object: [
+        aghast.Histogram,
+        aghast.Ntuple,
+        aghast.ParameterizedFunction,
+        aghast.BinnedEvaluatedFunction,
+        aghast.Collection,
+    ],
+}
+
 
 def num(x):
-    if not isinstance(x, (bool, numpy.bool, numpy.bool)) and isinstance(x, (numbers.Real, numpy.integer, numpy.floating)):
+    if not isinstance(x, (bool, numpy.bool, numpy.bool)) and isinstance(
+        x, (numbers.Real, numpy.integer, numpy.floating)
+    ):
         if x == float("-inf"):
             return u"\u2012\u221e"
         elif x == float("inf"):
             return u"\u221e"
-        elif x == -0.5*math.pi:
+        elif x == -0.5 * math.pi:
             return u"\u2012\u03c0/2"
-        elif x == 0.5*math.pi:
+        elif x == 0.5 * math.pi:
             return u"\u03c0/2"
         elif x == aghast.interface.MININT64:
             return u"\u20122\u2076\u00b3"  # -2**63
@@ -145,8 +176,12 @@ def num(x):
     else:
         return "`+{0}+`".format(repr(x))
 
+
 def formatted(cls, end="\n"):
-    out = [end + end + "== {0}{1}".format(cls.__name__, end), "*" + cls.description.strip() + "*"]
+    out = [
+        end + end + "== {0}{1}".format(cls.__name__, end),
+        "*" + cls.description.strip() + "*",
+    ]
 
     out.append(end + "[%hardbreaks]")
     for name, param in signature(cls.__init__).parameters.items():
@@ -164,23 +199,33 @@ def formatted(cls, end="\n"):
                     "[" if check.min_inclusive else "(",
                     num(check.min),
                     num(check.max),
-                    "]" if check.max_inclusive else ")")
+                    "]" if check.max_inclusive else ")",
+                )
             elif isinstance(check, aghast.checktype.CheckInteger):
                 typestring = "int in {0}{1}, {2}{3}".format(
                     "(" if check.min == float("-inf") else "[",
                     num(check.min),
                     num(check.max),
-                    ")" if check.max == float("inf") else "]")
+                    ")" if check.max == float("inf") else "]",
+                )
             elif isinstance(check, aghast.checktype.CheckEnum):
-                typestring = "one of {" + ", ".join("`+" + str(x) + "+`" for x in check.choices) + "}"
+                typestring = (
+                    "one of {"
+                    + ", ".join("`+" + str(x) + "+`" for x in check.choices)
+                    + "}"
+                )
             elif isinstance(check, aghast.checktype.CheckClass):
                 if check.type in unions:
-                    typestring = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
+                    typestring = " or ".join(
+                        "<<{0}>>".format(x.__name__) for x in unions[check.type]
+                    )
                 else:
                     typestring = "<<{0}>>".format(check.type.__name__)
             elif isinstance(check, aghast.checktype.CheckKey) and check.type is str:
                 typestring = "unique str"
-            elif isinstance(check, (aghast.checktype.CheckVector, aghast.checktype.CheckLookup)):
+            elif isinstance(
+                check, (aghast.checktype.CheckVector, aghast.checktype.CheckLookup)
+            ):
                 islist = True
                 if check.type is str:
                     subtype = "str"
@@ -189,17 +234,22 @@ def formatted(cls, end="\n"):
                 elif check.type is float:
                     subtype = "float"
                 elif isinstance(check.type, list):
-                    subtype = "{" + ", ".join("`+" + str(x) + "+`" for x in check.type) + "}"
+                    subtype = (
+                        "{" + ", ".join("`+" + str(x) + "+`" for x in check.type) + "}"
+                    )
                 else:
                     if check.type in unions:
-                        subtype = " or ".join("<<{0}>>".format(x.__name__) for x in unions[check.type])
+                        subtype = " or ".join(
+                            "<<{0}>>".format(x.__name__) for x in unions[check.type]
+                        )
                     else:
                         subtype = "<<{0}>>".format(check.type.__name__)
                 if check.minlen != 0 or check.maxlen != float("inf"):
                     withlength = " with length in [{0}, {1}{2}".format(
                         num(check.minlen),
                         num(check.maxlen),
-                        ")" if check.maxlen == float("inf") else "]")
+                        ")" if check.maxlen == float("inf") else "]",
+                    )
                 else:
                     withlength = ""
                 if isinstance(check, aghast.checktype.CheckVector):
@@ -217,11 +267,16 @@ def formatted(cls, end="\n"):
             if check.required:
                 defaultstring = "(required)"
             elif hasdefault:
-                defaultstring = "(default: {0})".format(num([] if islist and param.default is None else param.default))
+                defaultstring = "(default: {0})".format(
+                    num([] if islist and param.default is None else param.default)
+                )
             else:
                 raise AssertionError
 
-            out.append(u"\u2022{nbsp}" + " *{0}*: {1}{2}{3}".format(name, typestring, linebreak, defaultstring))
+            out.append(
+                u"\u2022{nbsp}"
+                + " *{0}*: {1}{2}{3}".format(name, typestring, linebreak, defaultstring)
+            )
 
     if len(cls.validity_rules) != 0:
         out.append((" +" + end).join(cls.validity_rules))
@@ -231,6 +286,7 @@ def formatted(cls, end="\n"):
         out.append(cls.long_description.strip())
 
     return end.join(out)
+
 
 if __name__ == "__main__":
     with open("../specification.adoc", "w") as file:

@@ -2,8 +2,8 @@
 
 # namespace: aghast_generated
 
+
 class Counts(object):
     NONE = 0
     UnweightedCounts = 1
     WeightedCounts = 2
-

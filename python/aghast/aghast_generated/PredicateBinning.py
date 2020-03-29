@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class PredicateBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsPredicateBinning(cls, buf, offset):
@@ -23,7 +24,9 @@ class PredicateBinning(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.String(
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4)
+            )
         return ""
 
     # PredicateBinning
@@ -40,8 +43,24 @@ class PredicateBinning(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def PredicateBinningStart(builder): builder.StartObject(2)
-def PredicateBinningAddPredicates(builder, predicates): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(predicates), 0)
-def PredicateBinningStartPredicatesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def PredicateBinningAddOverlappingFill(builder, overlappingFill): builder.PrependInt8Slot(1, overlappingFill, 0)
-def PredicateBinningEnd(builder): return builder.EndObject()
+
+def PredicateBinningStart(builder):
+    builder.StartObject(2)
+
+
+def PredicateBinningAddPredicates(builder, predicates):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(predicates), 0
+    )
+
+
+def PredicateBinningStartPredicatesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def PredicateBinningAddOverlappingFill(builder, overlappingFill):
+    builder.PrependInt8Slot(1, overlappingFill, 0)
+
+
+def PredicateBinningEnd(builder):
+    return builder.EndObject()

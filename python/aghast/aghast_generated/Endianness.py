@@ -2,7 +2,7 @@
 
 # namespace: aghast_generated
 
+
 class Endianness(object):
     little_endian = 0
     big_endian = 1
-

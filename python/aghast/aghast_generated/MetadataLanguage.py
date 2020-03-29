@@ -6,4 +6,3 @@
 class MetadataLanguage(object):
     meta_unspecified = 0
     meta_json = 1
-

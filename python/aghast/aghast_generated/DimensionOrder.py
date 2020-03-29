@@ -2,7 +2,7 @@
 
 # namespace: aghast_generated
 
+
 class DimensionOrder(object):
     c_order = 0
     fortran_order = 1
-

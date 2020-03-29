@@ -2,10 +2,10 @@
 
 # namespace: aghast_generated
 
+
 class HexagonalCoordinates(object):
     hex_offset = 0
     hex_doubled_offset = 1
     hex_cube_xy = 2
     hex_cube_yz = 3
     hex_cube_xz = 4
-
