@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class BinnedEvaluatedFunction(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsBinnedEvaluatedFunction(cls, buf, offset):
@@ -26,6 +27,7 @@ class BinnedEvaluatedFunction(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Axis import Axis
+
             obj = Axis()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -44,13 +46,32 @@ class BinnedEvaluatedFunction(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .EvaluatedFunction import EvaluatedFunction
+
             obj = EvaluatedFunction()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def BinnedEvaluatedFunctionStart(builder): builder.StartObject(2)
-def BinnedEvaluatedFunctionAddAxis(builder, axis): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0)
-def BinnedEvaluatedFunctionStartAxisVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def BinnedEvaluatedFunctionAddData(builder, data): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
-def BinnedEvaluatedFunctionEnd(builder): return builder.EndObject()
+
+def BinnedEvaluatedFunctionStart(builder):
+    builder.StartObject(2)
+
+
+def BinnedEvaluatedFunctionAddAxis(builder, axis):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0
+    )
+
+
+def BinnedEvaluatedFunctionStartAxisVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def BinnedEvaluatedFunctionAddData(builder, data):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0
+    )
+
+
+def BinnedEvaluatedFunctionEnd(builder):
+    return builder.EndObject()

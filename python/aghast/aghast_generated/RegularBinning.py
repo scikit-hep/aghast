@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class RegularBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsRegularBinning(cls, buf, offset):
@@ -22,7 +23,9 @@ class RegularBinning(object):
     def Num(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Uint64Flags, o + self._tab.Pos
+            )
         return 0
 
     # RegularBinning
@@ -31,6 +34,7 @@ class RegularBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealInterval import RealInterval
+
             obj = RealInterval()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -42,6 +46,7 @@ class RegularBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealOverflow import RealOverflow
+
             obj = RealOverflow()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -51,12 +56,35 @@ class RegularBinning(object):
     def Circular(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return False
 
-def RegularBinningStart(builder): builder.StartObject(4)
-def RegularBinningAddNum(builder, num): builder.PrependUint64Slot(0, num, 0)
-def RegularBinningAddInterval(builder, interval): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(interval), 0)
-def RegularBinningAddOverflow(builder, overflow): builder.PrependStructSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0)
-def RegularBinningAddCircular(builder, circular): builder.PrependBoolSlot(3, circular, 0)
-def RegularBinningEnd(builder): return builder.EndObject()
+
+def RegularBinningStart(builder):
+    builder.StartObject(4)
+
+
+def RegularBinningAddNum(builder, num):
+    builder.PrependUint64Slot(0, num, 0)
+
+
+def RegularBinningAddInterval(builder, interval):
+    builder.PrependStructSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(interval), 0
+    )
+
+
+def RegularBinningAddOverflow(builder, overflow):
+    builder.PrependStructSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0
+    )
+
+
+def RegularBinningAddCircular(builder, circular):
+    builder.PrependBoolSlot(3, circular, 0)
+
+
+def RegularBinningEnd(builder):
+    return builder.EndObject()

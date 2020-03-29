@@ -8,4 +8,3 @@ class DecorationLanguage(object):
     deco_css = 1
     deco_vega = 2
     deco_json = 3
-

@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Variation(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsVariation(cls, buf, offset):
@@ -26,6 +27,7 @@ class Variation(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Assignment import Assignment
+
             obj = Assignment()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -43,7 +45,10 @@ class Variation(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8),
+            )
         return 0
 
     # Variation
@@ -65,7 +70,9 @@ class Variation(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.String(
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4)
+            )
         return ""
 
     # Variation
@@ -75,11 +82,40 @@ class Variation(object):
             return self._tab.VectorLen(o)
         return 0
 
-def VariationStart(builder): builder.StartObject(3)
-def VariationAddAssignments(builder, assignments): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(assignments), 0)
-def VariationStartAssignmentsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def VariationAddSystematic(builder, systematic): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(systematic), 0)
-def VariationStartSystematicVector(builder, numElems): return builder.StartVector(8, numElems, 8)
-def VariationAddCategorySystematic(builder, categorySystematic): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(categorySystematic), 0)
-def VariationStartCategorySystematicVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def VariationEnd(builder): return builder.EndObject()
+
+def VariationStart(builder):
+    builder.StartObject(3)
+
+
+def VariationAddAssignments(builder, assignments):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(assignments), 0
+    )
+
+
+def VariationStartAssignmentsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def VariationAddSystematic(builder, systematic):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(systematic), 0
+    )
+
+
+def VariationStartSystematicVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
+
+
+def VariationAddCategorySystematic(builder, categorySystematic):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(categorySystematic), 0
+    )
+
+
+def VariationStartCategorySystematicVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def VariationEnd(builder):
+    return builder.EndObject()

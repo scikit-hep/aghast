@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Object(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsObject(cls, buf, offset):
@@ -30,6 +31,7 @@ class Object(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -48,6 +50,7 @@ class Object(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Metadata import Metadata
+
             obj = Metadata()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -59,6 +62,7 @@ class Object(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Decoration import Decoration
+
             obj = Decoration()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -71,11 +75,44 @@ class Object(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def ObjectStart(builder): builder.StartObject(6)
-def ObjectAddDataType(builder, dataType): builder.PrependUint8Slot(0, dataType, 0)
-def ObjectAddData(builder, data): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
-def ObjectAddTitle(builder, title): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0)
-def ObjectAddMetadata(builder, metadata): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
-def ObjectAddDecoration(builder, decoration): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0)
-def ObjectAddScript(builder, script): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(script), 0)
-def ObjectEnd(builder): return builder.EndObject()
+
+def ObjectStart(builder):
+    builder.StartObject(6)
+
+
+def ObjectAddDataType(builder, dataType):
+    builder.PrependUint8Slot(0, dataType, 0)
+
+
+def ObjectAddData(builder, data):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0
+    )
+
+
+def ObjectAddTitle(builder, title):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0
+    )
+
+
+def ObjectAddMetadata(builder, metadata):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0
+    )
+
+
+def ObjectAddDecoration(builder, decoration):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0
+    )
+
+
+def ObjectAddScript(builder, script):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(script), 0
+    )
+
+
+def ObjectEnd(builder):
+    return builder.EndObject()

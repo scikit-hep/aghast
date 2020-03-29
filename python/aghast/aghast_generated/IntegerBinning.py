@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class IntegerBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsIntegerBinning(cls, buf, offset):
@@ -46,9 +47,26 @@ class IntegerBinning(object):
             return self._tab.Get(flatbuffers.number_types.Int8Flags, o + self._tab.Pos)
         return 0
 
-def IntegerBinningStart(builder): builder.StartObject(4)
-def IntegerBinningAddMin(builder, min): builder.PrependInt64Slot(0, min, 0)
-def IntegerBinningAddMax(builder, max): builder.PrependInt64Slot(1, max, 0)
-def IntegerBinningAddLocUnderflow(builder, locUnderflow): builder.PrependInt8Slot(2, locUnderflow, 0)
-def IntegerBinningAddLocOverflow(builder, locOverflow): builder.PrependInt8Slot(3, locOverflow, 0)
-def IntegerBinningEnd(builder): return builder.EndObject()
+
+def IntegerBinningStart(builder):
+    builder.StartObject(4)
+
+
+def IntegerBinningAddMin(builder, min):
+    builder.PrependInt64Slot(0, min, 0)
+
+
+def IntegerBinningAddMax(builder, max):
+    builder.PrependInt64Slot(1, max, 0)
+
+
+def IntegerBinningAddLocUnderflow(builder, locUnderflow):
+    builder.PrependInt8Slot(2, locUnderflow, 0)
+
+
+def IntegerBinningAddLocOverflow(builder, locOverflow):
+    builder.PrependInt8Slot(3, locOverflow, 0)
+
+
+def IntegerBinningEnd(builder):
+    return builder.EndObject()

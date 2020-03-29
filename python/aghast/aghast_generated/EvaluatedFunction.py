@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class EvaluatedFunction(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsEvaluatedFunction(cls, buf, offset):
@@ -30,6 +31,7 @@ class EvaluatedFunction(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -47,6 +49,7 @@ class EvaluatedFunction(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -60,6 +63,7 @@ class EvaluatedFunction(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Quantiles import Quantiles
+
             obj = Quantiles()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -72,11 +76,40 @@ class EvaluatedFunction(object):
             return self._tab.VectorLen(o)
         return 0
 
-def EvaluatedFunctionStart(builder): builder.StartObject(5)
-def EvaluatedFunctionAddValuesType(builder, valuesType): builder.PrependUint8Slot(0, valuesType, 0)
-def EvaluatedFunctionAddValues(builder, values): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(values), 0)
-def EvaluatedFunctionAddDerivativesType(builder, derivativesType): builder.PrependUint8Slot(2, derivativesType, 0)
-def EvaluatedFunctionAddDerivatives(builder, derivatives): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(derivatives), 0)
-def EvaluatedFunctionAddErrors(builder, errors): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(errors), 0)
-def EvaluatedFunctionStartErrorsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def EvaluatedFunctionEnd(builder): return builder.EndObject()
+
+def EvaluatedFunctionStart(builder):
+    builder.StartObject(5)
+
+
+def EvaluatedFunctionAddValuesType(builder, valuesType):
+    builder.PrependUint8Slot(0, valuesType, 0)
+
+
+def EvaluatedFunctionAddValues(builder, values):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(values), 0
+    )
+
+
+def EvaluatedFunctionAddDerivativesType(builder, derivativesType):
+    builder.PrependUint8Slot(2, derivativesType, 0)
+
+
+def EvaluatedFunctionAddDerivatives(builder, derivatives):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(derivatives), 0
+    )
+
+
+def EvaluatedFunctionAddErrors(builder, errors):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(errors), 0
+    )
+
+
+def EvaluatedFunctionStartErrorsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def EvaluatedFunctionEnd(builder):
+    return builder.EndObject()

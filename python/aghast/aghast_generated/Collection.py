@@ -6,7 +6,7 @@ import flatbuffers
 
 # ///////////////////////////////////////////////// objects and collections
 class Collection(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsCollection(cls, buf, offset):
@@ -24,7 +24,9 @@ class Collection(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.String(a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.String(
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4)
+            )
         return ""
 
     # Collection
@@ -42,6 +44,7 @@ class Collection(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Object import Object
+
             obj = Object()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -62,6 +65,7 @@ class Collection(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Axis import Axis
+
             obj = Axis()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -74,11 +78,40 @@ class Collection(object):
             return self._tab.VectorLen(o)
         return 0
 
-def CollectionStart(builder): builder.StartObject(3)
-def CollectionAddLookup(builder, lookup): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(lookup), 0)
-def CollectionStartLookupVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def CollectionAddObjects(builder, objects): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(objects), 0)
-def CollectionStartObjectsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def CollectionAddAxis(builder, axis): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0)
-def CollectionStartAxisVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def CollectionEnd(builder): return builder.EndObject()
+
+def CollectionStart(builder):
+    builder.StartObject(3)
+
+
+def CollectionAddLookup(builder, lookup):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(lookup), 0
+    )
+
+
+def CollectionStartLookupVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def CollectionAddObjects(builder, objects):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(objects), 0
+    )
+
+
+def CollectionStartObjectsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def CollectionAddAxis(builder, axis):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(axis), 0
+    )
+
+
+def CollectionStartAxisVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def CollectionEnd(builder):
+    return builder.EndObject()

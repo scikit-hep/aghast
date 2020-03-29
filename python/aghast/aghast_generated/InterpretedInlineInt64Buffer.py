@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class InterpretedInlineInt64Buffer(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsInterpretedInlineInt64Buffer(cls, buf, offset):
@@ -23,7 +24,10 @@ class InterpretedInlineInt64Buffer(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint8Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint8Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 1),
+            )
         return 0
 
     # InterpretedInlineInt64Buffer
@@ -40,7 +44,20 @@ class InterpretedInlineInt64Buffer(object):
             return self._tab.VectorLen(o)
         return 0
 
-def InterpretedInlineInt64BufferStart(builder): builder.StartObject(1)
-def InterpretedInlineInt64BufferAddBuffer(builder, buffer): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0)
-def InterpretedInlineInt64BufferStartBufferVector(builder, numElems): return builder.StartVector(1, numElems, 1)
-def InterpretedInlineInt64BufferEnd(builder): return builder.EndObject()
+
+def InterpretedInlineInt64BufferStart(builder):
+    builder.StartObject(1)
+
+
+def InterpretedInlineInt64BufferAddBuffer(builder, buffer):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0
+    )
+
+
+def InterpretedInlineInt64BufferStartBufferVector(builder, numElems):
+    return builder.StartVector(1, numElems, 1)
+
+
+def InterpretedInlineInt64BufferEnd(builder):
+    return builder.EndObject()

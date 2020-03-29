@@ -7,27 +7,46 @@ import operator
 import re
 
 import numpy
+
 try:
     import pandas
 except ImportError:
-    raise ImportError("Install pandas package with:\n    pip install pandas\nor\n    conda install pandas")
+    raise ImportError(
+        "Install pandas package with:\n    pip install pandas\nor\n    conda install pandas"
+    )
 
 from aghast import *
+
 
 def binning2index(binning):
     if binning is None:
         return pandas.CategoricalIndex(["all"])
 
     elif isinstance(binning, IntegerBinning):
-        if binning.loc_underflow == BinLocation.nonexistent and binning.loc_overflow == BinLocation.nonexistent:
+        if (
+            binning.loc_underflow == BinLocation.nonexistent
+            and binning.loc_overflow == BinLocation.nonexistent
+        ):
             return pandas.RangeIndex(binning.min, binning.max + 1)
         else:
             return binning2index(binning.toCategoryBinning())
 
     elif isinstance(binning, RegularBinning):
-        if binning.overflow is None or (binning.overflow.loc_underflow == BinLocation.nonexistent and binning.overflow.loc_overflow == BinLocation.nonexistent and binning.overflow.loc_nanflow == BinLocation.nonexistent):
-            return pandas.interval_range(binning.interval.low, binning.interval.high, binning.num, closed=("left" if binning.interval.low_inclusive else "right"))
-        elif binning.overflow is None or binning.overflow.loc_nanflow == BinLocation.nonexistent:
+        if binning.overflow is None or (
+            binning.overflow.loc_underflow == BinLocation.nonexistent
+            and binning.overflow.loc_overflow == BinLocation.nonexistent
+            and binning.overflow.loc_nanflow == BinLocation.nonexistent
+        ):
+            return pandas.interval_range(
+                binning.interval.low,
+                binning.interval.high,
+                binning.num,
+                closed=("left" if binning.interval.low_inclusive else "right"),
+            )
+        elif (
+            binning.overflow is None
+            or binning.overflow.loc_nanflow == BinLocation.nonexistent
+        ):
             return binning2index(binning.toEdgesBinning())
         else:
             return binning2index(binning.toCategoryBinning())
@@ -36,10 +55,23 @@ def binning2index(binning):
         raise NotImplementedError
 
     elif isinstance(binning, EdgesBinning):
-        if binning.overflow is None or binning.overflow.loc_nanflow == BinLocation.nonexistent:
-            if binning.overflow is None or (binning.overflow.loc_underflow == BinLocation.nonexistent and binning.overflow.loc_overflow == BinLocation.nonexistent):
-                return pandas.IntervalIndex.from_breaks(binning.edges, closed=("left" if binning.low_inclusive else "right"))
-            elif binning.overflow is not None and binning.overflow.loc_underflow.value <= BinLocation.nonexistent.value and binning.overflow.loc_overflow.value >= BinLocation.nonexistent.value:
+        if (
+            binning.overflow is None
+            or binning.overflow.loc_nanflow == BinLocation.nonexistent
+        ):
+            if binning.overflow is None or (
+                binning.overflow.loc_underflow == BinLocation.nonexistent
+                and binning.overflow.loc_overflow == BinLocation.nonexistent
+            ):
+                return pandas.IntervalIndex.from_breaks(
+                    binning.edges, closed=("left" if binning.low_inclusive else "right")
+                )
+            elif (
+                binning.overflow is not None
+                and binning.overflow.loc_underflow.value
+                <= BinLocation.nonexistent.value
+                and binning.overflow.loc_overflow.value >= BinLocation.nonexistent.value
+            ):
                 edges = numpy.empty(binning._binshape()[0] + 1, dtype=numpy.float64)
                 shift = int(binning.overflow.loc_underflow != BinLocation.nonexistent)
                 edges[shift : shift + len(binning.edges)] = binning.edges
@@ -47,17 +79,39 @@ def binning2index(binning):
                     edges[0] = -numpy.inf
                 if binning.overflow.loc_overflow != BinLocation.nonexistent:
                     edges[-1] = numpy.inf
-                return pandas.IntervalIndex.from_breaks(edges, closed=("left" if binning.low_inclusive else "right"))
+                return pandas.IntervalIndex.from_breaks(
+                    edges, closed=("left" if binning.low_inclusive else "right")
+                )
             else:
                 return binning2index(binning.toIrregularBinning())
         else:
             return binning2index(binning.toCategoryBinning())
 
     elif isinstance(binning, IrregularBinning):
-        if (binning.overflow is None or binning.overflow.loc_nanflow == BinLocation.nonexistent) and len(binning.intervals) != 0 and binning.intervals[0].low_inclusive != binning.intervals[0].high_inclusive and all(x.low_inclusive == binning.intervals[0].low_inclusive and x.high_inclusive == binning.intervals[0].high_inclusive for x in binning.intervals):
+        if (
+            (
+                binning.overflow is None
+                or binning.overflow.loc_nanflow == BinLocation.nonexistent
+            )
+            and len(binning.intervals) != 0
+            and binning.intervals[0].low_inclusive
+            != binning.intervals[0].high_inclusive
+            and all(
+                x.low_inclusive == binning.intervals[0].low_inclusive
+                and x.high_inclusive == binning.intervals[0].high_inclusive
+                for x in binning.intervals
+            )
+        ):
             left = numpy.empty(binning._binshape(), dtype=numpy.float64)
             right = numpy.empty(binning._binshape(), dtype=numpy.float64)
-            flows = [] if binning.overflow is None else [(binning.overflow.loc_underflow, -numpy.inf), (binning.overflow.loc_overflow, numpy.inf)]
+            flows = (
+                []
+                if binning.overflow is None
+                else [
+                    (binning.overflow.loc_underflow, -numpy.inf),
+                    (binning.overflow.loc_overflow, numpy.inf),
+                ]
+            )
             low = numpy.inf
             high = -numpy.inf
             for interval in binning.intervals:
@@ -82,20 +136,24 @@ def binning2index(binning):
                 if val == numpy.inf:
                     left[i], right[i] = high, val
                 i += 1
-            return pandas.IntervalIndex.from_arrays(left, right, closed=("left" if binning.intervals[0].low_inclusive else "right"))
+            return pandas.IntervalIndex.from_arrays(
+                left,
+                right,
+                closed=("left" if binning.intervals[0].low_inclusive else "right"),
+            )
         else:
             return binning2index(binning.toCategoryBinning())
 
     elif isinstance(binning, CategoryBinning):
         categories = []
         flows = [(binning.loc_overflow,)]
-        for loc, in BinLocation._belows(flows):
+        for (loc,) in BinLocation._belows(flows):
             categories.append("(other)")
         categories.extend(binning.categories)
-        for loc, in BinLocation._aboves(flows):
+        for (loc,) in BinLocation._aboves(flows):
             categories.append("(other)")
         return pandas.CategoricalIndex(categories)
-        
+
     elif isinstance(binning, SparseRegularBinning):
         return binning2index(binning.toIrregularBinning())
 
@@ -110,6 +168,7 @@ def binning2index(binning):
 
     else:
         raise AssertionError(type(binning))
+
 
 def to_pandas(obj):
     if isinstance(obj, Histogram):
@@ -176,11 +235,47 @@ def to_pandas(obj):
         for profile in obj.profile:
             for moment in profile.statistics.moments:
                 data.append(moment.sumwxn.flatarray)
-                columns.append((profile.expression, "sum" + ("w" + (repr(moment.weightpower) if moment.weightpower != 1 else "") if moment.weightpower != 0 else "") + ("x" + (repr(moment.n) if moment.n != 1 else "") if moment.n != 0 else "")))
+                columns.append(
+                    (
+                        profile.expression,
+                        "sum"
+                        + (
+                            "w"
+                            + (
+                                repr(moment.weightpower)
+                                if moment.weightpower != 1
+                                else ""
+                            )
+                            if moment.weightpower != 0
+                            else ""
+                        )
+                        + (
+                            "x" + (repr(moment.n) if moment.n != 1 else "")
+                            if moment.n != 0
+                            else ""
+                        ),
+                    )
+                )
 
             for quantile in profile.statistics.quantiles:
                 data.append(quantile.values.flatarray)
-                columns.append((profile.expression, ("p=" + ("%g" % quantile.p)) + (" (w" + (repr(quantile.weightpower) if quantile.weightpower != 1 else "") + ")" if quantile.weightpower != 0 else "")))
+                columns.append(
+                    (
+                        profile.expression,
+                        ("p=" + ("%g" % quantile.p))
+                        + (
+                            " (w"
+                            + (
+                                repr(quantile.weightpower)
+                                if quantile.weightpower != 1
+                                else ""
+                            )
+                            + ")"
+                            if quantile.weightpower != 0
+                            else ""
+                        ),
+                    )
+                )
 
             if profile.statistics.mode is not None:
                 data.append(profile.statistics.mode.values.flatarray)
@@ -213,6 +308,7 @@ def to_pandas(obj):
     else:
         raise TypeError("{0} has no pandas equivalent".format(type(obj).__name__))
 
+
 def column2statistic(array, statexpr):
     m = column2statistic.moment.match(statexpr)
     if m is not None:
@@ -232,7 +328,9 @@ def column2statistic(array, statexpr):
                 n = 1
             else:
                 n = int(n)
-        return Moments(InterpretedInlineBuffer.fromarray(array), n=n, weightpower=weightpower)
+        return Moments(
+            InterpretedInlineBuffer.fromarray(array), n=n, weightpower=weightpower
+        )
 
     m = column2statistic.quantile.match(statexpr)
     if m is not None:
@@ -244,7 +342,9 @@ def column2statistic(array, statexpr):
             weightpower = 1
         else:
             weightpower = int(weightpower)
-        return Quantiles(InterpretedInlineBuffer.fromarray(array), p=p, weightpower=weightpower)
+        return Quantiles(
+            InterpretedInlineBuffer.fromarray(array), p=p, weightpower=weightpower
+        )
 
     if statexpr == "mode":
         return Modes(InterpretedInlineBuffer.fromarray(array))
@@ -257,12 +357,18 @@ def column2statistic(array, statexpr):
 
     return None
 
+
 column2statistic.moment = re.compile(r"sum(w([+-]?\d+)?)?(x([+-]?\d+)?)?")
-column2statistic.quantile = re.compile(r"p=([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)( \(w(\d*)\))?")
+column2statistic.quantile = re.compile(
+    r"p=([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)( \(w(\d*)\))?"
+)
+
 
 def index2binning(index):
     if isinstance(index, pandas.IntervalIndex):
-        ordered = (index.left[:-1] < index.left[1:]).all() and (index.right[:-1] < index.right[1:]).all()
+        ordered = (index.left[:-1] < index.left[1:]).all() and (
+            index.right[:-1] < index.right[1:]
+        ).all()
         abutting = (index.left[1:] == index.right[:-1]).all()
         fixedwidth = len(numpy.unique(index.right - index.left)) == 1
         if index.closed == "left":
@@ -275,42 +381,92 @@ def index2binning(index):
             low_inclusive, high_inclusive = False, False
 
         if ordered and abutting and fixedwidth and low_inclusive is not high_inclusive:
-            return RegularBinning(len(index), RealInterval(index.left[0], index.right[-1], low_inclusive=low_inclusive, high_inclusive=high_inclusive))
+            return RegularBinning(
+                len(index),
+                RealInterval(
+                    index.left[0],
+                    index.right[-1],
+                    low_inclusive=low_inclusive,
+                    high_inclusive=high_inclusive,
+                ),
+            )
 
-        elif ordered and abutting and not fixedwidth and low_inclusive is not high_inclusive:
+        elif (
+            ordered
+            and abutting
+            and not fixedwidth
+            and low_inclusive is not high_inclusive
+        ):
             edges = numpy.empty(len(index) + 1, dtype=numpy.int64)
-            edges[:len(index)] = index.left
+            edges[: len(index)] = index.left
             edges[-1] = leve.right[-1]
-            return EdgesBinning(edges, low_inclusive=low_inclusive, high_inclusive=high_inclusive)
+            return EdgesBinning(
+                edges, low_inclusive=low_inclusive, high_inclusive=high_inclusive
+            )
 
         elif not abutting and fixedwidth and low_inclusive is not high_inclusive:
             bin_width = index.right[0] - index.left[0]
             origin = index.left.min()
             bins = numpy.trunc((index.left - origin) / bin_width)
-            return SparseRegularBinning(bins, bin_width, origin=origin, low_inclusive=low_inclusive, high_inclusive=high_inclusive)
+            return SparseRegularBinning(
+                bins,
+                bin_width,
+                origin=origin,
+                low_inclusive=low_inclusive,
+                high_inclusive=high_inclusive,
+            )
 
         else:
-            return IrregularBinning([RealInterval(x.left, x.right, low_inclusive=low_inclusive, high_inclusive=high_inclusive) for x in index])
+            return IrregularBinning(
+                [
+                    RealInterval(
+                        x.left,
+                        x.right,
+                        low_inclusive=low_inclusive,
+                        high_inclusive=high_inclusive,
+                    )
+                    for x in index
+                ]
+            )
 
-    elif isinstance(index, (pandas.Int64Index, pandas.UInt64Index)) and len(index) == 1 + index.max() - index.min():
+    elif (
+        isinstance(index, (pandas.Int64Index, pandas.UInt64Index))
+        and len(index) == 1 + index.max() - index.min()
+    ):
         return IntegerBinning(index.min(), index.max())
 
     else:
         return CategoryBinning([str(x) for x in index])
 
+
 def from_pandas(obj):
-    if ((isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns) and ("unweighted" in obj["counts"].columns or "sumw" in obj["counts"].columns or "sumw2" in obj["counts"].columns)) or ("unweighted" in obj.columns or "sumw" in obj.columns or "sumw2" in obj.columns):
+    if (
+        (isinstance(obj.columns, pandas.MultiIndex) and "counts" in obj.columns)
+        and (
+            "unweighted" in obj["counts"].columns
+            or "sumw" in obj["counts"].columns
+            or "sumw2" in obj["counts"].columns
+        )
+    ) or (
+        "unweighted" in obj.columns or "sumw" in obj.columns or "sumw2" in obj.columns
+    ):
         # this is a histogram; make the data dense in the Cartesian grid
         unstacked = obj.unstack()
         unstacked = unstacked.reindex(sorted(unstacked.columns), axis=1)
         if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2:
             for expression, statexpr in obj.columns:
                 if statexpr == "min":
-                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(numpy.inf)
+                    unstacked[expression, statexpr] = unstacked[
+                        expression, statexpr
+                    ].fillna(numpy.inf)
                 elif statexpr == "max":
-                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(-numpy.inf)
+                    unstacked[expression, statexpr] = unstacked[
+                        expression, statexpr
+                    ].fillna(-numpy.inf)
                 elif statexpr.startswith("sum"):
-                    unstacked[expression, statexpr] = unstacked[expression, statexpr].fillna(0)
+                    unstacked[expression, statexpr] = unstacked[
+                        expression, statexpr
+                    ].fillna(0)
 
         obj = unstacked.stack(dropna=False)
 
@@ -325,14 +481,20 @@ def from_pandas(obj):
         for leveli in range(len(index.levels)):
             level = index.get_level_values(leveli)
             sizeafter = functools.reduce(operator.mul, levelsize[leveli + 1 :], 1)
-            level = level[::sizeafter][:levelsize[leveli]]
+            level = level[::sizeafter][: levelsize[leveli]]
             binning = index2binning(level)
             axis.append(Axis(binning=binning, expression=level.name))
-        
+
         unweighted, sumw, sumw2 = None, None, None
-        if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2 and "counts" in obj.columns:
+        if (
+            isinstance(obj.columns, pandas.MultiIndex)
+            and len(obj.columns.levels) == 2
+            and "counts" in obj.columns
+        ):
             if "unweighted" in obj["counts"].columns:
-                unweighted = InterpretedInlineBuffer.fromarray(obj["counts"]["unweighted"].values)
+                unweighted = InterpretedInlineBuffer.fromarray(
+                    obj["counts"]["unweighted"].values
+                )
             if "sumw" in obj["counts"].columns:
                 sumw = InterpretedInlineBuffer.fromarray(obj["counts"]["sumw"].values)
             if "sumw2" in obj["counts"].columns:
@@ -348,9 +510,25 @@ def from_pandas(obj):
         if unweighted is not None and sumw is None and sumw2 is None:
             counts = UnweightedCounts(unweighted)
         elif sumw is not None:
-            counts = WeightedCounts(sumw, sumw2, None if unweighted is None else UnweightedCounts(unweighted))
+            counts = WeightedCounts(
+                sumw,
+                sumw2,
+                None if unweighted is None else UnweightedCounts(unweighted),
+            )
         else:
-            raise ValueError("unrecognized combination of counts: ".format(", ".join(s for s, x in [("unweighted", unweighted), ("sumw", sumw), ("sumw2", sumw2)] if x is not None)))
+            raise ValueError(
+                "unrecognized combination of counts: ".format(
+                    ", ".join(
+                        s
+                        for s, x in [
+                            ("unweighted", unweighted),
+                            ("sumw", sumw),
+                            ("sumw2", sumw2),
+                        ]
+                        if x is not None
+                    )
+                )
+            )
 
         statistics = {}
         if isinstance(obj.columns, pandas.MultiIndex) and len(obj.columns.levels) == 2:
@@ -376,13 +554,31 @@ def from_pandas(obj):
 
         else:
             for expression in obj.columns:
-                if expression != "unweighted" and expression != "sumw" and expression != "sumw2":
+                if (
+                    expression != "unweighted"
+                    and expression != "sumw"
+                    and expression != "sumw2"
+                ):
                     array = obj[expression].values
-                    statistics[expression] = Statistics(moments=[Moments(InterpretedInlineBuffer.fromarray(array), n=1, weightpower=(0 if sumw2 is None else 1))])
+                    statistics[expression] = Statistics(
+                        moments=[
+                            Moments(
+                                InterpretedInlineBuffer.fromarray(array),
+                                n=1,
+                                weightpower=(0 if sumw2 is None else 1),
+                            )
+                        ]
+                    )
 
         profile = []
         for expression, statistic in statistics.items():
-            if len(statistic.moments) != 0 or len(statistic.quantiles) != 0 or statistic.mode is not None or statistic.min is not None or statistic.max is not None:
+            if (
+                len(statistic.moments) != 0
+                or len(statistic.quantiles) != 0
+                or statistic.mode is not None
+                or statistic.min is not None
+                or statistic.max is not None
+            ):
                 profile.append(Profile(expression, statistic))
 
         return Histogram(axis, counts, profile=profile)

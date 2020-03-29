@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class FunctionObject(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsFunctionObject(cls, buf, offset):
@@ -30,12 +31,26 @@ class FunctionObject(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def FunctionObjectStart(builder): builder.StartObject(2)
-def FunctionObjectAddDataType(builder, dataType): builder.PrependUint8Slot(0, dataType, 0)
-def FunctionObjectAddData(builder, data): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
-def FunctionObjectEnd(builder): return builder.EndObject()
+
+def FunctionObjectStart(builder):
+    builder.StartObject(2)
+
+
+def FunctionObjectAddDataType(builder, dataType):
+    builder.PrependUint8Slot(0, dataType, 0)
+
+
+def FunctionObjectAddData(builder, data):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0
+    )
+
+
+def FunctionObjectEnd(builder):
+    return builder.EndObject()

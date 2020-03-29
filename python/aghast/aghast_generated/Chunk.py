@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Chunk(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsChunk(cls, buf, offset):
@@ -26,6 +27,7 @@ class Chunk(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .ColumnChunk import ColumnChunk
+
             obj = ColumnChunk()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -44,13 +46,32 @@ class Chunk(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Metadata import Metadata
+
             obj = Metadata()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def ChunkStart(builder): builder.StartObject(2)
-def ChunkAddColumnChunks(builder, columnChunks): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(columnChunks), 0)
-def ChunkStartColumnChunksVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ChunkAddMetadata(builder, metadata): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
-def ChunkEnd(builder): return builder.EndObject()
+
+def ChunkStart(builder):
+    builder.StartObject(2)
+
+
+def ChunkAddColumnChunks(builder, columnChunks):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(columnChunks), 0
+    )
+
+
+def ChunkStartColumnChunksVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ChunkAddMetadata(builder, metadata):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0
+    )
+
+
+def ChunkEnd(builder):
+    return builder.EndObject()

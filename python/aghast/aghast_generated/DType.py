@@ -16,4 +16,3 @@ class DType(object):
     dtype_uint64 = 9
     dtype_float32 = 10
     dtype_float64 = 11
-

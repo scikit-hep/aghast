@@ -2,6 +2,7 @@
 
 # namespace: aghast_generated
 
+
 class Binning(object):
     NONE = 0
     IntegerBinning = 1
@@ -14,4 +15,3 @@ class Binning(object):
     FractionBinning = 8
     PredicateBinning = 9
     VariationBinning = 10
-

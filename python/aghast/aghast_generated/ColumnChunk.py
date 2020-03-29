@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class ColumnChunk(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsColumnChunk(cls, buf, offset):
@@ -26,6 +27,7 @@ class ColumnChunk(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Page import Page
+
             obj = Page()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -43,7 +45,10 @@ class ColumnChunk(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+            return self._tab.Get(
+                flatbuffers.number_types.Int64Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8),
+            )
         return 0
 
     # ColumnChunk
@@ -68,6 +73,7 @@ class ColumnChunk(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Extremes import Extremes
+
             obj = Extremes()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -88,6 +94,7 @@ class ColumnChunk(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Extremes import Extremes
+
             obj = Extremes()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -100,13 +107,50 @@ class ColumnChunk(object):
             return self._tab.VectorLen(o)
         return 0
 
-def ColumnChunkStart(builder): builder.StartObject(4)
-def ColumnChunkAddPages(builder, pages): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(pages), 0)
-def ColumnChunkStartPagesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ColumnChunkAddPageOffsets(builder, pageOffsets): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(pageOffsets), 0)
-def ColumnChunkStartPageOffsetsVector(builder, numElems): return builder.StartVector(8, numElems, 8)
-def ColumnChunkAddPageMin(builder, pageMin): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(pageMin), 0)
-def ColumnChunkStartPageMinVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ColumnChunkAddPageMax(builder, pageMax): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(pageMax), 0)
-def ColumnChunkStartPageMaxVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ColumnChunkEnd(builder): return builder.EndObject()
+
+def ColumnChunkStart(builder):
+    builder.StartObject(4)
+
+
+def ColumnChunkAddPages(builder, pages):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(pages), 0
+    )
+
+
+def ColumnChunkStartPagesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ColumnChunkAddPageOffsets(builder, pageOffsets):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(pageOffsets), 0
+    )
+
+
+def ColumnChunkStartPageOffsetsVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
+
+
+def ColumnChunkAddPageMin(builder, pageMin):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(pageMin), 0
+    )
+
+
+def ColumnChunkStartPageMinVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ColumnChunkAddPageMax(builder, pageMax):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(pageMax), 0
+    )
+
+
+def ColumnChunkStartPageMaxVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ColumnChunkEnd(builder):
+    return builder.EndObject()

@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class InterpretedExternalBuffer(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsInterpretedExternalBuffer(cls, buf, offset):
@@ -22,21 +23,27 @@ class InterpretedExternalBuffer(object):
     def Pointer(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Uint64Flags, o + self._tab.Pos
+            )
         return 0
 
     # InterpretedExternalBuffer
     def Numbytes(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint64Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Uint64Flags, o + self._tab.Pos
+            )
         return 0
 
     # InterpretedExternalBuffer
     def ExternalSource(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, o + self._tab.Pos)
+            return self._tab.Get(
+                flatbuffers.number_types.Uint32Flags, o + self._tab.Pos
+            )
         return 0
 
     # InterpretedExternalBuffer
@@ -44,7 +51,10 @@ class InterpretedExternalBuffer(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Uint32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.Get(
+                flatbuffers.number_types.Uint32Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
+            )
         return 0
 
     # InterpretedExternalBuffer
@@ -67,6 +77,7 @@ class InterpretedExternalBuffer(object):
         if o != 0:
             x = o + self._tab.Pos
             from .Slice import Slice
+
             obj = Slice()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -100,15 +111,56 @@ class InterpretedExternalBuffer(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def InterpretedExternalBufferStart(builder): builder.StartObject(9)
-def InterpretedExternalBufferAddPointer(builder, pointer): builder.PrependUint64Slot(0, pointer, 0)
-def InterpretedExternalBufferAddNumbytes(builder, numbytes): builder.PrependUint64Slot(1, numbytes, 0)
-def InterpretedExternalBufferAddExternalSource(builder, externalSource): builder.PrependUint32Slot(2, externalSource, 0)
-def InterpretedExternalBufferAddFilters(builder, filters): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0)
-def InterpretedExternalBufferStartFiltersVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def InterpretedExternalBufferAddPostfilterSlice(builder, postfilterSlice): builder.PrependStructSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0)
-def InterpretedExternalBufferAddDtype(builder, dtype): builder.PrependInt8Slot(5, dtype, 0)
-def InterpretedExternalBufferAddEndianness(builder, endianness): builder.PrependInt8Slot(6, endianness, 0)
-def InterpretedExternalBufferAddDimensionOrder(builder, dimensionOrder): builder.PrependInt8Slot(7, dimensionOrder, 0)
-def InterpretedExternalBufferAddLocation(builder, location): builder.PrependUOffsetTRelativeSlot(8, flatbuffers.number_types.UOffsetTFlags.py_type(location), 0)
-def InterpretedExternalBufferEnd(builder): return builder.EndObject()
+
+def InterpretedExternalBufferStart(builder):
+    builder.StartObject(9)
+
+
+def InterpretedExternalBufferAddPointer(builder, pointer):
+    builder.PrependUint64Slot(0, pointer, 0)
+
+
+def InterpretedExternalBufferAddNumbytes(builder, numbytes):
+    builder.PrependUint64Slot(1, numbytes, 0)
+
+
+def InterpretedExternalBufferAddExternalSource(builder, externalSource):
+    builder.PrependUint32Slot(2, externalSource, 0)
+
+
+def InterpretedExternalBufferAddFilters(builder, filters):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(filters), 0
+    )
+
+
+def InterpretedExternalBufferStartFiltersVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def InterpretedExternalBufferAddPostfilterSlice(builder, postfilterSlice):
+    builder.PrependStructSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(postfilterSlice), 0
+    )
+
+
+def InterpretedExternalBufferAddDtype(builder, dtype):
+    builder.PrependInt8Slot(5, dtype, 0)
+
+
+def InterpretedExternalBufferAddEndianness(builder, endianness):
+    builder.PrependInt8Slot(6, endianness, 0)
+
+
+def InterpretedExternalBufferAddDimensionOrder(builder, dimensionOrder):
+    builder.PrependInt8Slot(7, dimensionOrder, 0)
+
+
+def InterpretedExternalBufferAddLocation(builder, location):
+    builder.PrependUOffsetTRelativeSlot(
+        8, flatbuffers.number_types.UOffsetTFlags.py_type(location), 0
+    )
+
+
+def InterpretedExternalBufferEnd(builder):
+    return builder.EndObject()

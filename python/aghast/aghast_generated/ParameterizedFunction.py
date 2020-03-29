@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class ParameterizedFunction(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsParameterizedFunction(cls, buf, offset):
@@ -33,6 +34,7 @@ class ParameterizedFunction(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Parameter import Parameter
+
             obj = Parameter()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -50,7 +52,10 @@ class ParameterizedFunction(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Int32Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4))
+            return self._tab.Get(
+                flatbuffers.number_types.Int32Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 4),
+            )
         return 0
 
     # ParameterizedFunction
@@ -75,6 +80,7 @@ class ParameterizedFunction(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Covariance import Covariance
+
             obj = Covariance()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -87,12 +93,46 @@ class ParameterizedFunction(object):
             return self._tab.VectorLen(o)
         return 0
 
-def ParameterizedFunctionStart(builder): builder.StartObject(4)
-def ParameterizedFunctionAddExpression(builder, expression): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0)
-def ParameterizedFunctionAddParameters(builder, parameters): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(parameters), 0)
-def ParameterizedFunctionStartParametersVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ParameterizedFunctionAddParamaxis(builder, paramaxis): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(paramaxis), 0)
-def ParameterizedFunctionStartParamaxisVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ParameterizedFunctionAddParameterCovariances(builder, parameterCovariances): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(parameterCovariances), 0)
-def ParameterizedFunctionStartParameterCovariancesVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def ParameterizedFunctionEnd(builder): return builder.EndObject()
+
+def ParameterizedFunctionStart(builder):
+    builder.StartObject(4)
+
+
+def ParameterizedFunctionAddExpression(builder, expression):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0
+    )
+
+
+def ParameterizedFunctionAddParameters(builder, parameters):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(parameters), 0
+    )
+
+
+def ParameterizedFunctionStartParametersVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ParameterizedFunctionAddParamaxis(builder, paramaxis):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(paramaxis), 0
+    )
+
+
+def ParameterizedFunctionStartParamaxisVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ParameterizedFunctionAddParameterCovariances(builder, parameterCovariances):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(parameterCovariances), 0
+    )
+
+
+def ParameterizedFunctionStartParameterCovariancesVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def ParameterizedFunctionEnd(builder):
+    return builder.EndObject()

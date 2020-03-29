@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class Function(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsFunction(cls, buf, offset):
@@ -30,6 +31,7 @@ class Function(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -48,6 +50,7 @@ class Function(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Metadata import Metadata
+
             obj = Metadata()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -59,6 +62,7 @@ class Function(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Decoration import Decoration
+
             obj = Decoration()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -71,11 +75,44 @@ class Function(object):
             return self._tab.String(o + self._tab.Pos)
         return None
 
-def FunctionStart(builder): builder.StartObject(6)
-def FunctionAddDataType(builder, dataType): builder.PrependUint8Slot(0, dataType, 0)
-def FunctionAddData(builder, data): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0)
-def FunctionAddTitle(builder, title): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0)
-def FunctionAddMetadata(builder, metadata): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
-def FunctionAddDecoration(builder, decoration): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0)
-def FunctionAddScript(builder, script): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(script), 0)
-def FunctionEnd(builder): return builder.EndObject()
+
+def FunctionStart(builder):
+    builder.StartObject(6)
+
+
+def FunctionAddDataType(builder, dataType):
+    builder.PrependUint8Slot(0, dataType, 0)
+
+
+def FunctionAddData(builder, data):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(data), 0
+    )
+
+
+def FunctionAddTitle(builder, title):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0
+    )
+
+
+def FunctionAddMetadata(builder, metadata):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0
+    )
+
+
+def FunctionAddDecoration(builder, decoration):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0
+    )
+
+
+def FunctionAddScript(builder, script):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(script), 0
+    )
+
+
+def FunctionEnd(builder):
+    return builder.EndObject()

@@ -2,9 +2,9 @@
 
 # namespace: aghast_generated
 
+
 class NonRealMapping(object):
     missing = 0
     in_underflow = 1
     in_overflow = 2
     in_nanflow = 3
-

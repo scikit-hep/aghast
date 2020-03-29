@@ -2,6 +2,7 @@
 
 # namespace: aghast_generated
 
+
 class FractionErrorMethod(object):
     frac_unspecified = 0
     frac_normal = 1
@@ -11,4 +12,3 @@ class FractionErrorMethod(object):
     frac_feldman_cousins = 5
     frac_jeffrey = 6
     frac_bayesian_uniform = 7
-

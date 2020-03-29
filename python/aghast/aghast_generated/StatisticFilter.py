@@ -6,22 +6,47 @@ import flatbuffers
 
 # ///////////////////////////////////////////////// descriptive statistics
 class StatisticFilter(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     # StatisticFilter
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # StatisticFilter
-    def Min(self): return self._tab.Get(flatbuffers.number_types.Float64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def Min(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0),
+        )
+
     # StatisticFilter
-    def Max(self): return self._tab.Get(flatbuffers.number_types.Float64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
+    def Max(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Float64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8),
+        )
+
     # StatisticFilter
-    def ExcludesMinf(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def ExcludesMinf(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16),
+        )
+
     # StatisticFilter
-    def ExcludesPinf(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(17))
+    def ExcludesPinf(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(17),
+        )
+
     # StatisticFilter
-    def ExcludesNan(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(18))
+    def ExcludesNan(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(18),
+        )
+
 
 def CreateStatisticFilter(builder, min, max, excludesMinf, excludesPinf, excludesNan):
     builder.Prep(8, 24)

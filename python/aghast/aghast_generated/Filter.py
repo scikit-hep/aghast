@@ -2,9 +2,9 @@
 
 # namespace: aghast_generated
 
+
 class Filter(object):
     filter_none = 0
     filter_gzip = 1
     filter_lzma = 2
     filter_lz4 = 3
-

@@ -4,8 +4,9 @@
 
 import flatbuffers
 
+
 class EdgesBinning(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsEdgesBinning(cls, buf, offset):
@@ -23,7 +24,10 @@ class EdgesBinning(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             a = self._tab.Vector(o)
-            return self._tab.Get(flatbuffers.number_types.Float64Flags, a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8))
+            return self._tab.Get(
+                flatbuffers.number_types.Float64Flags,
+                a + flatbuffers.number_types.UOffsetTFlags.py_type(j * 8),
+            )
         return 0
 
     # EdgesBinning
@@ -46,6 +50,7 @@ class EdgesBinning(object):
         if o != 0:
             x = o + self._tab.Pos
             from .RealOverflow import RealOverflow
+
             obj = RealOverflow()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -55,28 +60,61 @@ class EdgesBinning(object):
     def LowInclusive(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return True
 
     # EdgesBinning
     def HighInclusive(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(10))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return False
 
     # EdgesBinning
     def Circular(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(12))
         if o != 0:
-            return bool(self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos))
+            return bool(
+                self._tab.Get(flatbuffers.number_types.BoolFlags, o + self._tab.Pos)
+            )
         return False
 
-def EdgesBinningStart(builder): builder.StartObject(5)
-def EdgesBinningAddEdges(builder, edges): builder.PrependUOffsetTRelativeSlot(0, flatbuffers.number_types.UOffsetTFlags.py_type(edges), 0)
-def EdgesBinningStartEdgesVector(builder, numElems): return builder.StartVector(8, numElems, 8)
-def EdgesBinningAddOverflow(builder, overflow): builder.PrependStructSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0)
-def EdgesBinningAddLowInclusive(builder, lowInclusive): builder.PrependBoolSlot(2, lowInclusive, 1)
-def EdgesBinningAddHighInclusive(builder, highInclusive): builder.PrependBoolSlot(3, highInclusive, 0)
-def EdgesBinningAddCircular(builder, circular): builder.PrependBoolSlot(4, circular, 0)
-def EdgesBinningEnd(builder): return builder.EndObject()
+
+def EdgesBinningStart(builder):
+    builder.StartObject(5)
+
+
+def EdgesBinningAddEdges(builder, edges):
+    builder.PrependUOffsetTRelativeSlot(
+        0, flatbuffers.number_types.UOffsetTFlags.py_type(edges), 0
+    )
+
+
+def EdgesBinningStartEdgesVector(builder, numElems):
+    return builder.StartVector(8, numElems, 8)
+
+
+def EdgesBinningAddOverflow(builder, overflow):
+    builder.PrependStructSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(overflow), 0
+    )
+
+
+def EdgesBinningAddLowInclusive(builder, lowInclusive):
+    builder.PrependBoolSlot(2, lowInclusive, 1)
+
+
+def EdgesBinningAddHighInclusive(builder, highInclusive):
+    builder.PrependBoolSlot(3, highInclusive, 0)
+
+
+def EdgesBinningAddCircular(builder, circular):
+    builder.PrependBoolSlot(4, circular, 0)
+
+
+def EdgesBinningEnd(builder):
+    return builder.EndObject()

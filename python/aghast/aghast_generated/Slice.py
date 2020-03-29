@@ -4,25 +4,56 @@
 
 import flatbuffers
 
+
 class Slice(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     # Slice
     def Init(self, buf, pos):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Slice
-    def Start(self): return self._tab.Get(flatbuffers.number_types.Int64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0))
+    def Start(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(0),
+        )
+
     # Slice
-    def Stop(self): return self._tab.Get(flatbuffers.number_types.Int64Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8))
+    def Stop(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int64Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(8),
+        )
+
     # Slice
-    def Step(self): return self._tab.Get(flatbuffers.number_types.Int32Flags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16))
+    def Step(self):
+        return self._tab.Get(
+            flatbuffers.number_types.Int32Flags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(16),
+        )
+
     # Slice
-    def HasStart(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(20))
+    def HasStart(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(20),
+        )
+
     # Slice
-    def HasStop(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(21))
+    def HasStop(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(21),
+        )
+
     # Slice
-    def HasStep(self): return self._tab.Get(flatbuffers.number_types.BoolFlags, self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(22))
+    def HasStep(self):
+        return self._tab.Get(
+            flatbuffers.number_types.BoolFlags,
+            self._tab.Pos + flatbuffers.number_types.UOffsetTFlags.py_type(22),
+        )
+
 
 def CreateSlice(builder, start, stop, step, hasStart, hasStop, hasStep):
     builder.Prep(8, 24)

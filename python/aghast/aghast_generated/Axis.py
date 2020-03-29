@@ -6,7 +6,7 @@ import flatbuffers
 
 # ///////////////////////////////////////////////// axis
 class Axis(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsAxis(cls, buf, offset):
@@ -31,6 +31,7 @@ class Axis(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
@@ -51,6 +52,7 @@ class Axis(object):
             x += flatbuffers.number_types.UOffsetTFlags.py_type(j) * 4
             x = self._tab.Indirect(x)
             from .Statistics import Statistics
+
             obj = Statistics()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -76,6 +78,7 @@ class Axis(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Metadata import Metadata
+
             obj = Metadata()
             obj.Init(self._tab.Bytes, x)
             return obj
@@ -87,18 +90,60 @@ class Axis(object):
         if o != 0:
             x = self._tab.Indirect(o + self._tab.Pos)
             from .Decoration import Decoration
+
             obj = Decoration()
             obj.Init(self._tab.Bytes, x)
             return obj
         return None
 
-def AxisStart(builder): builder.StartObject(7)
-def AxisAddBinningType(builder, binningType): builder.PrependUint8Slot(0, binningType, 0)
-def AxisAddBinning(builder, binning): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(binning), 0)
-def AxisAddExpression(builder, expression): builder.PrependUOffsetTRelativeSlot(2, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0)
-def AxisAddStatistics(builder, statistics): builder.PrependUOffsetTRelativeSlot(3, flatbuffers.number_types.UOffsetTFlags.py_type(statistics), 0)
-def AxisStartStatisticsVector(builder, numElems): return builder.StartVector(4, numElems, 4)
-def AxisAddTitle(builder, title): builder.PrependUOffsetTRelativeSlot(4, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0)
-def AxisAddMetadata(builder, metadata): builder.PrependUOffsetTRelativeSlot(5, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0)
-def AxisAddDecoration(builder, decoration): builder.PrependUOffsetTRelativeSlot(6, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0)
-def AxisEnd(builder): return builder.EndObject()
+
+def AxisStart(builder):
+    builder.StartObject(7)
+
+
+def AxisAddBinningType(builder, binningType):
+    builder.PrependUint8Slot(0, binningType, 0)
+
+
+def AxisAddBinning(builder, binning):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(binning), 0
+    )
+
+
+def AxisAddExpression(builder, expression):
+    builder.PrependUOffsetTRelativeSlot(
+        2, flatbuffers.number_types.UOffsetTFlags.py_type(expression), 0
+    )
+
+
+def AxisAddStatistics(builder, statistics):
+    builder.PrependUOffsetTRelativeSlot(
+        3, flatbuffers.number_types.UOffsetTFlags.py_type(statistics), 0
+    )
+
+
+def AxisStartStatisticsVector(builder, numElems):
+    return builder.StartVector(4, numElems, 4)
+
+
+def AxisAddTitle(builder, title):
+    builder.PrependUOffsetTRelativeSlot(
+        4, flatbuffers.number_types.UOffsetTFlags.py_type(title), 0
+    )
+
+
+def AxisAddMetadata(builder, metadata):
+    builder.PrependUOffsetTRelativeSlot(
+        5, flatbuffers.number_types.UOffsetTFlags.py_type(metadata), 0
+    )
+
+
+def AxisAddDecoration(builder, decoration):
+    builder.PrependUOffsetTRelativeSlot(
+        6, flatbuffers.number_types.UOffsetTFlags.py_type(decoration), 0
+    )
+
+
+def AxisEnd(builder):
+    return builder.EndObject()

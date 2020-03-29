@@ -6,7 +6,7 @@ import flatbuffers
 
 # ///////////////////////////////////////////////// ntuple
 class Page(object):
-    __slots__ = ['_tab']
+    __slots__ = ["_tab"]
 
     @classmethod
     def GetRootAsPage(cls, buf, offset):
@@ -31,12 +31,26 @@ class Page(object):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             from flatbuffers.table import Table
+
             obj = Table(bytearray(), 0)
             self._tab.Union(obj, o)
             return obj
         return None
 
-def PageStart(builder): builder.StartObject(2)
-def PageAddBufferType(builder, bufferType): builder.PrependUint8Slot(0, bufferType, 0)
-def PageAddBuffer(builder, buffer): builder.PrependUOffsetTRelativeSlot(1, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0)
-def PageEnd(builder): return builder.EndObject()
+
+def PageStart(builder):
+    builder.StartObject(2)
+
+
+def PageAddBufferType(builder, bufferType):
+    builder.PrependUint8Slot(0, bufferType, 0)
+
+
+def PageAddBuffer(builder, buffer):
+    builder.PrependUOffsetTRelativeSlot(
+        1, flatbuffers.number_types.UOffsetTFlags.py_type(buffer), 0
+    )
+
+
+def PageEnd(builder):
+    return builder.EndObject()

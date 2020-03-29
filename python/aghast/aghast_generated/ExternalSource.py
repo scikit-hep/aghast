@@ -2,9 +2,9 @@
 
 # namespace: aghast_generated
 
+
 class ExternalSource(object):
     external_memory = 0
     external_samefile = 1
     external_file = 2
     external_url = 3
-
