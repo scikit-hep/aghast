@@ -611,8 +611,7 @@ print("Bin contents length:", len(sum_hist.counts.array))
 
 The binning structure keeps track of the existence of underflow/overflow bins and where they are located.
 
-   * ROOT's convention is to put underflow before the normal bins (`below1`) and overflow after (`above1`), so that the normal bins are effectively 1-indexed.
-   * Boost.Histogram's convention is to put overflow after the normal bins (`above1`) and underflow after that (`above2`), so that underflow is accessed via `myhist[-1]` in Numpy.
+   * ROOT and Boost.Histogram put underflow before the normal bins (`below1`) and overflow after (`above1`), so that the normal bins are effectively 1-indexed.
    * Numpy histograms don't have underflow/overflow bins.
    * Pandas could have `Intervals` that extend to infinity.
 
