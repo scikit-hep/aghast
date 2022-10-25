@@ -1,5 +1,33 @@
 ![](https://github.com/scikit-hep/aghast/raw/master/docs/source/logo-300px.png)
 
+> **Warning**
+> **This package is deprecated.** The Pythonic histogramming landscape is much more centralized [than it was in 2019](https://indico.cern.ch/event/803122/contributions/3339215/attachments/1830076/2996786/pivarski-2019-04-15-irishep-aghast.pdf), as [boost-histogram](https://github.com/scikit-hep/boost-histogram) and its wrapper, [hist](https://github.com/scikit-hep/hist), are now leading in the Scikit-HEP ecosystem, and ROOT has always been a leading library in C++, Python, and serialized histograms. Thus, the $N(N-1)/2$ problem of connecting libraries to libraries is actually an $N=2$ problem, for boost-histogram/hist and ROOT.
+>
+> For the $N=2$ problem, the Agast library is overkill (and incomplete; the specification was still in flux and the C++ interface is completely unwritten).
+>
+> To convert between boost-histogram and PyROOT, you can use [Uproot](https://github.com/scikit-hep/uproot5/). The functions below convert boost-histogram/hist ↔ Uproot histograms ↔ ROOT histograms using in-memory, ROOT binary serialization. The round-trip is lossy because boost-histogram/hist and ROOT's TH* histograms have different feature sets.
+>
+> ```python
+> >>> import uproot, hist
+> >>> h_hist = hist.Hist.new.Reg(10, -5, 5).Double()
+> >>> h_hist
+> Hist(Regular(10, -5, 5, label='Axis 0'), storage=Double())
+> >>> h_uproot = uproot.to_writable(h_hist)
+> >>> h_uproot
+> <TH1D (version 3) at 0x7f61835a6310>
+> >>> h_pyroot = uproot.pyroot.to_pyroot(h_uproot)
+> >>> h_pyroot
+> <cppyy.gbl.TH1D object at 0x55945e5718c0>
+> >>> h_uproot_2 = uproot.from_pyroot(h_pyroot)
+> >>> h_uproot_2
+> <TH1D (version 3) at 0x7f616f86ffa0>
+> >>> h_hist_2 = h_uproot_2.to_hist()
+> >>> h_hist_2
+> Hist(Regular(10, -5, 5, label=<TString 'Axis 0' at 0x7f61730a6820>), storage=Weight())
+> ```
+>
+> _(October, 2022)_
+
 # aghast
 
 [![Build Status](https://travis-ci.org/scikit-hep/aghast.svg?branch=master)](https://travis-ci.org/scikit-hep/aghast)
